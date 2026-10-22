@@ -1,0 +1,36 @@
+{
+  "id": "eksempel-paris",
+  "title": "Eksempel: Eiffeltårnet",
+  "date": "2026-06-14",
+  "placedBy": [
+    "Emil",
+    "Eric"
+  ],
+  "lat": 48.8584,
+  "lng": 2.2945,
+  "country": "Frankrig",
+  "countryCode": "FR",
+  "city": "Paris",
+  "description": "Dette er en eksempel-sticker, så man kan se hvordan appen ser ud. Den bliver slettet, når den første rigtige sticker kommer ind.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/media/eksempel-paris/1.webp",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "type": "image",
+      "src": "/media/eksempel-paris/2.webp",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "type": "video",
+      "src": "/media/eksempel-paris/3.mp4",
+      "poster": "/media/eksempel-paris/3-poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  ]
+}

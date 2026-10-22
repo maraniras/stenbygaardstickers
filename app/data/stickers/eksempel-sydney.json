@@ -1,0 +1,15 @@
+{
+  "id": "eksempel-sydney",
+  "title": "Eksempel: Operahuset",
+  "date": "2026-08-02",
+  "placedBy": [
+    "Eric"
+  ],
+  "lat": -33.8568,
+  "lng": 151.2153,
+  "country": "Australien",
+  "countryCode": "AU",
+  "city": "Sydney",
+  "description": "Endnu en eksempel-sticker – helt nede i Australien.",
+  "media": []
+}
