@@ -8,11 +8,12 @@ const thumb = computed(() => thumbnail(props.sticker))
     <div class="media">
       <img v-if="thumb" :src="thumb" alt="" loading="lazy">
       <img v-else src="/marker.png" alt="" class="fallback">
+      <span class="flag-badge"><CountryFlag :code="sticker.countryCode" /></span>
       <span v-if="sticker.media.some(m => m.type === 'video')" class="tag">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg> Video
       </span>
       <div class="over">
-        <div class="place"><CountryFlag :code="sticker.countryCode" /> {{ sticker.city }}, {{ sticker.country }}</div>
+        <div class="place">{{ sticker.city }}, {{ sticker.country }}</div>
         <h3>{{ sticker.title }}</h3>
       </div>
     </div>
@@ -41,14 +42,28 @@ const thumb = computed(() => thumbnail(props.sticker))
   aspect-ratio: 4 / 3;
   background: var(--surface-2);
 }
-.media img {
+.media > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.media .fallback {
+.media > .fallback {
   object-fit: contain;
   padding: 18%;
+}
+.flag-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  place-items: center;
+  padding: 5px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  line-height: 1;
 }
 .tag {
   position: absolute;
