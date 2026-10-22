@@ -1,0 +1,29 @@
+{
+  "id": "2026-10-15-rom-trastevere",
+  "title": "Trastevere",
+  "date": "2026-10-15",
+  "placedBy": [
+    "Nicole",
+    "Mathias"
+  ],
+  "lat": 41.88989,
+  "lng": 12.474322,
+  "country": "Italien",
+  "countryCode": "IT",
+  "city": "Rom",
+  "description": "Emil har krydset Tiberen og slået sig ned i Trastevere ved Belli-stoppestedet, hvor han skriger ad hver eneste bus, der kommer for sent – altså dem alle sammen. Romerne har bygget kirker, akvædukter og et imperium; Emil har en lygtepæl og en åben mund, og han føler sig ærligt talt jævnbyrdig. Gerningsmændene er – selvfølgelig – Nicole og Mathias igen, og Rom er åbenbart ikke stor nok til kun én Emil.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/media/2026-10-15-rom-trastevere/1.webp",
+      "width": 1125,
+      "height": 1500
+    },
+    {
+      "type": "image",
+      "src": "/media/2026-10-15-rom-trastevere/2.webp",
+      "width": 844,
+      "height": 1125
+    }
+  ]
+}
