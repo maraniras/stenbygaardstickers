@@ -7,8 +7,11 @@ const route = useRoute()
 const router = useRouter()
 const el = ref<HTMLElement>()
 const selected = ref<Sticker>()
-const playing = ref(false)
-const playDate = ref('')
+
+const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
+const visible = computed(() => (person.value ? stickersBy(person.value) : stickers))
+const farthest = computed(() => visible.value.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined))
+const countries = computed(() => new Set(visible.value.map(s => s.countryCode)).size)
 
 let map: LMap | undefined
 let cluster: MarkerClusterGroup | undefined
@@ -18,70 +21,60 @@ function setActive(id: string | undefined) {
   for (const [key, m] of markers) m.getElement()?.classList.toggle('active', key === id)
 }
 
-function select(s: Sticker | undefined, fly = false) {
+/** Zoomer ind på stickeren, så den står over pop-up-kortet */
+function flyTo(s: Sticker) {
+  if (!map) return
+  const z = Math.max(map.getZoom(), 16)
+  const p = map.project([s.lat, s.lng], z).add([0, 90])
+  map.flyTo(map.unproject(p, z), z, { duration: 1.1 })
+}
+
+function select(s: Sticker | undefined) {
   selected.value = s
   setActive(s?.id)
-  if (s && map) {
-    if (fly) map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 14), { duration: 1.2 })
-    else map.panTo([s.lat, s.lng])
-  }
+  if (s) flyTo(s)
 }
 
 function fitAll() {
   if (!map) return
-  if (!stickers.length) return map.setView([AALBORG.lat, AALBORG.lng], 4)
-  if (stickers.length === 1) return map.setView([stickers[0]!.lat, stickers[0]!.lng], 12)
-  map.fitBounds(stickers.map(s => [s.lat, s.lng] as [number, number]), { padding: [50, 50], maxZoom: 12 })
+  const list = visible.value
+  if (!list.length) return map.setView([AALBORG.lat, AALBORG.lng], 4)
+  if (list.length === 1) return map.setView([list[0]!.lat, list[0]!.lng], 5)
+  map.fitBounds(list.map(s => [s.lat, s.lng] as [number, number]), { padding: [60, 60], maxZoom: 12 })
   // På en smal telefon kan hele verden ikke være der – vis så fra Aalborg og ud
   if (map.getZoom() <= map.getMinZoom()) map.setView([35, AALBORG.lng], map.getMinZoom())
+}
+
+function showVisible() {
+  if (!cluster) return
+  cluster.clearLayers()
+  cluster.addLayers(visible.value.map(s => markers.get(s.id)!))
+  if (selected.value && !visible.value.includes(selected.value)) select(undefined)
+  fitAll()
 }
 
 function openFromQuery() {
   const id = route.query.s
   if (typeof id !== 'string') return
   const s = getSticker(id)
-  if (!s || !map || !cluster) return
-  const m = markers.get(id)!
-  cluster.zoomToShowLayer(m, () => select(s))
+  if (!s || !map) return
+  select(s)
+  const { s: _, ...rest } = route.query
+  router.replace({ query: rest })
+}
+
+function clearPerson() {
   router.replace({ query: {} })
 }
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
-
-async function replay() {
-  if (!map || !cluster) return
-  if (playing.value) {
-    playing.value = false
-    return
-  }
-  playing.value = true
-  select(undefined)
-  cluster.clearLayers()
-  map.setView([30, 10], 2)
-  const ordered = [...stickers].reverse()
-  const step = Math.min(900, Math.max(150, 8000 / ordered.length))
-  await sleep(400)
-  for (const s of ordered) {
-    if (!playing.value) break
-    playDate.value = s.date
-    const m = markers.get(s.id)!
-    cluster.addLayer(m)
-    m.getElement()?.classList.add('pop')
-    await sleep(step)
-  }
-  // Afbrudt eller færdig: vis alle igen
-  cluster.addLayers([...markers.values()].filter(m => !cluster!.hasLayer(m)))
-  playing.value = false
-  playDate.value = ''
-  fitAll()
-}
+watch(person, showVisible)
 
 onMounted(async () => {
   const L = (await import('leaflet')).default
   ;(window as any).L = L
   await import('leaflet.markercluster')
 
-  map = L.map(el.value!, { zoomControl: false, worldCopyJump: true, minZoom: 2, attributionControl: true })
+  map = L.map(el.value!, { zoomControl: false, worldCopyJump: true, minZoom: 2 })
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19,
@@ -94,23 +87,22 @@ onMounted(async () => {
     iconCreateFunction: c => L.divIcon({
       className: 'sticker-cluster',
       html: `<div>${c.getChildCount()}</div>`,
-      iconSize: [42, 42],
+      iconSize: [44, 44],
     }),
   })
 
-  const icon = L.divIcon({ className: 'head-pin', html: '<img src="/marker.png" alt="">', iconSize: [48, 48], iconAnchor: [24, 42] })
+  const icon = L.divIcon({ className: 'head-pin', html: '<img src="/marker.png" alt="">', iconSize: [52, 52], iconAnchor: [26, 46] })
   for (const s of stickers) {
     const m = L.marker([s.lat, s.lng], { icon, title: s.title, riseOnHover: true })
     m.on('click', () => select(s))
     m.on('add', () => setActive(selected.value?.id))
     markers.set(s.id, m)
   }
-  cluster.addLayers([...markers.values()])
   cluster.on('animationend', () => setActive(selected.value?.id))
   map.addLayer(cluster)
   map.on('click', () => select(undefined))
 
-  fitAll()
+  showVisible()
   openFromQuery()
 })
 
@@ -120,7 +112,6 @@ onActivated(() => {
 })
 
 onBeforeUnmount(() => {
-  playing.value = false
   map?.remove()
 })
 </script>
@@ -130,35 +121,34 @@ onBeforeUnmount(() => {
     <div ref="el" class="map" />
 
     <header class="top">
-      <div class="brand">
+      <div class="brand glass">
         <img src="/logo.png" alt="">
-        <h1>Stenbygaard <span>Stickers</span></h1>
+        <div>
+          <h1>Stenbygaard Stickers</h1>
+          <p>{{ visible.length }} {{ visible.length === 1 ? 'sticker' : 'stickers' }} · {{ countries }} {{ countries === 1 ? 'land' : 'lande' }}</p>
+        </div>
       </div>
-      <div class="stats">
-        <span class="chip"><b>{{ stats.count }}</b> stickers</span>
-        <span class="chip"><b>{{ stats.countries }}</b> {{ stats.countries === 1 ? 'land' : 'lande' }}</span>
-        <button v-if="stats.farthest" class="chip far" @click="select(stats.farthest, true)">
-          Længst væk: <CountryFlag :code="stats.farthest.countryCode" /> {{ stats.farthest.city }} · {{ formatKm(stats.farthest.distanceKm) }}
+      <div class="chips">
+        <button v-if="person" class="chip glass filter" @click="clearPerson">
+          Sat op af {{ person }}
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+        <button v-if="farthest" class="chip glass" @click="select(farthest)">
+          <span class="muted">Længst væk</span>
+          <CountryFlag :code="farthest.countryCode" /> {{ farthest.city }} · {{ formatKm(farthest.distanceKm) }}
         </button>
       </div>
     </header>
 
-    <div class="tools" :class="{ raised: selected }">
-      <div v-if="playing && playDate" class="chip play-date">{{ formatDate(playDate) }}</div>
-      <button v-if="stickers.length > 1" class="round" :aria-label="playing ? 'Stop' : 'Afspil tidslinje'" @click="replay">
-        <svg v-if="!playing" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-        <svg v-else viewBox="0 0 24 24"><path d="M7 6h4v12H7zM13 6h4v12h-4z" /></svg>
-      </button>
-      <button class="round" aria-label="Vis alle" @click="select(undefined); fitAll()">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" /><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="2" /></svg>
-      </button>
-    </div>
+    <button class="round glass" :class="{ raised: selected }" aria-label="Vis alle" @click="select(undefined); fitAll()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" /></svg>
+    </button>
 
     <Transition name="sheet">
       <StickerSheet v-if="selected" :key="selected.id" :sticker="selected" @close="select(undefined)" />
     </Transition>
 
-    <div v-if="!stickers.length" class="empty chip">Ingen stickers endnu</div>
+    <div v-if="!visible.length" class="empty chip glass">{{ person ? `Ingen stickers fra ${person}` : 'Ingen stickers endnu' }}</div>
   </div>
 </template>
 
@@ -179,73 +169,82 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   z-index: 500;
-  padding: calc(10px + var(--safe-t)) 12px 0;
+  padding: calc(12px + var(--safe-t)) 12px 0;
   pointer-events: none;
 }
 .top > * { pointer-events: auto; }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 14px 4px 4px;
-  border: 2.5px solid var(--ink);
+  gap: 10px;
+  padding: 6px 18px 6px 6px;
   border-radius: 999px;
-  background: var(--yellow);
-  box-shadow: 3px 3px 0 var(--ink);
 }
 .brand img {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  padding: 3px;
   border-radius: 50%;
-  background: #fff;
+  background: linear-gradient(160deg, #ffe07a, var(--accent));
   object-fit: contain;
 }
-.brand h1 { font-size: 19px; }
-.brand h1 span { font-weight: 600; }
-.stats {
+.brand h1 { font-size: 16px; }
+.brand p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.chips {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   margin: 10px -12px 0;
-  padding: 0 12px 6px;
+  padding: 0 12px 10px;
   overflow-x: auto;
   scrollbar-width: none;
+  pointer-events: none;
 }
-.stats::-webkit-scrollbar { display: none; }
-.stats .chip { box-shadow: 2px 2px 0 var(--ink); }
-.far {
-  background: var(--ink);
+.chips::-webkit-scrollbar { display: none; }
+.chips .chip {
+  pointer-events: auto;
+  padding: 8px 14px;
+  box-shadow: var(--shadow-sm);
+}
+.muted { color: var(--muted); }
+.filter {
+  background: var(--text) !important;
   color: #fff;
-  cursor: pointer;
 }
-.tools {
+.filter svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.round {
   position: absolute;
   right: 12px;
-  bottom: 16px;
+  bottom: var(--nav-space);
   z-index: 500;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: bottom .25s;
-}
-.tools.raised { bottom: 190px; }
-.round {
   display: grid;
   place-items: center;
   width: 48px;
   height: 48px;
   padding: 0;
-  border: 2.5px solid var(--ink);
+  border: 0;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 3px 3px 0 var(--ink);
   cursor: pointer;
+  transition: opacity .2s;
 }
-.round:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-.round svg { width: 24px; height: 24px; fill: currentColor; }
-.play-date {
-  font-size: 15px;
-  font-weight: 800;
-  box-shadow: 2px 2px 0 var(--ink);
+.round.raised { opacity: 0; pointer-events: none; }
+.round svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
 }
 .empty {
   position: absolute;
@@ -254,6 +253,6 @@ onBeforeUnmount(() => {
   z-index: 500;
   transform: translate(-50%, -50%);
 }
-.sheet-enter-active, .sheet-leave-active { transition: transform .25s, opacity .25s; }
-.sheet-enter-from, .sheet-leave-to { transform: translateY(30px); opacity: 0; }
+.sheet-enter-active, .sheet-leave-active { transition: transform .3s cubic-bezier(.2, .9, .3, 1), opacity .25s; }
+.sheet-enter-from, .sheet-leave-to { transform: translateY(40px); opacity: 0; }
 </style>

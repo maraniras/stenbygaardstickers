@@ -1,0 +1,30 @@
+{
+  "id": "2026-10-19-rom-colosseum",
+  "title": "Colosseum",
+  "date": "2026-10-19",
+  "placedBy": [
+    "Mathias",
+    "Nicole"
+  ],
+  "lat": 41.889851,
+  "lng": 12.493779,
+  "country": "Italien",
+  "countryCode": "IT",
+  "city": "Rom",
+  "description": "Emil hænger øst for Colosseum med et perfekt udsyn til et 2000 år gammelt stadion, der stadig er i bedre stand end hans knæ. Han deler lygtepæl med et par hundrede andre klistermærker, men lad os være ærlige: det er kun ham, turisterne stopper op for. Gladiatorerne kæmpede for ære og frihed – Emil står bare og skriger ad trafikken. Respekt.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/media/2026-10-19-rom-colosseum/1.webp",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "type": "video",
+      "src": "/media/2026-10-19-rom-colosseum/2.mp4",
+      "poster": "/media/2026-10-19-rom-colosseum/2-poster.webp",
+      "width": 720,
+      "height": 1280
+    }
+  ]
+}

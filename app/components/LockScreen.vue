@@ -13,13 +13,15 @@ function submit() {
 
 <template>
   <div class="lock">
-    <img class="logo" src="/logo.png" alt="">
-    <h1>Stenbygaard<br><span>Stickers</span></h1>
+    <div class="logo">
+      <img src="/logo.png" alt="">
+    </div>
+    <h1>Stenbygaard Stickers</h1>
+    <p class="sub">Indtast koden for at se kortet</p>
     <form :class="{ wrong }" @submit.prevent="submit">
       <input
         v-model="code"
         type="password"
-        inputmode="text"
         autocomplete="off"
         autocapitalize="none"
         spellcheck="false"
@@ -29,7 +31,7 @@ function submit() {
       >
       <button class="btn" type="submit">Lås op</button>
     </form>
-    <p v-if="wrong" class="err">Forkert kode – prøv igen.</p>
+    <p class="err" :class="{ show: wrong }">Forkert kode – prøv igen</p>
   </div>
 </template>
 
@@ -40,59 +42,67 @@ function submit() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
   padding: calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b));
   text-align: center;
   background:
-    radial-gradient(circle at 50% 30%, #fff6cf 0, transparent 60%),
-    var(--paper);
+    radial-gradient(60% 40% at 50% 28%, var(--accent-soft) 0, transparent 100%),
+    var(--bg);
 }
 .logo {
-  width: 180px;
-  height: 180px;
-  object-fit: contain;
-  padding: 10px;
-  border: 3px solid var(--ink);
+  display: grid;
+  place-items: center;
+  width: 148px;
+  height: 148px;
+  overflow: hidden;
   border-radius: 50%;
-  background: var(--yellow);
-  box-shadow: 5px 5px 0 var(--ink);
-  transform: rotate(-6deg);
+  background: linear-gradient(160deg, #ffe07a, var(--accent));
+  box-shadow: 0 20px 50px rgba(255, 185, 0, .35);
+}
+.logo img {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .25));
 }
 h1 {
-  font-size: 40px;
+  margin-top: 28px;
+  font-size: 28px;
 }
-h1 span {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 0 10px;
-  background: var(--ink);
-  color: var(--yellow);
-  transform: rotate(-2deg);
+.sub {
+  margin: 6px 0 28px;
+  color: var(--muted);
 }
 form {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-width: 340px;
+  max-width: 320px;
 }
 form.wrong { animation: shake .35s; }
 input {
-  flex: 1;
-  min-width: 0;
-  height: 48px;
+  height: 54px;
   padding: 0 18px;
-  border: 2.5px solid var(--ink);
-  border-radius: 999px;
-  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   font-size: 17px;
+  text-align: center;
   outline: none;
+  transition: box-shadow .15s;
 }
-input:focus { box-shadow: 0 0 0 3px var(--yellow); }
+input:focus { box-shadow: 0 0 0 4px rgba(255, 201, 40, .45); }
+.btn { min-height: 54px; }
 .err {
-  margin: 0;
-  color: #c2361b;
+  margin: 14px 0 0;
+  font-size: 14px;
   font-weight: 600;
+  color: #d33a2c;
+  opacity: 0;
+  transition: opacity .2s;
 }
+.err.show { opacity: 1; }
 @keyframes shake {
   25% { transform: translateX(-8px); }
   50% { transform: translateX(7px); }

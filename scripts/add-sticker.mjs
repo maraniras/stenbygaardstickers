@@ -81,7 +81,7 @@ for (const file of files) {
     execFileSync(ffmpegPath, ['-y', '-loglevel', 'error', '-i', file, '-t', '15',
       '-vf', "scale='min(1080,iw)':-2", '-c:v', 'libx264', '-preset', 'slow', '-crf', '28',
       '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', out])
-    const frame = execFileSync(ffmpegPath, ['-loglevel', 'error', '-ss', '0.5', '-i', out, '-frames:v', '1', '-f', 'image2pipe', '-c:v', 'png', '-'])
+    const frame = execFileSync(ffmpegPath, ['-loglevel', 'error', '-ss', '0.5', '-i', out, '-frames:v', '1', '-f', 'image2pipe', '-c:v', 'png', '-'], { maxBuffer: 64 * 1024 * 1024 })
     const meta = await sharp(frame).webp({ quality: 75 }).toFile(poster)
     media.push({ type: 'video', src: `/${out.replace(/\\/g, '/').replace(/^public\//, '')}`, poster: `/${poster.replace(/\\/g, '/').replace(/^public\//, '')}`, width: meta.width, height: meta.height })
   }

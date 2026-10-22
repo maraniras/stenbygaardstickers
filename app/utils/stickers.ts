@@ -72,6 +72,34 @@ export function thumbnail(s: StickerData) {
   return m.type === 'video' ? m.poster : m.src
 }
 
+const sameName = (a: string, b: string) => a.localeCompare(b, 'da', { sensitivity: 'base' }) === 0
+
+export function stickersBy(name: string) {
+  return stickers.filter(s => s.placedBy.some(n => sameName(n, name)))
+}
+
+/** Alle der har sat stickers op, flest først */
+export const people = (() => {
+  const counts = new Map<string, number>()
+  for (const s of stickers) {
+    for (const n of s.placedBy) {
+      const key = [...counts.keys()].find(k => sameName(k, n)) ?? n
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+    }
+  }
+  return [...counts].map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
+})()
+
+/** Dansk ejefald: Nicoles, Mathias' */
+export function genitive(name: string) {
+  return /[sxz]$/i.test(name) ? `${name}'` : `${name}s`
+}
+
+export function personUrl(name: string) {
+  return `/person/${encodeURIComponent(name)}`
+}
+
 export const stats = {
   count: stickers.length,
   countries: new Set(stickers.map(s => s.countryCode)).size,

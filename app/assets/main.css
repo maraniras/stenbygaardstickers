@@ -1,13 +1,19 @@
+/* Design v2 – lyst, glas og bløde skygger. v1 (tykke streger) ligger i git-tagget design-v1. */
 :root {
-  --paper: #fbf8f1;
-  --paper-2: #f2ede1;
-  --ink: #161616;
-  --muted: #6b665c;
-  --line: #e2dccd;
-  --yellow: #ffd23f;
-  --red: #ff5a36;
-  --radius: 18px;
-  --nav-h: 64px;
+  --bg: #f4f4f6;
+  --surface: #ffffff;
+  --surface-2: #eeeef1;
+  --glass: rgba(255, 255, 255, .78);
+  --text: #111114;
+  --muted: #6e6e78;
+  --hairline: rgba(17, 17, 20, .08);
+  --accent: #ffc928;
+  --accent-soft: #fff4cc;
+  --star: #ffb800;
+  --shadow-sm: 0 1px 2px rgba(17, 17, 20, .06), 0 2px 8px rgba(17, 17, 20, .06);
+  --shadow: 0 2px 6px rgba(17, 17, 20, .06), 0 12px 32px rgba(17, 17, 20, .12);
+  --radius: 22px;
+  --nav-space: calc(84px + var(--safe-b));
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
   color-scheme: light;
@@ -21,11 +27,11 @@ html, body, #__nuxt {
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 16px;
-  line-height: 1.45;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
@@ -41,8 +47,15 @@ a { color: inherit; }
 h1, h2, h3 {
   margin: 0;
   font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: var(--shadow);
 }
 
 .btn {
@@ -50,41 +63,55 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 20px;
-  border: 2.5px solid var(--ink);
-  border-radius: 999px;
-  background: var(--yellow);
-  color: var(--ink);
-  font-weight: 800;
+  min-height: 50px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--text);
+  color: #fff;
+  font-weight: 700;
   text-decoration: none;
-  box-shadow: 3px 3px 0 var(--ink);
   cursor: pointer;
-  transition: transform .08s, box-shadow .08s;
+  transition: transform .12s, opacity .12s;
 }
-.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-.btn.secondary { background: #fff; }
+.btn:active { transform: scale(.97); }
+.btn.secondary { background: var(--surface-2); color: var(--text); }
+.btn svg { width: 20px; height: 20px; }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 11px;
-  border: 2px solid var(--ink);
+  padding: 6px 12px;
+  border: 0;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface-2);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
+  text-decoration: none;
+}
+a.chip, button.chip { cursor: pointer; }
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* Leaflet-tilpasninger */
 .leaflet-container {
   font-family: inherit;
-  background: #dde6ea;
+  background: #e8eaed;
+}
+.leaflet-tile-pane {
+  filter: saturate(.3) brightness(1.06) contrast(.92);
 }
 .leaflet-control-attribution {
   font-size: 10px;
+  background: rgba(255, 255, 255, .6) !important;
 }
 
 .head-pin {
@@ -94,17 +121,11 @@ h1, h2, h3 {
 .head-pin img {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 3px 4px rgba(0, 0, 0, .35));
-  transition: transform .15s;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
+  transition: transform .2s cubic-bezier(.3, 1.5, .5, 1);
   transform-origin: 50% 90%;
 }
-.head-pin.active img { transform: scale(1.35); }
-.head-pin.pop img { animation: pop .45s cubic-bezier(.3, 1.6, .5, 1); }
-
-@keyframes pop {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
-}
+.head-pin.active img { transform: scale(1.4); }
 
 .sticker-cluster {
   background: none;
@@ -115,10 +136,11 @@ h1, h2, h3 {
   place-items: center;
   width: 100%;
   height: 100%;
-  border: 2.5px solid var(--ink);
+  border: 3px solid #fff;
   border-radius: 50%;
-  background: var(--yellow);
+  background: var(--text);
+  color: #fff;
   font-weight: 800;
   font-size: 15px;
-  box-shadow: 2px 2px 0 var(--ink);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
 }

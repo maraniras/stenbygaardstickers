@@ -14,13 +14,11 @@ const { unlocked } = useUnlock()
 
 <style scoped>
 .shell {
+  position: relative;
   height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 .content {
-  flex: 1;
-  min-height: 0;
+  height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
