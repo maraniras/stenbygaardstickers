@@ -121,6 +121,7 @@ onBeforeUnmount(() => {
     <div ref="el" class="map" />
 
     <header class="top">
+      <RefreshButton class="refresh-btn" />
       <div class="brand glass">
         <img src="/logo.png" alt="">
         <div>
@@ -173,6 +174,11 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 .top > * { pointer-events: auto; }
+.refresh-btn {
+  position: absolute;
+  top: calc(16px + var(--safe-t));
+  right: 12px;
+}
 .brand {
   display: inline-flex;
   align-items: center;

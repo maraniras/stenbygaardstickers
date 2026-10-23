@@ -23,7 +23,10 @@ const groups = computed(() => {
 <template>
   <div class="page">
     <header>
-      <h1>Stickers</h1>
+      <div class="title">
+        <h1>Stickers</h1>
+        <RefreshButton />
+      </div>
       <div class="grid">
         <div class="stat"><b>{{ stats.count }}</b><span>{{ stats.count === 1 ? 'sticker' : 'stickers' }}</span></div>
         <div class="stat"><b>{{ stats.countries }}</b><span>{{ stats.countries === 1 ? 'land' : 'lande' }}</span></div>
@@ -71,6 +74,11 @@ const groups = computed(() => {
   max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+}
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 h1 { font-size: 34px; }
 .grid {
