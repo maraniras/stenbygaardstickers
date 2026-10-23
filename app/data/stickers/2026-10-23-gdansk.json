@@ -1,0 +1,28 @@
+{
+  "id": "2026-10-23-gdansk",
+  "title": "Gdansk",
+  "date": "2026-10-23",
+  "placedBy": [
+    "Norsk"
+  ],
+  "lat": 54.353619,
+  "lng": 18.6594592,
+  "country": "Polen",
+  "countryCode": "PL",
+  "city": "Gdańsk",
+  "description": "Emil hænger ved Motława-floden med kæben på vid gab og udsigt direkte til det store GDAŃSK-skilt. Holder man telefonen i den rigtige vinkel, ligner det, at han er i gang med at spise hele byen – og han ser ikke ud til at have tænkt sig at stoppe ved skiltet. Nogen har endda skrevet hans navn med tusch lige under ham, så pælen er officielt hans nu.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/media/2026-10-23-gdansk/1.webp",
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "type": "image",
+      "src": "/media/2026-10-23-gdansk/2.webp",
+      "width": 1200,
+      "height": 1600
+    }
+  ]
+}
