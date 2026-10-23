@@ -19,8 +19,22 @@
       "height": 1600
     },
     {
+      "type": "video",
+      "src": "/media/2026-10-23-gdansk/2.mp4",
+      "poster": "/media/2026-10-23-gdansk/2-poster.webp",
+      "width": 720,
+      "height": 1280
+    },
+    {
+      "type": "video",
+      "src": "/media/2026-10-23-gdansk/3.mp4",
+      "poster": "/media/2026-10-23-gdansk/3-poster.webp",
+      "width": 720,
+      "height": 1280
+    },
+    {
       "type": "image",
-      "src": "/media/2026-10-23-gdansk/2.webp",
+      "src": "/media/2026-10-23-gdansk/4.webp",
       "width": 1200,
       "height": 1600
     }
