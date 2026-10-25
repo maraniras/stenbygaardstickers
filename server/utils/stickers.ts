@@ -26,9 +26,27 @@ async function seedFiles(): Promise<StoredSticker[]> {
   return out
 }
 
+// Dev-siden (Vercel Preview) har sin egen database. Første gang henter den de
+// godkendte stickers fra den rigtige app, så der er noget at teste på. Den læser
+// kun det offentlige API – prod bliver aldrig ændret herfra.
+const PROD_URL = process.env.PROD_URL || 'https://stenbygaardstickers.vercel.app'
+
+async function copyFromProd() {
+  const [done] = await redis([['GET', 'stickers:prodcopy']]) as [string | null]
+  if (done) return
+  const list = await $fetch<StickerData[]>(`${PROD_URL}/api/stickers`, { timeout: 10000 })
+  await redis([
+    ...list.map(s => ['HSETNX', 'stickers', s.id, JSON.stringify({ ...s, status: 'approved' })]),
+    ['SET', 'stickers:prodcopy', new Date().toISOString()],
+  ])
+}
+
 /** Kopierer nye JSON-filer fra repoet ind i databasen */
 function ensureSeeded() {
   seededIds ??= (async () => {
+    if (process.env.VERCEL_ENV === 'preview' && redisEnabled) {
+      await copyFromProd().catch(err => console.error('Kunne ikke kopiere fra prod', err))
+    }
     const files = await seedFiles()
     if (!redisEnabled) {
       const data = await readLocal()

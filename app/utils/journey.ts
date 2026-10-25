@@ -3,6 +3,9 @@
 // Hver sticker får en nål, når hovedet lander. Kan stoppes med en AbortSignal.
 import type * as Leaflet from 'leaflet'
 
+/** Hjemme – her starter rejsen */
+export const JOURNEY_START = { lat: 57.042237, lng: 9.914973 }
+
 export interface JourneyStop {
   lat: number
   lng: number

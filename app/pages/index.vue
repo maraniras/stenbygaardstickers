@@ -79,7 +79,7 @@ const journey = ref<{ list: Sticker[], index: number, done: boolean }>()
 const journeyKm = computed(() => {
   const list = journey.value?.list ?? []
   const out = [0]
-  list.forEach((s, i) => out.push(out[i]! + distanceKm(i ? list[i - 1]! : AALBORG, s)))
+  list.forEach((s, i) => out.push(out[i]! + distanceKm(i ? list[i - 1]! : JOURNEY_START, s)))
   return out
 })
 const journeyAt = computed(() => (journey.value?.index ? journey.value.list[journey.value.index - 1] : undefined))
@@ -98,7 +98,7 @@ async function startJourney() {
   try {
     await playJourney(
       Lf, map, journeyLayer,
-      [AALBORG, ...list.map(s => ({ lat: s.lat, lng: s.lng, id: s.id }))],
+      [JOURNEY_START, ...list.map(s => ({ lat: s.lat, lng: s.lng, id: s.id }))],
       (i) => { if (journey.value === run) journey.value.index = i },
       id => router.push(`/sticker/${id}`),
       journeyAbort.signal,
