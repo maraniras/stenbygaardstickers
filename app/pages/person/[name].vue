@@ -43,6 +43,8 @@ function back() {
       <p class="sub">{{ earnedCount(badges) }} af {{ badges.length }} badges</p>
     </header>
 
+    <LevelCard :points="totalPoints(badges)" />
+
     <div class="grid">
       <div class="stat"><b>{{ stats.count }}</b><span>{{ stats.count === 1 ? 'sticker' : 'stickers' }}</span></div>
       <div class="stat"><b>{{ stats.countries }}</b><span>{{ stats.countries === 1 ? 'land' : 'lande' }}</span></div>

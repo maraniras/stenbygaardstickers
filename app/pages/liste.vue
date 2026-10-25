@@ -2,7 +2,7 @@
 const sort = ref<'date' | 'far' | 'stars'>('date')
 const { stickers, people, stats } = useStickers()
 const { ratings, enabled } = useRatings()
-const badgeCount = computed(() => Object.fromEntries(people.value.map(p => [p.name, earnedCount(badgesFor(p.name, stickers.value, ratings.value))])))
+const levels = computed(() => Object.fromEntries(people.value.map(p => [p.name, levelFor(totalPoints(badgesFor(p.name, stickers.value, ratings.value)))])))
 const { show: showInstall } = useInstall()
 const standalone = ref(true)
 onMounted(() => { standalone.value = isStandalone() })
@@ -56,7 +56,7 @@ const groups = computed(() => {
             <span class="avatar">{{ p.name[0] }}</span>
             {{ p.name }}
             <span class="n">{{ p.count }}</span>
-            <span v-if="badgeCount[p.name]" class="medals" :title="`${badgeCount[p.name]} badges`">🏅 {{ badgeCount[p.name] }}</span>
+            <span class="medals" :title="`Level ${levels[p.name]!.level} · ${levels[p.name]!.title}`">Lvl {{ levels[p.name]!.level }}</span>
           </NuxtLink>
         </div>
       </section>

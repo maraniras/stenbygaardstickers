@@ -11,14 +11,19 @@ const ring = computed(() => {
   return TIER_COLORS[Math.min(b.level, TIER_COLORS.length) - 1]!
 })
 
+// Kort tekst under medaljen – beskrivelsen står kun i modalen
 const sub = computed(() => {
   const b = props.badge
-  if (b.kind === 'record') return b.earned ? (b.final ? 'Vundet' : 'Rekord') : b.desc
-  if (b.kind === 'tier') {
-    if (!b.earned) return `${b.value}/${b.next} · ${b.desc}`
-    return b.next ? `Næste: ${b.nextName} · ${b.value}/${b.next}` : 'Højeste niveau'
+  if (b.kind === 'record') {
+    if (b.earned) return b.final ? `Vundet · ${b.points} p` : 'Rekord'
+    return 'Rekord'
   }
-  return b.earned ? (b.id === 'pioneer' && b.value > 1 ? `${b.value} lande` : 'Opnået') : b.desc
+  if (b.kind === 'tier') {
+    if (!b.earned) return `${b.value}/${b.next} · ${b.worth} p`
+    return b.next ? `${b.value}/${b.next} · ${b.points} p` : `Max · ${b.points} p`
+  }
+  if (b.earned) return b.id === 'pioneer' && (b.count ?? 0) > 1 ? `${b.count} lande · ${b.points} p` : `${b.points} p`
+  return b.progress ? `${Math.min(b.progress.value, b.progress.target)}/${b.progress.target} · ${b.worth} p` : `${b.worth} p`
 })
 </script>
 

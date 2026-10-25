@@ -18,6 +18,19 @@ const status = computed(() => {
   return x.earned ? 'Opnået' : 'Ikke opnået endnu'
 })
 
+/** Point-tekst øverst: hvad man har fået, eller hvad den giver */
+const pointsText = computed(() => {
+  const x = b.value
+  if (x.kind === 'record') {
+    if (!x.id.startsWith('year-')) return 'Ingen point – rekorder kan mistes'
+    if (x.earned && x.final) return `+${x.points} point`
+    return `${x.worth} point, når året er slut`
+  }
+  if (x.id === 'pioneer') return x.earned ? `+${x.points} point · ${x.worth} pr. land` : `${x.worth} point pr. land`
+  if (x.kind === 'tier') return x.earned ? `+${x.points} point${x.next ? ` · næste trin giver ${x.worth}` : ''}` : `Første trin giver ${x.worth} point`
+  return x.earned ? `+${x.points} point` : `Giver ${x.worth} point`
+})
+
 function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape') emit('close')
 }
@@ -37,6 +50,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <span class="status" :class="{ earned: b.earned }">{{ status }}</span>
         <h2>{{ b.name }}</h2>
         <p class="desc">{{ b.about ?? b.desc }}</p>
+        <span class="pts" :class="{ got: b.points > 0 }">{{ pointsText }}</span>
       </div>
 
       <!-- Hvornår -->
@@ -62,7 +76,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
               <b>{{ s.name }}</b>
               <span>{{ s.label }}</span>
             </span>
-            <span class="step-date">{{ s.reachedAt ? formatDate(s.reachedAt) : '' }}</span>
+            <span class="step-date">
+              <b>{{ s.points }} p</b>
+              <span v-if="s.reachedAt">{{ formatDate(s.reachedAt) }}</span>
+            </span>
           </li>
         </ol>
       </div>
@@ -152,6 +169,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 .status.earned { background: #e3f5e8; color: #1b6e34; }
 h2 { margin-top: 10px; font-size: 24px; }
 .desc { margin: 6px 0 0; color: var(--muted); }
+.pts {
+  margin-top: 10px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.pts.got { background: var(--accent); color: var(--on-accent); }
 .box {
   display: flex;
   flex-direction: column;
@@ -204,7 +231,9 @@ h2 { margin-top: 10px; font-size: 24px; }
 .step-name b { font-size: 15px; }
 .step-name span { font-size: 12px; color: var(--muted); }
 .steps li:not(.done) .step-name b { color: var(--muted); }
-.step-date { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.step-date { display: flex; flex-direction: column; align-items: flex-end; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.step-date b { color: var(--text); font-size: 13px; }
+.steps li:not(.done) .step-date b { color: var(--muted); }
 .holders { display: flex; flex-wrap: wrap; gap: 6px; }
 .holder { padding: 3px 10px 3px 3px; font-size: 14px; }
 .avatar {

@@ -18,6 +18,8 @@ export interface BadgeStep {
   label: string
   /** Dato trinnet blev nået (kun med history) */
   reachedAt?: string
+  /** Point for trinnet */
+  points?: number
 }
 
 export interface Badge {
@@ -47,6 +49,12 @@ export interface Badge {
   final?: boolean
   /** Rekord: hvem har den lige nu */
   holders?: string[]
+  /** Pioner: antal lande man var først i */
+  count?: number
+  /** Point man har fået for badgen (trin: summen af de nåede trin) */
+  points: number
+  /** Point badgen giver – trin: næste trin, Pioner: pr. land, rekord: når den er officiel */
+  worth: number
   /** Landekode – vises som flag-billede i stedet for emoji (Windows kan ikke vise flag-emojis) */
   flag?: string
   /** Hvornår den blev opnået, og med hvilken sticker (kun med history) */
@@ -64,7 +72,7 @@ function tier(id: string, emoji: string, names: string[], label: (n: number) => 
   const level = steps.filter(s => value >= s).length
   const next = steps[level]
   return {
-    id, emoji, kind: 'tier', earned: level > 0, level, levels: steps.length, value, next, about,
+    id, emoji, kind: 'tier', earned: level > 0, level, levels: steps.length, value, next, about, points: 0, worth: 0,
     name: `${names[Math.max(0, level - 1)]}${level ? suffix : ''}`,
     nextName: next ? names[level] : undefined,
     desc: label(steps[0]!),
@@ -73,11 +81,11 @@ function tier(id: string, emoji: string, names: string[], label: (n: number) => 
 }
 
 function single(id: string, emoji: string, name: string, desc: string, earned: boolean, progress?: { value: number, target: number }): Badge {
-  return { id, emoji, name, desc, kind: 'single', earned, level: earned ? 1 : 0, levels: 1, value: earned ? 1 : 0, progress }
+  return { id, emoji, name, desc, kind: 'single', earned, level: earned ? 1 : 0, levels: 1, value: earned ? 1 : 0, progress, points: 0, worth: 0 }
 }
 
 function record(id: string, emoji: string, name: string, desc: string, earned: boolean, holders: string[], final = false): Badge {
-  return { id, emoji, name, desc, kind: 'record', earned, level: earned ? 1 : 0, levels: 1, value: earned ? 1 : 0, holders, final }
+  return { id, emoji, name, desc, kind: 'record', earned, level: earned ? 1 : 0, levels: 1, value: earned ? 1 : 0, holders, final, points: 0, worth: 0 }
 }
 
 const byFirst = (a: Sticker, b: Sticker) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)
@@ -144,11 +152,15 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
   const countries = new Set(mine.map(s => s.countryCode)).size
   const dkCities = new Set(mine.filter(s => s.countryCode === 'DK').map(s => s.city)).size
 
-  // Kontinenter
+  // Kontinenter. Til kontinent-badgene tæller Danmark ikke som Europa (det skal være
+  // en rejse), men Kontinent-kryds tæller alle kontinenter man har været på.
+  const continentsVisited = new Set<Continent>()
   const perContinent = new Map<Continent, number>()
   for (const s of mine) {
     const c = continentOf(s.countryCode)
-    if (c) perContinent.set(c, (perContinent.get(c) ?? 0) + 1)
+    if (!c) continue
+    continentsVisited.add(c)
+    if (s.countryCode !== 'DK') perContinent.set(c, (perContinent.get(c) ?? 0) + 1)
   }
 
   // Makker: den person man har sat flest op sammen med
@@ -219,12 +231,12 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       'Antal forskellige personer man har sat stickers op sammen med.'),
     tier('capitals', '🏛️', ['Hovedstads-turist', 'Hovedstadsjæger', 'Diplomat', 'Verdensambassadør'], unit('hovedstad', 'hovedstæder'), [1, 3, 5, 10], capitals,
       'Antal hovedstæder med en sticker (inden for 25 km af centrum).'),
-    tier('continents', '🌐', ['Interkontinental', 'Verdensfarer', 'Jordomrejsende', 'Kosmopolit', 'Hele kloden'], unit('kontinent', 'kontinenter'), [2, 3, 4, 5, 6], perContinent.size,
+    tier('continents', '🌐', ['Interkontinental', 'Verdensfarer', 'Jordomrejsende', 'Kosmopolit', 'Hele kloden'], unit('kontinent', 'kontinenter'), [2, 3, 4, 5, 6], continentsVisited.size,
       'Antal forskellige kontinenter med en sticker.'),
     ...CONTINENT_BADGES.map(c => tier(`continent-${c.id}`, c.emoji, c.names, unit(`sticker i ${CONTINENT_NAMES[c.id]}`, `stickers i ${CONTINENT_NAMES[c.id]}`), [1, 3, 5, 10, 15], perContinent.get(c.id) ?? 0,
-      `Antal stickers i ${CONTINENT_NAMES[c.id]}.`)),
+      c.id === 'europa' ? 'Antal stickers i Europa – Danmark tæller ikke med.' : `Antal stickers i ${CONTINENT_NAMES[c.id]}.`)),
 
-    single('pioneer', '🌍', 'Pioner', 'Første sticker nogensinde i et nyt land', pioneered > 0),
+    { ...single('pioneer', '🌍', 'Pioner', 'Første sticker nogensinde i et nyt land – giver point for hvert land', pioneered > 0), count: pioneered },
     single('original', '⏳', 'Original', 'Var med til en af de 5 første stickers', ordered.slice(0, 5).some(inMine)),
     single('home', '🏠', 'Hjemmebane', 'En sticker i Danmark', mine.some(s => s.countryCode === 'DK')),
     { ...single('denmark', '🇩🇰', 'Rundt i Danmark', '5 forskellige danske byer', dkCities >= 5, { value: dkCities, target: 5 }), flag: 'DK' },
@@ -252,6 +264,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
     single('summer', '☀️', 'Sommer', 'En sticker i juni–august', mine.some(s => [6, 7, 8].includes(month(s)))),
     single('autumn', '🍂', 'Efterår', 'En sticker i september–november', mine.some(s => [9, 10, 11].includes(month(s)))),
     single('winter', '❄️', 'Vinter', 'En sticker i december–februar', mine.some(s => [12, 1, 2].includes(month(s)))),
+    single('paaske', '🐣', 'Påske', 'En sticker i påsken (onsdag før palmesøndag – tirsdag efter 2. påskedag)', mine.some(s => season(s) === 'paaske')),
     single('halloween', '🎃', 'Halloween', 'En sticker i halloween-ugen (26/10–1/11)', mine.some(s => season(s) === 'halloween')),
     single('jul', '🎄', 'Jul', 'En sticker i juletiden (20/11–31/12)', mine.some(s => season(s) === 'jul')),
     single('newyear', '🎆', 'Nytår', 'En sticker 31. december eller 1. januar', mine.some(s => s.date.endsWith('-12-31') || s.date.endsWith('-01-01'))),
@@ -286,7 +299,7 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
   const now = opts.now ?? new Date()
   const mine = all.filter(s => hasName(s, name)).sort(byFirst)
   const badges = compute(name, mine, all, ratings, now)
-  if (!opts.history) return badges
+  if (!opts.history) return score(badges)
 
   // Afspil stickers i datoorden: første gang en badge (eller et trin) er opnået,
   // er det den sticker, der udløste den.
@@ -312,9 +325,87 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
       b.earnedWith = undefined
     }
   }
-  return badges
+  return score(badges)
 }
 
 export function earnedCount(badges: Badge[]) {
   return badges.filter(b => b.earned).length
+}
+
+// ── Point og levels ─────────────────────────────────────────────────────────
+// Rejser giver flest point – de fleste rejser ikke så meget. Rekorder giver først
+// point, når de er officielle (Årets flittigste, når året er slut).
+
+/** Point pr. trin */
+const TIER_POINTS: Record<string, number[]> = {
+  'stickers': [1, 2, 4, 8, 16],
+  'cities': [2, 4, 8, 12, 16],
+  'countries': [3, 6, 12, 20],
+  'partner': [1, 2, 4, 8, 12],
+  'network': [1, 2, 4, 8],
+  'capitals': [2, 4, 8, 16],
+  'continents': [6, 12, 18, 24, 36],
+  'continent-europa': [3, 6, 10, 16, 24],
+}
+const OTHER_CONTINENT_POINTS = [8, 12, 18, 24, 36]
+
+const SINGLE_POINTS: Record<string, number> = {
+  'home': 1, 'team': 1, 'regular': 1, 'turbo': 1, 'director': 1, 'spring': 1, 'summer': 1, 'autumn': 1, 'winter': 1,
+  'roadtrip': 2, 'weekend': 2, 'denmark': 2, 'paaske': 2, 'halloween': 2, 'jul': 2, 'newyear': 2, 'birthday': 2, 'comeback': 2,
+  'gang': 2, 'filmstar': 2, 'photographer': 2, 'author': 2, 'magnet': 2, 'jubilee-10': 2,
+  'far': 4, 'border': 4, 'neighbour': 4, 'streak': 4, 'stardust': 4, 'fivestar': 4, 'peoples': 4, 'original': 4,
+  'jubilee-25': 4, 'jubilee-50': 4, 'jubilee-75': 4,
+  'world': 8, 'equator': 8, 'arctic': 8, 'longhaul': 8, 'jubilee-100': 8,
+  'nordic': 16,
+}
+const PIONEER_POINTS = 3
+const YEAR_POINTS = 10
+
+export const LEVELS = [
+  { at: 0, title: 'Nybegynder' },
+  { at: 10, title: 'Klistrelærling' },
+  { at: 25, title: 'Gadeplakat' },
+  { at: 45, title: 'Lygtepæls-kender' },
+  { at: 75, title: 'Byvandrer' },
+  { at: 115, title: 'Eventyrer' },
+  { at: 170, title: 'Globetrotter' },
+  { at: 240, title: 'Verdensstjerne' },
+  { at: 330, title: 'Mester-klistrer' },
+  { at: 450, title: 'Stenbygaard-legende' },
+]
+
+/** Sætter points (opnået) og worth (hvad den giver) på alle badges */
+function score(badges: Badge[]) {
+  for (const b of badges) {
+    if (b.kind === 'tier') {
+      const pts = TIER_POINTS[b.id] ?? (b.id.startsWith('continent-') ? OTHER_CONTINENT_POINTS : [])
+      b.steps?.forEach((s, i) => { s.points = pts[i] ?? 0 })
+      b.points = pts.slice(0, b.level).reduce((a, p) => a + p, 0)
+      b.worth = pts[b.level] ?? 0
+    }
+    else if (b.id === 'pioneer') {
+      b.worth = PIONEER_POINTS
+      b.points = (b.count ?? 0) * PIONEER_POINTS
+    }
+    else if (b.kind === 'record') {
+      b.worth = b.id.startsWith('year-') ? YEAR_POINTS : 0
+      b.points = b.earned && b.final ? b.worth : 0
+    }
+    else {
+      b.worth = SINGLE_POINTS[b.id] ?? 0
+      b.points = b.earned ? b.worth : 0
+    }
+  }
+  return badges
+}
+
+export function totalPoints(badges: Badge[]) {
+  return badges.reduce((sum, b) => sum + b.points, 0)
+}
+
+/** Level 1–10 ud fra point, med titel og hvad der skal til for næste */
+export function levelFor(points: number) {
+  const i = LEVELS.reduce((best, l, idx) => (points >= l.at ? idx : best), 0)
+  const next = LEVELS[i + 1]
+  return { level: i + 1, title: LEVELS[i]!.title, points, at: LEVELS[i]!.at, next }
 }
