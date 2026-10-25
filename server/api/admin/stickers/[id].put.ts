@@ -24,6 +24,6 @@ export default defineEventHandler(async (event) => {
     status: body?.status === 'approved' ? 'approved' : 'pending',
   }
   await saveSticker(sticker)
-  await deleteUnused(old.media, sticker.media)
+  await deleteUnused(event, old.media, sticker.media)
   return sticker
 })

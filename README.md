@@ -18,7 +18,7 @@ Stickers ligger i Upstash Redis, og uploadede billeder og videoer ligger i Verce
 | Variabel | Hvad |
 | --- | --- |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | Upstash Redis (stickers og stjerner) |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob (uploads) – kommer automatisk, når en Blob-store forbindes til projektet |
+| `BLOB_STORE_ID` (eller `BLOB_READ_WRITE_TOKEN`) | Vercel Blob (uploads) – kommer automatisk, når en Blob-store forbindes til projektet. Lageret skal være **Public** |
 | `ADMIN_PASSWORD` | Adgangskode til `/admin` |
 
 Under `npm run dev` uden variablerne gemmes alt i `.data/`, og admin-adgangskoden er `admin`.

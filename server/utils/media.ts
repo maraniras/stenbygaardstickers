@@ -1,11 +1,22 @@
-// Uploadede billeder og videoer ligger i Vercel Blob (BLOB_READ_WRITE_TOKEN).
-// Under `npm run dev` uden token gemmes de i `.data/` og serveres fra /api/media/.
+// Uploadede billeder og videoer ligger i Vercel Blob. Nye Blob-stores logger ind med
+// OIDC (BLOB_STORE_ID + headeren x-vercel-oidc-token), ældre med BLOB_READ_WRITE_TOKEN.
+// Under `npm run dev` uden nogen af dem gemmes filerne i `.data/` og serveres fra /api/media/.
 // Medier fra repoet ligger i public/media/ og slettes aldrig herfra.
 import { del } from '@vercel/blob'
+import type { H3Event } from 'h3'
 
-export const blobEnabled = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+const readWriteToken = process.env.BLOB_READ_WRITE_TOKEN
+export const blobEnabled = Boolean(readWriteToken || process.env.BLOB_STORE_ID)
 
-export const uploadMode: 'blob' | 'local' | 'off' = blobEnabled ? 'blob' : import.meta.dev ? 'local' : 'off'
+export const uploadMode: 'blob' | 'presigned' | 'local' | 'off' = readWriteToken
+  ? 'blob'
+  : process.env.BLOB_STORE_ID ? 'presigned' : import.meta.dev ? 'local' : 'off'
+
+/** OIDC-tokenet som Vercel sender med hver request til funktionen */
+export function blobAuth(event: H3Event) {
+  const oidcToken = getHeader(event, 'x-vercel-oidc-token')
+  return !readWriteToken && oidcToken ? { oidcToken } : {}
+}
 
 const BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/stickers\/[\w./-]+$/i
 const LOCAL_RE = /^\/api\/media\/[\w.-]+$/
@@ -20,13 +31,13 @@ function files(list: StickerMedia[]) {
 }
 
 /** Sletter uploadede filer, som ikke længere bruges */
-export async function deleteUnused(before: StickerMedia[], after: StickerMedia[] = []) {
+export async function deleteUnused(event: H3Event, before: StickerMedia[], after: StickerMedia[] = []) {
   const keep = new Set(files(after))
   const gone = files(before).filter(src => !keep.has(src))
   const blobs = gone.filter(src => BLOB_RE.test(src))
   const local = gone.filter(src => LOCAL_RE.test(src))
   try {
-    if (blobs.length && blobEnabled) await del(blobs)
+    if (blobs.length && blobEnabled) await del(blobs, blobAuth(event))
     for (const src of local) await useStorage('data').removeItem(`uploads:${src.split('/').pop()}`)
   }
   catch (err) {

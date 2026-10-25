@@ -1,14 +1,15 @@
 // Upload fra browseren: billeder skaleres ned og laves om til webp (eller jpeg
 // på browsere uden webp-encoder), videoer sendes som de er med et stillbillede.
 // Filerne går direkte til Vercel Blob – eller til .data/ under `npm run dev`.
-import { upload } from '@vercel/blob/client'
+import { upload, uploadPresigned } from '@vercel/blob/client'
 
 export const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 
-let modePromise: Promise<'blob' | 'local' | 'off'> | undefined
+type Mode = 'blob' | 'presigned' | 'local' | 'off'
+let modePromise: Promise<Mode> | undefined
 
 function uploadMode() {
-  modePromise ??= $fetch<{ mode: 'blob' | 'local' | 'off' }>('/api/upload')
+  modePromise ??= $fetch<{ mode: Mode }>('/api/upload')
     .then(r => r.mode)
     .catch((err) => {
       modePromise = undefined
@@ -29,12 +30,14 @@ async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void)
     onProgress?.(100)
     return r.url
   }
-  const r = await upload(`stickers/${randomName()}.${ext}`, blob, {
-    access: 'public',
+  const options = {
+    access: 'public' as const,
     handleUploadUrl: '/api/upload',
     multipart: blob.size > 8 * 1024 * 1024,
-    onUploadProgress: e => onProgress?.(e.percentage),
-  })
+    onUploadProgress: (e: { percentage: number }) => onProgress?.(e.percentage),
+  }
+  const pathname = `stickers/${randomName()}.${ext}`
+  const r = mode === 'presigned' ? await uploadPresigned(pathname, blob, options) : await upload(pathname, blob, options)
   return r.url
 }
 

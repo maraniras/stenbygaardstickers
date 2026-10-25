@@ -5,6 +5,6 @@ export default defineEventHandler(async (event) => {
   const old = await getStored(id)
   if (!old) throw createError({ statusCode: 404, statusMessage: 'Sticker findes ikke' })
   await removeSticker(id)
-  await deleteUnused(old.media)
+  await deleteUnused(event, old.media)
   return { ok: true }
 })
