@@ -11,34 +11,19 @@ export const CHANGELOG: Release[] = [
   {
     version: '2.0',
     notes: [
+      'Tilføj selv en sticker med + knappen',
+      'Nye stickers dukker op af sig selv',
+      'Del en sticker med dine venner',
+      'Se Emils rejse som animation på kortet',
       'Få besked, når Emil lander et nyt sted 🔔',
       'Profiler med badges og levels – tryk på et navn',
       'Verdenskort over alle lande Emil har været i',
-      'Datoen udfyldes selv fra billedet, når du tilføjer en sticker',
       'Installer appen på din telefon',
-      'Påsketema 🐣',
+      'Halloween-, jule- og påsketema 🎃🎄🐣',
     ],
   },
   {
-    version: '1.3',
-    date: '2026-10-25',
-    notes: [
-      'Halloween- og juletema 🎃🎄',
-    ],
-  },
-  {
-    version: '1.2',
-    date: '2026-10-25',
-    notes: [
-      'Tilføj selv en sticker med + knappen',
-      'Nye stickers dukker op af sig selv',
-      'Luftfoto på kortet',
-      'Del en sticker med dine venner',
-      'Se Emils rejse som animation på kortet',
-    ],
-  },
-  {
-    version: '1.1',
+    version: '1.0.1',
     date: '2026-10-23',
     notes: [
       'Opdater-knap på kortet og listen',
