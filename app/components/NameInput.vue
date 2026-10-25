@@ -189,7 +189,7 @@ function onBlur() {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--text);
+  background: var(--ink);
   color: #fff;
   font-weight: 800;
 }

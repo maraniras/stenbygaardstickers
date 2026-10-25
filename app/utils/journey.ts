@@ -78,8 +78,8 @@ export async function playJourney(
   onPinClick: (id: string) => void,
   signal: AbortSignal,
 ) {
-  const pin = L.divIcon({ className: 'head-pin journey-pin', html: '<img src="/marker.png" alt="">', iconSize: [46, 46], iconAnchor: [23, 41] })
-  const head = L.divIcon({ className: 'journey-head', html: '<img src="/marker.png" alt="">', iconSize: [40, 40], iconAnchor: [20, 20] })
+  const pin = L.divIcon({ className: 'head-pin journey-pin', html: '<div class="pin"><img src="/marker.png" alt=""></div>', iconSize: [46, 46], iconAnchor: [23, 41] })
+  const head = L.divIcon({ className: 'journey-head', html: '<div class="pin"><img src="/marker.png" alt=""></div>', iconSize: [40, 40], iconAnchor: [20, 20] })
   const home = L.divIcon({ className: 'journey-home', html: '<span>🏠</span>', iconSize: [34, 34], iconAnchor: [17, 17] })
   const line = { color: '#111114', weight: 3, opacity: 0.85, dashArray: '1 9', lineCap: 'round' as const }
 

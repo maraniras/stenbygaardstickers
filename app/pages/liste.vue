@@ -116,7 +116,7 @@ h1 { font-size: 34px; }
   margin-top: 8px;
   padding: 16px 18px;
   border-radius: 18px;
-  background: var(--text);
+  background: var(--ink);
   color: #fff;
   text-decoration: none;
 }

@@ -24,7 +24,7 @@ function place(lat: number, lng: number, opts: { fly?: boolean, zoom?: number } 
   locateError.value = ''
   if (!map || !L) return
   if (!marker) {
-    const icon = L.divIcon({ className: 'head-pin', html: '<img src="/marker.png" alt="">', iconSize: [48, 48], iconAnchor: [24, 42] })
+    const icon = L.divIcon({ className: 'head-pin', html: '<div class="pin"><img src="/marker.png" alt=""></div>', iconSize: [48, 48], iconAnchor: [24, 42] })
     marker = L.marker([lat, lng], { icon, draggable: true }).addTo(map)
     marker.on('dragend', () => {
       const p = marker!.getLatLng()
@@ -162,7 +162,7 @@ onBeforeUnmount(() => map?.remove())
   font-weight: 700;
   cursor: pointer;
 }
-.layers.on { background: var(--text); color: #fff; }
+.layers.on { background: var(--ink); color: #fff; }
 .hint {
   position: absolute;
   left: 50%;
@@ -171,7 +171,7 @@ onBeforeUnmount(() => map?.remove())
   margin: 0;
   padding: 6px 12px;
   border-radius: 999px;
-  background: var(--text);
+  background: var(--ink);
   color: #fff;
   font-size: 13px;
   font-weight: 600;

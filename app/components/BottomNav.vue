@@ -42,7 +42,7 @@ a {
   transition: background .2s, color .2s;
 }
 a.on {
-  background: var(--text);
+  background: var(--ink);
   color: #fff;
 }
 svg {

@@ -147,7 +147,7 @@ onMounted(async () => {
     }),
   })
 
-  const icon = L.divIcon({ className: 'head-pin', html: '<img src="/marker.png" alt="">', iconSize: [52, 52], iconAnchor: [26, 46] })
+  const icon = L.divIcon({ className: 'head-pin', html: '<div class="pin"><img src="/marker.png" alt=""></div>', iconSize: [52, 52], iconAnchor: [26, 46] })
   buildMarkers = () => {
     markers.clear()
     for (const s of stickers.value) {
@@ -370,13 +370,13 @@ onBeforeUnmount(() => {
 .j-bar span {
   display: block;
   height: 100%;
-  background: var(--text);
+  background: var(--ink);
   transition: width .4s;
 }
 .j-actions { display: flex; gap: 8px; margin-top: 6px; }
 .j-actions .btn { flex: 1; min-height: 44px; font-size: 15px; }
 .filter {
-  background: var(--text) !important;
+  background: var(--ink) !important;
   color: #fff;
 }
 .filter svg {
@@ -413,7 +413,7 @@ onBeforeUnmount(() => {
 }
 .round.layers { bottom: calc(var(--nav-space) + 58px); }
 .round.layers.on {
-  background: var(--text);
+  background: var(--ink);
   color: #fff;
 }
 .empty {

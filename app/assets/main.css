@@ -14,6 +14,8 @@
   --on-accent: #111114;
   --star: #ffb800;
   --cluster: #111114;
+  /* Mørke flader: aktiv menu, knapper, "Længst væk" … */
+  --ink: #111114;
   --shadow-sm: 0 1px 2px rgba(17, 17, 20, .06), 0 2px 8px rgba(17, 17, 20, .06);
   --shadow: 0 2px 6px rgba(17, 17, 20, .06), 0 12px 32px rgba(17, 17, 20, .12);
   --radius: 22px;
@@ -71,7 +73,7 @@ h1, h2, h3 {
   padding: 0 22px;
   border: 0;
   border-radius: 16px;
-  background: var(--text);
+  background: var(--ink);
   color: #fff;
   font-weight: 700;
   text-decoration: none;
@@ -123,20 +125,28 @@ a.chip, button.chip { cursor: pointer; }
   background: none;
   border: 0;
 }
-.head-pin img {
+/* Hovedet og en evt. temahat ligger i .pin, så de skaleres sammen */
+.head-pin .pin, .journey-head .pin {
+  position: relative;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
   transition: transform .2s cubic-bezier(.3, 1.5, .5, 1);
   transform-origin: 50% 90%;
 }
-.head-pin.active img { transform: scale(1.4); }
+.head-pin img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
+}
+.head-pin.active .pin { transform: scale(1.4); }
 
 /* Emils rejse */
-.journey-pin img { animation: journey-pop .45s cubic-bezier(.3, 1.6, .5, 1); }
+.journey-pin .pin { animation: journey-pop .45s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes journey-pop { from { transform: scale(0); } }
 .journey-head { background: none; border: 0; }
 .journey-head img {
+  display: block;
   width: 100%;
   height: 100%;
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .4));
@@ -208,6 +218,11 @@ a.chip, button.chip { cursor: pointer; }
 /* ── Sæsontemaer (useTheme.ts) ─────────────────────────────────────────── */
 [data-theme="halloween"] {
   --bg: #f6efe8;
+  --surface: #fffaf5;
+  --surface-2: #f3e5d8;
+  --hairline: rgba(59, 33, 87, .12);
+  --ink: #3b2157;
+  --title: #3b2157;
   --accent: #ff7a1a;
   --accent-light: #ffb35c;
   --accent-soft: #ffe2c9;
@@ -222,6 +237,11 @@ a.chip, button.chip { cursor: pointer; }
 
 [data-theme="jul"] {
   --bg: #f2f6f3;
+  --surface: #ffffff;
+  --surface-2: #e6f0e9;
+  --hairline: rgba(31, 107, 58, .14);
+  --ink: #1f5c37;
+  --title: #b3202c;
   --accent: #d62f3c;
   --accent-light: #ff7b7b;
   --accent-soft: #fde1e3;
@@ -236,27 +256,43 @@ a.chip, button.chip { cursor: pointer; }
 /* Luftfoto beholder sine farver i alle temaer */
 :root .satellite .leaflet-tile-pane { filter: none; }
 
-/* Hat på Emil – heksehat til halloween, nissehue til jul */
-[data-theme="halloween"] .head-pin::after,
-[data-theme="halloween"] .journey-head::after,
-[data-theme="jul"] .head-pin::after,
-[data-theme="jul"] .journey-head::after {
-  content: '';
+/* Hat på Emil – heksehat til halloween, nissehue til jul. Placeret over issen
+   (toppen af hovedet er ca. 47–55 % inde og helt øverst i marker.png) */
+[data-theme="halloween"] .pin::after,
+[data-theme="jul"] .pin::after {
+  content: "";
   position: absolute;
-  left: 2%;
-  top: -34%;
-  width: 70%;
-  height: 56%;
-  background: url('/theme/witch-hat.svg') center / contain no-repeat;
-  transform: rotate(-14deg);
+  left: 22%;
+  top: -27%;
+  width: 64%;
+  height: 52%;
+  background: url("/theme/witch-hat.svg") center bottom / contain no-repeat;
+  transform: rotate(14deg);
+  transform-origin: 50% 85%;
   pointer-events: none;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .3));
 }
-[data-theme="jul"] .head-pin::after,
-[data-theme="jul"] .journey-head::after {
-  top: -22%;
-  left: 0;
-  width: 74%;
-  background-image: url('/theme/santa-hat.svg');
-  transform: rotate(-10deg);
+[data-theme="jul"] .pin::after {
+  left: 20%;
+  top: -23%;
+  width: 68%;
+  background-image: url("/theme/santa-hat.svg");
+  transform: rotate(10deg);
 }
+
+/* Mere farve i temaerne: overskrifter, en blød glød i toppen og farvet glas */
+[data-theme] h1 { color: var(--title, var(--text)); }
+[data-theme="halloween"] body {
+  background:
+    radial-gradient(120% 340px at 50% -80px, rgba(255, 122, 26, .28), transparent 70%),
+    radial-gradient(80% 260px at 100% 0, rgba(123, 63, 191, .16), transparent 70%),
+    var(--bg) no-repeat;
+}
+[data-theme="jul"] body {
+  background:
+    radial-gradient(120% 340px at 50% -80px, rgba(214, 47, 60, .2), transparent 70%),
+    radial-gradient(80% 260px at 0 0, rgba(31, 107, 58, .16), transparent 70%),
+    var(--bg) no-repeat;
+}
+[data-theme="halloween"] .glass { box-shadow: var(--shadow), inset 0 0 0 1.5px rgba(255, 122, 26, .35); }
+[data-theme="jul"] .glass { box-shadow: var(--shadow), inset 0 0 0 1.5px rgba(214, 47, 60, .3); }

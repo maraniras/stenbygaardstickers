@@ -150,7 +150,7 @@ function dismiss(job: Job) {
   left: 0;
   bottom: 0;
   height: 4px;
-  background: var(--text);
+  background: var(--ink);
   transition: width .2s;
 }
 .add {
