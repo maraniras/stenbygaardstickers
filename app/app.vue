@@ -39,6 +39,7 @@ useNuxtApp().hook('page:finish', () => {
     <ThemeDecor />
     <InstallPrompt />
     <PushPrompt />
+    <UpdateToast />
   </div>
 </template>
 
