@@ -208,7 +208,7 @@ onBeforeUnmount(() => {
       <div v-if="!journey" class="chips">
         <button v-if="visible.length" class="chip glass play" @click="startJourney">
           <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5Z" /></svg>
-          {{ person ? `${genitive(person)} rejse` : 'Emils rejse' }}
+          {{ person ? `${genitive(person)} rejse` : 'Se rejsen' }}
         </button>
         <button v-if="person" class="chip glass filter" @click="clearPerson">
           Sat op af {{ person }}
