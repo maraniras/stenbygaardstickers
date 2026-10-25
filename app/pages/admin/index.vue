@@ -79,6 +79,8 @@ function submitted(s: StoredSticker) {
           <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
         </NuxtLink>
       </div>
+
+      <AdminBackups />
     </template>
 
     <p v-else class="empty">Henter…</p>

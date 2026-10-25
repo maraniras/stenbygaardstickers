@@ -22,6 +22,25 @@ function back() {
   else router.push('/')
 }
 
+// Telefonens egen del-menu – ellers kopieres linket
+const copied = ref(false)
+async function share() {
+  const s = sticker.value
+  if (!s) return
+  const url = `${location.origin}/sticker/${s.id}`
+  if (navigator.share) {
+    try { await navigator.share({ title: s.title, text: `Emil i ${s.city}`, url }) }
+    catch {}
+    return
+  }
+  try {
+    await navigator.clipboard.writeText(url)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 2000)
+  }
+  catch {}
+}
+
 // Stop videoer der ikke er i fokus
 watch(index, (i) => {
   track.value?.querySelectorAll('video').forEach((v) => {
@@ -53,6 +72,12 @@ watch(index, (i) => {
       <button class="back glass" aria-label="Tilbage" @click="back">
         <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
       </button>
+      <button class="back share glass" aria-label="Del sticker" title="Del sticker" @click="share">
+        <svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5" /><path d="M7 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1" /></svg>
+      </button>
+      <Transition name="fade">
+        <span v-if="copied" class="copied glass">Link kopieret</span>
+      </Transition>
       <div v-if="sticker.media.length > 1" class="dots">
         <button v-for="(m, i) in sticker.media" :key="m.src" :class="{ on: i === index }" :aria-label="`Medie ${i + 1}`" @click="goTo(i)" />
       </div>
@@ -160,6 +185,19 @@ watch(index, (i) => {
   cursor: pointer;
 }
 .back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.share { left: auto; right: 12px; }
+.share svg { width: 20px; height: 20px; stroke-width: 2.1; }
+.copied {
+  position: absolute;
+  top: calc(20px + var(--safe-t));
+  right: 64px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.fade-enter-active, .fade-leave-active { transition: opacity .2s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 .dots {
   position: absolute;
   left: 50%;
