@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Level 1–10 på profilen: ring der fyldes op mod næste level, titel og point.
-// Tryk for at se alle levels.
+// Level 1–10 på profilen: level-badge, titel, point og en bjælke mod næste level.
+// Tryk for at se alle levels med deres badges.
 const props = defineProps<{ points: number }>()
 const open = ref(false)
 
@@ -13,21 +13,20 @@ const pct = computed(() => {
 
 <template>
   <button class="level" :aria-expanded="open" @click="open = !open">
-    <span class="ring" :style="{ '--pct': `${pct}%` }">
-      <span class="inner"><small>Level</small>{{ lv.level }}</span>
-    </span>
+    <LevelBadge :level="lv.level" :size="68" />
     <span class="info">
+      <span class="eyebrow">Level {{ lv.level }}</span>
       <b>{{ lv.title }}</b>
-      <span>{{ lv.points }} point</span>
-      <span v-if="lv.next" class="to-next">{{ lv.next.at - lv.points }} point til {{ lv.next.title }}</span>
-      <span v-else class="to-next">Højeste level nået 🎉</span>
+      <span class="bar"><span :style="{ width: `${pct}%` }" /></span>
+      <span v-if="lv.next" class="to-next">{{ lv.points }} point · {{ lv.next.at - lv.points }} til {{ lv.next.title }}</span>
+      <span v-else class="to-next">{{ lv.points }} point · højeste level 🎉</span>
     </span>
     <svg class="chev" :class="{ open }" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
   </button>
 
   <ol v-if="open" class="levels">
     <li v-for="(l, i) in LEVELS" :key="l.at" :class="{ done: lv.level > i, current: lv.level === i + 1 }">
-      <span class="n">{{ i + 1 }}</span>
+      <LevelBadge :level="i + 1" :size="30" class="lb" />
       <span class="t">{{ l.title }}</span>
       <span class="p">{{ l.at }} p</span>
     </li>
@@ -51,39 +50,22 @@ const pct = computed(() => {
   color: inherit;
   cursor: pointer;
 }
-.ring {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: conic-gradient(var(--accent) var(--pct), var(--surface-2) 0);
+.info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.info b { font-size: 19px; line-height: 1.2; }
+.bar {
+  height: 7px;
+  margin: 6px 0 2px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
 }
-.inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: var(--surface);
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1;
+.bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
 }
-.inner small {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.info b { font-size: 18px; }
-.info span { font-size: 14px; color: var(--muted); }
-.info .to-next { font-size: 13px; font-weight: 600; color: var(--text); }
+.to-next { font-size: 13px; font-weight: 600; color: var(--muted); }
 .chev { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
 .chev.open { transform: rotate(180deg); }
 .levels {
@@ -97,24 +79,14 @@ const pct = computed(() => {
 .levels li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 8px;
+  gap: 12px;
+  padding: 6px 8px;
   border-radius: 12px;
   color: var(--muted);
 }
+.levels li:not(.done) .lb { filter: grayscale(1); opacity: .45; }
 .levels li.done { color: var(--text); }
 .levels li.current { background: var(--accent-soft); font-weight: 700; }
-.n {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--surface-2);
-  font-size: 12px;
-  font-weight: 800;
-}
-.done .n { background: var(--accent); color: var(--on-accent); }
 .t { flex: 1; }
 .p { font-size: 13px; font-variant-numeric: tabular-nums; }
 </style>

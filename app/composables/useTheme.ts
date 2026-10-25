@@ -44,18 +44,12 @@ export function themeForDate(d = new Date()): Theme {
   return 'normal'
 }
 
-/** Midlertidigt: på dev-siden (Vercel Preview) vises påsketemaet altid, så det kan ses */
-function devTheme(): Theme | undefined {
-  if (import.meta.client && location.hostname.includes('-git-dev-')) return 'paaske'
-  return undefined
-}
-
 export function useTheme() {
   const theme = useState<Theme>('theme', () => {
     // Fjern et evt. valg fra den gamle midlertidige tema-knap
     try { localStorage.removeItem('stenbygaard-theme') }
     catch {}
-    return devTheme() ?? themeForDate()
+    return themeForDate()
   })
   return { theme }
 }

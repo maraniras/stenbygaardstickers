@@ -56,7 +56,7 @@ const groups = computed(() => {
             <span class="avatar">{{ p.name[0] }}</span>
             {{ p.name }}
             <span class="n">{{ p.count }}</span>
-            <span class="medals" :title="`Level ${levels[p.name]!.level} · ${levels[p.name]!.title}`">Lvl {{ levels[p.name]!.level }}</span>
+            <LevelBadge :level="levels[p.name]!.level" :size="24" :title="`Level ${levels[p.name]!.level} · ${levels[p.name]!.title}`" />
           </NuxtLink>
         </div>
       </section>
@@ -161,14 +161,6 @@ h1 { font-size: 34px; }
   border-radius: 50%;
   background: var(--accent-soft);
   font-weight: 800;
-}
-.medals {
-  padding: 1px 7px 1px 5px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
 }
 .n {
   min-width: 24px;
