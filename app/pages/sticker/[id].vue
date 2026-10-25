@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
+const { getSticker } = useStickers()
 const sticker = computed(() => getSticker(String(route.params.id)))
 const index = ref(0)
 const track = ref<HTMLElement>()

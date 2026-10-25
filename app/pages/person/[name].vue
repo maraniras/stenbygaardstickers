@@ -1,9 +1,10 @@
 <script setup lang="ts">
 const route = useRoute()
+const { people, stickersBy } = useStickers()
 const router = useRouter()
 const name = computed(() => String(route.params.name))
 const list = computed(() => stickersBy(name.value))
-const displayName = computed(() => people.find(p => p.name.localeCompare(name.value, 'da', { sensitivity: 'base' }) === 0)?.name ?? name.value)
+const displayName = computed(() => people.value.find(p => p.name.localeCompare(name.value, 'da', { sensitivity: 'base' }) === 0)?.name ?? name.value)
 const countries = computed(() => new Set(list.value.map(s => s.countryCode)).size)
 const farthest = computed(() => list.value.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined))
 

@@ -45,7 +45,7 @@ export function useRatings() {
     const count = (prev?.count ?? 0) + (prev?.mine ? 0 : 1)
     ratings.value = { ...ratings.value, [stickerId]: { avg: values / count, count, mine: stars } }
     try {
-      ratings.value = await $fetch('/api/ratings', { method: 'POST', body: { stickerId, device, stars } })
+      ratings.value = await $fetch<Record<string, RatingSummary>>('/api/ratings', { method: 'POST', body: { stickerId, device, stars } })
     }
     catch {
       ratings.value = { ...ratings.value, [stickerId]: prev ?? { avg: 0, count: 0 } }

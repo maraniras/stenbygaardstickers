@@ -9,22 +9,7 @@ export interface RatingSummary {
   mine?: number
 }
 
-const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
-const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
-
-export const ratingsEnabled = Boolean(url && token) || import.meta.dev
-
-async function pipeline(cmds: (string | number)[][]) {
-  const res = await $fetch<{ result: unknown, error?: string }[]>(`${url}/pipeline`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: cmds,
-  })
-  return res.map((r) => {
-    if (r.error) throw new Error(r.error)
-    return r.result
-  })
-}
+export const ratingsEnabled = redisEnabled || import.meta.dev
 
 function summarize(values: number[], mine?: number): RatingSummary {
   const sum = values.reduce((a, b) => a + b, 0)
@@ -35,16 +20,16 @@ type LocalData = Record<string, Record<string, number>>
 
 export async function getRatings(device?: string) {
   const out: Record<string, RatingSummary> = {}
-  if (!url) {
+  if (!redisEnabled) {
     const data = (await useStorage('data').getItem<LocalData>('ratings')) ?? {}
     for (const [id, byDevice] of Object.entries(data)) {
       out[id] = summarize(Object.values(byDevice), device ? byDevice[device] : undefined)
     }
     return out
   }
-  const [ids] = await pipeline([['SMEMBERS', 'rated']]) as [string[]]
+  const [ids] = await redis([['SMEMBERS', 'rated']]) as [string[]]
   if (!ids.length) return out
-  const res = await pipeline(ids.flatMap(id => [['HVALS', `rating:${id}`], ['HGET', `rating:${id}`, device || '-']]))
+  const res = await redis(ids.flatMap(id => [['HVALS', `rating:${id}`], ['HGET', `rating:${id}`, device || '-']]))
   ids.forEach((id, i) => {
     const values = (res[i * 2] as string[]).map(Number)
     const mine = res[i * 2 + 1] as string | null
@@ -54,14 +39,14 @@ export async function getRatings(device?: string) {
 }
 
 export async function setRating(stickerId: string, device: string, stars: number) {
-  if (!url) {
+  if (!redisEnabled) {
     const storage = useStorage('data')
     const data = (await storage.getItem<LocalData>('ratings')) ?? {}
     data[stickerId] = { ...data[stickerId], [device]: stars }
     await storage.setItem('ratings', data)
     return
   }
-  await pipeline([
+  await redis([
     ['HSET', `rating:${stickerId}`, device, stars],
     ['SADD', 'rated', stickerId],
   ])

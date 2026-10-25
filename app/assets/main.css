@@ -144,3 +144,40 @@ a.chip, button.chip { cursor: pointer; }
   font-size: 15px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
 }
+
+/* Formularer (upload og admin) */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form input, .form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+.form input:focus, .form textarea:focus { border-color: var(--text); }
+.form input.invalid { border-color: #c62828; }
+.form textarea {
+  min-height: 120px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.form .hint-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.btn:disabled { opacity: .45; cursor: default; transform: none; }
+.btn.danger { background: #fdecea; color: #c62828; }

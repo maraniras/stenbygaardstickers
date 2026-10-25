@@ -7,15 +7,17 @@ const route = useRoute()
 const router = useRouter()
 const el = ref<HTMLElement>()
 const selected = ref<Sticker>()
+const { stickers, stickersBy, getSticker } = useStickers()
 
 const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
-const visible = computed(() => (person.value ? stickersBy(person.value) : stickers))
+const visible = computed(() => (person.value ? stickersBy(person.value) : stickers.value))
 const farthest = computed(() => visible.value.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined))
 const countries = computed(() => new Set(visible.value.map(s => s.countryCode)).size)
 
 let map: LMap | undefined
 let cluster: MarkerClusterGroup | undefined
 const markers = new Map<string, Marker>()
+let buildMarkers: (() => void) | undefined
 
 function setActive(id: string | undefined) {
   for (const [key, m] of markers) m.getElement()?.classList.toggle('active', key === id)
@@ -92,18 +94,29 @@ onMounted(async () => {
   })
 
   const icon = L.divIcon({ className: 'head-pin', html: '<img src="/marker.png" alt="">', iconSize: [52, 52], iconAnchor: [26, 46] })
-  for (const s of stickers) {
-    const m = L.marker([s.lat, s.lng], { icon, title: s.title, riseOnHover: true })
-    m.on('click', () => select(s))
-    m.on('add', () => setActive(selected.value?.id))
-    markers.set(s.id, m)
+  buildMarkers = () => {
+    markers.clear()
+    for (const s of stickers.value) {
+      const m = L.marker([s.lat, s.lng], { icon, title: s.title, riseOnHover: true })
+      m.on('click', () => select(s))
+      m.on('add', () => setActive(selected.value?.id))
+      markers.set(s.id, m)
+    }
   }
+  buildMarkers()
   cluster.on('animationend', () => setActive(selected.value?.id))
   map.addLayer(cluster)
   map.on('click', () => select(undefined))
 
   showVisible()
   openFromQuery()
+})
+
+// Nye eller rettede stickers (fx efter godkendelse i admin)
+watch(stickers, () => {
+  if (!buildMarkers) return
+  buildMarkers()
+  showVisible()
 })
 
 onActivated(() => {

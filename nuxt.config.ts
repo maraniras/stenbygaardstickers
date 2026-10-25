@@ -1,7 +1,13 @@
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   ssr: false,
   devtools: { enabled: false },
+  nitro: {
+    // JSON-filerne er startdata, som serveren kopierer ind i databasen (server/utils/stickers.ts)
+    serverAssets: [{ baseName: 'seed', dir: fileURLToPath(new URL('./app/data/stickers', import.meta.url)) }],
+  },
   css: ['leaflet/dist/leaflet.css', '~/assets/main.css'],
   app: {
     head: {

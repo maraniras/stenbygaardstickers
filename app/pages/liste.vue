@@ -1,17 +1,18 @@
 <script setup lang="ts">
 const sort = ref<'date' | 'far' | 'stars'>('date')
+const { stickers, people, stats } = useStickers()
 const { ratings, enabled } = useRatings()
 
 const groups = computed(() => {
   if (sort.value === 'far') {
-    return [{ label: '', items: [...stickers].sort((a, b) => b.distanceKm - a.distanceKm) }]
+    return [{ label: '', items: [...stickers.value].sort((a, b) => b.distanceKm - a.distanceKm) }]
   }
   if (sort.value === 'stars') {
     const avg = (s: Sticker) => ratings.value[s.id]?.avg ?? 0
-    return [{ label: '', items: [...stickers].sort((a, b) => avg(b) - avg(a)) }]
+    return [{ label: '', items: [...stickers.value].sort((a, b) => avg(b) - avg(a)) }]
   }
   const out: { label: string, items: Sticker[] }[] = []
-  for (const s of stickers) {
+  for (const s of stickers.value) {
     const label = new Date(`${s.date}T12:00:00`).toLocaleDateString('da-DK', { month: 'long', year: 'numeric' })
     if (out.at(-1)?.label !== label) out.push({ label, items: [] })
     out.at(-1)!.items.push(s)
@@ -66,6 +67,8 @@ const groups = computed(() => {
         <StickerCard v-for="s in g.items" :key="s.id" :sticker="s" />
       </div>
     </section>
+
+    <NuxtLink class="add-link" to="/upload">Har du sat en sticker op? Tilføj den her</NuxtLink>
   </div>
 </template>
 
@@ -181,5 +184,14 @@ h1 { font-size: 34px; }
   display: grid;
   gap: 14px;
   margin-top: 14px;
+}
+.add-link {
+  display: block;
+  margin: 32px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+  text-underline-offset: 3px;
 }
 </style>

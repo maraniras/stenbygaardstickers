@@ -1,27 +1,5 @@
-export interface StickerMedia {
-  type: 'image' | 'video'
-  src: string
-  /** Stillbillede til video */
-  poster?: string
-  width?: number
-  height?: number
-}
-
-export interface StickerData {
-  id: string
-  title: string
-  /** YYYY-MM-DD */
-  date: string
-  placedBy: string[]
-  lat: number
-  lng: number
-  country: string
-  /** ISO 3166-1 alpha-2, fx "DK" */
-  countryCode: string
-  city: string
-  description: string
-  media: StickerMedia[]
-}
+// StickerData og StickerMedia ligger i shared/types/sticker.ts.
+// Selve listen hentes fra serveren med useStickers().
 
 export interface Sticker extends StickerData {
   distanceKm: number
@@ -38,15 +16,11 @@ export function distanceKm(a: { lat: number, lng: number }, b: { lat: number, ln
   return 2 * R * Math.asin(Math.sqrt(h))
 }
 
-const files = import.meta.glob<StickerData>('../data/stickers/*.json', { eager: true, import: 'default' })
-
-/** Alle stickers, nyeste først */
-export const stickers: Sticker[] = Object.values(files)
-  .map(s => ({ ...s, distanceKm: distanceKm(AALBORG, s) }))
-  .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title))
-
-export function getSticker(id: string) {
-  return stickers.find(s => s.id === id)
+/** Med afstand fra Aalborg, nyeste først */
+export function withDistance(list: StickerData[]): Sticker[] {
+  return list
+    .map(s => ({ ...s, distanceKm: distanceKm(AALBORG, s) }))
+    .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title))
 }
 
 export function googleMapsUrl(s: { lat: number, lng: number }) {
@@ -72,16 +46,12 @@ export function thumbnail(s: StickerData) {
   return m.type === 'video' ? m.poster : m.src
 }
 
-const sameName = (a: string, b: string) => a.localeCompare(b, 'da', { sensitivity: 'base' }) === 0
-
-export function stickersBy(name: string) {
-  return stickers.filter(s => s.placedBy.some(n => sameName(n, name)))
-}
+export const sameName = (a: string, b: string) => a.localeCompare(b, 'da', { sensitivity: 'base' }) === 0
 
 /** Alle der har sat stickers op, flest først */
-export const people = (() => {
+export function countPeople(list: StickerData[]) {
   const counts = new Map<string, number>()
-  for (const s of stickers) {
+  for (const s of list) {
     for (const n of s.placedBy) {
       const key = [...counts.keys()].find(k => sameName(k, n)) ?? n
       counts.set(key, (counts.get(key) ?? 0) + 1)
@@ -89,7 +59,7 @@ export const people = (() => {
   }
   return [...counts].map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
-})()
+}
 
 /** Dansk ejefald: Nicoles, Mathias' */
 export function genitive(name: string) {
@@ -100,9 +70,68 @@ export function personUrl(name: string) {
   return `/person/${encodeURIComponent(name)}`
 }
 
-export const stats = {
-  count: stickers.length,
-  countries: new Set(stickers.map(s => s.countryCode)).size,
-  cities: new Set(stickers.map(s => `${s.countryCode}:${s.city}`)).size,
-  farthest: stickers.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined),
+export function statsFor(list: Sticker[]) {
+  return {
+    count: list.length,
+    countries: new Set(list.map(s => s.countryCode)).size,
+    cities: new Set(list.map(s => `${s.countryCode}:${s.city}`)).size,
+    farthest: list.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined),
+  }
+}
+
+/** Koordinat som Google Maps kopierer det: "55.676098, 12.568337" */
+export function formatCoords(lat: number, lng: number) {
+  return `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+}
+
+/** Læser "55.676098, 12.568337" (også med mellemrum eller semikolon) */
+export function parseCoords(text: string) {
+  const m = text.trim().match(/^(-?\d{1,2}(?:\.\d+)?)\s*[,;\s]\s*(-?\d{1,3}(?:\.\d+)?)$/)
+  if (!m) return undefined
+  const lat = Number(m[1])
+  const lng = Number(m[2])
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return undefined
+  return { lat, lng }
+}
+
+export function today() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** Det upload- og admin-formularen redigerer */
+export interface StickerDraft {
+  title: string
+  date: string
+  description: string
+  placedBy: string[]
+  location: { lat: number, lng: number } | null
+  media: StickerMedia[]
+  city: string
+  country: string
+  countryCode: string
+}
+
+export function emptyDraft(): StickerDraft {
+  return { title: '', date: today(), description: '', placedBy: [], location: null, media: [], city: '', country: '', countryCode: '' }
+}
+
+export function draftFrom(s: StickerData): StickerDraft {
+  return {
+    title: s.title,
+    date: s.date,
+    description: s.description,
+    placedBy: [...s.placedBy],
+    location: { lat: s.lat, lng: s.lng },
+    media: [...s.media],
+    city: s.city,
+    country: s.country,
+    countryCode: s.countryCode,
+  }
+}
+
+/** Det serveren skal have */
+export function draftBody(d: StickerDraft) {
+  const { location, ...rest } = d
+  return { ...rest, lat: location?.lat, lng: location?.lng }
 }
