@@ -10,6 +10,9 @@ export default defineNuxtConfig({
   },
   css: ['leaflet/dist/leaflet.css', '~/assets/main.css'],
   app: {
+    // Ikke Nuxts standard "/_nuxt/": nogle browsere har gemt en HTML-side under gamle
+    // /_nuxt/-filnavne (se server/middleware/missing-assets.ts). Ny mappe = nye adresser.
+    buildAssetsDir: '/_app/',
     head: {
       htmlAttrs: { lang: 'da' },
       title: 'Stenbygaard Stickers',
