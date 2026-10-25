@@ -2,6 +2,7 @@
 const sort = ref<'date' | 'far' | 'stars'>('date')
 const { stickers, people, stats } = useStickers()
 const { ratings, enabled } = useRatings()
+const badgeCount = computed(() => Object.fromEntries(people.value.map(p => [p.name, earnedCount(badgesFor(p.name, stickers.value, ratings.value))])))
 
 const groups = computed(() => {
   if (sort.value === 'far') {
@@ -27,13 +28,14 @@ const groups = computed(() => {
       <div class="title">
         <h1>Stickers</h1>
         <div class="title-actions">
+          <NotifyButton />
           <UploadButton />
           <RefreshButton />
         </div>
       </div>
       <div class="grid">
         <div class="stat"><b>{{ stats.count }}</b><span>{{ stats.count === 1 ? 'sticker' : 'stickers' }}</span></div>
-        <div class="stat"><b>{{ stats.countries }}</b><span>{{ stats.countries === 1 ? 'land' : 'lande' }}</span></div>
+        <NuxtLink class="stat link" to="/lande"><b>{{ stats.countries }}</b><span>{{ stats.countries === 1 ? 'land' : 'lande' }} <i>›</i></span></NuxtLink>
         <div class="stat"><b>{{ stats.cities }}</b><span>{{ stats.cities === 1 ? 'by' : 'byer' }}</span></div>
       </div>
       <NuxtLink v-if="stats.farthest" class="farthest" :to="`/sticker/${stats.farthest.id}`">
@@ -51,6 +53,7 @@ const groups = computed(() => {
             <span class="avatar">{{ p.name[0] }}</span>
             {{ p.name }}
             <span class="n">{{ p.count }}</span>
+            <span v-if="badgeCount[p.name]" class="medals" :title="`${badgeCount[p.name]} badges`">🏅 {{ badgeCount[p.name] }}</span>
           </NuxtLink>
         </div>
       </section>
@@ -107,6 +110,8 @@ h1 { font-size: 34px; }
 }
 .stat b { font-size: 28px; line-height: 1.1; letter-spacing: -0.02em; }
 .stat span { font-size: 13px; color: var(--muted); font-weight: 600; }
+.stat.link { text-decoration: none; }
+.stat.link i { font-style: normal; font-weight: 800; color: var(--accent); }
 .farthest {
   display: flex;
   align-items: center;
@@ -150,6 +155,14 @@ h1 { font-size: 34px; }
   border-radius: 50%;
   background: var(--accent-soft);
   font-weight: 800;
+}
+.medals {
+  padding: 1px 7px 1px 5px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .n {
   min-width: 24px;

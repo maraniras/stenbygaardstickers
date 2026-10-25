@@ -4,6 +4,6 @@ export default defineEventHandler(async (event) => {
   const { endpoint } = getQuery(event)
   return {
     publicKey: await vapidPublicKey(),
-    subscribed: typeof endpoint === 'string' ? await hasSub(endpoint) : false,
+    subscribed: typeof endpoint === 'string' ? await hasSub('admin', endpoint) : false,
   }
 })

@@ -1,75 +1,31 @@
 <script setup lang="ts">
-// "Få besked om nye stickers" – Web Push til denne telefon. Virker på Android og
-// computere; på iPhone kun når appen er føjet til hjemmeskærmen (iOS 16.4+).
+// "Få besked om nye indsendte stickers" – kun for admins
 const supported = ref(true)
-const on = ref(false)
-const busy = ref(false)
+const { on, busy, refresh, enable, disable } = usePush('admin')
 const message = ref('')
 const error = ref('')
 
-function keyBytes(base64: string) {
-  const b64 = (base64 + '='.repeat((4 - base64.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/')
-  return Uint8Array.from(atob(b64), c => c.charCodeAt(0))
-}
-
-async function registration() {
-  return (await navigator.serviceWorker.getRegistration('/')) ?? navigator.serviceWorker.register('/sw.js', { scope: '/' })
-}
-
-onMounted(async () => {
-  supported.value = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
-  if (!supported.value) return
-  const reg = await navigator.serviceWorker.getRegistration('/')
-  const sub = await reg?.pushManager.getSubscription()
-  if (!sub) return
-  const r = await $fetch<{ subscribed: boolean }>('/api/admin/push', { query: { endpoint: sub.endpoint } }).catch(() => undefined)
-  on.value = Boolean(r?.subscribed)
+onMounted(() => {
+  supported.value = pushSupported()
+  refresh()
 })
 
-async function enable() {
-  const permission = await Notification.requestPermission()
-  if (permission !== 'granted') {
-    error.value = 'Notifikationer er blokeret. Slå dem til for appen i telefonens indstillinger.'
-    return
-  }
-  const { publicKey } = await $fetch<{ publicKey: string }>('/api/admin/push')
-  const reg = await registration()
-  await navigator.serviceWorker.ready
-  let sub = await reg.pushManager.getSubscription()
-  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) })
-  await $fetch('/api/admin/push', { method: 'POST', body: sub.toJSON() })
-  on.value = true
-  message.value = 'Du får nu besked, når nogen indsender en sticker.'
-}
-
-async function disable() {
-  const reg = await navigator.serviceWorker.getRegistration('/')
-  const sub = await reg?.pushManager.getSubscription()
-  if (sub) {
-    await $fetch('/api/admin/push', { method: 'DELETE', body: { endpoint: sub.endpoint } })
-    await sub.unsubscribe()
-  }
-  on.value = false
-  message.value = ''
-}
-
 async function toggle() {
-  busy.value = true
   error.value = ''
   message.value = ''
   try {
-    await (on.value ? disable() : enable())
+    if (on.value) await disable()
+    else {
+      await enable()
+      message.value = 'Du får nu besked, når nogen indsender en sticker.'
+    }
   }
   catch (err: any) {
     error.value = err?.data?.statusMessage || err?.message || 'Det lykkedes ikke'
   }
-  finally {
-    busy.value = false
-  }
 }
 
 async function test() {
-  busy.value = true
   error.value = ''
   try {
     await $fetch('/api/admin/push/test', { method: 'POST' })
@@ -77,9 +33,6 @@ async function test() {
   }
   catch {
     error.value = 'Kunne ikke sende testbesked'
-  }
-  finally {
-    busy.value = false
   }
 }
 </script>
@@ -90,7 +43,7 @@ async function test() {
     <template v-if="supported">
       <button class="toggle" :class="{ on }" :disabled="busy" role="switch" :aria-checked="on" @click="toggle">
         <span class="text">
-          <b>Få besked om nye stickers</b>
+          <b>Få besked om nye indsendte stickers</b>
           <span>På denne telefon</span>
         </span>
         <span class="switch"><span /></span>

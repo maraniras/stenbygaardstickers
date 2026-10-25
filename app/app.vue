@@ -37,6 +37,7 @@ useNuxtApp().hook('page:finish', () => {
     </main>
     <BottomNav />
     <ThemeDecor />
+    <PushPrompt />
   </div>
 </template>
 

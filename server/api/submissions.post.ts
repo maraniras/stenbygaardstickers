@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
   await saveSticker(sticker)
   const by = sticker.placedBy.join(', ')
-  await notifyAdmins({
+  await notify('admin', {
     title: 'Ny sticker venter',
     body: `${sticker.title}${sticker.city ? ` i ${sticker.city}` : ''}${by ? ` – sat op af ${by}` : ''}`,
     url: `/admin/${sticker.id}`,

@@ -25,5 +25,14 @@ export default defineEventHandler(async (event) => {
   }
   await saveSticker(sticker)
   await deleteUnused(event, old.media, sticker.media)
+  // Første gang en sticker godkendes, får alle der har sagt ja besked
+  if (old.status !== 'approved' && sticker.status === 'approved') {
+    const by = formatList(sticker.placedBy)
+    await notify('all', {
+      title: `📍 Emil er landet i ${sticker.city || sticker.title}!`,
+      body: `${sticker.title}${by ? ` – sat op af ${by}` : ''}`,
+      url: `/sticker/${sticker.id}`,
+    })
+  }
   return sticker
 })

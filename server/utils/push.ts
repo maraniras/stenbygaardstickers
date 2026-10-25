@@ -1,8 +1,14 @@
-// Notifikationer til admins (Web Push). Hver telefon, der har slået "Få besked" til
-// på /admin, gemmes som et abonnement. VAPID-nøgleparret laves automatisk første
-// gang og gemmes i databasen, så der ikke skal sættes noget op på Vercel.
-// Redis: "push:vapid" (JSON med nøglerne) og hashen "push:subs" (endpoint → abonnement).
+// Notifikationer (Web Push) til to lister: "admin" (nye indsendte stickers – slås til
+// på /admin) og "all" (alle der har sagt ja til besked om nye godkendte stickers).
+// VAPID-nøgleparret laves automatisk første gang og gemmes i databasen, så der ikke
+// skal sættes noget op på Vercel.
+// Redis: "push:vapid" (JSON med nøglerne), hashen "push:subs" (admins) og "push:all"
+// (alle), begge med endpoint → abonnement.
 import webpush, { type PushSubscription } from 'web-push'
+
+export type PushList = 'admin' | 'all'
+const REDIS_KEY: Record<PushList, string> = { admin: 'push:subs', all: 'push:all' }
+const LOCAL_KEY: Record<PushList, string> = { admin: 'push-subs', all: 'push-all' }
 
 interface Vapid { publicKey: string, privateKey: string }
 
@@ -37,36 +43,38 @@ export async function vapidPublicKey() {
   return (await getVapid()).publicKey
 }
 
-async function allSubs(): Promise<PushSubscription[]> {
-  if (!redisEnabled) return Object.values((await useStorage('data').getItem<Record<string, PushSubscription>>('push-subs')) ?? {})
-  const [flat] = await redis([['HVALS', 'push:subs']]) as [string[]]
+type LocalSubs = Record<string, PushSubscription>
+
+async function allSubs(list: PushList): Promise<PushSubscription[]> {
+  if (!redisEnabled) return Object.values((await useStorage('data').getItem<LocalSubs>(LOCAL_KEY[list])) ?? {})
+  const [flat] = await redis([['HVALS', REDIS_KEY[list]]]) as [string[]]
   return flat.map(s => JSON.parse(s))
 }
 
-export async function addSub(sub: PushSubscription) {
+export async function addSub(list: PushList, sub: PushSubscription) {
   if (!redisEnabled) {
     const storage = useStorage('data')
-    const subs = (await storage.getItem<Record<string, PushSubscription>>('push-subs')) ?? {}
+    const subs = (await storage.getItem<LocalSubs>(LOCAL_KEY[list])) ?? {}
     subs[sub.endpoint] = sub
-    await storage.setItem('push-subs', subs)
+    await storage.setItem(LOCAL_KEY[list], subs)
     return
   }
-  await redis([['HSET', 'push:subs', sub.endpoint, JSON.stringify(sub)]])
+  await redis([['HSET', REDIS_KEY[list], sub.endpoint, JSON.stringify(sub)]])
 }
 
-export async function removeSub(endpoint: string) {
+export async function removeSub(list: PushList, endpoint: string) {
   if (!redisEnabled) {
     const storage = useStorage('data')
-    const subs = (await storage.getItem<Record<string, PushSubscription>>('push-subs')) ?? {}
+    const subs = (await storage.getItem<LocalSubs>(LOCAL_KEY[list])) ?? {}
     delete subs[endpoint]
-    await storage.setItem('push-subs', subs)
+    await storage.setItem(LOCAL_KEY[list], subs)
     return
   }
-  await redis([['HDEL', 'push:subs', endpoint]])
+  await redis([['HDEL', REDIS_KEY[list], endpoint]])
 }
 
-export async function hasSub(endpoint: string) {
-  return (await allSubs()).some(s => s.endpoint === endpoint)
+export async function hasSub(list: PushList, endpoint: string) {
+  return (await allSubs(list)).some(s => s.endpoint === endpoint)
 }
 
 export function cleanSub(body: unknown): PushSubscription {
@@ -78,10 +86,10 @@ export function cleanSub(body: unknown): PushSubscription {
   return { endpoint: b.endpoint, keys: { p256dh: b.keys.p256dh, auth: b.keys.auth } }
 }
 
-/** Sender til alle admins. Abonnementer, som telefonen har opgivet, fjernes. */
-export async function notifyAdmins(message: { title: string, body: string, url: string }) {
+/** Sender til en liste. Abonnementer, som telefonen har opgivet, fjernes. */
+export async function notify(list: PushList, message: { title: string, body: string, url: string }) {
   try {
-    const subs = await allSubs()
+    const subs = await allSubs(list)
     if (!subs.length) return
     const keys = await getVapid()
     const payload = JSON.stringify(message)
@@ -92,11 +100,17 @@ export async function notifyAdmins(message: { title: string, body: string, url: 
         timeout: 5000,
       })
       .catch(async (err: { statusCode?: number }) => {
-        if (err.statusCode === 404 || err.statusCode === 410) await removeSub(sub.endpoint)
+        if (err.statusCode === 404 || err.statusCode === 410) await removeSub(list, sub.endpoint)
         else console.error('Notifikation fejlede', err)
       })))
   }
   catch (err) {
     console.error('Kunne ikke sende notifikationer', err)
   }
+}
+
+/** "Nicole og Mathias", "A, B og C" */
+export function formatList(names: string[]) {
+  if (names.length <= 1) return names[0] ?? ''
+  return `${names.slice(0, -1).join(', ')} og ${names[names.length - 1]}`
 }
