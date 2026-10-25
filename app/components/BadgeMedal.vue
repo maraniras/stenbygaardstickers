@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Én badge som medalje: farvet ring efter niveau, emoji i midten, prikker for trin.
 // Ikke opnåede er grå med fremskridt ("3/5").
-const props = defineProps<{ badge: Badge }>()
+const props = defineProps<{ badge: Badge, big?: boolean }>()
 
 const ring = computed(() => {
   const b = props.badge
@@ -23,15 +23,15 @@ const sub = computed(() => {
 </script>
 
 <template>
-  <div class="badge" :class="[badge.kind, { earned: badge.earned }]" :title="`${badge.name}: ${badge.desc}`">
+  <div class="badge" :class="[badge.kind, { earned: badge.earned, big }]" :title="`${badge.name}: ${badge.desc}`">
     <div class="medal" :style="{ background: ring }">
       <span class="face"><CountryFlag v-if="badge.flag" :code="badge.flag" /><template v-else>{{ badge.emoji }}</template></span>
       <span v-if="badge.kind === 'tier'" class="pips">
         <i v-for="i in badge.levels" :key="i" :class="{ on: i <= badge.level }" />
       </span>
     </div>
-    <b>{{ badge.name }}</b>
-    <span class="sub">{{ sub }}</span>
+    <b v-if="!big">{{ badge.name }}</b>
+    <span v-if="!big" class="sub">{{ sub }}</span>
   </div>
 </template>
 
@@ -97,4 +97,9 @@ b {
   line-height: 1.25;
   color: var(--muted);
 }
+</style>
+<style scoped>
+.big .medal { width: 104px; height: 104px; padding: 7px; }
+.big .face { font-size: 48px; }
+.big .pips i { width: 7px; height: 7px; }
 </style>

@@ -17,7 +17,9 @@ const countryList = computed(() => {
   }
   return [...map.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
 })
-const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value))
+const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value, { history: true }))
+const openBadge = ref<string>()
+const openedBadge = computed(() => badges.value.find(b => b.id === openBadge.value))
 const badgeTab = ref<'earned' | 'missing'>('earned')
 const shownBadges = computed(() => badges.value.filter(b => b.earned === (badgeTab.value === 'earned')))
 
@@ -61,7 +63,9 @@ function back() {
         <button :class="{ on: badgeTab === 'missing' }" @click="badgeTab = 'missing'">Mangler <span>{{ badges.length - earnedCount(badges) }}</span></button>
       </div>
       <div v-if="shownBadges.length" class="badges">
-        <BadgeMedal v-for="b in shownBadges" :key="b.id" :badge="b" />
+        <button v-for="b in shownBadges" :key="b.id" class="badge-btn" :aria-label="`${b.name} – se detaljer`" @click="openBadge = b.id">
+          <BadgeMedal :badge="b" />
+        </button>
       </div>
       <p v-else class="empty">{{ badgeTab === 'earned' ? 'Ingen badges endnu – sæt en sticker op!' : 'Alle badges er taget 🎉' }}</p>
     </section>
@@ -86,6 +90,10 @@ function back() {
         <StickerCard v-for="s in list" :key="s.id" :sticker="s" />
       </div>
     </section>
+
+    <Transition name="fade">
+      <BadgeSheet v-if="openedBadge" :badge="openedBadge" :person="displayName" @close="openBadge = undefined" />
+    </Transition>
   </div>
 </template>
 
@@ -211,6 +219,19 @@ h1 {
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
+.badge-btn {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.badge-btn:active { transform: scale(.96); }
+.fade-enter-active, .fade-leave-active { transition: opacity .2s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 .countries {
   display: flex;
   flex-wrap: wrap;
