@@ -8,6 +8,7 @@ const router = useRouter()
 const el = ref<HTMLElement>()
 const selected = ref<Sticker>()
 const { stickers, stickersBy, getSticker } = useStickers()
+const { basemap, toggle: toggleBasemap } = useBasemap()
 
 const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
 const visible = computed(() => (person.value ? stickersBy(person.value) : stickers.value))
@@ -77,10 +78,7 @@ onMounted(async () => {
   await import('leaflet.markercluster')
 
   map = L.map(el.value!, { zoomControl: false, worldCopyJump: true, minZoom: 2 })
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 19,
-  }).addTo(map)
+  attachBasemap(L, map, basemap)
   map.attributionControl.setPrefix(false)
 
   cluster = L.markerClusterGroup({
@@ -160,6 +158,16 @@ onBeforeUnmount(() => {
         </button>
       </div>
     </header>
+
+    <button
+      class="round layers glass"
+      :class="{ raised: selected, on: basemap === 'luftfoto' }"
+      :aria-label="basemap === 'kort' ? 'Vis luftfoto' : 'Vis kort'"
+      :title="basemap === 'kort' ? 'Vis luftfoto' : 'Vis kort'"
+      @click="toggleBasemap"
+    >
+      <svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
+    </button>
 
     <button class="round glass" :class="{ raised: selected }" aria-label="Vis alle" @click="select(undefined); fitAll()">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" /></svg>
@@ -273,6 +281,12 @@ onBeforeUnmount(() => {
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
+  stroke-linejoin: round;
+}
+.round.layers { bottom: calc(var(--nav-space) + 58px); }
+.round.layers.on {
+  background: var(--text);
+  color: #fff;
 }
 .empty {
   position: absolute;

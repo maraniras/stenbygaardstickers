@@ -109,6 +109,7 @@ a.chip, button.chip { cursor: pointer; }
 .leaflet-tile-pane {
   filter: saturate(.3) brightness(1.06) contrast(.92);
 }
+.satellite .leaflet-tile-pane { filter: none; }
 .leaflet-control-attribution {
   font-size: 10px;
   background: rgba(255, 255, 255, .6) !important;

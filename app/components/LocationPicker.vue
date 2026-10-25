@@ -7,6 +7,7 @@ const model = defineModel<{ lat: number, lng: number } | null>({ required: true 
 const props = defineProps<{ locate?: boolean }>()
 
 const el = ref<HTMLElement>()
+const { basemap, toggle: toggleBasemap } = useBasemap()
 const text = ref(model.value ? formatCoords(model.value.lat, model.value.lng) : '')
 const invalid = ref(false)
 const locating = ref(false)
@@ -64,8 +65,9 @@ function locate() {
 
 onMounted(async () => {
   L = (await import('leaflet')).default
-  map = L.map(el.value!, { zoomControl: false, attributionControl: false })
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map)
+  map = L.map(el.value!, { zoomControl: false })
+  map.attributionControl.setPrefix(false)
+  attachBasemap(L, map, basemap)
   L.control.zoom({ position: 'bottomright' }).addTo(map)
   map.on('click', e => place(e.latlng.lat, e.latlng.lng))
 
@@ -93,6 +95,10 @@ onBeforeUnmount(() => map?.remove())
     <button type="button" class="me glass" :disabled="locating" @click="locate">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /><circle cx="12" cy="12" r="7.5" /></svg>
       {{ locating ? 'Finder dig…' : 'Min position' }}
+    </button>
+    <button type="button" class="layers glass" :class="{ on: basemap === 'luftfoto' }" @click="toggleBasemap">
+      <svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
+      {{ basemap === 'kort' ? 'Luftfoto' : 'Kort' }}
     </button>
     <p v-if="!model" class="hint">Tryk på kortet, hvor stickeren sidder</p>
   </div>
@@ -140,7 +146,23 @@ onBeforeUnmount(() => map?.remove())
   font-weight: 700;
   cursor: pointer;
 }
-.me svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.me svg, .layers svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.layers {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.layers.on { background: var(--text); color: #fff; }
 .hint {
   position: absolute;
   left: 50%;
