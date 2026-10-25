@@ -10,6 +10,7 @@ export interface Release {
 export const CHANGELOG: Release[] = [
   {
     version: '2.0',
+    date: '2026-10-25',
     notes: [
       'Tilføj selv en sticker med + knappen',
       'Nye stickers dukker op af sig selv',
