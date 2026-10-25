@@ -28,6 +28,8 @@ export interface Badge {
   nextName?: string
   /** Rekord der ikke kan mistes mere (fx et afsluttet år) */
   final?: boolean
+  /** Landekode – vises som flag-billede i stedet for emoji (Windows kan ikke vise flag-emojis) */
+  flag?: string
 }
 
 /** Ring-farve pr. niveau: bronze, sølv, guld, platin, diamant */
@@ -141,6 +143,24 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
   const borderHop = mine.some((a, i) => mine.slice(i + 1).some(b =>
     a.countryCode !== b.countryCode && Math.abs(day(a).getTime() - day(b).getTime()) <= 7 * DAY_MS))
 
+  const capitals = new Set(mine.map(capitalOf).filter(Boolean)).size
+  const visited = (codes: string[]) => codes.every(c => mine.some(s => s.countryCode === c))
+
+  // Roadtrip: 3 forskellige byer inden for 14 dage (mine er sorteret efter dato)
+  const roadtrip = mine.some((a, i) => new Set(mine.slice(i)
+    .filter(b => day(b).getTime() - day(a).getTime() <= 14 * DAY_MS)
+    .map(b => `${b.countryCode}:${b.city}`)).size >= 3)
+  // Langtur: to af ens stickers over 5.000 km fra hinanden
+  const longHaul = mine.some((a, i) => mine.slice(i + 1).some(b => distanceKm(a, b) > 5000))
+  // Comeback: en ny sticker efter over et halvt års pause
+  const comeback = mine.some((s, i) => i > 0 && day(s).getTime() - day(mine[i - 1]!).getTime() > 182 * DAY_MS)
+
+  // Jubilar: satte app'ens sticker nr. 10, 25, 50, 75 eller 100 op
+  const ordered = [...all].sort(byFirst)
+  const jubilees = [10, 25, 50, 75, 100]
+
+  const votes = mine.reduce((sum, s) => sum + (ratings[s.id]?.count ?? 0), 0)
+
   // Stime: stickers 3 måneder i træk
   const months = [...new Set(mine.map(s => { const d = day(s); return d.getFullYear() * 12 + d.getMonth() }))].sort((a, b) => a - b)
   const streak = months.some((m, i) => months[i + 1] === m + 1 && months[i + 2] === m + 2)
@@ -159,13 +179,24 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
     tier('cities', '🏙️', ['Byturist', 'Bybuster', 'Storbymenneske', 'Metropol-mester', 'Byernes konge'], 'byer', [5, 10, 15, 20, 25], cityCounts.size),
     tier('countries', '✈️', ['Grænsekrydser', 'Eventyrer', 'Globetrotter', 'Verdensborger'], 'lande', [3, 5, 10, 15], countries),
     tier('partner', '🤝', ['Makkere', 'Venner', 'BFF', 'Partners in Crime', 'Dynamisk Duo'], 'stickers med samme person', [2, 3, 5, 10, 15], partnerCount, partner ? ` med ${partner}` : ''),
+    tier('network', '🕸️', ['Social', 'Netværker', 'Samlingspunkt', 'Kendt af alle'], 'forskellige makkere', [2, 3, 5, 10], partners.size),
+    tier('capitals', '🏛️', ['Hovedstads-turist', 'Hovedstadsjæger', 'Diplomat', 'Verdensambassadør'], 'hovedstæder', [1, 3, 5, 10], capitals),
     tier('continents', '🌐', ['Interkontinental', 'Verdensfarer', 'Jordomrejsende', 'Kosmopolit', 'Hele kloden'], 'kontinenter', [2, 3, 4, 5, 6], perContinent.size),
     ...CONTINENT_BADGES.map(c => tier(`continent-${c.id}`, c.emoji, c.names, `sticker i ${CONTINENT_NAMES[c.id]}`, [1, 3, 5, 10, 15], perContinent.get(c.id) ?? 0)),
 
     single('pioneer', '🌍', 'Pioner', 'Første sticker i et nyt land', pioneered > 0, pioneered),
     single('original', '⏳', 'Original', 'Var med til en af de 5 første stickers', originals.some(s => hasName(s, name))),
     single('home', '🏠', 'Hjemmebane', 'En sticker i Danmark', mine.some(s => s.countryCode === 'DK')),
-    single('denmark', '🇩🇰', 'Rundt i Danmark', '5 forskellige danske byer', dkCities >= 5),
+    { ...single('denmark', '🇩🇰', 'Rundt i Danmark', '5 forskellige danske byer', dkCities >= 5), flag: 'DK' },
+    single('neighbour', '🏡', 'En god nabo', 'En sticker i både Sverige, Norge og Tyskland', visited(['SE', 'NO', 'DE'])),
+    single('nordic', '🌲', 'Nordisk mester', 'Danmark, Sverige, Norge, Finland og Island', visited(['DK', 'SE', 'NO', 'FI', 'IS'])),
+    single('arctic', '🐻‍❄️', 'Polarcirklen', 'En sticker nord for polarcirklen', mine.some(s => s.lat > 66.5634)),
+    single('equator', '🌏', 'Ekvator', 'En sticker syd for ækvator', mine.some(s => s.lat < 0)),
+    single('roadtrip', '🛣️', 'Roadtrip', '3 forskellige byer inden for 2 uger', roadtrip),
+    single('longhaul', '🧳', 'Langtur', 'To stickers over 5.000 km fra hinanden', longHaul),
+    single('comeback', '🔄', 'Comeback', 'En ny sticker efter over et halvt års pause', comeback),
+    single('birthday', '🎂', 'Emils fødselsdag', 'En sticker den 27. juli', mine.some(s => s.date.endsWith('-07-27'))),
+    single('gang', '👨‍👩‍👧‍👦', 'Hele banden', 'En sticker sat op af 4 eller flere', mine.some(s => s.placedBy.length >= 4)),
     single('regular', '🔁', 'Stamkunde', '2 stickers i samme by', [...cityCounts.values()].some(n => n >= 2)),
     single('far', '🛫', 'Langt hjemmefra', 'En sticker over 1.000 km fra Aalborg', mine.some(s => s.distanceKm > 1000)),
     single('world', '🚀', 'Ud i verden', 'En sticker over 5.000 km fra Aalborg', mine.some(s => s.distanceKm > 5000)),
@@ -182,10 +213,17 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
     single('jul', '🎄', 'Jul', 'En sticker i juletiden', mine.some(s => season(s) === 'jul')),
     single('newyear', '🎆', 'Nytår', 'En sticker 31. december eller 1. januar', mine.some(s => s.date.endsWith('-12-31') || s.date.endsWith('-01-01'))),
     single('director', '🎬', 'Instruktør', 'En sticker med video', mine.some(s => s.media.some(m => m.type === 'video'))),
+    single('filmstar', '🎥', 'Filmstjerne', '3 stickers med video', mine.filter(s => s.media.some(m => m.type === 'video')).length >= 3),
+    single('author', '✍️', 'Forfatter', 'En beskrivelse på over 300 tegn', mine.some(s => s.description.length > 300)),
     single('photographer', '📸', 'Fotograf', 'En sticker med 3+ billeder/videoer', mine.some(s => s.media.length >= 3)),
     single('magnet', '🧲', 'Magnet', 'En sticker med mindst 5 stemmer', mine.some(s => (ratings[s.id]?.count ?? 0) >= 5)),
     single('stardust', '🌟', 'Stjernestøv', 'En sticker med 4,5+ stjerner og flere end 3 stemmer',
       mine.some(s => (ratings[s.id]?.count ?? 0) > 3 && (ratings[s.id]?.avg ?? 0) >= 4.5)),
+    single('fivestar', '💎', 'Femstjernet', 'En sticker med 5,0 i snit og mindst 3 stemmer',
+      mine.some(s => (ratings[s.id]?.count ?? 0) >= 3 && (ratings[s.id]?.avg ?? 0) >= 4.999)),
+    single('peoples', '🗳️', 'Folkets valg', 'Mindst 20 stemmer i alt på ens stickers', votes >= 20, votes),
+    ...jubilees.map(n => single(`jubilee-${n}`, '🎉', `Jubilar #${n}`, `Satte sticker nr. ${n} op`,
+      Boolean(ordered[n - 1] && hasName(ordered[n - 1]!, name)))),
 
     record('farthest', '🧭', 'Længst væk', 'Har stickeren længst fra Aalborg', Boolean(farthest && hasName(farthest, name))),
     record('north', '❄️', 'Nordligst', 'Har den nordligste sticker', Boolean(north && hasName(north, name))),

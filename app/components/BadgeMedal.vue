@@ -25,7 +25,7 @@ const sub = computed(() => {
 <template>
   <div class="badge" :class="[badge.kind, { earned: badge.earned }]" :title="`${badge.name}: ${badge.desc}`">
     <div class="medal" :style="{ background: ring }">
-      <span class="face">{{ badge.emoji }}</span>
+      <span class="face"><CountryFlag v-if="badge.flag" :code="badge.flag" /><template v-else>{{ badge.emoji }}</template></span>
       <span v-if="badge.kind === 'tier'" class="pips">
         <i v-for="i in badge.levels" :key="i" :class="{ on: i <= badge.level }" />
       </span>
