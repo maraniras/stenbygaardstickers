@@ -43,7 +43,7 @@ export async function storeBackup(event: H3Event) {
     await useStorage('data').setItem(`backups:${name}`, backup)
   }
   else {
-    await put(`backups/${name}`, body, { access: 'public', addRandomSuffix: true, contentType: 'application/json', ...blobAuth(event) })
+    await put(`${blobFolder}backups/${name}`, body, { access: 'public', addRandomSuffix: true, contentType: 'application/json', ...blobAuth(event) })
   }
   const files = await listBackups(event)
   const old = files.slice(KEEP)
@@ -66,8 +66,8 @@ export async function listBackups(event: H3Event): Promise<BackupFile[]> {
     }))
     return files.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   }
-  const { blobs } = await list({ prefix: 'backups/', ...blobAuth(event) })
+  const { blobs } = await list({ prefix: `${blobFolder}backups/`, ...blobAuth(event) })
   return blobs
-    .map(b => ({ name: b.pathname.replace('backups/', ''), url: b.url, size: b.size, createdAt: new Date(b.uploadedAt).toISOString() }))
+    .map(b => ({ name: b.pathname.split('/').pop()!, url: b.url, size: b.size, createdAt: new Date(b.uploadedAt).toISOString() }))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 }

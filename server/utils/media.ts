@@ -18,7 +18,11 @@ export function blobAuth(event: H3Event) {
   return !readWriteToken && oidcToken ? { oidcToken } : {}
 }
 
-const BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/stickers\/[\w./-]+$/i
+/** Dev-siden uploader til mappen dev/ og må kun slette derfra (se redis.ts) */
+export const blobFolder = isPreview ? 'dev/' : ''
+
+const BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?stickers\/[\w./-]+$/i
+const DEV_BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/dev\//i
 const LOCAL_RE = /^\/api\/media\/[\w.-]+$/
 export const LOCAL_NAME_RE = /^[\w-]{1,80}\.(webp|jpg|jpeg|png|mp4|mov|m4v|webm)$/i
 
@@ -34,7 +38,8 @@ function files(list: StickerMedia[]) {
 export async function deleteUnused(event: H3Event, before: StickerMedia[], after: StickerMedia[] = []) {
   const keep = new Set(files(after))
   const gone = files(before).filter(src => !keep.has(src))
-  const blobs = gone.filter(src => BLOB_RE.test(src))
+  // Dev har kopier af prod's stickers, som peger på prod's filer – dem må den ikke slette
+  const blobs = gone.filter(src => BLOB_RE.test(src) && (!isPreview || DEV_BLOB_RE.test(src)))
   const local = gone.filter(src => LOCAL_RE.test(src))
   try {
     if (blobs.length && blobEnabled) await del(blobs, blobAuth(event))

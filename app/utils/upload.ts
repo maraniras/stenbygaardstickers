@@ -6,11 +6,11 @@ import { upload, uploadPresigned } from '@vercel/blob/client'
 export const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 
 type Mode = 'blob' | 'presigned' | 'local' | 'off'
-let modePromise: Promise<Mode> | undefined
+let modePromise: Promise<{ mode: Mode, folder: string }> | undefined
 
 function uploadMode() {
-  modePromise ??= $fetch<{ mode: Mode }>('/api/upload')
-    .then(r => r.mode)
+  modePromise ??= $fetch<{ mode: Mode, folder?: string }>('/api/upload')
+    .then(r => ({ mode: r.mode, folder: r.folder ?? '' }))
     .catch((err) => {
       modePromise = undefined
       throw err
@@ -23,7 +23,7 @@ function randomName() {
 }
 
 async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void) {
-  const mode = await uploadMode()
+  const { mode, folder } = await uploadMode()
   if (mode === 'off') throw new Error('Upload er ikke sat op endnu')
   if (mode === 'local') {
     const r = await $fetch<{ url: string }>('/api/upload/local', { method: 'PUT', query: { name: `f.${ext}` }, body: blob })
@@ -36,7 +36,7 @@ async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void)
     multipart: blob.size > 8 * 1024 * 1024,
     onUploadProgress: (e: { percentage: number }) => onProgress?.(e.percentage),
   }
-  const pathname = `stickers/${randomName()}.${ext}`
+  const pathname = `${folder}stickers/${randomName()}.${ext}`
   const r = mode === 'presigned' ? await uploadPresigned(pathname, blob, options) : await upload(pathname, blob, options)
   return r.url
 }

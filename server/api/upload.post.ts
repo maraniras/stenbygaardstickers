@@ -10,7 +10,9 @@ const limits = {
 }
 
 function checkPath(pathname: string) {
-  if (!/^stickers\/[\w.-]+$/.test(pathname)) throw new Error('Ugyldigt filnavn')
+  if (pathname !== `${blobFolder}stickers/${pathname.split('/').pop()}` || !/^[\w.-]+$/.test(pathname.split('/').pop()!)) {
+    throw new Error('Ugyldigt filnavn')
+  }
 }
 
 export default defineEventHandler(async (event) => {
