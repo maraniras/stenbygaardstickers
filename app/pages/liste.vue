@@ -27,7 +27,6 @@ const groups = computed(() => {
       <div class="title">
         <h1>Stickers</h1>
         <div class="title-actions">
-          <ThemeButton />
           <UploadButton />
           <RefreshButton />
         </div>

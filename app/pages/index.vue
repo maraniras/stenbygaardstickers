@@ -195,7 +195,6 @@ onBeforeUnmount(() => {
 
     <header class="top">
       <div class="top-actions">
-        <ThemeButton />
         <UploadButton />
         <RefreshButton />
       </div>
