@@ -80,6 +80,7 @@ function submitted(s: StoredSticker) {
         </NuxtLink>
       </div>
 
+      <AdminPush />
       <AdminBackups />
     </template>
 

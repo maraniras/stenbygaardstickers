@@ -10,5 +10,11 @@ export default defineEventHandler(async (event) => {
     submittedAt: new Date().toISOString(),
   }
   await saveSticker(sticker)
+  const by = sticker.placedBy.join(', ')
+  await notifyAdmins({
+    title: 'Ny sticker venter',
+    body: `${sticker.title}${sticker.city ? ` i ${sticker.city}` : ''}${by ? ` – sat op af ${by}` : ''}`,
+    url: `/admin/${sticker.id}`,
+  })
   return { id: sticker.id }
 })
