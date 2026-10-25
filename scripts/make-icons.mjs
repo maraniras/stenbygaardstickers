@@ -28,4 +28,13 @@ await icon(48, 'public/favicon.png', 0.04)
 await sharp(head).resize(128, 128, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toFile('public/marker.png')
 await sharp(head).resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toFile('public/logo.png')
 
+// Notifikations-badge: Android bruger kun formen og farver den hvid, så det skal
+// være hovedets silhuet i hvid på gennemsigtig baggrund (ellers bliver det en hvid firkant)
+const silhouette = await sharp(head).resize(84, 84, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).extractChannel('alpha').toBuffer()
+await sharp({ create: { width: 84, height: 84, channels: 3, background: '#ffffff' } })
+  .joinChannel(silhouette)
+  .extend({ top: 6, bottom: 6, left: 6, right: 6, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  .png()
+  .toFile('public/icons/badge-96.png')
+
 console.log('Ikoner lavet i public/')

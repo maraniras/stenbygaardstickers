@@ -11,7 +11,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(self.registration.showNotification(data.title || 'Stenbygaard Stickers', {
     body: data.body || '',
     icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    // Hvid silhuet – Android viser kun formen i statuslinjen
+    badge: '/icons/badge-96.png',
     data: { url: data.url || '/admin' },
   }))
 })
