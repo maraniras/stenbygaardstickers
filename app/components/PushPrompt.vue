@@ -7,6 +7,7 @@ export type PromptMode = 'ask' | 'ios' | 'blocked' | 'unsupported' | 'on' | 'off
 const ASKED = 'stenbygaard-push-asked'
 const mode = useState<PromptMode | null>('push-prompt', () => null)
 const { on, busy, refresh, enable } = usePush('all')
+const { open: installOpen } = useInstall()
 const error = ref('')
 
 onMounted(async () => {
@@ -15,7 +16,16 @@ onMounted(async () => {
   try { asked = Boolean(localStorage.getItem(ASKED)) }
   catch {}
   if (asked || on.value || !pushSupported() || Notification.permission === 'denied') return
-  setTimeout(() => { if (!mode.value) mode.value = 'ask' }, 1500)
+  // Vis ikke oven i install-boksen – vent til den er lukket
+  const tryAsk = () => { if (!mode.value && !installOpen.value) mode.value = 'ask' }
+  setTimeout(() => {
+    if (!installOpen.value) return void setTimeout(tryAsk, 600)
+    const stop = watch(installOpen, (open) => {
+      if (open) return
+      stop()
+      setTimeout(tryAsk, 600)
+    })
+  }, 2500)
 })
 
 function close() {

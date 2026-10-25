@@ -3,6 +3,9 @@ const sort = ref<'date' | 'far' | 'stars'>('date')
 const { stickers, people, stats } = useStickers()
 const { ratings, enabled } = useRatings()
 const badgeCount = computed(() => Object.fromEntries(people.value.map(p => [p.name, earnedCount(badgesFor(p.name, stickers.value, ratings.value))])))
+const { show: showInstall } = useInstall()
+const standalone = ref(true)
+onMounted(() => { standalone.value = isStandalone() })
 
 const groups = computed(() => {
   if (sort.value === 'far') {
@@ -74,7 +77,10 @@ const groups = computed(() => {
       </div>
     </section>
 
-    <NuxtLink class="add-link" to="/admin">Admin</NuxtLink>
+    <div class="footer-links">
+      <button v-if="!standalone" class="add-link" @click="showInstall">Installer appen</button>
+      <NuxtLink class="add-link" to="/admin">Admin</NuxtLink>
+    </div>
   </div>
 </template>
 
@@ -205,13 +211,22 @@ h1 { font-size: 34px; }
   gap: 14px;
   margin-top: 14px;
 }
-.add-link {
-  display: block;
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   margin: 32px 0 8px;
+}
+.add-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-size: 13px;
   font-weight: 600;
   color: var(--muted);
-  text-align: center;
+  text-decoration: underline;
   text-underline-offset: 3px;
+  cursor: pointer;
 }
 </style>

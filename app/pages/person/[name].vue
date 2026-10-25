@@ -17,8 +17,9 @@ const countryList = computed(() => {
   }
   return [...map.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
 })
-const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value)
-  .sort((a, b) => Number(b.earned) - Number(a.earned)))
+const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value))
+const badgeTab = ref<'earned' | 'missing'>('earned')
+const shownBadges = computed(() => badges.value.filter(b => b.earned === (badgeTab.value === 'earned')))
 
 useHead(() => ({ title: `${displayName.value} · Stenbygaard Stickers` }))
 
@@ -55,9 +56,14 @@ function back() {
 
     <section class="section">
       <h2 class="eyebrow">Badges</h2>
-      <div class="badges">
-        <BadgeMedal v-for="b in badges" :key="b.id" :badge="b" />
+      <div class="tabs" role="tablist">
+        <button :class="{ on: badgeTab === 'earned' }" @click="badgeTab = 'earned'">Opnået <span>{{ earnedCount(badges) }}</span></button>
+        <button :class="{ on: badgeTab === 'missing' }" @click="badgeTab = 'missing'">Mangler <span>{{ badges.length - earnedCount(badges) }}</span></button>
       </div>
+      <div v-if="shownBadges.length" class="badges">
+        <BadgeMedal v-for="b in shownBadges" :key="b.id" :badge="b" />
+      </div>
+      <p v-else class="empty">{{ badgeTab === 'earned' ? 'Ingen badges endnu – sæt en sticker op!' : 'Alle badges er taget 🎉' }}</p>
     </section>
 
     <section v-if="countryList.length" class="section">
@@ -171,6 +177,31 @@ h1 {
 }
 .section { margin-top: 28px; }
 .section h2 { margin: 0 0 12px 4px; }
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.tabs button {
+  flex: 1;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tabs button span { margin-left: 4px; opacity: .7; }
+.tabs button.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
 .badges {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));

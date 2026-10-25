@@ -13,10 +13,10 @@ const ring = computed(() => {
 
 const sub = computed(() => {
   const b = props.badge
-  if (b.kind === 'record') return b.earned ? 'Rekord' : b.desc
+  if (b.kind === 'record') return b.earned ? (b.final ? 'Vundet' : 'Rekord') : b.desc
   if (b.kind === 'tier') {
-    if (!b.earned) return `${b.value}/${b.next}`
-    return b.next ? `${TIER_NAMES[b.level - 1]} · ${b.value}/${b.next}` : `${TIER_NAMES[b.level - 1]} · max`
+    if (!b.earned) return `${b.value}/${b.next} · ${b.desc}`
+    return b.next ? `Næste: ${b.nextName} · ${b.value}/${b.next}` : 'Højeste niveau'
   }
   return b.earned ? (b.id === 'pioneer' && b.value > 1 ? `${b.value} lande` : 'Opnået') : b.desc
 })
