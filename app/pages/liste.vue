@@ -26,7 +26,10 @@ const groups = computed(() => {
     <header>
       <div class="title">
         <h1>Stickers</h1>
-        <RefreshButton />
+        <div class="title-actions">
+          <UploadButton />
+          <RefreshButton />
+        </div>
       </div>
       <div class="grid">
         <div class="stat"><b>{{ stats.count }}</b><span>{{ stats.count === 1 ? 'sticker' : 'stickers' }}</span></div>
@@ -68,7 +71,7 @@ const groups = computed(() => {
       </div>
     </section>
 
-    <NuxtLink class="add-link" to="/upload">Har du sat en sticker op? Tilføj den her</NuxtLink>
+    <NuxtLink class="add-link" to="/admin">Admin</NuxtLink>
   </div>
 </template>
 
@@ -82,6 +85,10 @@ const groups = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.title-actions {
+  display: flex;
+  gap: 8px;
 }
 h1 { font-size: 34px; }
 .grid {

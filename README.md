@@ -11,7 +11,7 @@ Koden til appen er `emileric`.
 
 ## Nye stickers
 
-Alle kan tilføje en sticker via linket nederst på listen (`/upload`). Den kommer først på kortet, når den er godkendt på `/admin`, hvor man også kan rette titel, beskrivelse, navne, placering og medier.
+Alle kan tilføje en sticker med plus-knappen ved siden af opdater-knappen (`/upload`). Den kommer først på kortet, når den er godkendt på `/admin` (link nederst på listen), hvor man også kan rette titel, beskrivelse, navne, placering og medier.
 
 Stickers ligger i Upstash Redis, og uploadede billeder og videoer ligger i Vercel Blob. Vercel-projektet skal have:
 
