@@ -107,6 +107,22 @@ function videoFrame(file: File) {
   })
 }
 
+/** Datoen billedet er taget (EXIF), hvis telefonen har gemt den. Skal læses før
+ *  komprimeringen, som fjerner EXIF. Biblioteket hentes først, når det skal bruges. */
+export async function photoDate(file: File) {
+  if (!file.type.startsWith('image/') && !/\.hei[cf]$/i.test(file.name)) return undefined
+  try {
+    const exifr = (await import('exifr')).default
+    const tags = await exifr.parse(file, ['DateTimeOriginal', 'CreateDate'])
+    const d = tags?.DateTimeOriginal ?? tags?.CreateDate
+    if (!(d instanceof Date) || Number.isNaN(d.getTime()) || d > new Date()) return undefined
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+  catch {
+    return undefined
+  }
+}
+
 /** Komprimerer og uploader én fil. Returnerer det, der skal stå i stickerens media-liste. */
 export async function uploadMedia(file: File, onProgress?: (pct: number) => void): Promise<StickerMedia> {
   if (file.type.startsWith('video/')) {

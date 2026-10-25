@@ -2,6 +2,8 @@
 // Billeder og videoer til en sticker. Det første er forsidebillede (thumbnail).
 const model = defineModel<StickerMedia[]>({ required: true })
 const busy = defineModel<boolean>('busy', { default: false })
+/** Datoen fra det første billede, der har en (EXIF) */
+const emit = defineEmits<{ photoDate: [date: string] }>()
 
 interface Job { id: number, name: string, video: boolean, pct: number, error?: string }
 const jobs = ref<Job[]>([])
@@ -21,6 +23,8 @@ async function onFiles(e: Event) {
   // Én ad gangen, så rækkefølgen bliver som valgt
   for (const [i, file] of files.entries()) {
     const job = batch[i]!
+    const date = await photoDate(file)
+    if (date) emit('photoDate', date)
     try {
       const m = await uploadMedia(file, (pct) => { job.pct = pct })
       model.value = [...model.value, m]

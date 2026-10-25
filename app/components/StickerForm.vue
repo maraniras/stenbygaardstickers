@@ -7,6 +7,16 @@ const props = defineProps<{ admin?: boolean, locate?: boolean, names: string[] }
 
 const geocoding = ref(false)
 
+// Dato fra det første billede med EXIF-dato – men kun ved upload, og kun hvis
+// man ikke selv har rettet datoen
+const dateTouched = ref(false)
+const dateFromPhoto = ref(false)
+function onPhotoDate(date: string) {
+  if (props.admin || dateTouched.value || dateFromPhoto.value) return
+  draft.value.date = date
+  dateFromPhoto.value = true
+}
+
 if (props.admin) {
   let last = draft.value.location
   watch(() => draft.value.location, async (loc) => {
@@ -57,7 +67,8 @@ if (props.admin) {
 
     <label class="field">
       <span class="eyebrow">Dato</span>
-      <input v-model="draft.date" type="date" :max="today()">
+      <input v-model="draft.date" type="date" :max="today()" @input="dateTouched = true; dateFromPhoto = false">
+      <span v-if="dateFromPhoto" class="hint-text">📷 Hentet fra billedet – ret den, hvis den er forkert</span>
     </label>
 
     <label class="field">
@@ -67,7 +78,7 @@ if (props.admin) {
 
     <div class="field">
       <span class="eyebrow">Billeder og video</span>
-      <MediaEditor v-model="draft.media" v-model:busy="busy" />
+      <MediaEditor v-model="draft.media" v-model:busy="busy" @photo-date="onPhotoDate" />
       <p class="hint-text">Det første bliver forsidebillede. Tryk på stjernen for at vælge et andet.</p>
     </div>
   </div>
