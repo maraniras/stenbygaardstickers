@@ -27,6 +27,7 @@ const groups = computed(() => {
       <div class="title">
         <h1>Stickers</h1>
         <div class="title-actions">
+          <ThemeButton />
           <UploadButton />
           <RefreshButton />
         </div>
@@ -125,7 +126,7 @@ h1 { font-size: 34px; }
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--accent);
-  color: var(--text);
+  color: var(--on-accent);
   font-weight: 800;
   white-space: nowrap;
 }

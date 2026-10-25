@@ -135,7 +135,7 @@ h1 { font-size: 34px; }
   padding: 0 6px;
   border-radius: 999px;
   background: var(--accent);
-  color: var(--text);
+  color: var(--on-accent);
   font-size: 12px;
 }
 .empty { color: var(--muted); }

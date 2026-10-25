@@ -195,6 +195,7 @@ onBeforeUnmount(() => {
 
     <header class="top">
       <div class="top-actions">
+        <ThemeButton />
         <UploadButton />
         <RefreshButton />
       </div>
@@ -309,7 +310,7 @@ onBeforeUnmount(() => {
   height: 44px;
   padding: 3px;
   border-radius: 50%;
-  background: linear-gradient(160deg, #ffe07a, var(--accent));
+  background: linear-gradient(160deg, var(--accent-light), var(--accent));
   object-fit: contain;
 }
 .brand h1 { font-size: 16px; }
@@ -337,6 +338,7 @@ onBeforeUnmount(() => {
 .muted { color: var(--muted); }
 .play {
   background: var(--accent) !important;
+  color: var(--on-accent);
   font-weight: 700;
 }
 .play svg { width: 14px; height: 14px; fill: currentColor; }

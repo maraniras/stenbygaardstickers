@@ -154,6 +154,7 @@ function onBlur() {
   height: 24px;
   border-radius: 50%;
   background: var(--accent);
+  color: var(--on-accent);
   font-size: 12px;
   font-weight: 800;
 }

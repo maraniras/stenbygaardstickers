@@ -142,7 +142,7 @@ watch(index, (i) => {
   display: grid;
   place-items: center;
   height: calc(220px + var(--safe-t));
-  background: linear-gradient(160deg, #ffe07a, var(--accent));
+  background: linear-gradient(160deg, var(--accent-light), var(--accent));
 }
 .placeholder {
   width: 130px;
@@ -279,6 +279,7 @@ h1 {
   height: 24px;
   border-radius: 50%;
   background: var(--accent);
+  color: var(--on-accent);
   font-size: 12px;
   font-weight: 800;
 }

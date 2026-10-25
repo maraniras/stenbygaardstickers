@@ -117,7 +117,7 @@ function dismiss(job: Job) {
   left: auto;
   right: 6px;
   background: var(--accent);
-  color: var(--text);
+  color: var(--on-accent);
 }
 .x, .star {
   position: absolute;

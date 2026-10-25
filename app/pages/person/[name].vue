@@ -75,7 +75,7 @@ header {
   width: 84px;
   height: 84px;
   border-radius: 50%;
-  background: linear-gradient(160deg, #ffe07a, var(--accent));
+  background: linear-gradient(160deg, var(--accent-light), var(--accent));
   font-size: 36px;
   font-weight: 800;
   box-shadow: 0 12px 30px rgba(255, 185, 0, .3);

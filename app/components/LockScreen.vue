@@ -55,7 +55,7 @@ function submit() {
   height: 148px;
   overflow: hidden;
   border-radius: 50%;
-  background: linear-gradient(160deg, #ffe07a, var(--accent));
+  background: linear-gradient(160deg, var(--accent-light), var(--accent));
   box-shadow: 0 20px 50px rgba(255, 185, 0, .35);
 }
 .logo img {

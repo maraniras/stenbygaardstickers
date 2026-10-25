@@ -8,8 +8,12 @@
   --muted: #6e6e78;
   --hairline: rgba(17, 17, 20, .08);
   --accent: #ffc928;
+  --accent-light: #ffe07a;
   --accent-soft: #fff4cc;
+  /* Tekst oven på --accent */
+  --on-accent: #111114;
   --star: #ffb800;
+  --cluster: #111114;
   --shadow-sm: 0 1px 2px rgba(17, 17, 20, .06), 0 2px 8px rgba(17, 17, 20, .06);
   --shadow: 0 2px 6px rgba(17, 17, 20, .06), 0 12px 32px rgba(17, 17, 20, .12);
   --radius: 22px;
@@ -157,7 +161,7 @@ a.chip, button.chip { cursor: pointer; }
   height: 100%;
   border: 3px solid #fff;
   border-radius: 50%;
-  background: var(--text);
+  background: var(--cluster);
   color: #fff;
   font-weight: 800;
   font-size: 15px;
@@ -200,3 +204,59 @@ a.chip, button.chip { cursor: pointer; }
 }
 .btn:disabled { opacity: .45; cursor: default; transform: none; }
 .btn.danger { background: #fdecea; color: #c62828; }
+
+/* ── Sæsontemaer (useTheme.ts) ─────────────────────────────────────────── */
+[data-theme="halloween"] {
+  --bg: #f6efe8;
+  --accent: #ff7a1a;
+  --accent-light: #ffb35c;
+  --accent-soft: #ffe2c9;
+  --on-accent: #1d1206;
+  --star: #ff7a1a;
+  --cluster: #3b2157;
+  --glass: rgba(255, 248, 242, .8);
+}
+[data-theme="halloween"] .leaflet-tile-pane {
+  filter: sepia(.45) saturate(.55) hue-rotate(-12deg) brightness(.94) contrast(.95);
+}
+
+[data-theme="jul"] {
+  --bg: #f2f6f3;
+  --accent: #d62f3c;
+  --accent-light: #ff7b7b;
+  --accent-soft: #fde1e3;
+  --on-accent: #ffffff;
+  --star: #f2b705;
+  --cluster: #1f6b3a;
+  --glass: rgba(255, 255, 255, .82);
+}
+[data-theme="jul"] .leaflet-tile-pane {
+  filter: saturate(.15) brightness(1.12) contrast(.86);
+}
+/* Luftfoto beholder sine farver i alle temaer */
+:root .satellite .leaflet-tile-pane { filter: none; }
+
+/* Hat på Emil – heksehat til halloween, nissehue til jul */
+[data-theme="halloween"] .head-pin::after,
+[data-theme="halloween"] .journey-head::after,
+[data-theme="jul"] .head-pin::after,
+[data-theme="jul"] .journey-head::after {
+  content: '';
+  position: absolute;
+  left: 2%;
+  top: -34%;
+  width: 70%;
+  height: 56%;
+  background: url('/theme/witch-hat.svg') center / contain no-repeat;
+  transform: rotate(-14deg);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .3));
+}
+[data-theme="jul"] .head-pin::after,
+[data-theme="jul"] .journey-head::after {
+  top: -22%;
+  left: 0;
+  width: 74%;
+  background-image: url('/theme/santa-hat.svg');
+  transform: rotate(-10deg);
+}
