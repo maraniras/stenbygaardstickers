@@ -47,12 +47,12 @@ function fitAll() {
   if (map.getZoom() <= map.getMinZoom()) map.setView([35, AALBORG.lng], map.getMinZoom())
 }
 
-function showVisible() {
+function showVisible(fit = true) {
   if (!cluster) return
   cluster.clearLayers()
   cluster.addLayers(visible.value.map(s => markers.get(s.id)!))
   if (selected.value && !visible.value.includes(selected.value)) select(undefined)
-  fitAll()
+  if (fit) fitAll()
 }
 
 function openFromQuery() {
@@ -69,7 +69,7 @@ function clearPerson() {
   router.replace({ query: {} })
 }
 
-watch(person, showVisible)
+watch(person, () => showVisible())
 
 onMounted(async () => {
   const L = (await import('leaflet')).default
@@ -112,11 +112,15 @@ onMounted(async () => {
   openFromQuery()
 })
 
-// Nye eller rettede stickers (fx efter godkendelse i admin)
+// Nye eller rettede stickers (automatisk hentet eller godkendt i admin). Kortet
+// bliver stående, og en åben sticker forbliver åben.
 watch(stickers, () => {
   if (!buildMarkers) return
   buildMarkers()
-  showVisible()
+  const id = selected.value?.id
+  if (id) selected.value = visible.value.find(s => s.id === id)
+  showVisible(false)
+  setActive(selected.value?.id)
 })
 
 onActivated(() => {
