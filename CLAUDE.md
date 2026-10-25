@@ -29,4 +29,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Code lock: `emileric` (`app/composables/useUnlock.ts`), client-side only.
 - Icons: `npm run icons` regenerates favicon/PWA icons/marker from `branding/logo.png`.
 - Build assets live under `/_app/` (`app.buildAssetsDir`), not `/_nuxt/`: some browsers cached the SPA HTML under old `/_nuxt/` chunk names (a missing chunk during a deploy switch got the HTML with the immutable cache header → blank app). `server/middleware/missing-assets.ts` now answers missing build files with an uncached 404.
+- **Hvad er nyt** (`/nyheder`, link at the bottom of `/liste`): versions and short user-facing notes in `app/utils/changelog.ts` (newest first, no admin/backup items). Add a note when something users can notice ships, and set `date` when it reaches prod.
 - `npx nuxi typecheck` must pass.

@@ -78,6 +78,7 @@ const groups = computed(() => {
     </section>
 
     <div class="footer-links">
+      <NuxtLink class="add-link" to="/nyheder">Hvad er nyt</NuxtLink>
       <button v-if="!standalone" class="add-link" @click="showInstall">Installer appen</button>
       <NuxtLink class="add-link" to="/admin">Admin</NuxtLink>
     </div>
