@@ -17,6 +17,7 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Users can click a name → `/person/<navn>` (list) and `/?by=<navn>` (map filter). Write the sticker description funny/sarcastic in Danish if the user only gives a start; Emil is the face on the sticker.
 - Star ratings 1–5, one per device (random id in localStorage): `server/api/ratings.*` + `server/utils/ratings.ts`. Redis is shared with the stickers (`server/utils/redis.ts`, env vars `KV_REST_API_URL`/`KV_REST_API_TOKEN` or `UPSTASH_REDIS_REST_*`); without them in production the ratings API returns 503 and the stars are hidden. In dev both fall back to Nitro storage in `.data/`.
 - Design: v2 (light, glass, soft shadows). The first design (thick black outlines, yellow) is git tag `design-v1` if the user wants to go back.
+- **Emils rejse** (`app/utils/journey.ts`): play button on the map animates a dotted arc from Aalborg to each visible sticker in date order with a flying head, landing pins and a progress card (respects the person filter). The normal pins/cluster are hidden while it plays.
 - Distances are measured from Aalborg (`AALBORG` in `app/utils/stickers.ts`).
 - Code lock: `emileric` (`app/composables/useUnlock.ts`), client-side only.
 - Icons: `npm run icons` regenerates favicon/PWA icons/marker from `branding/logo.png`.

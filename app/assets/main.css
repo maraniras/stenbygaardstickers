@@ -128,6 +128,24 @@ a.chip, button.chip { cursor: pointer; }
 }
 .head-pin.active img { transform: scale(1.4); }
 
+/* Emils rejse */
+.journey-pin img { animation: journey-pop .45s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes journey-pop { from { transform: scale(0); } }
+.journey-head { background: none; border: 0; }
+.journey-head img {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .4));
+}
+.journey-home {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  font-size: 18px;
+}
+
 .sticker-cluster {
   background: none;
   border: 0;
