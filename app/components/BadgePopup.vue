@@ -35,11 +35,7 @@ watch([level, seenLevel], ([l, s]) => {
   if (l && s === undefined && seen.value) markSeen([`level:${l.level}`])
 })
 
-/** Testknappen på profilen (vises kun på dev-siden) */
-const testLevelUp = useState('level-up-test', () => false)
-
 const levelUp = computed(() => {
-  if (testLevelUp.value && level.value) return level.value
   if (!level.value || seenLevel.value === undefined) return undefined
   return level.value.level > seenLevel.value ? level.value : undefined
 })
@@ -56,7 +52,7 @@ let timer: ReturnType<typeof setTimeout> | undefined
 watch(() => Boolean(mode.value) && !blocked.value, (want) => {
   clearTimeout(timer)
   if (!want) show.value = false
-  else timer = setTimeout(() => { show.value = Boolean(mode.value) && !blocked.value }, testLevelUp.value ? 0 : 1500)
+  else timer = setTimeout(() => { show.value = Boolean(mode.value) && !blocked.value }, 1500)
 }, { immediate: true })
 
 // Konfetti, når level-op vises
@@ -68,8 +64,7 @@ const allKeys = computed(() => unseen.value.flatMap(u => u.keys))
 
 function close() {
   if (mode.value === 'level') {
-    if (testLevelUp.value) testLevelUp.value = false
-    else if (levelUp.value) markSeen([`level:${levelUp.value.level}`])
+    if (levelUp.value) markSeen([`level:${levelUp.value.level}`])
     // Er der også nye badges, kommer de bagefter
     return
   }

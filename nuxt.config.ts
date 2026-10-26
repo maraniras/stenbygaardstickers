@@ -4,12 +4,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   ssr: false,
   devtools: { enabled: false },
-  runtimeConfig: {
-    public: {
-      // Testknapper (fx "Test level op" på profilen) – kun lokalt og på dev-siden
-      testTools: process.env.VERCEL_ENV !== 'production',
-    },
-  },
   nitro: {
     // JSON-filerne er startdata, som serveren kopierer ind i databasen (server/utils/stickers.ts)
     serverAssets: [{ baseName: 'seed', dir: fileURLToPath(new URL('./app/data/stickers', import.meta.url)) }],

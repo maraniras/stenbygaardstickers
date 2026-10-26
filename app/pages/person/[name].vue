@@ -4,10 +4,7 @@ const route = useRoute()
 const { stickers, people, stickersBy } = useStickers()
 const { ratings } = useRatings()
 const { commentStats } = useCommentStats()
-const { name: me, isMe, markSeen } = useUser()
-const testTools = useRuntimeConfig().public.testTools
-const testLevelUp = useState('level-up-test', () => false)
-const router = useRouter()
+const { name: me, isMe, markSeen } = useUser()const router = useRouter()
 const name = computed(() => String(route.params.name))
 const list = computed(() => stickersBy(name.value))
 const displayName = computed(() => people.value.find(p => sameName(p.name, name.value))?.name ?? name.value)
@@ -70,9 +67,7 @@ function back() {
       <UserAvatar class="avatar" :name="displayName" />
       <h1>{{ displayName }}</h1>
       <p class="sub">{{ earnedCount(badges) }} af {{ badges.length }} badges</p>
-      <span v-if="isMe(displayName)" class="chip you">Det er dig</span>
-      <button v-if="testTools && isMe(displayName)" class="chip test" @click="testLevelUp = true">🧪 Test level op</button>
-    </header>
+      <span v-if="isMe(displayName)" class="chip you">Det er dig</span>    </header>
 
     <LevelCard :points="totalPoints(badges)" />
 
@@ -185,14 +180,7 @@ h1 {
 .you {
   margin-top: 10px;
   background: var(--accent-soft);
-}
-.test {
-  margin-top: 8px;
-  border: 1px dashed var(--hairline);
-  background: none;
-  color: var(--muted);
-}
-.grid {
+}.grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
