@@ -5,7 +5,7 @@
 //    (ringen går bronze → sølv → guld → platin → diamant)
 //  - enkelt: opnået eller ej
 //  - rekord: kun én (eller dem der satte stickeren op sammen) har den – kan mistes
-//    igen. "Årets flittigste" låses, når året er slut.
+//    igen. "Årets Dengse" låses, når året er slut.
 // Med { history: true } afspilles personens stickers i datoorden for at finde, hvornår
 // (og med hvilken sticker) hver badge og hvert trin blev opnået – til badge-modalen.
 
@@ -227,9 +227,9 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       'Antal stickers man har været med til at sætte op.'),
     tier('cities', '🏙️', ['Byturist', 'Bybuster', 'Storbymenneske', 'Metropol-mester', 'Byernes konge'], unit('by', 'byer'), [5, 10, 15, 20, 25], cityCounts.size,
       'Antal forskellige byer med en sticker.'),
-    tier('countries', '✈️', ['Grænsekrydser', 'Eventyrer', 'Globetrotter', 'Verdensborger'], unit('land', 'lande'), [3, 5, 10, 15], countries,
+    tier('countries', '✈️', ['Grænsekrydser', 'Eventyrer', 'Klistrefnat', 'Verdensborger'], unit('land', 'lande'), [3, 5, 10, 15], countries,
       'Antal forskellige lande med en sticker.'),
-    tier('partner', '🤝', ['Makkere', 'Venner', 'BFF', 'Partners in Crime', 'Dynamisk Duo'], unit('sticker med samme person', 'stickers med samme person'), [2, 3, 5, 10, 15], partnerCount,
+    tier('partner', '🤝', ['Makker', 'Venner', 'BFF', 'Dynamisk Duo', 'Sindssyg Ægte venner'], unit('sticker med samme person', 'stickers med samme person'), [2, 3, 5, 10, 15], partnerCount,
       'Stickers sat op sammen med den samme person – den man har flest med.', partner ? ` med ${partner}` : ''),
     tier('network', '🕸️', ['Social', 'Netværker', 'Samlingspunkt', 'Kendt af alle'], unit('makker', 'forskellige makkere'), [2, 3, 5, 10], partners.size,
       'Antal forskellige personer man har sat stickers op sammen med.'),
@@ -241,15 +241,15 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       c.id === 'europa' ? 'Antal stickers i Europa – Danmark tæller ikke med.' : `Antal stickers i ${CONTINENT_NAMES[c.id]}.`)),
 
     { ...single('pioneer', '🌍', 'Pioner', 'Første sticker nogensinde i et nyt land – giver point for hvert land', pioneered > 0), count: pioneered },
-    single('original', '⏳', 'Original', 'Var med til en af de 5 første stickers', ordered.slice(0, 5).some(inMine)),
+    single('original', '⏳', 'Ægte', 'Var med til en af de 5 første stickers', ordered.slice(0, 5).some(inMine)),
     single('home', '🏠', 'Hjemmebane', 'En sticker i Danmark', mine.some(s => s.countryCode === 'DK')),
     { ...single('denmark', '🇩🇰', 'Rundt i Danmark', '5 forskellige danske byer', dkCities >= 5, { value: dkCities, target: 5 }), flag: 'DK' },
-    single('neighbour', '🏡', 'En god nabo', 'En sticker i både Sverige, Norge og Tyskland', visitedOf(['SE', 'NO', 'DE']) === 3,
+    single('neighbour', '🏡', 'En ægte nabo', 'En sticker i både Sverige, Norge og Tyskland', visitedOf(['SE', 'NO', 'DE']) === 3,
       { value: visitedOf(['SE', 'NO', 'DE']), target: 3 }),
     single('nordic', '🌲', 'Nordisk mester', 'Danmark, Sverige, Norge, Finland og Island', visitedOf(['DK', 'SE', 'NO', 'FI', 'IS']) === 5,
       { value: visitedOf(['DK', 'SE', 'NO', 'FI', 'IS']), target: 5 }),
-    single('arctic', '🐻‍❄️', 'Polarcirklen', 'En sticker nord for polarcirklen', mine.some(s => s.lat > 66.5634)),
-    single('equator', '🌏', 'Ekvator', 'En sticker syd for ækvator', mine.some(s => s.lat < 0)),
+    single('arctic', '🐻‍❄️', 'Pisse kold', 'En sticker nord for polarcirklen', mine.some(s => s.lat > 66.5634)),
+    single('equator', '🌏', 'Fucking varmt', 'En sticker syd for ækvator', mine.some(s => s.lat < 0)),
     single('roadtrip', '🛣️', 'Roadtrip', '3 forskellige byer inden for 2 uger', roadtripCities >= 3, { value: roadtripCities, target: 3 }),
     single('longhaul', '🧳', 'Langtur', 'To stickers over 5.000 km fra hinanden', longHaul),
     single('comeback', '🔄', 'Comeback', 'En ny sticker efter over et halvt års pause', comeback),
@@ -274,6 +274,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
     single('newyear', '🎆', 'Nytår', 'En sticker 31. december eller 1. januar', mine.some(s => s.date.endsWith('-12-31') || s.date.endsWith('-01-01'))),
     single('director', '🎬', 'Instruktør', 'En sticker med video', videos >= 1),
     single('filmstar', '🎥', 'Filmstjerne', '3 stickers med video', videos >= 3, { value: videos, target: 3 }),
+    single('live', '🔴', 'Er vi live?', '5 stickers med video', videos >= 5, { value: videos, target: 5 }),
     single('author', '✍️', 'Forfatter', 'En beskrivelse på over 300 tegn', mine.some(s => s.description.length > 300)),
     single('photographer', '📸', 'Fotograf', 'En sticker med 3+ billeder/videoer', mine.some(s => s.media.length >= 3),
       { value: maxOf(mine.map(s => s.media.length)), target: 3 }),
@@ -299,7 +300,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       inMine(favorite), favorite?.placedBy ?? []),
     ...years.map((y) => {
       const w = yearWinners(all, y)
-      return record(`year-${y}`, '🏆', `Årets flittigste ${y}`, `Flest stickers i ${y} – ved lighed den der nåede antallet først`,
+      return record(`year-${y}`, '🏆', `Årets Dengse ${y}`, `Flest stickers i ${y} – ved lighed den der nåede antallet først`,
         w.names.some(n => sameName(n, name)), w.names, y < now.getFullYear())
     }),
   ]
@@ -341,7 +342,7 @@ export function badgesFor(
     b.earnedWith = undefined
     b.steps?.forEach((s) => { s.reachedAt = undefined })
   }
-  // Årets flittigste: datoen man nåede det vindende antal
+  // Årets Dengse: datoen man nåede det vindende antal
   for (const b of badges) {
     if (b.id.startsWith('year-') && b.earned) {
       b.earnedAt = yearWinners(all, Number(b.id.slice(5))).reachedAt
@@ -370,7 +371,7 @@ export function earnedCount(badges: Badge[]) {
 
 // ── Point og levels ─────────────────────────────────────────────────────────
 // Rejser giver flest point – de fleste rejser ikke så meget. Rekorder giver først
-// point, når de er officielle (Årets flittigste, når året er slut).
+// point, når de er officielle (Årets Dengse, når året er slut).
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
@@ -390,7 +391,7 @@ const SINGLE_POINTS: Record<string, number> = {
   'commenter': 1, 'tagged': 1, 'hit': 2, 'viral': 4,
   'home': 1, 'team': 1, 'regular': 1, 'turbo': 1, 'director': 1, 'spring': 1, 'summer': 1, 'autumn': 1, 'winter': 1,
   'roadtrip': 2, 'weekend': 2, 'denmark': 2, 'paaske': 2, 'halloween': 2, 'jul': 2, 'newyear': 2, 'birthday': 2, 'comeback': 2,
-  'gang': 2, 'filmstar': 2, 'photographer': 2, 'author': 2, 'magnet': 2, 'jubilee-10': 2,
+  'gang': 2, 'filmstar': 2, 'live': 4, 'photographer': 2, 'author': 2, 'magnet': 2, 'jubilee-10': 2,
   'far': 4, 'border': 4, 'neighbour': 4, 'streak': 4, 'stardust': 4, 'fivestar': 4, 'peoples': 4, 'original': 4,
   'jubilee-25': 4, 'jubilee-50': 4, 'jubilee-75': 4,
   'world': 8, 'equator': 8, 'arctic': 8, 'longhaul': 8, 'jubilee-100': 8,
