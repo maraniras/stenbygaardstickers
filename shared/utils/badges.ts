@@ -229,7 +229,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       'Antal forskellige byer med en sticker.'),
     tier('countries', '✈️', ['Grænsekrydser', 'Eventyrer', 'Globetrotter', 'Verdensborger'], unit('land', 'lande'), [3, 5, 10, 15], countries,
       'Antal forskellige lande med en sticker.'),
-    tier('partner', '🤝', ['Makker', 'Venner', 'BFF', 'Dynamisk Duo', 'Sindssyg Ægte venner'], unit('sticker med samme person', 'stickers med samme person'), [2, 3, 5, 10, 15], partnerCount,
+    tier('partner', '🤝', ['Makker', 'Venner', 'BFF', 'Dynamisk Duo', 'Sindssyg ægte venner'], unit('sticker med samme person', 'stickers med samme person'), [2, 3, 5, 10, 15], partnerCount,
       'Stickers sat op sammen med den samme person – den man har flest med.', partner ? ` med ${partner}` : ''),
     tier('network', '🕸️', ['Social', 'Netværker', 'Samlingspunkt', 'Kendt af alle'], unit('makker', 'forskellige makkere'), [2, 3, 5, 10], partners.size,
       'Antal forskellige personer man har sat stickers op sammen med.'),

@@ -11,7 +11,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes).
 | x1 | 🎯 Stickers (`stickers`) | Første klister 1 · Klistrelus 5 · Klistrefnat 10 · Sticker-mester 25 · Sticker-legende 50 |
 | x2 | 🏙️ Byer (`cities`) | Byturist 5 · Bybuster 10 · Storbymenneske 15 · Metropol-mester 20 · Byernes konge 25 |
 | x3 | ✈️ Lande (`countries`) | Grænsekrydser 3 · Eventyrer 5 · Globetrotter 10 · Verdensborger 15 |
-| x4 | 🤝 Makker (`partner`) | Makker 2 · Venner 3 · BFF 5 · Dynamisk Duo 10 · Sindssyg Ægte venner 15 (+ "med <navn>") |
+| x4 | 🤝 Makker (`partner`) | Makker 2 · Venner 3 · BFF 5 · Dynamisk Duo 10 · Sindssyg ægte venner 15 (+ "med <navn>") |
 | x5 | 🕸️ Netværk (`network`) | Social 2 · Netværker 3 · Samlingspunkt 5 · Kendt af alle 10 |
 | x6 | 🏛️ Hovedstæder (`capitals`) | Hovedstads-turist 1 · Hovedstadsjæger 3 · Diplomat 5 · Verdensambassadør 10 |
 | x7 | 🌐 Kontinenter (`continents`) | Interkontinental 2 · Verdensfarer 3 · Jordomrejsende 4 · Kosmopolit 5 · Hele kloden 6 |
