@@ -81,6 +81,7 @@ function submitted(s: StoredSticker) {
       </div>
 
       <AdminPush />
+      <AdminUsers />
       <AdminBackups />
     </template>
 

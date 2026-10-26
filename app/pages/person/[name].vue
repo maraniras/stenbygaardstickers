@@ -3,6 +3,7 @@
 const route = useRoute()
 const { stickers, people, stickersBy } = useStickers()
 const { ratings } = useRatings()
+const { isMe } = useUser()
 const router = useRouter()
 const name = computed(() => String(route.params.name))
 const list = computed(() => stickersBy(name.value))
@@ -41,6 +42,7 @@ function back() {
       <span class="avatar">{{ displayName[0] }}</span>
       <h1>{{ displayName }}</h1>
       <p class="sub">{{ earnedCount(badges) }} af {{ badges.length }} badges</p>
+      <NuxtLink v-if="isMe(displayName)" class="chip you" to="/mig">Det er dig · Indstillinger</NuxtLink>
     </header>
 
     <LevelCard :points="totalPoints(badges)" />
@@ -146,6 +148,10 @@ h1 {
   margin: 4px 0 0;
   color: var(--muted);
   font-weight: 600;
+}
+.you {
+  margin-top: 10px;
+  background: var(--accent-soft);
 }
 .grid {
   display: grid;
