@@ -16,7 +16,7 @@ export default defineEventHandler(async (event): Promise<CommentView> => {
   }
   const top = parent?.parentId ? await getComment(stickerId, parent.parentId) : parent
 
-  const users = (await listUsers()).map(u => u.name)
+  const users = await taggableNames()
   const c: CommentData = {
     id: newCommentId(),
     stickerId,

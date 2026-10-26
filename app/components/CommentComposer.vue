@@ -1,12 +1,22 @@
 <script setup lang="ts">
 // Tekstfelt til kommentarer med @-forslag: skriv "@Nico" og vælg Nicole. Man kan
-// ikke tagge sig selv. Forslagene er dem, der har valgt et navn i appen.
+// ikke tagge sig selv. Forslagene er dem, der har valgt et navn i appen, og alle der
+// står på en sticker (de får først besked, når de vælger deres navn).
 const text = defineModel<string>({ required: true })
 const props = defineProps<{ placeholder?: string, busy?: boolean, submitLabel?: string, autofocus?: boolean, cancelable?: boolean }>()
 const emit = defineEmits<{ submit: [], cancel: [] }>()
 
 const { users } = useUsers()
+const { people } = useStickers()
 const { name: me } = useUser()
+
+const names = computed(() => {
+  const out: string[] = []
+  for (const n of [...users.value.map(u => u.name), ...people.value.map(p => p.name)]) {
+    if (!out.some(o => sameName(o, n))) out.push(n)
+  }
+  return out
+})
 const area = ref<HTMLTextAreaElement>()
 const query = ref<string | null>(null)
 const active = ref(0)
@@ -14,8 +24,7 @@ const active = ref(0)
 const options = computed(() => {
   if (query.value === null) return []
   const q = query.value.toLocaleLowerCase('da')
-  return users.value
-    .map(u => u.name)
+  return names.value
     .filter(n => !(me.value && sameName(n, me.value)))
     .filter(n => n.toLocaleLowerCase('da').startsWith(q) || (q.length > 1 && n.toLocaleLowerCase('da').includes(q)))
     .sort((a, b) => a.localeCompare(b, 'da'))

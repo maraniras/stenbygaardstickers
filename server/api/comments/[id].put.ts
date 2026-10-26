@@ -13,7 +13,7 @@ export default defineEventHandler(async (event): Promise<CommentData> => {
     throw createError({ statusCode: 403, statusMessage: 'Kommentarer kan kun rettes de første 10 minutter' })
   }
   const text = cleanCommentText(body?.text)
-  const users = (await listUsers()).map(u => u.name)
+  const users = await taggableNames()
   const c: CommentData = { ...old, text, mentions: findMentions(text, users, old.author), editedAt: new Date().toISOString() }
   await saveComment(c)
 

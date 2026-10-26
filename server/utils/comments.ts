@@ -161,6 +161,15 @@ export function findMentions(text: string, users: string[], author: string) {
   return found
 }
 
+/** Navne man kan tagge: brugere og alle der står på en godkendt sticker */
+export async function taggableNames() {
+  const out: string[] = []
+  const add = (n: string) => { if (!out.some(o => sameName(o, n))) out.push(n) }
+  for (const u of await listUsers()) add(u.name)
+  for (const s of await listStickers()) if (s.status === 'approved') s.placedBy.forEach(add)
+  return out
+}
+
 export function cleanCommentText(input: unknown) {
   const text = typeof input === 'string' ? input.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim() : ''
   if (!text) throw createError({ statusCode: 400, statusMessage: 'Skriv noget først' })
