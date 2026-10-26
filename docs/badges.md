@@ -21,7 +21,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes).
 | x11 | 🗽 Nordamerika (`continent-nordamerika`) | Amerika-turist · Road trip · American Dream · Cowboy · Mr. President |
 | x12 | 🦜 Sydamerika (`continent-sydamerika`) | Sydamerika-turist · Samba-Emil · Gaucho · Amazonas-ekspert · Inka-kongen |
 | x13 | 🦘 Oceanien (`continent-oceanien`) | Down Under · Kænguru-ven · Surfer · Crocodile Emil · Kænguru-kongen |
-| x53 | 👍 Likes (`likes`) | Liket 1 · Populær 5 · Folkets stemme 10 · Influencer 25 · Kultstatus 50 👍 på kommentarer |
+| x53 | 👍 Likes (`likes`) | Liket 1 · Populær 5 · Folkets stemme 10 · Influencer 25 · Sindssygt 50 👍 på kommentarer |
 
 ## Enkelt-badges
 

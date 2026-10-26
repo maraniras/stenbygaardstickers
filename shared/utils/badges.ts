@@ -287,7 +287,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
     single('peoples', '🗳️', 'Folkets valg', 'Mindst 20 stemmer i alt på ens stickers', votes >= 20, { value: votes, target: 20 }),
     single('commenter', '💬', 'Første kommentar', 'Skriv en kommentar på en sticker', cs.comments >= 1),
     single('tagged', '🏷️', 'Tagget', 'Bliv tagget i en kommentar', cs.tagged >= 1),
-    tier('likes', '👍', ['Liket', 'Populær', 'Folkets stemme', 'Influencer', 'Kultstatus'], unit('👍 på kommentarer', '👍 på kommentarer'), [1, 5, 10, 25, 50], cs.likes,
+    tier('likes', '👍', ['Liket', 'Populær', 'Folkets stemme', 'Influencer', 'Sindssygt'], unit('👍 på kommentarer', '👍 på kommentarer'), [1, 5, 10, 25, 50], cs.likes,
       '👍 i alt på dine kommentarer.'),
     single('hit', '💥', 'Hit', '5 👍 på én kommentar', cs.maxLikes >= 5, { value: cs.maxLikes, target: 5 }),
     single('viral', '📣', 'Viral', '10 👍 på én kommentar', cs.maxLikes >= 10, { value: cs.maxLikes, target: 10 }),
@@ -385,7 +385,7 @@ const TIER_POINTS: Record<string, number[]> = {
   'continent-europa': [3, 6, 10, 16, 24],
   'likes': [1, 2, 4, 8, 12],
 }
-const OTHER_CONTINENT_POINTS = [8, 12, 18, 24, 36]
+const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
   'commenter': 1, 'tagged': 1, 'hit': 2, 'viral': 4,
@@ -402,14 +402,14 @@ const YEAR_POINTS = 10
 
 export const LEVELS = [
   { at: 0, title: 'Nybegynder' },
-  { at: 10, title: 'Klistrelærling' },
-  { at: 25, title: 'Gadeplakat' },
-  { at: 45, title: 'Lygtepæls-kender' },
-  { at: 75, title: 'Byvandrer' },
-  { at: 115, title: 'Eventyrer' },
-  { at: 170, title: 'Globetrotter' },
-  { at: 240, title: 'Verdensstjerne' },
-  { at: 330, title: 'Mester-klistrer' },
+  { at: 15, title: 'Klistrelærling' },
+  { at: 40, title: 'Gadeplakat' },
+  { at: 70, title: 'Lygtepæls-kender' },
+  { at: 110, title: 'Byvandrer' },
+  { at: 160, title: 'Eventyrer' },
+  { at: 220, title: 'Globetrotter' },
+  { at: 290, title: 'Verdensstjerne' },
+  { at: 370, title: 'Mester-klistrer' },
   { at: 450, title: 'Stenbygaard-legende' },
 ]
 
