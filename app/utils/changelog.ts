@@ -9,6 +9,18 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.1',
+    notes: [
+      'Vælg dit navn under »Mig«, og upload et profilbillede',
+      'Kommentér stickers, svar hinanden og tag med @',
+      'Giv 👍 til stickers (1–5) og til kommentarer',
+      'Få besked, når nogen tagger dig, svarer dig eller kommenterer din sticker',
+      'Vælg selv hvilke notifikationer du vil have 🔔',
+      'Nye badges og level op med konfetti 🎉',
+      'Nye 3D-badges, og flere har fået nye navne',
+    ],
+  },
+  {
     version: '2.0',
     date: '2026-10-25',
     notes: [
