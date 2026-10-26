@@ -223,11 +223,11 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
   for (let y = FIRST_YEAR; y <= now.getFullYear(); y++) years.push(y)
 
   return [
-    tier('stickers', '🎯', ['Første klister', 'Klistrelus', 'Sticker-jæger', 'Sticker-mester', 'Sticker-legende'], unit('sticker', 'stickers'), [1, 5, 10, 25, 50], mine.length,
+    tier('stickers', '🎯', ['Første klister', 'Klistrelus', 'Klistrefnat', 'Sticker-mester', 'Sticker-legende'], unit('sticker', 'stickers'), [1, 5, 10, 25, 50], mine.length,
       'Antal stickers man har været med til at sætte op.'),
     tier('cities', '🏙️', ['Byturist', 'Bybuster', 'Storbymenneske', 'Metropol-mester', 'Byernes konge'], unit('by', 'byer'), [5, 10, 15, 20, 25], cityCounts.size,
       'Antal forskellige byer med en sticker.'),
-    tier('countries', '✈️', ['Grænsekrydser', 'Eventyrer', 'Klistrefnat', 'Verdensborger'], unit('land', 'lande'), [3, 5, 10, 15], countries,
+    tier('countries', '✈️', ['Grænsekrydser', 'Eventyrer', 'Globetrotter', 'Verdensborger'], unit('land', 'lande'), [3, 5, 10, 15], countries,
       'Antal forskellige lande med en sticker.'),
     tier('partner', '🤝', ['Makker', 'Venner', 'BFF', 'Dynamisk Duo', 'Sindssyg Ægte venner'], unit('sticker med samme person', 'stickers med samme person'), [2, 3, 5, 10, 15], partnerCount,
       'Stickers sat op sammen med den samme person – den man har flest med.', partner ? ` med ${partner}` : ''),
@@ -248,7 +248,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       { value: visitedOf(['SE', 'NO', 'DE']), target: 3 }),
     single('nordic', '🌲', 'Nordisk mester', 'Danmark, Sverige, Norge, Finland og Island', visitedOf(['DK', 'SE', 'NO', 'FI', 'IS']) === 5,
       { value: visitedOf(['DK', 'SE', 'NO', 'FI', 'IS']), target: 5 }),
-    single('arctic', '🐻‍❄️', 'Pisse kold', 'En sticker nord for polarcirklen', mine.some(s => s.lat > 66.5634)),
+    single('arctic', '🐻‍❄️', 'Pisse koldt', 'En sticker nord for polarcirklen', mine.some(s => s.lat > 66.5634)),
     single('equator', '🌏', 'Fucking varmt', 'En sticker syd for ækvator', mine.some(s => s.lat < 0)),
     single('roadtrip', '🛣️', 'Roadtrip', '3 forskellige byer inden for 2 uger', roadtripCities >= 3, { value: roadtripCities, target: 3 }),
     single('longhaul', '🧳', 'Langtur', 'To stickers over 5.000 km fra hinanden', longHaul),

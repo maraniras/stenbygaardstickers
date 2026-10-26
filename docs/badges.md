@@ -8,9 +8,9 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes).
 
 | Nr. | Badge (id) | Trin |
 |---|---|---|
-| x1 | 🎯 Stickers (`stickers`) | Første klister 1 · Klistrelus 5 · Sticker-jæger 10 · Sticker-mester 25 · Sticker-legende 50 |
+| x1 | 🎯 Stickers (`stickers`) | Første klister 1 · Klistrelus 5 · Klistrefnat 10 · Sticker-mester 25 · Sticker-legende 50 |
 | x2 | 🏙️ Byer (`cities`) | Byturist 5 · Bybuster 10 · Storbymenneske 15 · Metropol-mester 20 · Byernes konge 25 |
-| x3 | ✈️ Lande (`countries`) | Grænsekrydser 3 · Eventyrer 5 · Klistrefnat 10 · Verdensborger 15 |
+| x3 | ✈️ Lande (`countries`) | Grænsekrydser 3 · Eventyrer 5 · Globetrotter 10 · Verdensborger 15 |
 | x4 | 🤝 Makker (`partner`) | Makker 2 · Venner 3 · BFF 5 · Dynamisk Duo 10 · Sindssyg Ægte venner 15 (+ "med <navn>") |
 | x5 | 🕸️ Netværk (`network`) | Social 2 · Netværker 3 · Samlingspunkt 5 · Kendt af alle 10 |
 | x6 | 🏛️ Hovedstæder (`capitals`) | Hovedstads-turist 1 · Hovedstadsjæger 3 · Diplomat 5 · Verdensambassadør 10 |
@@ -33,7 +33,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes).
 | x17 | 🇩🇰 Rundt i Danmark (`denmark`) | 5 danske byer |
 | x18 | 🏡 En ægte nabo (`neighbour`) | Sverige, Norge og Tyskland |
 | x19 | 🌲 Nordisk mester (`nordic`) | DK, SE, NO, FI og IS |
-| x20 | 🐻‍❄️ Pisse kold (`arctic`) | Nord for polarcirklen |
+| x20 | 🐻‍❄️ Pisse koldt (`arctic`) | Nord for polarcirklen |
 | x21 | 🌏 Fucking varmt (`equator`) | Syd for ækvator |
 | x22 | 🛣️ Roadtrip (`roadtrip`) | 3 byer inden for 2 uger |
 | x23 | 🧳 Langtur (`longhaul`) | To stickers over 5.000 km fra hinanden |
