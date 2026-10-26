@@ -17,6 +17,7 @@ const thumb = computed(() => thumbnail(props.sticker))
       <div class="meta">
         {{ formatDate(sticker.date) }}
         <RatingBadge :sticker-id="sticker.id" />
+        <CommentCount :sticker-id="sticker.id" />
       </div>
       <div class="meta">{{ formatKm(sticker.distanceKm) }} fra Aalborg</div>
       <span class="more">Se sticker
@@ -100,7 +101,7 @@ h2 {
   font-size: 13px;
   color: var(--muted);
 }
-.meta :deep(.badge) { color: var(--text); }
+.meta :deep(.badge), .meta :deep(.count) { color: var(--text); }
 .more {
   display: inline-flex;
   align-items: center;

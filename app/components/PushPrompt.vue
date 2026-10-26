@@ -8,7 +8,13 @@ const ASKED = 'stenbygaard-push-asked'
 const mode = useState<PromptMode | null>('push-prompt', () => null)
 const { on, busy, refresh, enable } = usePush('all')
 const { open: installOpen } = useInstall()
+const namePrompt = useState<'pending' | 'open' | 'done'>('name-prompt', () => 'pending')
 const error = ref('')
+
+function pushAsked() {
+  try { return Boolean(localStorage.getItem(ASKED)) }
+  catch { return true }
+}
 
 onMounted(async () => {
   await refresh()
@@ -16,8 +22,9 @@ onMounted(async () => {
   try { asked = Boolean(localStorage.getItem(ASKED)) }
   catch {}
   if (asked || on.value || !pushSupported() || Notification.permission === 'denied') return
-  // Vis ikke oven i install-boksen – vent til den er lukket
-  const tryAsk = () => { if (!mode.value && !installOpen.value) mode.value = 'ask' }
+  // Vis ikke oven i install-boksen – vent til den er lukket. Spørger "Hvem er du?"
+  // (NamePrompt.vue), spørger den selv om notifikationer bagefter.
+  const tryAsk = () => { if (!mode.value && !installOpen.value && namePrompt.value === 'done' && !pushAsked()) mode.value = 'ask' }
   setTimeout(() => {
     if (!installOpen.value) return void setTimeout(tryAsk, 600)
     const stop = watch(installOpen, (open) => {

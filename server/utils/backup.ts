@@ -1,4 +1,4 @@
-// Backup af databasen: alle stickers (også dem der venter), 👍 og kommentarer som én
+// Backup af databasen: alle stickers (også dem der venter), 👍, kommentarer og brugere som én
 // JSON-fil. Køres dagligt af Vercel Cron (vercel.json) og kan hentes fra admin.
 // Gemmes i Vercel Blob under backups/ (med tilfældigt suffiks, så adressen ikke kan
 // gættes) – eller i .data/ under `npm run dev`. De nyeste 30 beholdes.
@@ -15,6 +15,8 @@ export interface Backup {
   comments?: CommentData[]
   /** kommentar-id → "u:navn"/"d:enhed" → værdi */
   commentLikes?: Record<string, Record<string, string>>
+  /** Brugere med navn, profilbillede, indstillinger og enheder (kun hashes af nøglerne) */
+  users?: UserRecord[]
 }
 
 async function allRatings(): Promise<Backup['ratings']> {
@@ -39,6 +41,7 @@ export async function createBackup(): Promise<Backup> {
     ratings: await allRatings(),
     comments,
     commentLikes: await getLikes(comments.map(c => c.id)),
+    users: await listUsers(),
   }
 }
 

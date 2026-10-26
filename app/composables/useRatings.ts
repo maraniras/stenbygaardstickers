@@ -1,5 +1,6 @@
-// 👍 (1–5) pr. enhed: hver browser får et tilfældigt id i localStorage og tæller
-// som én. Samme id bruges til 👍 på kommentarer, når man ikke er logget ind.
+// 👍 (1–5): hver browser får et tilfældigt id i localStorage og tæller som én. Er man
+// logget ind, tæller man som brugeren i stedet (én stemme på alle ens enheder).
+// Samme id bruges til 👍 på kommentarer, når man ikke er logget ind.
 
 const KEY = 'stenbygaard-device'
 
@@ -28,12 +29,18 @@ export function useRatings() {
   const ready = useState('ratings-ready', () => false)
   const error = ref('')
 
-  if (!loading) {
-    loading = $fetch<Record<string, RatingSummary>>('/api/ratings', { query: { device: deviceId() } })
+  function reload() {
+    loading = $fetch<Record<string, RatingSummary>>('/api/ratings', {
+      query: { device: deviceId() },
+      headers: { 'x-user-token': userToken() },
+    })
       .then((r) => { ratings.value = r })
       .catch(() => { enabled.value = false })
       .finally(() => { ready.value = true })
+    return loading
   }
+
+  if (!loading) reload()
 
   /** Samme antal igen fjerner ens vurdering */
   async function rate(stickerId: string, thumbs: number) {
@@ -65,5 +72,12 @@ export function useRatings() {
     }
   }
 
-  return { ratings, enabled, ready, error, rate }
+  /** Lige logget ind: enhedens 👍 flyttes over på brugeren */
+  async function claim() {
+    const device = deviceId()
+    if (device) await $fetch('/api/ratings/claim', { method: 'POST', body: { device }, headers: { 'x-user-token': userToken() } }).catch(() => {})
+    await reload()
+  }
+
+  return { ratings, enabled, ready, error, rate, reload, claim }
 }

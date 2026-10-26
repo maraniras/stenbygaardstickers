@@ -80,6 +80,12 @@ function submitted(s: StoredSticker) {
         </NuxtLink>
       </div>
 
+      <NuxtLink class="comments-link" to="/admin/kommentarer">
+        <span>💬</span>
+        <b>Kommentarer</b>
+        <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
+      </NuxtLink>
+
       <AdminPush />
       <AdminUsers />
       <AdminBackups />
@@ -178,5 +184,19 @@ h1 { font-size: 34px; }
   white-space: nowrap;
 }
 .info .when { color: var(--text); font-weight: 600; }
+.comments-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+.comments-link span { font-size: 22px; }
+.comments-link b { flex: 1; }
+.comments-link svg { width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .row > svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 </style>

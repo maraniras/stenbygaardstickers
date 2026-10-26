@@ -3,6 +3,8 @@
 const KEY = 'stenbygaard-user-token'
 // Har man slået badge-beskeder fra på denne enhed, kobles push ikke på igen af sig selv
 const PUSH_OFF_KEY = 'stenbygaard-badge-push-off'
+// Hvilket navn enhedens 👍 sidst er flyttet over til
+const CLAIMED_KEY = 'stenbygaard-ratings-claimed'
 
 /** Enhedens nøgle – sendes som x-user-token, når serveren skal vide, hvem man er */
 export function userToken() {
@@ -50,8 +52,17 @@ export function useUser() {
     badgePush.value = Boolean(r.push)
     notify.value = r.notify ?? {}
     // Navnet er frigivet i admin: glem nøglen
-    if (!r.name) writeToken(null)
-    else syncPush()
+    if (!r.name) return writeToken(null)
+    syncPush()
+    // Én gang pr. enhed: enhedens 👍 flyttes over på brugeren (også for dem, der
+    // loggede ind, før 👍 fulgte brugeren)
+    try {
+      if (localStorage.getItem(CLAIMED_KEY) !== r.name) {
+        localStorage.setItem(CLAIMED_KEY, r.name)
+        useRatings().claim()
+      }
+    }
+    catch {}
   }
 
   if (!loading && import.meta.client) {
@@ -63,6 +74,7 @@ export function useUser() {
     writeToken(r.token)
     name.value = r.name
     useUsers().reload()
+    // loadMe flytter også enhedens 👍 over på brugeren
     await loadMe().catch(() => {})
   }
 
@@ -84,7 +96,7 @@ export function useUser() {
     name.value = null
     seen.value = null
     badgePush.value = false
-    await useUsers().reload()
+    await Promise.all([useUsers().reload(), useRatings().reload()])
   }
 
   async function setAvatar(file: File) {

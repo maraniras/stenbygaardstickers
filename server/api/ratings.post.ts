@@ -1,4 +1,5 @@
-/** Giv 1–5 👍 – eller 0 for at fjerne sin vurdering. Man kan ikke give 👍 til sine egne. */
+/** Giv 1–5 👍 – eller 0 for at fjerne sin vurdering. Man kan ikke give 👍 til sine egne.
+ *  Logget ind gemmes den på brugeren (én stemme uanset antal enheder). */
 export default defineEventHandler(async (event) => {
   if (!ratingsEnabled) throw createError({ statusCode: 503, statusMessage: '👍 er ikke sat op' })
   const body = await readBody<{ stickerId?: unknown, device?: unknown, value?: unknown, stars?: unknown }>(event)
@@ -16,8 +17,9 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 403, statusMessage: 'Du kan ikke give 👍 til din egen sticker' })
     }
   }
-  await setRating(stickerId, device, value)
+  const voter = { device, userKey: user?.key }
+  await setRating(stickerId, voter, value)
   // 👍 kan give badges (Publikumsfavorit, Magnet …) og tage rekorder
   await syncBadgesLater(event)
-  return getRatings(device)
+  return getRatings(voter)
 })

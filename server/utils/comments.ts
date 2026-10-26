@@ -128,6 +128,23 @@ export async function allComments(): Promise<CommentData[]> {
   return res.flatMap(values => (values ?? []).map(v => JSON.parse(v) as CommentData))
 }
 
+/** Antal kommentarer pr. sticker (kun dem der har nogen) */
+export async function commentCounts(): Promise<Record<string, number>> {
+  const out: Record<string, number> = {}
+  if (!redisEnabled) {
+    for (const [id, c] of Object.entries((await readLocal()).comments)) {
+      const n = Object.keys(c).length
+      if (n) out[id] = n
+    }
+    return out
+  }
+  const [ids] = await redis([['SMEMBERS', 'commented']]) as [string[]]
+  if (!ids.length) return out
+  const res = await redis(ids.map(id => ['HLEN', `comments:${id}`])) as number[]
+  ids.forEach((id, i) => { if (res[i]) out[id] = res[i]! })
+  return out
+}
+
 /** Tal til kommentar-badges, pr. navn med små bogstaver */
 export async function commentStats(): Promise<Record<string, CommentStats>> {
   const comments = await allComments()

@@ -38,6 +38,7 @@ useNuxtApp().hook('page:finish', () => {
     <BottomNav />
     <ThemeDecor />
     <InstallPrompt />
+    <NamePrompt />
     <PushPrompt />
     <UpdateToast />
     <BadgePopup />

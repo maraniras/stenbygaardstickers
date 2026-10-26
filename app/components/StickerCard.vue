@@ -21,7 +21,10 @@ const thumb = computed(() => thumbnail(props.sticker))
       <span>{{ formatDate(sticker.date) }}</span>
       <span class="dot">·</span>
       <span>{{ formatKm(sticker.distanceKm) }}</span>
-      <RatingBadge class="rating" :sticker-id="sticker.id" />
+      <span class="right">
+        <CommentCount :sticker-id="sticker.id" />
+        <RatingBadge :sticker-id="sticker.id" />
+      </span>
     </div>
   </NuxtLink>
 </template>
@@ -110,7 +113,9 @@ h3 {
   color: var(--muted);
 }
 .dot { opacity: .5; }
-.rating {
+.right {
+  display: inline-flex;
+  gap: 10px;
   margin-left: auto;
   color: var(--text);
 }
