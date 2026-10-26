@@ -74,7 +74,10 @@ function resize() {
   const el = area.value
   if (!el) return
   el.style.height = 'auto'
-  el.style.height = `${Math.min(el.scrollHeight, 220)}px`
+  // scrollHeight er uden kanten – uden den kommer der en scrollbar på pc
+  const full = el.scrollHeight + el.offsetHeight - el.clientHeight
+  el.style.height = `${Math.min(full, 220)}px`
+  el.style.overflowY = full > 220 ? 'auto' : 'hidden'
 }
 
 watch(text, () => nextTick(resize))
