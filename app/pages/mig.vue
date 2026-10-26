@@ -1,13 +1,7 @@
 <script setup lang="ts">
 // "Hvem er du?": vælg et navn (låses til enheden), brug en kode fra en anden
 // enhed, eller – når man er logget ind – lav en kode til en ny enhed.
-const { name, ready, badgePush, claim, pair, createCode, logout, setAvatar, removeAvatar, setBadgePush } = useUser()
-const canPush = ref(false)
-const homeScreenFirst = ref(false)
-onMounted(() => {
-  canPush.value = pushSupported()
-  homeScreenFirst.value = needsHomeScreen()
-})
+const { name, ready, claim, pair, createCode, logout, setAvatar, removeAvatar } = useUser()
 const { people } = useStickers()
 const { isTaken: taken, avatarFor, reload: reloadUsers } = useUsers()
 
@@ -137,27 +131,14 @@ function doLogout() {
         <h1>{{ name }}</h1>
       </header>
 
-      <section class="card">
-        <div class="switch-row">
-          <div>
-            <h2>Besked om nye badges</h2>
-            <p class="hint">Når du får en ny badge, eller nogen tager din rekord.</p>
-          </div>
-          <button
-            v-if="canPush && !homeScreenFirst"
-            class="switch"
-            :class="{ on: badgePush }"
-            role="switch"
-            :aria-checked="badgePush"
-            :disabled="busy"
-            @click="run(() => setBadgePush(!badgePush))"
-          >
-            <span />
-          </button>
+      <NuxtLink class="card link-row" to="/notifikationer">
+        <span class="icon">🔔</span>
+        <div>
+          <h2>Notifikationer</h2>
+          <p class="hint">Badges, level, tags, kommentarer og nye stickers</p>
         </div>
-        <p v-if="homeScreenFirst" class="hint">På iPhone skal appen først føjes til hjemmeskærmen: tryk Del → »Føj til hjemmeskærm« og åbn den derfra.</p>
-        <p v-else-if="!canPush" class="hint">Denne browser kan ikke vise notifikationer.</p>
-      </section>
+        <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
+      </NuxtLink>
 
       <section class="card">
         <h2>Brug appen på en enhed mere</h2>
@@ -336,38 +317,16 @@ header .eyebrow { margin: 0 0 2px; }
   box-shadow: var(--shadow-sm);
 }
 .card h2 { font-size: 18px; }
-.switch-row {
-  display: flex;
+.link-row {
+  flex-direction: row;
   align-items: center;
   gap: 14px;
+  text-decoration: none;
 }
-.switch-row > div { flex: 1; }
-.switch-row .hint { margin-top: 4px; }
-.switch {
-  flex: none;
-  position: relative;
-  width: 52px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: var(--surface-2);
-  cursor: pointer;
-  transition: background .2s;
-}
-.switch span {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
-  transition: transform .2s;
-}
-.switch.on { background: var(--ink); }
-.switch.on span { transform: translateX(20px); }
+.link-row > div { flex: 1; }
+.link-row .hint { margin-top: 2px; }
+.link-row .icon { font-size: 24px; }
+.link-row svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .hint {
   margin: 0;
   font-size: 14px;

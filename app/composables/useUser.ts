@@ -38,14 +38,17 @@ export function useUser() {
   const ready = useState('user-ready', () => false)
   /** Badges man har set (earnedKeys) – null indtil det er hentet */
   const seen = useState<string[] | null>('user-seen', () => null)
-  /** Får denne enhed besked om nye badges */
+  /** Får denne enhed beskeder til brugeren (badges, kommentarer …) */
   const badgePush = useState('user-badge-push', () => false)
+  /** Hvilke typer man vil have (mangler = til) */
+  const notify = useState<NotifyPrefs>('user-notify', () => ({}))
 
   async function loadMe() {
     const r = await $fetch<MeResponse>('/api/me', { headers: headers() })
     name.value = r.name
     seen.value = r.seen ?? null
     badgePush.value = Boolean(r.push)
+    notify.value = r.notify ?? {}
     // Navnet er frigivet i admin: glem nøglen
     if (!r.name) writeToken(null)
     else syncPush()
@@ -120,6 +123,19 @@ export function useUser() {
     badgePush.value = on
   }
 
+  /** Slår en type notifikationer til/fra for brugeren (alle enheder) */
+  async function setNotify(type: NotifyType, on: boolean) {
+    const prev = notify.value
+    notify.value = { ...prev, [type]: on }
+    try {
+      notify.value = await $fetch<NotifyPrefs>('/api/me/notify', { method: 'PUT', body: { [type]: on }, headers: headers() })
+    }
+    catch (err) {
+      notify.value = prev
+      throw err
+    }
+  }
+
   /** Markerer badges som set, så pop-up'en ikke viser dem */
   async function markSeen(keys: string[]) {
     if (!name.value || !keys.length) return
@@ -134,5 +150,5 @@ export function useUser() {
   /** Er det her mig? */
   const isMe = (other: string) => Boolean(name.value && sameName(name.value, other))
 
-  return { name, ready, seen, badgePush, claim, pair, createCode, logout, setAvatar, removeAvatar, syncPush, setBadgePush, markSeen, isMe }
+  return { name, ready, seen, badgePush, notify, claim, pair, createCode, logout, setAvatar, removeAvatar, syncPush, setBadgePush, setNotify, markSeen, isMe }
 }

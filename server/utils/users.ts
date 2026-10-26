@@ -30,6 +30,10 @@ export interface UserRecord {
   /** Nøgle → hvornår der sidst blev sendt besked, så en rekord der skifter frem og
    *  tilbage ikke giver besked hele tiden */
   notifiedAt?: Record<string, string>
+  /** Hvilke typer notifikationer man vil have (shared/utils/notify.ts) */
+  notify?: NotifyPrefs
+  /** Level serveren sidst har set – til "Level op"-beskeden */
+  level?: number
 }
 
 interface LocalUsers {

@@ -10,5 +10,6 @@ export default defineEventHandler(async (event): Promise<MeResponse> => {
     ...(user.avatar ? { avatar: user.avatar } : {}),
     push: Boolean(user.devices[found.hash]?.push),
     seen: user.seenKeys ?? [],
+    notify: user.notify ?? {},
   }
 })

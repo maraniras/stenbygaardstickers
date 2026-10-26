@@ -113,10 +113,11 @@ export async function sendPush(subs: PushSubscription[], message: PushMessage) {
   return gone
 }
 
-/** Sender til en liste. Abonnementer, som telefonen har opgivet, fjernes. */
-export async function notify(list: PushList, message: PushMessage) {
+/** Sender til en liste. Abonnementer, som telefonen har opgivet, fjernes.
+ *  skip: endpoints der ikke skal have den (fx brugere der har slået typen fra). */
+export async function notify(list: PushList, message: PushMessage, skip?: Set<string>) {
   try {
-    const gone = await sendPush(await allSubs(list), message)
+    const gone = await sendPush((await allSubs(list)).filter(s => !skip?.has(s.endpoint)), message)
     for (const endpoint of gone) await removeSub(list, endpoint)
   }
   catch (err) {

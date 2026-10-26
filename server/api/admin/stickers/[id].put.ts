@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       title: `📍 Emil er landet i ${sticker.city || sticker.title}!`,
       body: `${sticker.title}${by ? ` – sat op af ${by}` : ''}`,
       url: `/sticker/${sticker.id}`,
-    })
+    }, await mutedEndpoints('stickers'))
   }
   // Nye badges og mistede rekorder – kun hvis kortet faktisk kan have ændret sig
   if (old.status === 'approved' || sticker.status === 'approved') await syncBadgesLater(event)

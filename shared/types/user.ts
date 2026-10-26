@@ -1,3 +1,5 @@
+import type { NotifyPrefs } from '../utils/notify'
+
 /** Det en enhed får at vide om sig selv */
 export interface MeResponse {
   name: string | null
@@ -6,6 +8,8 @@ export interface MeResponse {
   push?: boolean
   /** Badges brugeren har set (earnedKeys) */
   seen?: string[]
+  /** Notifikationstyper slået til/fra (mangler = til) */
+  notify?: NotifyPrefs
 }
 
 /** Svar når man vælger navn eller bruger en kode: enhedens nøgle */
