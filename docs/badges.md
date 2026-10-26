@@ -2,7 +2,7 @@
 
 Faste numre, så vi nemt kan tale om en badge ("ret x18"). Nye badges får næste ledige
 nummer – numrene flytter sig aldrig, selvom rækkefølgen i appen ændres.
-Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes).
+Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikonet er `public/badges/<id>.webp` (Fluent Emoji 3D).
 
 ## Trin-badges
 

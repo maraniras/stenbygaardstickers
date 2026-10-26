@@ -1,7 +1,11 @@
 <script setup lang="ts">
-// Én badge som medalje: farvet ring efter niveau, emoji i midten, prikker for trin.
-// Ikke opnåede er grå med fremskridt ("3/5").
+// Én badge som medalje: farvet ring efter niveau, ikon (SVG, ellers emoji) i midten,
+// prikker for trin. Ikke opnåede er grå med fremskridt ("3/5").
 const props = defineProps<{ badge: Badge, big?: boolean }>()
+const icon = computed(() => badgeIcon(props.badge.id))
+// Mangler billedet (fx en ny badge uden ikon endnu), vises emojien
+const broken = ref(false)
+watch(icon, () => { broken.value = false })
 
 const ring = computed(() => {
   const b = props.badge
@@ -30,7 +34,11 @@ const sub = computed(() => {
 <template>
   <div class="badge" :class="[badge.kind, { earned: badge.earned, big }]" :title="`${badge.name}: ${badge.desc}`">
     <div class="medal" :style="{ background: ring }">
-      <span class="face"><CountryFlag v-if="badge.flag" :code="badge.flag" /><template v-else>{{ badge.emoji }}</template></span>
+      <span class="face">
+        <CountryFlag v-if="badge.flag" :code="badge.flag" />
+        <img v-else-if="icon && !broken" class="icon" :src="icon" alt="" draggable="false" @error="broken = true">
+        <template v-else>{{ badge.emoji }}</template>
+      </span>
       <span v-if="badge.kind === 'tier'" class="pips">
         <i v-for="i in badge.levels" :key="i" :class="{ on: i <= badge.level }" />
       </span>
@@ -70,6 +78,13 @@ const sub = computed(() => {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, .12);
   font-size: 28px;
   line-height: 1;
+}
+.icon {
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .18));
+  user-select: none;
 }
 .badge:not(.earned) .face { filter: grayscale(1); opacity: .45; }
 .earned .medal { box-shadow: 0 4px 12px rgba(0, 0, 0, .14); }
