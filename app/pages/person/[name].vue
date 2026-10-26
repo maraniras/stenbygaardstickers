@@ -3,7 +3,7 @@
 const route = useRoute()
 const { stickers, people, stickersBy } = useStickers()
 const { ratings } = useRatings()
-const { isMe } = useUser()
+const { name: me, isMe, markSeen } = useUser()
 const router = useRouter()
 const name = computed(() => String(route.params.name))
 const list = computed(() => stickersBy(name.value))
@@ -25,6 +25,26 @@ const badgeTab = ref<'earned' | 'missing'>('earned')
 const shownBadges = computed(() => badges.value.filter(b => b.earned === (badgeTab.value === 'earned')))
 
 useHead(() => ({ title: `${displayName.value} · Stenbygaard Stickers` }))
+
+// Åbnet fra en notifikation (/person/<navn>?badge=<id>): vis badgen med det samme
+watch(() => route.query.badge, (id) => {
+  if (typeof id !== 'string' || !badges.value.some(b => b.id === id)) return
+  openBadge.value = id
+  if (id) badgeTab.value = badges.value.find(b => b.id === id)?.earned ? 'earned' : 'missing'
+  const { badge: _, ...rest } = route.query
+  router.replace({ query: rest })
+}, { immediate: true })
+
+// "Ny badge"-pop-up'en venter, mens en badge er åben
+const sheetOpen = useState('badge-sheet-open', () => false)
+watch(openedBadge, (b) => { sheetOpen.value = Boolean(b) }, { immediate: true })
+onBeforeUnmount(() => { sheetOpen.value = false })
+
+// Ens egne badges tæller som set, når man har åbnet dem. Åbnes appen fra en
+// notifikation, er brugeren måske ikke hentet endnu – så venter vi på navnet.
+watch([openedBadge, me], ([b]) => {
+  if (b?.earned && isMe(displayName.value)) markSeen(earnedKeys([b]))
+}, { immediate: true })
 
 function back() {
   if (window.history.state?.back) router.back()

@@ -8,5 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Ugyldig stjerne' })
   }
   await setRating(stickerId, device, stars)
+  // Stjerner kan give badges (Publikumsfavorit, Magnet …) og tage rekorder
+  await syncBadgesLater(event)
   return getRatings(device)
 })

@@ -13,6 +13,7 @@ self.addEventListener('push', (event) => {
     icon: '/icons/icon-192.png',
     // Hvid silhuet – Android viser kun formen i statuslinjen
     badge: '/icons/badge-96.png',
+    ...(data.tag ? { tag: data.tag } : {}),
     data: { url: data.url || '/admin' },
   }))
 })

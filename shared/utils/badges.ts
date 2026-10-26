@@ -1,5 +1,6 @@
-// Badges på profilsiden. Udregnes i browseren ud fra alle godkendte stickers (og
-// stjerner). Tre slags:
+// Badges på profilsiden. Udregnes ud fra alle godkendte stickers (og stjerner) – i
+// browseren og på serveren, som sender besked om nye badges (server/utils/badge-push.ts).
+// Tre slags:
 //  - trin: samme badge i flere niveauer med eget navn pr. niveau
 //    (ringen går bronze → sølv → guld → platin → diamant)
 //  - enkelt: opnået eller ej
@@ -7,7 +8,6 @@
 //    igen. "Årets flittigste" låses, når året er slut.
 // Med { history: true } afspilles personens stickers i datoorden for at finde, hvornår
 // (og med hvilken sticker) hver badge og hvert trin blev opnået – til badge-modalen.
-import type { RatingSummary } from '~/composables/useRatings'
 
 export type BadgeKind = 'tier' | 'single' | 'record'
 
@@ -327,6 +327,19 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
   }
   return score(badges)
 }
+
+/** Nøgler for alt opnået – ét pr. trin ("cities:2"), ellers badge-id'et. Bruges til at
+ *  finde nye badges (notifikationer og "ny badge"-pop-up'en). */
+export function earnedKeys(badges: Badge[]) {
+  return badges.flatMap((b) => {
+    if (!b.earned) return []
+    if (b.kind === 'tier') return Array.from({ length: b.level }, (_, i) => `${b.id}:${i + 1}`)
+    return [b.id]
+  })
+}
+
+/** Badge-id'et i en nøgle */
+export const badgeIdOf = (key: string) => key.split(':')[0]!
 
 export function earnedCount(badges: Badge[]) {
   return badges.filter(b => b.earned).length

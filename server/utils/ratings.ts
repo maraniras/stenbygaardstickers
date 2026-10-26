@@ -3,11 +3,6 @@
 // Redis: hash "rating:<stickerId>" med deviceId → stjerner, og et set "rated"
 // med alle sticker-id'er, der har fået stjerner.
 
-export interface RatingSummary {
-  avg: number
-  count: number
-  mine?: number
-}
 
 export const ratingsEnabled = redisEnabled || import.meta.dev
 

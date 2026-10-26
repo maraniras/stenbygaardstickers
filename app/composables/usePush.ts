@@ -20,9 +20,19 @@ export function needsHomeScreen() {
   return ios && !standalone
 }
 
-async function subscription() {
+export async function subscription() {
   const reg = await navigator.serviceWorker.getRegistration('/')
   return reg?.pushManager.getSubscription()
+}
+
+/** Spørger om lov (skal ske fra et tryk) og giver browserens push-abonnement */
+export async function ensureSubscription() {
+  const permission = await Notification.requestPermission()
+  if (permission !== 'granted') throw new Error('Notifikationer er blokeret. Slå dem til for appen i telefonens indstillinger.')
+  const { publicKey } = await $fetch<{ publicKey: string }>('/api/push')
+  const reg = (await navigator.serviceWorker.getRegistration('/')) ?? await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+  await navigator.serviceWorker.ready
+  return (await reg.pushManager.getSubscription()) ?? await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) })
 }
 
 export function usePush(list: List) {
@@ -43,15 +53,11 @@ export function usePush(list: List) {
 
   /** Spørger om lov (skal ske fra et tryk) og melder telefonen til */
   async function enable() {
-    const permission = await Notification.requestPermission()
-    if (permission !== 'granted') throw new Error('Notifikationer er blokeret. Slå dem til for appen i telefonens indstillinger.')
-    const { publicKey } = await $fetch<{ publicKey: string }>(api)
-    const reg = (await navigator.serviceWorker.getRegistration('/')) ?? await navigator.serviceWorker.register('/sw.js', { scope: '/' })
-    await navigator.serviceWorker.ready
-    let sub = await reg.pushManager.getSubscription()
-    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) })
+    const sub = await ensureSubscription()
     await $fetch(api, { method: 'POST', body: sub.toJSON() })
     on.value = true
+    // Er man logget ind, får man også besked om sine badges på denne enhed
+    if (list === 'all') useUser().syncPush()
   }
 
   /** Melder telefonen fra denne liste. Abonnementet i browseren beholdes, hvis den anden liste bruger det. */

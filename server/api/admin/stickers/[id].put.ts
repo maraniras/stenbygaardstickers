@@ -34,5 +34,7 @@ export default defineEventHandler(async (event) => {
       url: `/sticker/${sticker.id}`,
     })
   }
+  // Nye badges og mistede rekorder – kun hvis kortet faktisk kan have ændret sig
+  if (old.status === 'approved' || sticker.status === 'approved') await syncBadgesLater(event)
   return sticker
 })

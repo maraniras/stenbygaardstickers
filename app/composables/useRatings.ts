@@ -1,10 +1,5 @@
 // Stjerner pr. enhed: hver browser får et tilfældigt id i localStorage og
 // tæller som én bruger.
-export interface RatingSummary {
-  avg: number
-  count: number
-  mine?: number
-}
 
 const KEY = 'stenbygaard-device'
 
@@ -29,11 +24,14 @@ let loading: Promise<void> | undefined
 export function useRatings() {
   const ratings = useState<Record<string, RatingSummary>>('ratings', () => ({}))
   const enabled = useState('ratings-enabled', () => true)
+  /** Første hentning er færdig (også hvis den fejlede) */
+  const ready = useState('ratings-ready', () => false)
 
   if (!loading) {
     loading = $fetch<Record<string, RatingSummary>>('/api/ratings', { query: { device: deviceId() } })
       .then((r) => { ratings.value = r })
       .catch(() => { enabled.value = false })
+      .finally(() => { ready.value = true })
   }
 
   async function rate(stickerId: string, stars: number) {
@@ -52,5 +50,5 @@ export function useRatings() {
     }
   }
 
-  return { ratings, enabled, rate }
+  return { ratings, enabled, ready, rate }
 }

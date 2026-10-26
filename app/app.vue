@@ -40,6 +40,7 @@ useNuxtApp().hook('page:finish', () => {
     <InstallPrompt />
     <PushPrompt />
     <UpdateToast />
+    <BadgePopup />
   </div>
 </template>
 

@@ -2,6 +2,10 @@
 export interface MeResponse {
   name: string | null
   avatar?: string
+  /** Får denne enhed besked om nye badges */
+  push?: boolean
+  /** Badges brugeren har set (earnedKeys) */
+  seen?: string[]
 }
 
 /** Svar når man vælger navn eller bruger en kode: enhedens nøgle */

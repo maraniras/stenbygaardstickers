@@ -7,10 +7,13 @@
 // (nøglehash → navnenøgle), "user-code:<kode>" med udløb og "user-pairfail:<ip>"
 // som tæller forkerte koder. Uden Redis bruges Nitros lokale storage i `.data/`.
 import { createHash, randomBytes, randomInt } from 'node:crypto'
+import type { PushSubscription } from 'web-push'
 
 interface UserDevice {
   addedAt: string
   lastSeen: string
+  /** Push-abonnement til badge-notifikationer på denne enhed */
+  push?: PushSubscription
 }
 
 export interface UserRecord {
@@ -20,6 +23,13 @@ export interface UserRecord {
   avatar?: string
   /** Nøglehash → enhed */
   devices: Record<string, UserDevice>
+  /** Badges serveren sidst har set (earnedKeys) – til at finde nye og mistede */
+  badgeKeys?: string[]
+  /** Badges brugeren har set – i en notifikation eller "ny badge"-pop-up'en */
+  seenKeys?: string[]
+  /** Nøgle → hvornår der sidst blev sendt besked, så en rekord der skifter frem og
+   *  tilbage ikke giver besked hele tiden */
+  notifiedAt?: Record<string, string>
 }
 
 interface LocalUsers {
@@ -95,6 +105,18 @@ export async function setAvatar(key: string, user: UserRecord, avatar: string | 
   else delete user.avatar
   await saveUser(key, user)
   return old
+}
+
+/** Læser brugeren frisk, ændrer den og gemmer – så samtidige ændringer (fx en ny
+ *  enhed) ikke overskrives af en, der har læst en gammel udgave */
+export async function updateUser(key: string, change: (user: UserRecord) => void) {
+  const user = await getUser(key)
+  if (!user) return undefined
+  change(user)
+  // Er navnet frigivet i mellemtiden, må det ikke genopstå
+  if (!(await getUser(key))) return undefined
+  await saveUser(key, user)
+  return user
 }
 
 async function saveUser(key: string, user: UserRecord) {

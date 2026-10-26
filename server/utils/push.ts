@@ -86,23 +86,38 @@ export function cleanSub(body: unknown): PushSubscription {
   return { endpoint: b.endpoint, keys: { p256dh: b.keys.p256dh, auth: b.keys.auth } }
 }
 
+export interface PushMessage {
+  title: string
+  body: string
+  url: string
+  /** Samme tag erstatter en tidligere notifikation i stedet for at lægge sig ved siden af */
+  tag?: string
+}
+
+/** Sender til en række abonnementer. Giver endpoints tilbage, som telefonen har opgivet. */
+export async function sendPush(subs: PushSubscription[], message: PushMessage) {
+  const gone: string[] = []
+  if (!subs.length) return gone
+  const keys = await getVapid()
+  const payload = JSON.stringify(message)
+  await Promise.allSettled(subs.map(sub => webpush
+    .sendNotification(sub, payload, {
+      vapidDetails: { subject: 'https://stenbygaardstickers.vercel.app', ...keys },
+      TTL: 60 * 60 * 24,
+      timeout: 5000,
+    })
+    .catch((err: { statusCode?: number }) => {
+      if (err.statusCode === 404 || err.statusCode === 410) gone.push(sub.endpoint)
+      else console.error('Notifikation fejlede', err)
+    })))
+  return gone
+}
+
 /** Sender til en liste. Abonnementer, som telefonen har opgivet, fjernes. */
-export async function notify(list: PushList, message: { title: string, body: string, url: string }) {
+export async function notify(list: PushList, message: PushMessage) {
   try {
-    const subs = await allSubs(list)
-    if (!subs.length) return
-    const keys = await getVapid()
-    const payload = JSON.stringify(message)
-    await Promise.allSettled(subs.map(sub => webpush
-      .sendNotification(sub, payload, {
-        vapidDetails: { subject: 'https://stenbygaardstickers.vercel.app', ...keys },
-        TTL: 60 * 60 * 24,
-        timeout: 5000,
-      })
-      .catch(async (err: { statusCode?: number }) => {
-        if (err.statusCode === 404 || err.statusCode === 410) await removeSub(list, sub.endpoint)
-        else console.error('Notifikation fejlede', err)
-      })))
+    const gone = await sendPush(await allSubs(list), message)
+    for (const endpoint of gone) await removeSub(list, endpoint)
   }
   catch (err) {
     console.error('Kunne ikke sende notifikationer', err)
