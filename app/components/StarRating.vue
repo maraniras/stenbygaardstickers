@@ -1,33 +1,38 @@
 <script setup lang="ts">
-const props = defineProps<{ stickerId: string }>()
-const { ratings, enabled, rate } = useRatings()
+// 1–5 👍 på en sticker. Tryk på samme antal igen for at fjerne sin vurdering.
+// Ens egne stickers kan man ikke give 👍 (tjekkes også på serveren).
+const props = defineProps<{ stickerId: string, placedBy: string[] }>()
+const { ratings, enabled, error, rate } = useRatings()
+const { isMe } = useUser()
 const r = computed(() => ratings.value[props.stickerId])
+const own = computed(() => props.placedBy.some(isMe))
 const hover = ref(0)
 const shown = computed(() => hover.value || r.value?.mine || 0)
+const avg = computed(() => r.value?.avg.toLocaleString('da-DK', { maximumFractionDigits: 1, minimumFractionDigits: 1 }))
 </script>
 
 <template>
   <section v-if="enabled" class="rating">
     <div class="head">
-      <span class="eyebrow">{{ r?.mine ? 'Din vurdering' : 'Giv stjerner' }}</span>
-      <span v-if="r?.count" class="avg">
-        <svg viewBox="0 0 24 24"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z" /></svg>
-        {{ r.avg.toLocaleString('da-DK', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) }}
-        <span>({{ r.count }})</span>
-      </span>
+      <span class="eyebrow">{{ own ? 'Din sticker' : r?.mine ? 'Din vurdering' : 'Giv 👍' }}</span>
+      <span v-if="r?.count" class="avg">👍 {{ avg }} <span>({{ r.count }})</span></span>
     </div>
-    <div class="stars" @pointerleave="hover = 0">
+    <p v-if="own" class="own">Du kan ikke give 👍 til dine egne stickers – det er de andres tur.</p>
+    <div v-else class="thumbs" @pointerleave="hover = 0">
       <button
         v-for="n in 5"
         :key="n"
         :class="{ on: n <= shown }"
-        :aria-label="`${n} ${n === 1 ? 'stjerne' : 'stjerner'}`"
+        :aria-label="`${n} 👍${r?.mine === n ? ' – tryk igen for at fjerne' : ''}`"
+        :aria-pressed="r?.mine === n"
         @pointerenter="hover = n"
-        @click="rate(stickerId, n)"
+        @click="rate(stickerId, n); hover = 0"
       >
-        <svg viewBox="0 0 24 24"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z" /></svg>
+        👍
       </button>
     </div>
+    <p v-if="!own && r?.mine" class="hint">Tryk på {{ r.mine }} igen for at fjerne din vurdering</p>
+    <p v-if="error" class="err">{{ error }}</p>
   </section>
 </template>
 
@@ -43,20 +48,14 @@ const shown = computed(() => hover.value || r.value?.mine || 0)
   align-items: center;
   justify-content: space-between;
 }
-.avg {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 800;
-}
+.avg { font-weight: 800; }
 .avg span { font-weight: 500; color: var(--muted); }
-.avg svg { width: 16px; height: 16px; fill: var(--star); }
-.stars {
+.thumbs {
   display: flex;
   justify-content: space-between;
   margin-top: 6px;
 }
-.stars button {
+.thumbs button {
   display: grid;
   place-items: center;
   width: 52px;
@@ -64,15 +63,21 @@ const shown = computed(() => hover.value || r.value?.mine || 0)
   padding: 0;
   border: 0;
   background: none;
+  font-size: 32px;
+  line-height: 1;
   cursor: pointer;
   touch-action: manipulation;
+  filter: grayscale(1);
+  opacity: .3;
+  transition: filter .15s, opacity .15s, transform .2s cubic-bezier(.3, 1.6, .5, 1);
 }
-.stars svg {
-  width: 38px;
-  height: 38px;
-  fill: var(--surface-2);
-  transition: fill .15s, transform .2s cubic-bezier(.3, 1.6, .5, 1);
+.thumbs button.on { filter: none; opacity: 1; }
+.thumbs button:active { transform: scale(1.25); }
+.own, .hint, .err {
+  margin: 8px 0 4px;
+  font-size: 13px;
+  color: var(--muted);
 }
-.stars button.on svg { fill: var(--star); }
-.stars button:active svg { transform: scale(1.25); }
+.hint { margin: 2px 0 0; text-align: center; }
+.err { color: #c62828; font-weight: 600; }
 </style>

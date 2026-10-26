@@ -4,12 +4,13 @@
 const { name, seen, markSeen } = useUser()
 const { stickers } = useStickers()
 const { ratings, ready: ratingsReady } = useRatings()
+const { commentStats } = useCommentStats()
 const route = useRoute()
 const router = useRouter()
 
 const unseen = computed(() => {
   if (!name.value || !seen.value || !ratingsReady.value) return []
-  const badges = badgesFor(name.value, stickers.value, ratings.value)
+  const badges = badgesFor(name.value, stickers.value, ratings.value, { comments: commentStats.value })
   const seenSet = new Set(seen.value)
   const keys = earnedKeys(badges).filter(k => !seenSet.has(k))
   const ids = new Set(keys.map(badgeIdOf))

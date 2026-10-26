@@ -1,4 +1,4 @@
-// Badges på profilsiden. Udregnes ud fra alle godkendte stickers (og stjerner) – i
+// Badges på profilsiden. Udregnes ud fra alle godkendte stickers (og 👍 og kommentarer) – i
 // browseren og på serveren, som sender besked om nye badges (server/utils/badge-push.ts).
 // Tre slags:
 //  - trin: samme badge i flere niveauer med eget navn pr. niveau
@@ -99,7 +99,7 @@ function holder(all: Sticker[], value: (s: Sticker) => number) {
   return [...all].sort((a, b) => value(b) - value(a) || byFirst(a, b))[0]
 }
 
-/** Flest stjerner i snit → flest stemmer → sat op først */
+/** Flest 👍 i snit → flest stemmer → sat op først */
 export function crowdFavorite(all: Sticker[], ratings: Record<string, RatingSummary>) {
   return all
     .filter(s => (ratings[s.id]?.count ?? 0) > 0)
@@ -143,7 +143,11 @@ const CONTINENT_NAMES: Record<Continent, string> = {
 }
 
 /** Udregner alle badges ud fra personens stickers (mine – evt. kun de første) */
-function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<string, RatingSummary>, now: Date): Badge[] {
+const NO_COMMENTS: CommentStats = { comments: 0, tagged: 0, likes: 0, maxLikes: 0 }
+/** Badges der kommer fra kommentarer – de har ikke en sticker eller dato */
+const COMMENT_BADGES = new Set(['commenter', 'tagged', 'likes', 'hit', 'viral'])
+
+function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<string, RatingSummary>, now: Date, cs: CommentStats): Badge[] {
   const mineIds = new Set(mine.map(s => s.id))
   const inMine = (s?: Sticker) => Boolean(s && mineIds.has(s.id))
 
@@ -275,17 +279,23 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
       { value: maxOf(mine.map(s => s.media.length)), target: 3 }),
     single('magnet', '🧲', 'Magnet', 'En sticker med mindst 5 stemmer', mine.some(s => (ratings[s.id]?.count ?? 0) >= 5),
       { value: maxOf(mine.map(s => ratings[s.id]?.count ?? 0)), target: 5 }),
-    single('stardust', '🌟', 'Stjernestøv', 'En sticker med 4,5+ stjerner og flere end 3 stemmer',
+    single('stardust', '🗼', 'Tommel-tårn', 'En sticker med 4,5+ 👍 i snit og flere end 3 stemmer',
       mine.some(s => (ratings[s.id]?.count ?? 0) > 3 && (ratings[s.id]?.avg ?? 0) >= 4.5)),
-    single('fivestar', '💎', 'Femstjernet', 'En sticker med 5,0 i snit og mindst 3 stemmer',
+    single('fivestar', '🖐️', 'Fuld hånd', 'En sticker med 5,0 👍 i snit og mindst 3 stemmer',
       mine.some(s => (ratings[s.id]?.count ?? 0) >= 3 && (ratings[s.id]?.avg ?? 0) >= 4.999)),
     single('peoples', '🗳️', 'Folkets valg', 'Mindst 20 stemmer i alt på ens stickers', votes >= 20, { value: votes, target: 20 }),
+    single('commenter', '💬', 'Første kommentar', 'Skriv en kommentar på en sticker', cs.comments >= 1),
+    single('tagged', '🏷️', 'Tagget', 'Bliv tagget i en kommentar', cs.tagged >= 1),
+    tier('likes', '👍', ['Liket', 'Populær', 'Folkets stemme', 'Influencer', 'Kultstatus'], unit('👍 på kommentarer', '👍 på kommentarer'), [1, 5, 10, 25, 50], cs.likes,
+      '👍 i alt på dine kommentarer.'),
+    single('hit', '💥', 'Hit', '5 👍 på én kommentar', cs.maxLikes >= 5, { value: cs.maxLikes, target: 5 }),
+    single('viral', '📣', 'Viral', '10 👍 på én kommentar', cs.maxLikes >= 10, { value: cs.maxLikes, target: 10 }),
     ...jubilees.map(n => single(`jubilee-${n}`, '🎉', `Jubilar #${n}`, `Satte appens sticker nr. ${n} op`, inMine(ordered[n - 1]))),
 
     record('farthest', '🧭', 'Længst væk', 'Har stickeren længst fra Aalborg', inMine(farthest), farthest?.placedBy ?? []),
     record('north', '❄️', 'Nordligst', 'Har den nordligste sticker', inMine(north), north?.placedBy ?? []),
     record('south', '🌴', 'Sydligst', 'Har den sydligste sticker', inMine(south), south?.placedBy ?? []),
-    record('favorite', '⭐', 'Publikums­favorit', 'Har stickeren med flest stjerner (ved lighed flest stemmer, så først sat op)',
+    record('favorite', '⭐', 'Publikums­favorit', 'Har stickeren med flest 👍 i snit (ved lighed flest stemmer, så først sat op)',
       inMine(favorite), favorite?.placedBy ?? []),
     ...years.map((y) => {
       const w = yearWinners(all, y)
@@ -295,10 +305,16 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
   ]
 }
 
-export function badgesFor(name: string, all: Sticker[], ratings: Record<string, RatingSummary> = {}, opts: { now?: Date, history?: boolean } = {}): Badge[] {
+export function badgesFor(
+  name: string,
+  all: Sticker[],
+  ratings: Record<string, RatingSummary> = {},
+  opts: { now?: Date, history?: boolean, comments?: Record<string, CommentStats> } = {},
+): Badge[] {
   const now = opts.now ?? new Date()
   const mine = all.filter(s => hasName(s, name)).sort(byFirst)
-  const badges = compute(name, mine, all, ratings, now)
+  const cs = opts.comments?.[name.toLocaleLowerCase('da')] ?? NO_COMMENTS
+  const badges = compute(name, mine, all, ratings, now, cs)
   if (!opts.history) return score(badges)
 
   // Afspil stickers i datoorden: første gang en badge (eller et trin) er opnået,
@@ -306,7 +322,7 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
   const byId = new Map(badges.map(b => [b.id, b]))
   for (let k = 1; k <= mine.length; k++) {
     const s = mine[k - 1]!
-    for (const b of compute(name, mine.slice(0, k), all, ratings, now)) {
+    for (const b of compute(name, mine.slice(0, k), all, ratings, now, cs)) {
       const full = byId.get(b.id)
       if (!full) continue
       if (b.earned && !full.earnedAt) {
@@ -317,6 +333,13 @@ export function badgesFor(name: string, all: Sticker[], ratings: Record<string, 
         if (!step.reachedAt && b.level > i) step.reachedAt = s.date
       })
     }
+  }
+  // Kommentar-badges hører ikke til en sticker
+  for (const b of badges) {
+    if (!COMMENT_BADGES.has(b.id)) continue
+    b.earnedAt = undefined
+    b.earnedWith = undefined
+    b.steps?.forEach((s) => { s.reachedAt = undefined })
   }
   // Årets flittigste: datoen man nåede det vindende antal
   for (const b of badges) {
@@ -359,10 +382,12 @@ const TIER_POINTS: Record<string, number[]> = {
   'capitals': [2, 4, 8, 16],
   'continents': [6, 12, 18, 24, 36],
   'continent-europa': [3, 6, 10, 16, 24],
+  'likes': [1, 2, 4, 8, 12],
 }
 const OTHER_CONTINENT_POINTS = [8, 12, 18, 24, 36]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'commenter': 1, 'tagged': 1, 'hit': 2, 'viral': 4,
   'home': 1, 'team': 1, 'regular': 1, 'turbo': 1, 'director': 1, 'spring': 1, 'summer': 1, 'autumn': 1, 'winter': 1,
   'roadtrip': 2, 'weekend': 2, 'denmark': 2, 'paaske': 2, 'halloween': 2, 'jul': 2, 'newyear': 2, 'birthday': 2, 'comeback': 2,
   'gang': 2, 'filmstar': 2, 'photographer': 2, 'author': 2, 'magnet': 2, 'jubilee-10': 2,

@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!old) throw createError({ statusCode: 404, statusMessage: 'Sticker findes ikke' })
   await removeSticker(id)
   await deleteUnused(event, old.media)
+  await deleteComments(id, (await listComments(id)).map(c => c.id))
   if (old.status === 'approved') await syncBadgesLater(event)
   return { ok: true }
 })

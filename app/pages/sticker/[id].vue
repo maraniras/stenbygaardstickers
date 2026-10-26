@@ -105,7 +105,7 @@ watch(index, (i) => {
 
       <p v-if="sticker.description" class="desc">{{ sticker.description }}</p>
 
-      <StarRating :sticker-id="sticker.id" />
+      <StarRating :sticker-id="sticker.id" :placed-by="sticker.placedBy" />
 
       <div class="actions">
         <a class="btn" :href="googleMapsUrl(sticker)" target="_blank" rel="noopener">
@@ -118,6 +118,8 @@ watch(index, (i) => {
         </NuxtLink>
       </div>
       <p class="coords">{{ sticker.lat.toFixed(5) }}, {{ sticker.lng.toFixed(5) }}</p>
+
+      <CommentsSection :key="sticker.id" :sticker-id="sticker.id" />
     </article>
   </div>
 

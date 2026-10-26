@@ -14,7 +14,8 @@ async function badgeLookup(): Promise<Lookup> {
   const approved = (await listStickers()).filter(s => s.status === 'approved').map(publicSticker)
   const stickers = withDistance(approved)
   const ratings = ratingsEnabled ? await getRatings() : {}
-  return name => badgesFor(name, stickers, ratings)
+  const comments = await commentStats()
+  return name => badgesFor(name, stickers, ratings, { comments })
 }
 
 /** Første gang: alt man allerede har tæller som set, så man ikke får 20 beskeder */
@@ -48,6 +49,17 @@ function gainedMessage(name: string, b: Badge, key: string): PushMessage {
 }
 
 const personUrl = (name: string) => `/person/${encodeURIComponent(name)}`
+
+/** Sender til alle enheder, hvor brugeren har slået notifikationer til */
+export async function notifyUser(name: string, message: PushMessage) {
+  try {
+    const found = await findUser(name)
+    if (found) await pushToUser(found.key, found.user, [message])
+  }
+  catch (err) {
+    console.error('Kunne ikke sende besked', err)
+  }
+}
 
 async function pushToUser(key: string, user: UserRecord, messages: PushMessage[]) {
   const subs = Object.values(user.devices).flatMap(d => (d.push ? [d.push] : []))

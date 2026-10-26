@@ -1,8 +1,9 @@
 <script setup lang="ts">
-// Profil: tal, badges (app/utils/badges.ts), lande og personens stickers
+// Profil: tal, badges (shared/utils/badges.ts), lande og personens stickers
 const route = useRoute()
 const { stickers, people, stickersBy } = useStickers()
 const { ratings } = useRatings()
+const { commentStats } = useCommentStats()
 const { name: me, isMe, markSeen } = useUser()
 const router = useRouter()
 const name = computed(() => String(route.params.name))
@@ -18,7 +19,7 @@ const countryList = computed(() => {
   }
   return [...map.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
 })
-const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value, { history: true }))
+const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value, { history: true, comments: commentStats.value }))
 const openBadge = ref<string>()
 const openedBadge = computed(() => badges.value.find(b => b.id === openBadge.value))
 const badgeTab = ref<'earned' | 'missing'>('earned')

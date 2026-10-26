@@ -1,9 +1,9 @@
-// Stjerner pr. enhed: hver browser får et tilfældigt id i localStorage og
-// tæller som én bruger.
+// 👍 (1–5) pr. enhed: hver browser får et tilfældigt id i localStorage og tæller
+// som én. Samme id bruges til 👍 på kommentarer, når man ikke er logget ind.
 
 const KEY = 'stenbygaard-device'
 
-function deviceId() {
+export function deviceId() {
   try {
     let id = localStorage.getItem(KEY)
     if (!id) {
@@ -26,6 +26,7 @@ export function useRatings() {
   const enabled = useState('ratings-enabled', () => true)
   /** Første hentning er færdig (også hvis den fejlede) */
   const ready = useState('ratings-ready', () => false)
+  const error = ref('')
 
   if (!loading) {
     loading = $fetch<Record<string, RatingSummary>>('/api/ratings', { query: { device: deviceId() } })
@@ -34,21 +35,35 @@ export function useRatings() {
       .finally(() => { ready.value = true })
   }
 
-  async function rate(stickerId: string, stars: number) {
+  /** Samme antal igen fjerner ens vurdering */
+  async function rate(stickerId: string, thumbs: number) {
     const device = deviceId()
     if (!device) return
     const prev = ratings.value[stickerId]
+    const value = prev?.mine === thumbs ? 0 : thumbs
     // Vis med det samme, ret til når serveren svarer
-    const values = (prev?.avg ?? 0) * (prev?.count ?? 0) - (prev?.mine ?? 0) + stars
-    const count = (prev?.count ?? 0) + (prev?.mine ? 0 : 1)
-    ratings.value = { ...ratings.value, [stickerId]: { avg: values / count, count, mine: stars } }
+    const sum = (prev?.avg ?? 0) * (prev?.count ?? 0) - (prev?.mine ?? 0) + value
+    const count = (prev?.count ?? 0) - (prev?.mine ? 1 : 0) + (value ? 1 : 0)
+    const next = { ...ratings.value }
+    if (count) next[stickerId] = { avg: sum / count, count, ...(value ? { mine: value } : {}) }
+    else delete next[stickerId]
+    ratings.value = next
+    error.value = ''
     try {
-      ratings.value = await $fetch<Record<string, RatingSummary>>('/api/ratings', { method: 'POST', body: { stickerId, device, stars } })
+      ratings.value = await $fetch<Record<string, RatingSummary>>('/api/ratings', {
+        method: 'POST',
+        body: { stickerId, device, value },
+        headers: { 'x-user-token': userToken() },
+      })
     }
-    catch {
-      ratings.value = { ...ratings.value, [stickerId]: prev ?? { avg: 0, count: 0 } }
+    catch (err: any) {
+      error.value = err?.data?.statusMessage || 'Kunne ikke gemme'
+      const back = { ...ratings.value }
+      if (prev) back[stickerId] = prev
+      else delete back[stickerId]
+      ratings.value = back
     }
   }
 
-  return { ratings, enabled, ready, rate }
+  return { ratings, enabled, ready, error, rate }
 }

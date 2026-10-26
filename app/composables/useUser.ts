@@ -4,10 +4,12 @@ const KEY = 'stenbygaard-user-token'
 // Har man slået badge-beskeder fra på denne enhed, kobles push ikke på igen af sig selv
 const PUSH_OFF_KEY = 'stenbygaard-badge-push-off'
 
-function readToken() {
+/** Enhedens nøgle – sendes som x-user-token, når serveren skal vide, hvem man er */
+export function userToken() {
   try { return localStorage.getItem(KEY) ?? '' }
   catch { return '' }
 }
+const readToken = userToken
 
 function writeToken(token: string | null) {
   try {

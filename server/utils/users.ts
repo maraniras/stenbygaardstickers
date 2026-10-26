@@ -173,6 +173,13 @@ async function addDevice(key: string) {
   return { name: user.name, token }
 }
 
+/** Brugeren med dette navn, hvis nogen har valgt det */
+export async function findUser(name: string) {
+  const key = nameKey(name)
+  const user = await getUser(key)
+  return user ? { key, user } : undefined
+}
+
 async function getUser(key: string) {
   if (!redisEnabled) return (await readLocal()).users[key]
   const [json] = await redis([['HGET', 'users', key]]) as [string | null]

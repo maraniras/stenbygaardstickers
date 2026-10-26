@@ -2,7 +2,8 @@
 const sort = ref<'date' | 'far' | 'stars'>('date')
 const { stickers, people, stats } = useStickers()
 const { ratings, enabled } = useRatings()
-const levels = computed(() => Object.fromEntries(people.value.map(p => [p.name, levelFor(totalPoints(badgesFor(p.name, stickers.value, ratings.value)))])))
+const { commentStats } = useCommentStats()
+const levels = computed(() => Object.fromEntries(people.value.map(p => [p.name, levelFor(totalPoints(badgesFor(p.name, stickers.value, ratings.value, { comments: commentStats.value })))])))
 const { show: showInstall } = useInstall()
 const standalone = ref(true)
 onMounted(() => { standalone.value = isStandalone() })
@@ -64,7 +65,7 @@ const groups = computed(() => {
       <div class="sort" role="tablist">
         <button :class="{ on: sort === 'date' }" @click="sort = 'date'">Nyeste</button>
         <button :class="{ on: sort === 'far' }" @click="sort = 'far'">Længst væk</button>
-        <button v-if="enabled" :class="{ on: sort === 'stars' }" @click="sort = 'stars'">Flest stjerner</button>
+        <button v-if="enabled" :class="{ on: sort === 'stars' }" @click="sort = 'stars'">Flest 👍</button>
       </div>
     </header>
 
