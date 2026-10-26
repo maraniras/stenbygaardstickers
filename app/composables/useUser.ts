@@ -39,6 +39,7 @@ export function useUser() {
   function signedIn(r: LoginResponse) {
     writeToken(r.token)
     name.value = r.name
+    useUsers().reload()
   }
 
   async function claim(input: string) {
@@ -57,10 +58,22 @@ export function useUser() {
     await $fetch('/api/me', { method: 'DELETE', headers: headers() }).catch(() => {})
     writeToken(null)
     name.value = null
+    await useUsers().reload()
+  }
+
+  async function setAvatar(file: File) {
+    const url = await uploadAvatar(file)
+    await $fetch('/api/me/avatar', { method: 'PUT', body: { url }, headers: headers() })
+    await useUsers().reload()
+  }
+
+  async function removeAvatar() {
+    await $fetch('/api/me/avatar', { method: 'DELETE', headers: headers() })
+    await useUsers().reload()
   }
 
   /** Er det her mig? */
   const isMe = (other: string) => Boolean(name.value && sameName(name.value, other))
 
-  return { name, ready, claim, pair, createCode, logout, isMe }
+  return { name, ready, claim, pair, createCode, logout, setAvatar, removeAvatar, isMe }
 }

@@ -10,7 +10,9 @@ const limits = {
 }
 
 function checkPath(pathname: string) {
-  if (pathname !== `${blobFolder}stickers/${pathname.split('/').pop()}` || !/^[\w.-]+$/.test(pathname.split('/').pop()!)) {
+  const file = pathname.split('/').pop()!
+  const ok = [`${blobFolder}stickers/${file}`, `${blobFolder}avatars/${file}`].includes(pathname)
+  if (!ok || !/^[\w.-]+$/.test(file)) {
     throw new Error('Ugyldigt filnavn')
   }
 }

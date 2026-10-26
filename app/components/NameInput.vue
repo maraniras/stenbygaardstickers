@@ -73,7 +73,7 @@ function onBlur() {
   <div class="names">
     <div class="box" @click="input?.focus()">
       <span v-for="(n, i) in model" :key="n" class="chip tag">
-        <span class="avatar">{{ n[0] }}</span>{{ n }}
+        <UserAvatar class="avatar" :name="n" />{{ n }}
         <button type="button" :aria-label="`Fjern ${n}`" @click.stop="remove(i)">
           <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
@@ -98,7 +98,7 @@ function onBlur() {
             <span class="plus">+</span> Tilføj »{{ o }}«
           </template>
           <template v-else>
-            <span class="avatar">{{ o[0] }}</span>{{ o }}
+            <UserAvatar class="avatar" :name="o" />{{ o }}
           </template>
         </button>
       </li>

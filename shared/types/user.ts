@@ -1,6 +1,7 @@
 /** Det en enhed får at vide om sig selv */
 export interface MeResponse {
   name: string | null
+  avatar?: string
 }
 
 /** Svar når man vælger navn eller bruger en kode: enhedens nøgle */
@@ -13,6 +14,12 @@ export interface PairCode {
   code: string
   /** ISO-tidspunkt */
   expiresAt: string
+}
+
+/** Offentligt om en bruger */
+export interface PublicUser {
+  name: string
+  avatar?: string
 }
 
 /** Til admin */

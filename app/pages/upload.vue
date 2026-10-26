@@ -3,7 +3,20 @@
 const router = useRouter()
 const { people } = useStickers()
 
-const draft = ref<StickerDraft>(emptyDraft())
+const { name: me } = useUser()
+
+// Er man logget ind, står man selv som den, der satte den op
+function newDraft() {
+  const d = emptyDraft()
+  if (me.value) d.placedBy = [me.value]
+  return d
+}
+
+const draft = ref<StickerDraft>(newDraft())
+// Navnet kan først være hentet, efter siden er åbnet
+watch(me, (n) => {
+  if (n && !draft.value.placedBy.length) draft.value.placedBy = [n]
+})
 const busy = ref(false)
 const sending = ref(false)
 const error = ref('')
@@ -35,7 +48,7 @@ async function submit() {
 }
 
 function again() {
-  draft.value = emptyDraft()
+  draft.value = newDraft()
   sent.value = false
 }
 

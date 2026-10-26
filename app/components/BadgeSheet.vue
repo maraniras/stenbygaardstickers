@@ -98,7 +98,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <span class="eyebrow">{{ b.final ? 'Vinder' : 'Har rekorden lige nu' }}</span>
         <div v-if="b.holders?.length" class="holders">
           <NuxtLink v-for="h in b.holders" :key="h" class="chip holder" :to="personUrl(h)" @click="emit('close')">
-            <span class="avatar">{{ h[0] }}</span>{{ h }}
+            <UserAvatar class="avatar" :name="h" />{{ h }}
           </NuxtLink>
         </div>
         <p v-else class="muted">Ingen endnu</p>

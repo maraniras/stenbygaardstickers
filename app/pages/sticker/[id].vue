@@ -97,7 +97,7 @@ watch(index, (i) => {
           <span class="eyebrow">Sat op af</span>
           <div class="names">
             <NuxtLink v-for="n in sticker.placedBy" :key="n" class="chip person" :to="personUrl(n)">
-              <span class="avatar">{{ n[0] }}</span>{{ n }}
+              <UserAvatar class="avatar" :name="n" />{{ n }}
             </NuxtLink>
           </div>
         </div>

@@ -4,5 +4,5 @@ export default defineEventHandler(async (event): Promise<MeResponse> => {
   const found = await userForToken(readToken(event))
   if (!found) return { name: null }
   await touchDevice(found.key, found.hash, found.user)
-  return { name: found.user.name }
+  return { name: found.user.name, ...(found.user.avatar ? { avatar: found.user.avatar } : {}) }
 })

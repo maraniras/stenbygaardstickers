@@ -16,6 +16,8 @@ interface UserDevice {
 export interface UserRecord {
   name: string
   createdAt: string
+  /** Profilbillede (Blob-URL eller /api/media/ under dev) */
+  avatar?: string
   /** Nøglehash → enhed */
   devices: Record<string, UserDevice>
 }
@@ -86,6 +88,15 @@ export async function touchDevice(key: string, hash: string, user: UserRecord) {
   await saveUser(key, user)
 }
 
+/** Skifter profilbilledet og giver det gamle tilbage, så det kan slettes */
+export async function setAvatar(key: string, user: UserRecord, avatar: string | undefined) {
+  const old = user.avatar
+  if (avatar) user.avatar = avatar
+  else delete user.avatar
+  await saveUser(key, user)
+  return old
+}
+
 async function saveUser(key: string, user: UserRecord) {
   if (!redisEnabled) {
     const data = await readLocal()
@@ -146,10 +157,11 @@ async function getUser(key: string) {
   return json ? JSON.parse(json) as UserRecord : undefined
 }
 
-/** Logger enheden ud. Var det den sidste enhed, bliver navnet ledigt igen. */
+/** Logger enheden ud. Var det den sidste enhed, bliver navnet ledigt igen –
+ *  så gives brugeren tilbage, så profilbilledet kan slettes. */
 export async function removeDevice(key: string, hash: string) {
   const user = await getUser(key)
-  if (!user) return
+  if (!user) return undefined
   delete user.devices[hash]
   const empty = !Object.keys(user.devices).length
   if (!redisEnabled) {
@@ -158,31 +170,33 @@ export async function removeDevice(key: string, hash: string) {
     if (empty) delete data.users[key]
     else data.users[key] = user
     await writeLocal(data)
-    return
   }
-  await redis([
-    ['HDEL', 'user-tokens', hash],
-    empty ? ['HDEL', 'users', key] : ['HSET', 'users', key, JSON.stringify(user)],
-  ])
+  else {
+    await redis([
+      ['HDEL', 'user-tokens', hash],
+      empty ? ['HDEL', 'users', key] : ['HSET', 'users', key, JSON.stringify(user)],
+    ])
+  }
+  return empty ? user : undefined
 }
 
 /** Sletter brugeren og alle dens enheder (admin) */
 export async function deleteUser(key: string) {
   const user = await getUser(key)
-  if (!user) return false
+  if (!user) return undefined
   const hashes = Object.keys(user.devices)
   if (!redisEnabled) {
     const data = await readLocal()
     for (const h of hashes) delete data.tokens[h]
     delete data.users[key]
     await writeLocal(data)
-    return true
+    return user
   }
   await redis([
     ['HDEL', 'users', key],
     ...(hashes.length ? [['HDEL', 'user-tokens', ...hashes]] : []),
   ])
-  return true
+  return user
 }
 
 export async function listUsers(): Promise<UserRecord[]> {

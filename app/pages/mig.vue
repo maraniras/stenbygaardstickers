@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // "Hvem er du?": vælg et navn (låses til enheden), brug en kode fra en anden
 // enhed, eller – når man er logget ind – lav en kode til en ny enhed.
-const { name, ready, claim, pair, createCode, logout } = useUser()
+const { name, ready, claim, pair, createCode, logout, setAvatar, removeAvatar } = useUser()
 const { people } = useStickers()
+const { isTaken: taken, avatarFor, reload: reloadUsers } = useUsers()
 
 useHead({ title: 'Mig · Stenbygaard Stickers' })
 
@@ -11,14 +12,25 @@ const input = ref('')
 const codeInput = ref('')
 const error = ref('')
 const busy = ref(false)
-const taken = ref<string[]>([])
 
-onMounted(async () => {
-  taken.value = await $fetch<string[]>('/api/users').catch(() => [])
-})
+onMounted(reloadUsers)
 
-const free = computed(() => people.value.map(p => p.name).filter(n => !taken.value.some(t => sameName(t, n))))
-const isTaken = computed(() => Boolean(input.value.trim() && taken.value.some(t => sameName(t, input.value.trim()))))
+const free = computed(() => people.value.map(p => p.name).filter(n => !taken(n)))
+const isTaken = computed(() => Boolean(input.value.trim() && taken(input.value.trim())))
+
+// Profilbillede
+const fileInput = ref<HTMLInputElement>()
+const uploading = ref(false)
+const hasAvatar = computed(() => Boolean(name.value && avatarFor(name.value)))
+
+async function onFile(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  ;(e.target as HTMLInputElement).value = ''
+  if (!file) return
+  uploading.value = true
+  await run(() => setAvatar(file))
+  uploading.value = false
+}
 
 async function run(fn: () => Promise<unknown>) {
   busy.value = true
@@ -88,7 +100,19 @@ function doLogout() {
     <!-- Logget ind -->
     <template v-else-if="name">
       <header>
-        <span class="avatar">{{ name[0] }}</span>
+        <button class="avatar-btn" :aria-label="hasAvatar ? 'Skift profilbillede' : 'Vælg profilbillede'" :disabled="uploading" @click="fileInput?.click()">
+          <UserAvatar class="avatar" :class="{ dim: uploading }" :name="name" />
+          <span class="cam">
+            <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg>
+          </span>
+        </button>
+        <input ref="fileInput" type="file" accept="image/*" hidden @change="onFile">
+        <div class="pic-actions">
+          <button class="link" :disabled="uploading" @click="fileInput?.click()">
+            {{ uploading ? 'Uploader…' : hasAvatar ? 'Skift billede' : 'Tilføj profilbillede' }}
+          </button>
+          <button v-if="hasAvatar && !uploading" class="link muted" @click="run(removeAvatar)">Fjern</button>
+        </div>
         <p class="eyebrow">Du er logget ind som</p>
         <h1>{{ name }}</h1>
       </header>
@@ -143,7 +167,7 @@ function doLogout() {
               :class="{ on: sameName(n, input) }"
               @click="input = n"
             >
-              <span class="mini">{{ n[0] }}</span>{{ n }}
+              <UserAvatar class="mini" :name="n" />{{ n }}
             </button>
           </div>
         </div>
@@ -185,12 +209,50 @@ header {
   text-align: center;
   margin-bottom: 4px;
 }
+.avatar-btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.cam {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--bg);
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+}
+.cam svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.dim { opacity: .5; }
+.pic-actions {
+  display: flex;
+  gap: 14px;
+  margin: 10px 0 14px;
+}
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link.muted { color: var(--muted); }
 .avatar {
   display: grid;
   place-items: center;
-  width: 84px;
-  height: 84px;
-  margin-bottom: 14px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   background: linear-gradient(160deg, var(--accent-light), var(--accent));
   color: var(--on-accent);

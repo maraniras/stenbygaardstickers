@@ -39,7 +39,7 @@ function back() {
     </button>
 
     <header>
-      <span class="avatar">{{ displayName[0] }}</span>
+      <UserAvatar class="avatar" :name="displayName" />
       <h1>{{ displayName }}</h1>
       <p class="sub">{{ earnedCount(badges) }} af {{ badges.length }} badges</p>
       <NuxtLink v-if="isMe(displayName)" class="chip you" to="/mig">Det er dig · Indstillinger</NuxtLink>

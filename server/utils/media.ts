@@ -22,12 +22,30 @@ export function blobAuth(event: H3Event) {
 export const blobFolder = isPreview ? 'dev/' : ''
 
 const BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?stickers\/[\w./-]+$/i
+const AVATAR_BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?avatars\/[\w.-]+$/i
 const DEV_BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/dev\//i
 const LOCAL_RE = /^\/api\/media\/[\w.-]+$/
 export const LOCAL_NAME_RE = /^[\w-]{1,80}\.(webp|jpg|jpeg|png|mp4|mov|m4v|webm)$/i
 
 export function isOwnMedia(src: string) {
   return src.startsWith('/media/') || BLOB_RE.test(src) || LOCAL_RE.test(src)
+}
+
+/** Profilbillede uploadet fra appen (mappen avatars/) */
+export function isAvatarFile(src: string) {
+  return (AVATAR_BLOB_RE.test(src) && (!isPreview || DEV_BLOB_RE.test(src))) || LOCAL_RE.test(src)
+}
+
+/** Sletter et gammelt profilbillede */
+export async function deleteAvatar(event: H3Event, src: string | undefined) {
+  if (!src || !isAvatarFile(src)) return
+  try {
+    if (AVATAR_BLOB_RE.test(src) && blobEnabled) await del(src, blobAuth(event))
+    else if (LOCAL_RE.test(src)) await useStorage('data').removeItem(`uploads:${src.split('/').pop()}`)
+  }
+  catch (err) {
+    console.error('Kunne ikke slette profilbillede', err)
+  }
 }
 
 function files(list: StickerMedia[]) {

@@ -22,7 +22,7 @@ function randomName() {
   return Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('')
 }
 
-async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void) {
+async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void, dir: 'stickers' | 'avatars' = 'stickers') {
   const { mode, folder } = await uploadMode()
   if (mode === 'off') throw new Error('Upload er ikke sat op endnu')
   if (mode === 'local') {
@@ -36,7 +36,7 @@ async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void)
     multipart: blob.size > 8 * 1024 * 1024,
     onUploadProgress: (e: { percentage: number }) => onProgress?.(e.percentage),
   }
-  const pathname = `${folder}stickers/${randomName()}.${ext}`
+  const pathname = `${folder}${dir}/${randomName()}.${ext}`
   const r = mode === 'presigned' ? await uploadPresigned(pathname, blob, options) : await upload(pathname, blob, options)
   return r.url
 }
@@ -52,6 +52,10 @@ async function encode(source: CanvasImageSource, w: number, h: number, max: numb
   canvas.width = Math.round(w * scale)
   canvas.height = Math.round(h * scale)
   canvas.getContext('2d')!.drawImage(source, 0, 0, canvas.width, canvas.height)
+  return encodeCanvas(canvas)
+}
+
+async function encodeCanvas(canvas: HTMLCanvasElement) {
   let blob = await canvasBlob(canvas, 'image/webp', 0.8)
   let ext = 'webp'
   if (!blob || blob.type !== 'image/webp') {
@@ -121,6 +125,20 @@ export async function photoDate(file: File) {
   catch {
     return undefined
   }
+}
+
+/** Profilbillede: midten skæres ud som et kvadrat på 400×400 */
+export async function uploadAvatar(file: File) {
+  if (!file.type.startsWith('image/') && !/\.hei[cf]$/i.test(file.name)) throw new Error('Vælg et billede')
+  const { source, w, h } = await loadImage(file)
+  const side = Math.min(w, h)
+  const size = Math.min(400, side)
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  canvas.getContext('2d')!.drawImage(source, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size)
+  const img = await encodeCanvas(canvas)
+  return send(img.blob, img.ext, undefined, 'avatars')
 }
 
 /** Komprimerer og uploader én fil. Returnerer det, der skal stå i stickerens media-liste. */

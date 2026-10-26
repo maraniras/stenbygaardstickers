@@ -53,7 +53,7 @@ const groups = computed(() => {
         <span class="eyebrow">Sat op af</span>
         <div class="row">
           <NuxtLink v-for="p in people" :key="p.name" class="chip person" :to="personUrl(p.name)">
-            <span class="avatar">{{ p.name[0] }}</span>
+            <UserAvatar class="avatar" :name="p.name" />
             {{ p.name }}
             <span class="n">{{ p.count }}</span>
             <LevelBadge :level="levels[p.name]!.level" :size="24" :title="`Level ${levels[p.name]!.level} · ${levels[p.name]!.title}`" />
