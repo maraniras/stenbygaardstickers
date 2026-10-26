@@ -18,7 +18,7 @@ const tab = computed(() => {
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="7" rx="2" /><rect x="4" y="14" width="16" height="6" rx="2" /></svg>
       Stickers
     </NuxtLink>
-    <NuxtLink to="/mig" :class="{ on: tab === 'me' }">
+    <NuxtLink :to="name ? personUrl(name) : '/mig'" :class="{ on: tab === 'me' }">
       <UserAvatar v-if="name" class="me" :name="name" />
       <svg v-else viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
       Mig

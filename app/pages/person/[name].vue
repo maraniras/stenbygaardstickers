@@ -34,15 +34,20 @@ function back() {
 
 <template>
   <div class="page">
-    <button class="back" aria-label="Tilbage" @click="back">
-      <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-    </button>
+    <div class="topbar">
+      <button class="back" aria-label="Tilbage" @click="back">
+        <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
+      </button>
+      <NuxtLink v-if="isMe(displayName)" class="back" to="/mig" aria-label="Indstillinger" title="Indstillinger">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>
+      </NuxtLink>
+    </div>
 
     <header>
       <UserAvatar class="avatar" :name="displayName" />
       <h1>{{ displayName }}</h1>
       <p class="sub">{{ earnedCount(badges) }} af {{ badges.length }} badges</p>
-      <NuxtLink v-if="isMe(displayName)" class="chip you" to="/mig">Det er dig · Indstillinger</NuxtLink>
+      <span v-if="isMe(displayName)" class="chip you">Det er dig</span>
     </header>
 
     <LevelCard :points="totalPoints(badges)" />
@@ -107,6 +112,10 @@ function back() {
   max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
 }
 .back {
   display: grid;

@@ -83,6 +83,17 @@ function newCode() {
 }
 onBeforeUnmount(() => clearInterval(timer))
 
+const router = useRouter()
+function toProfile() {
+  if (window.history.state?.back && name.value && window.history.state.back === personUrl(name.value)) router.back()
+  else if (name.value) router.push(personUrl(name.value))
+}
+
+// Lige logget ind: videre til profilen
+watch(name, (n, old) => {
+  if (n && !old && ready.value) router.push(personUrl(n))
+})
+
 const confirmLogout = ref(false)
 function doLogout() {
   return run(async () => {
@@ -99,6 +110,9 @@ function doLogout() {
 
     <!-- Logget ind -->
     <template v-else-if="name">
+      <button class="back" aria-label="Tilbage til profilen" @click="toProfile">
+        <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
+      </button>
       <header>
         <button class="avatar-btn" :aria-label="hasAvatar ? 'Skift profilbillede' : 'Vælg profilbillede'" :disabled="uploading" @click="fileInput?.click()">
           <UserAvatar class="avatar" :class="{ dim: uploading }" :name="name" />
@@ -116,8 +130,6 @@ function doLogout() {
         <p class="eyebrow">Du er logget ind som</p>
         <h1>{{ name }}</h1>
       </header>
-
-      <NuxtLink class="btn" :to="personUrl(name)">Se min profil</NuxtLink>
 
       <section class="card">
         <h2>Brug appen på en enhed mere</h2>
@@ -202,6 +214,20 @@ function doLogout() {
   margin: 0 auto;
   padding: calc(28px + var(--safe-t)) 16px var(--nav-space);
 }
+.back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -12px 0 -32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 header {
   display: flex;
   flex-direction: column;
