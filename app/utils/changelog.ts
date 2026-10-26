@@ -10,6 +10,7 @@ export interface Release {
 export const CHANGELOG: Release[] = [
   {
     version: '2.1',
+    date: '2026-10-26',
     notes: [
       'Vælg dit navn under »Mig«, og upload et profilbillede',
       'Kommentér stickers, svar hinanden og tag med @',
