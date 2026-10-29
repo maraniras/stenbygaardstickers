@@ -5,6 +5,8 @@ const { ready, failed, reload } = useStickers()
 // Sæsontema på <html>, så CSS-variablerne skifter overalt
 const { theme } = useTheme()
 watchEffect(() => { document.documentElement.dataset.theme = theme.value })
+const { dark } = useAppearance()
+useHead(() => ({ meta: [{ name: 'theme-color', content: dark.value ? '#141418' : '#f4f4f6' }] }))
 
 // Det er .content og ikke vinduet der scroller, så Vue Router kan ikke selv nulstille.
 // Nye sider starter øverst; med tilbage-knappen kommer man tilbage hvor man var.

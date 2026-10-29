@@ -7,6 +7,9 @@ const router = useRouter()
 const { stickers } = useStickers()
 const el = ref<HTMLElement>()
 const loading = ref(true)
+const { dark } = useAppearance()
+let repaint = () => {}
+watch(dark, () => repaint())
 
 const countries = computed(() => {
   const map = new Map<string, { code: string, name: string, count: number, cities: Set<string>, people: Set<string> }>()
@@ -45,16 +48,9 @@ onMounted(async () => {
   ])
   const geo = feature(topo, topo.objects.countries) as unknown as GeoJSON.FeatureCollection
   const byCode = new Map(countries.value.map(c => [c.code, c]))
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ffc928'
 
   map = L.map(el.value!, { zoomControl: false, attributionControl: false, worldCopyJump: true, minZoom: 1, maxZoom: 6 })
   layer = L.geoJSON(geo, {
-    style: (f) => {
-      const c = byCode.get(iso.numericToAlpha2(String(f?.id ?? '')) ?? '')
-      return c
-        ? { fillColor: accent, fillOpacity: color(c.count), color: '#fff', weight: 0.8 }
-        : { fillColor: '#d9d9de', fillOpacity: 1, color: '#fff', weight: 0.6 }
-    },
     onEachFeature: (f, l) => {
       const code = iso.numericToAlpha2(String(f.id ?? ''))
       const c = code ? byCode.get(code) : undefined
@@ -63,6 +59,15 @@ onMounted(async () => {
       l.bindTooltip(`${c.name} · ${c.count} ${c.count === 1 ? 'sticker' : 'stickers'}`, { sticky: true })
     },
   }).addTo(map)
+  repaint = () => {
+    const css = getComputedStyle(document.documentElement)
+    const value = (key: string) => css.getPropertyValue(key).trim()
+    layer?.setStyle((f) => {
+      const c = byCode.get(iso.numericToAlpha2(String(f?.id ?? '')) ?? '')
+      return { fillColor: value(c ? '--accent' : '--map-land'), fillOpacity: c ? color(c.count) : 1, color: value('--map-border'), weight: c ? 0.8 : 0.6 }
+    })
+  }
+  repaint()
 
   // Vis de besøgte lande, men aldrig mere end hele verden
   const visited = [...bounds.values()]
@@ -162,7 +167,7 @@ h1 { font-size: 34px; }
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: #eef3f8;
+  background: var(--map-water);
 }
 .loading {
   position: absolute;

@@ -7,6 +7,9 @@
   --text: #111114;
   --muted: #6e6e78;
   --hairline: rgba(17, 17, 20, .08);
+  --map-water: #eef3f8;
+  --map-land: #d9d9de;
+  --map-border: #ffffff;
   --accent: #ffc928;
   --accent-light: #ffe07a;
   --accent-soft: #fff4cc;
@@ -255,6 +258,73 @@ a.chip, button.chip { cursor: pointer; }
 }
 /* Luftfoto beholder sine farver i alle temaer */
 :root .satellite .leaflet-tile-pane { filter: none; }
+
+/* Udseende vælges uafhængigt af sæsonen. Kun kortfliser filtreres; pins,
+   billeder og luftfoto beholder deres egne farver. */
+:root[data-appearance="dark"] {
+  color-scheme: dark;
+  --bg: #141418;
+  --surface: #222228;
+  --surface-2: #2d2d35;
+  --glass: rgba(34, 34, 40, .88);
+  --text: #f4f4f7;
+  --muted: #b0b0bd;
+  --hairline: rgba(255, 255, 255, .13);
+  --map-water: #20242a;
+  --map-land: #42434d;
+  --map-border: #222228;
+  --title: #f4f4f7;
+  --ink: #41414d;
+  --cluster: #41414d;
+  --accent-soft: #40351a;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .24), 0 2px 8px rgba(0, 0, 0, .18);
+  --shadow: 0 2px 6px rgba(0, 0, 0, .24), 0 12px 32px rgba(0, 0, 0, .35);
+}
+:root[data-appearance="dark"][data-theme="halloween"] {
+  --bg: #1b151f;
+  --surface: #29212f;
+  --surface-2: #382c3f;
+  --glass: rgba(41, 33, 47, .9);
+  --title: #ffb35c;
+  --ink: #593977;
+  --cluster: #593977;
+  --accent-soft: #4b301e;
+}
+:root[data-appearance="dark"][data-theme="jul"] {
+  --bg: #131d18;
+  --surface: #202c25;
+  --surface-2: #2c3c31;
+  --glass: rgba(32, 44, 37, .9);
+  --title: #ff8a93;
+  --ink: #346744;
+  --cluster: #346744;
+  --accent-soft: #512a30;
+}
+:root[data-appearance="dark"][data-theme="paaske"] {
+  --bg: #191e14;
+  --surface: #272e20;
+  --surface-2: #35402a;
+  --glass: rgba(39, 46, 32, .9);
+  --title: #c0e39a;
+  --ink: #466c35;
+  --cluster: #466c35;
+  --accent-soft: #45401f;
+}
+:root[data-appearance="dark"] .leaflet-container { background: #20242a; }
+:root[data-appearance="dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) saturate(.35) brightness(.85) contrast(.9);
+}
+:root[data-appearance="dark"] .satellite .leaflet-tile-pane { filter: none; }
+:root[data-appearance="dark"] .leaflet-control-attribution {
+  background: var(--glass) !important;
+  color: var(--muted);
+}
+:root[data-appearance="dark"] .leaflet-control-attribution a { color: #a8caff; }
+:root[data-appearance="dark"] .leaflet-tooltip {
+  background: var(--surface);
+  border-color: var(--hairline);
+  color: var(--text);
+}
 
 /* Hat på Emil – heksehat til halloween, nissehue til jul. Placeret over issen
    (toppen af hovedet er ca. 47–55 % inde og helt øverst i marker.png) */

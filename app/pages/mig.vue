@@ -140,6 +140,8 @@ function doLogout() {
         <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
       </NuxtLink>
 
+      <AppearanceSettings />
+
       <section class="card">
         <h2>Brug appen på en enhed mere</h2>
         <p class="hint">Fx en ny telefon, din computer eller appen på hjemmeskærmen. Tryk på knappen og skriv koden på den anden enhed under »Jeg har en kode«.</p>
@@ -175,6 +177,8 @@ function doLogout() {
         <button :class="{ on: mode === 'name' }" @click="mode = 'name'; error = ''">Vælg navn</button>
         <button :class="{ on: mode === 'code' }" @click="mode = 'code'; error = ''">Jeg har en kode</button>
       </div>
+
+      <AppearanceSettings />
 
       <form v-if="mode === 'name'" class="form" @submit.prevent="submitName">
         <div v-if="free.length" class="field">
