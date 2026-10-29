@@ -7,12 +7,12 @@ const route = useRoute()
 const router = useRouter()
 const el = ref<HTMLElement>()
 const selected = ref<Sticker>()
+const toolsOpen = ref(false)
 const { stickers, stickersBy, getSticker } = useStickers()
 const { basemap, toggle: toggleBasemap } = useBasemap()
 
 const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
 const visible = computed(() => (person.value ? stickersBy(person.value) : stickers.value))
-const farthest = computed(() => visible.value.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined))
 const countries = computed(() => new Set(visible.value.map(s => s.countryCode)).size)
 
 let map: LMap | undefined
@@ -177,7 +177,10 @@ watch(stickers, () => {
   setActive(selected.value?.id)
 })
 
-onDeactivated(() => stopJourney())
+onDeactivated(() => {
+  toolsOpen.value = false
+  stopJourney()
+})
 
 onActivated(() => {
   map?.invalidateSize()
@@ -194,10 +197,6 @@ onBeforeUnmount(() => {
     <div ref="el" class="map" />
 
     <header class="top">
-      <div class="top-actions">
-        <UploadButton />
-        <RefreshButton />
-      </div>
       <div class="brand glass">
         <img src="/logo.png" alt="">
         <div>
@@ -205,35 +204,32 @@ onBeforeUnmount(() => {
           <p>{{ visible.length }} {{ visible.length === 1 ? 'sticker' : 'stickers' }} · {{ countries }} {{ countries === 1 ? 'land' : 'lande' }}</p>
         </div>
       </div>
-      <div v-if="!journey" class="chips">
-        <button v-if="visible.length" class="chip glass play" @click="startJourney">
-          <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5Z" /></svg>
-          {{ person ? `${genitive(person)} rejse` : 'Se rejsen' }}
-        </button>
+      <div v-if="!journey && person" class="chips">
         <button v-if="person" class="chip glass filter" @click="clearPerson">
           Sat op af {{ person }}
           <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
-        <button v-if="farthest" class="chip glass" @click="select(farthest)">
-          <span class="muted">Længst væk</span>
-          <CountryFlag :code="farthest.countryCode" /> {{ farthest.city }} · {{ formatKm(farthest.distanceKm) }}
-        </button>
       </div>
     </header>
 
-    <button
-      class="round layers glass"
-      :class="{ raised: selected || journey, on: basemap === 'luftfoto' }"
-      :aria-label="basemap === 'kort' ? 'Vis luftfoto' : 'Vis kort'"
-      :title="basemap === 'kort' ? 'Vis luftfoto' : 'Vis kort'"
-      @click="toggleBasemap"
-    >
-      <svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
-    </button>
+    <template v-if="!selected && !journey">
+      <button class="map-tools glass" aria-haspopup="dialog" :aria-expanded="toolsOpen" @click="toolsOpen = true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
+        Kortvalg
+      </button>
+      <UploadButton />
+    </template>
 
-    <button class="round glass" :class="{ raised: selected || journey }" aria-label="Vis alle" @click="select(undefined); fitAll()">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" /></svg>
-    </button>
+    <MapToolsSheet
+      v-if="toolsOpen"
+      :basemap="basemap"
+      :has-stickers="visible.length > 0"
+      :person="person"
+      @close="toolsOpen = false"
+      @overview="select(undefined); fitAll()"
+      @basemap="toggleBasemap"
+      @journey="startJourney"
+    />
 
     <Transition name="sheet">
       <StickerSheet v-if="selected" :key="selected.id" :sticker="selected" @close="select(undefined)" />
@@ -290,13 +286,6 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 .top > * { pointer-events: auto; }
-.top-actions {
-  position: absolute;
-  top: calc(16px + var(--safe-t));
-  right: 12px;
-  display: flex;
-  gap: 8px;
-}
 .brand {
   display: inline-flex;
   align-items: center;
@@ -334,13 +323,6 @@ onBeforeUnmount(() => {
   padding: 8px 14px;
   box-shadow: var(--shadow-sm);
 }
-.muted { color: var(--muted); }
-.play {
-  background: var(--accent) !important;
-  color: var(--on-accent);
-  font-weight: 700;
-}
-.play svg { width: 14px; height: 14px; fill: currentColor; }
 .journey {
   position: absolute;
   left: 12px;
@@ -386,34 +368,30 @@ onBeforeUnmount(() => {
   stroke-width: 2.6;
   stroke-linecap: round;
 }
-.round {
+.map-tools {
   position: absolute;
-  right: 12px;
-  bottom: var(--nav-space);
+  left: max(16px, env(safe-area-inset-left, 0px));
+  bottom: calc(var(--nav-space) + 8px);
   z-index: 500;
-  display: grid;
-  place-items: center;
-  width: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   height: 48px;
-  padding: 0;
+  padding: 0 16px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity .2s;
 }
-.round.raised { opacity: 0; pointer-events: none; }
-.round svg {
+.map-tools:focus-visible { outline: 3px solid var(--text); outline-offset: 4px; }
+.map-tools svg {
   width: 22px;
   height: 22px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linejoin: round;
-}
-.round.layers { bottom: calc(var(--nav-space) + 58px); }
-.round.layers.on {
-  background: var(--ink);
-  color: #fff;
 }
 .empty {
   position: absolute;

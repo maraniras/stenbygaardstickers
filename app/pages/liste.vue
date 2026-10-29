@@ -33,8 +33,6 @@ const groups = computed(() => {
         <h1>Stickers</h1>
         <div class="title-actions">
           <NotifyButton />
-          <UploadButton />
-          <RefreshButton />
         </div>
       </div>
       <div class="grid">
@@ -78,6 +76,8 @@ const groups = computed(() => {
       </div>
     </section>
 
+    <UploadButton />
+
     <div class="footer-links">
       <NuxtLink class="add-link" to="/nyheder">Hvad er nyt</NuxtLink>
       <button v-if="!standalone" class="add-link" @click="showInstall">Installer appen</button>
@@ -90,7 +90,7 @@ const groups = computed(() => {
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 80px);
 }
 .title {
   display: flex;

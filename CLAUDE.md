@@ -1,5 +1,8 @@
 # Stenbygaard Stickers
 
+- **Mobile map controls (Oct 2026)**: map title/logo stay at the top, with only an active person filter below. `Kortvalg` opens `MapToolsSheet.vue` (native modal dialog: overview, aerial-map toggle, journey). No fixed farthest-sticker chip on the map. `UploadButton.vue` is a 56 px floating + above the bottom navigation, shared by map/list; on the map it hides while a sticker sheet or journey is open. No manual refresh buttons on map/list: `useStickers()` refreshes automatically and the update plugin detects builds. The list reserves extra bottom space for the floating button.
+- **Game brainstorm**: agreed ideas and open proposals for bananas and daily games are in `docs/spil-ideer.md`; no game implementation yet.
+
 Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to the user in Danish; the app UI is Danish. Mobile first, deployed on Vercel.
 
 - Nuxt 4, `ssr: false`. Pages: `/` map (Leaflet + markercluster; OSM tiles by default, toggle to Esri World Imagery aerial photo + labels, `app/utils/basemap.ts`, choice saved in localStorage and shared with the upload map picker), `/liste` timeline + stats, `/sticker/[id]` detail with gallery, `/upload` (round + button next to the refresh button on map and list), `/admin` + `/admin/[id]` (small "Admin" link at the bottom of `/liste`).

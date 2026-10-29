@@ -5,23 +5,27 @@
 </template>
 
 <style scoped>
-/* Samme form som RefreshButton */
+/* Fælles tilføj-knap over bundmenuen på kort og liste. */
 .upload {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(var(--nav-space) + 8px);
+  z-index: 650;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-sm);
-  color: var(--muted);
+  background: var(--accent);
+  box-shadow: var(--shadow);
+  color: var(--on-accent);
+  transition: transform .15s;
 }
 .upload:active { transform: scale(.92); }
+.upload:focus-visible { outline: 3px solid var(--text); outline-offset: 4px; }
 svg {
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.4;
