@@ -17,14 +17,7 @@ defineProps<{ kind: 'city' | 'wheel' }>()
     </template>
     <template v-else>
       <span class="spark spark-a">✦</span><span class="spark spark-b">✧</span>
-      <div class="wheel-wrap">
-        <div class="wheel">
-          <span v-for="(symbol, i) in ['🍌', '×', '🍌', '✦', '🍌', '×', '🍌', '✦']" :key="i" class="wheel-symbol" :style="{ '--slice': i }">{{ symbol }}</span>
-          <div class="wheel-hub"><img src="/marker.png" alt=""></div>
-        </div>
-        <span class="pointer" />
-      </div>
-      <span class="coin coin-a">🍌</span><span class="coin coin-b">🍌</span>
+      <div class="wheel-wrap"><WheelFace compact /></div>
     </template>
   </div>
 </template>
@@ -44,14 +37,7 @@ defineProps<{ kind: 'city' | 'wheel' }>()
 .emil span { position: absolute; right: -12px; top: 1px; display: grid; place-items: center; width: 32px; height: 32px; background: #e6f5bc; border-radius: 12px 12px 12px 2px; color: #153b3a; font-size: 22px; font-weight: 800; transform: rotate(-9deg); }
 .map-dot { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #d4efc8; box-shadow: 0 0 0 4px #d4efc81a; }.dot-a { top: 26%; left: 28%; }.dot-b { top: 73%; left: 53%; }.dot-c { top: 23%; right: 10%; }
 .crosshair { position: absolute; bottom: 14px; right: 16px; color: #d0e6d6; font-size: 20px; line-height: 1; }
-.wheel { position: relative; width: 142px; height: 142px; border: 6px solid #ffd563; border-radius: 50%; background: conic-gradient(from -22.5deg, #ffdc73 0 45deg, #784c9f 45deg 90deg, #ffb776 90deg 135deg, #b2a0d5 135deg 180deg, #ffdc73 180deg 225deg, #784c9f 225deg 270deg, #ffb776 270deg 315deg, #b2a0d5 315deg 360deg); box-shadow: 0 8px 0 #1b153e26, 0 14px 22px #1b153e26; transform: rotate(-12deg); }
-.wheel-wrap { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.wheel-symbol { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; display: grid; place-items: center; margin: -12px; transform: rotate(calc(var(--slice) * 45deg)) translateY(-47px) rotate(calc(var(--slice) * -45deg)); color: #fff3cc; font-size: 18px; font-weight: 800; }
-.wheel-hub { position: absolute; inset: 42px; display: grid; place-items: center; border-radius: 50%; background: #fff1bb; box-shadow: 0 2px 5px #34224e40; }
-.wheel-hub img { width: 32px; height: 36px; object-fit: contain; transform: rotate(12deg); }
-.pointer { position: absolute; left: 50%; top: -7px; width: 20px; height: 25px; background: #fff3c4; clip-path: polygon(0 0, 100% 0, 50% 100%); transform: translateX(-50%); filter: drop-shadow(0 2px 1px #1b153e33); }
-.coin { position: absolute; display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid #ffe38c; border-radius: 50%; background: #ffcb51; font-size: 17px; box-shadow: 0 4px 0 #d3933e; }
-.coin-a { right: 5%; bottom: 18%; transform: rotate(17deg); }.coin-b { left: 8%; top: 19%; transform: rotate(-17deg) scale(.75); }
+.wheel-wrap { width:min(142px,88%); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .spark { position: absolute; color: #9d76c8; }.spark-a { top: 12%; right: 14%; font-size: 19px; }.spark-b { left: 9%; bottom: 16%; font-size: 28px; }
-.game-art.wheel { width: auto; height: 168px; border: 0; border-radius: 0; background: light-dark(#f1e9ff, #30253f); box-shadow: none; transform: none; }
+.game-art.wheel { width: auto; height: 168px; border: 0; border-radius: 0; background: transparent; box-shadow: none; transform: none; }
 </style>
