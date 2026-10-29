@@ -134,3 +134,23 @@ test('Preview EVAL prefixes keys only and preserves Lua/arguments', async () => 
   vm.runInContext(code,context); assert.equal(await exports.redisEval('lua',['economy'],['user','old','new']),1)
   assert.equal(JSON.stringify(sent),JSON.stringify([['EVAL','lua',1,'dev:economy','user','old','new']]))
 })
+test('equal visual wheel slots always land on the server prize, including repeated Miv slots', () => {
+  const exports={}
+  const {api:a}=setup()
+  const context=vm.createContext({exports,require:()=>({WHEEL_PRIZES:a.WHEEL_PRIZES})})
+  const code=ts.transpileModule(readFileSync('app/utils/wheel.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText
+  vm.runInContext(code,context)
+  const slots=exports.WHEEL_SLOTS
+  assert.equal(slots.length,20); assert.equal(slots.filter(s=>s.value===0).length,7)
+  assert.ok(slots.every((s,i)=>s.end-s.start===18 && s.start===i*18))
+  for(const prize of a.WHEEL_PRIZES) {
+    const visited=new Set()
+    for(let i=0;i<100;i++) {
+      const angle=(360-exports.wheelTarget(prize.value,i/100))%360
+      const slot=slots.find(s=>angle>=s.start && angle<s.end)
+      assert.equal(slot.value,prize.value); visited.add(slot.index)
+    }
+    assert.equal(visited.size,slots.filter(s=>s.value===prize.value).length)
+  }
+  assert.equal(exports.WHEEL_SPIN_MS,6500)
+})
