@@ -85,4 +85,20 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikonet er 
 | x64 | ⭐ Publikumsfavorit (`favorite`) | Flest 👍 i snit |
 | x65 | 🏆 Årets Dengse (`year-<år>`) | Flest stickers i året – én pr. år |
 
-Næste ledige nummer: **x67**
+## Bananer og daglige spil
+
+| Nr. | Badge (id) | Krav | Bananer pr. trin |
+|---|---|---|---|
+| x67 | Et bundt → Bananimperium (`banana-baron`) | Højeste saldo 1.000/5.000/10.000/25.000/50.000 | 50/100/200/400/800 |
+| x68 | Rejseleder → Verdensguide (`city-guide`) | 1/10/30/100/250 rigtige byer | 20/40/80/160/320 |
+| x69 | Uden GPS → Emils navigatør (`city-gps`) | 1/5/10/25/50 rigtige på første gæt | 20/40/80/160/320 |
+| x70 | På rette spor → Aldrig faret vild (`city-streak`) | 3/7/14/30/100 spildøgn med rigtigt svar i træk | 10/25/50/100/250 |
+| x71 | En omgang mere → Hjulminister (`wheel-spins`) | 7/30/100/200/365 spins | 25/50/100/200/400 |
+| x72 | Fast inventar → Møder altid op (`wheel-streak`) | 3/7/14/30/100 spildøgn med spin i træk | 10/25/50/100/250 |
+| x73 | Hjulets udvalgte (`wheel-jackpot`) | Ram 500 på hjulet | 250 |
+| x74 | I sidste øjeblik (`city-last`) | Rigtigt svar på femte gæt | 25 |
+| x75 | Nitteekspert (`wheel-nits`) | Tre nitter i på hinanden følgende spins | 25 |
+
+Hvert trin udbetales én gang. Formuebadge giver ingen levelpoint; spiltrin giver 1/2/3/4/5 point, og x73–75 giver 2/1/1 point. Gamle badges giver 20 bananer pr. point pr. trin, Pioner 60 pr. land, og Årets Dengse 200 efter årets udgang. Midlertidige rekorder giver ingen bananer.
+
+Næste ledige nummer: **x76**

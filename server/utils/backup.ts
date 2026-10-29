@@ -17,6 +17,9 @@ export interface Backup {
   commentLikes?: Record<string, Record<string, string>>
   /** Brugere med navn, profilbillede, indstillinger og enheder (kun hashes af nøglerne) */
   users?: UserRecord[]
+  /** Saldi, udbetalingsnøgler, spilstatus og historik – ikke blot de viste tal. */
+  economy?: Awaited<ReturnType<typeof allEconomyRecords>>
+  games?: Awaited<ReturnType<typeof gameBackup>>
 }
 
 async function allRatings(): Promise<Backup['ratings']> {
@@ -42,6 +45,8 @@ export async function createBackup(): Promise<Backup> {
     comments,
     commentLikes: await getLikes(comments.map(c => c.id)),
     users: await listUsers(),
+    economy: await allEconomyRecords(),
+    games: await gameBackup(),
   }
 }
 

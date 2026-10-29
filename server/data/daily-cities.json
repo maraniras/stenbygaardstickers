@@ -1,0 +1,1346 @@
+[
+  {
+    "id": "CV",
+    "name": "Praia",
+    "lat": 14.93,
+    "lng": -23.51,
+    "continent": "AF"
+  },
+  {
+    "id": "SN",
+    "name": "Dakar",
+    "lat": 14.72,
+    "lng": -17.47,
+    "continent": "AF"
+  },
+  {
+    "id": "GM",
+    "name": "Banjul",
+    "lat": 13.45,
+    "lng": -16.58,
+    "continent": "AF"
+  },
+  {
+    "id": "MR",
+    "name": "Nouakchott",
+    "lat": 18.07,
+    "lng": -15.96,
+    "continent": "AF"
+  },
+  {
+    "id": "GW",
+    "name": "Bissau",
+    "lat": 11.86,
+    "lng": -15.6,
+    "continent": "AF"
+  },
+  {
+    "id": "GN",
+    "name": "Conakry",
+    "lat": 9.64,
+    "lng": -13.58,
+    "continent": "AF"
+  },
+  {
+    "id": "SL",
+    "name": "Freetown",
+    "lat": 8.48,
+    "lng": -13.23,
+    "continent": "AF"
+  },
+  {
+    "id": "LR",
+    "name": "Monrovia",
+    "lat": 6.3,
+    "lng": -10.8,
+    "continent": "AF"
+  },
+  {
+    "id": "ML",
+    "name": "Bamako",
+    "lat": 12.64,
+    "lng": -8,
+    "continent": "AF"
+  },
+  {
+    "id": "MA",
+    "name": "Rabat",
+    "lat": 34.02,
+    "lng": -6.84,
+    "continent": "AF"
+  },
+  {
+    "id": "CI",
+    "name": "Yamoussoukro",
+    "lat": 6.83,
+    "lng": -5.29,
+    "continent": "AF"
+  },
+  {
+    "id": "BF",
+    "name": "Ouagadougou",
+    "lat": 12.37,
+    "lng": -1.52,
+    "continent": "AF"
+  },
+  {
+    "id": "GH",
+    "name": "Accra",
+    "lat": 5.6,
+    "lng": -0.19,
+    "continent": "AF"
+  },
+  {
+    "id": "TG",
+    "name": "Lome",
+    "lat": 6.13,
+    "lng": 1.22,
+    "continent": "AF"
+  },
+  {
+    "id": "NE",
+    "name": "Niamey",
+    "lat": 13.51,
+    "lng": 2.11,
+    "continent": "AF"
+  },
+  {
+    "id": "BJ",
+    "name": "Porto-Novo",
+    "lat": 6.5,
+    "lng": 2.6,
+    "continent": "AF"
+  },
+  {
+    "id": "DZ",
+    "name": "Algiers",
+    "lat": 36.75,
+    "lng": 3.06,
+    "continent": "AF"
+  },
+  {
+    "id": "ST",
+    "name": "Sao Tome",
+    "lat": 0.34,
+    "lng": 6.73,
+    "continent": "AF"
+  },
+  {
+    "id": "NG",
+    "name": "Abuja",
+    "lat": 9.08,
+    "lng": 7.4,
+    "continent": "AF"
+  },
+  {
+    "id": "GQ",
+    "name": "Ciudad de la Paz",
+    "lat": 3.75,
+    "lng": 8.78,
+    "continent": "AF"
+  },
+  {
+    "id": "GA",
+    "name": "Libreville",
+    "lat": 0.42,
+    "lng": 9.47,
+    "continent": "AF"
+  },
+  {
+    "id": "TN",
+    "name": "Tunis",
+    "lat": 36.81,
+    "lng": 10.18,
+    "continent": "AF"
+  },
+  {
+    "id": "CM",
+    "name": "Yaounde",
+    "lat": 3.85,
+    "lng": 11.5,
+    "continent": "AF"
+  },
+  {
+    "id": "LY",
+    "name": "Tripoli",
+    "lat": 32.89,
+    "lng": 13.19,
+    "continent": "AF"
+  },
+  {
+    "id": "AO",
+    "name": "Luanda",
+    "lat": -8.84,
+    "lng": 13.29,
+    "continent": "AF"
+  },
+  {
+    "id": "TD",
+    "name": "N'Djamena",
+    "lat": 12.13,
+    "lng": 15.06,
+    "continent": "AF"
+  },
+  {
+    "id": "CG",
+    "name": "Brazzaville",
+    "lat": -4.26,
+    "lng": 15.24,
+    "continent": "AF"
+  },
+  {
+    "id": "CD",
+    "name": "Kinshasa",
+    "lat": -4.44,
+    "lng": 15.27,
+    "continent": "AF"
+  },
+  {
+    "id": "NA",
+    "name": "Windhoek",
+    "lat": -22.56,
+    "lng": 17.08,
+    "continent": "AF"
+  },
+  {
+    "id": "CF",
+    "name": "Bangui",
+    "lat": 4.39,
+    "lng": 18.56,
+    "continent": "AF"
+  },
+  {
+    "id": "BW",
+    "name": "Gaborone",
+    "lat": -24.63,
+    "lng": 25.92,
+    "continent": "AF"
+  },
+  {
+    "id": "LS",
+    "name": "Maseru",
+    "lat": -29.31,
+    "lng": 27.48,
+    "continent": "AF"
+  },
+  {
+    "id": "ZM",
+    "name": "Lusaka",
+    "lat": -15.39,
+    "lng": 28.32,
+    "continent": "AF"
+  },
+  {
+    "id": "BI",
+    "name": "Gitega",
+    "lat": -3.43,
+    "lng": 29.93,
+    "continent": "AF"
+  },
+  {
+    "id": "RW",
+    "name": "Kigali",
+    "lat": -1.94,
+    "lng": 30.06,
+    "continent": "AF"
+  },
+  {
+    "id": "ZW",
+    "name": "Harare",
+    "lat": -17.83,
+    "lng": 31.05,
+    "continent": "AF"
+  },
+  {
+    "id": "SZ",
+    "name": "Mbabane",
+    "lat": -26.31,
+    "lng": 31.14,
+    "continent": "AF"
+  },
+  {
+    "id": "EG",
+    "name": "Kairo",
+    "lat": 30.04,
+    "lng": 31.24,
+    "continent": "AF"
+  },
+  {
+    "id": "SS",
+    "name": "Juba",
+    "lat": 4.85,
+    "lng": 31.58,
+    "continent": "AF"
+  },
+  {
+    "id": "SD",
+    "name": "Khartoum",
+    "lat": 15.5,
+    "lng": 32.56,
+    "continent": "AF"
+  },
+  {
+    "id": "MZ",
+    "name": "Maputo",
+    "lat": -25.97,
+    "lng": 32.57,
+    "continent": "AF"
+  },
+  {
+    "id": "UG",
+    "name": "Kampala",
+    "lat": 0.35,
+    "lng": 32.58,
+    "continent": "AF"
+  },
+  {
+    "id": "MW",
+    "name": "Lilongwe",
+    "lat": -13.96,
+    "lng": 33.79,
+    "continent": "AF"
+  },
+  {
+    "id": "TZ",
+    "name": "Dodoma",
+    "lat": -6.16,
+    "lng": 35.75,
+    "continent": "AF"
+  },
+  {
+    "id": "KE",
+    "name": "Nairobi",
+    "lat": -1.29,
+    "lng": 36.82,
+    "continent": "AF"
+  },
+  {
+    "id": "ET",
+    "name": "Addis Ababa",
+    "lat": 9.03,
+    "lng": 38.74,
+    "continent": "AF"
+  },
+  {
+    "id": "ER",
+    "name": "Asmara",
+    "lat": 15.32,
+    "lng": 38.93,
+    "continent": "AF"
+  },
+  {
+    "id": "DJ",
+    "name": "Djibouti",
+    "lat": 11.59,
+    "lng": 43.15,
+    "continent": "AF"
+  },
+  {
+    "id": "KM",
+    "name": "Moroni",
+    "lat": -11.7,
+    "lng": 43.26,
+    "continent": "AF"
+  },
+  {
+    "id": "SO",
+    "name": "Mogadishu",
+    "lat": 2.05,
+    "lng": 45.32,
+    "continent": "AF"
+  },
+  {
+    "id": "MG",
+    "name": "Antananarivo",
+    "lat": -18.88,
+    "lng": 47.51,
+    "continent": "AF"
+  },
+  {
+    "id": "SC",
+    "name": "Victoria",
+    "lat": -4.62,
+    "lng": 55.45,
+    "continent": "AF"
+  },
+  {
+    "id": "MU",
+    "name": "Port Louis",
+    "lat": -20.16,
+    "lng": 57.5,
+    "continent": "AF"
+  },
+  {
+    "id": "TR",
+    "name": "Ankara",
+    "lat": 39.93,
+    "lng": 32.86,
+    "continent": "AS"
+  },
+  {
+    "id": "LB",
+    "name": "Beirut",
+    "lat": 33.89,
+    "lng": 35.5,
+    "continent": "AS"
+  },
+  {
+    "id": "JO",
+    "name": "Amman",
+    "lat": 31.95,
+    "lng": 35.93,
+    "continent": "AS"
+  },
+  {
+    "id": "SY",
+    "name": "Damascus",
+    "lat": 33.51,
+    "lng": 36.28,
+    "continent": "AS"
+  },
+  {
+    "id": "YE",
+    "name": "Sanaa",
+    "lat": 15.37,
+    "lng": 44.19,
+    "continent": "AS"
+  },
+  {
+    "id": "IQ",
+    "name": "Baghdad",
+    "lat": 33.31,
+    "lng": 44.36,
+    "continent": "AS"
+  },
+  {
+    "id": "AM",
+    "name": "Yerevan",
+    "lat": 40.18,
+    "lng": 44.51,
+    "continent": "AS"
+  },
+  {
+    "id": "GE",
+    "name": "Tbilisi",
+    "lat": 41.72,
+    "lng": 44.79,
+    "continent": "AS"
+  },
+  {
+    "id": "SA",
+    "name": "Riyadh",
+    "lat": 24.71,
+    "lng": 46.68,
+    "continent": "AS"
+  },
+  {
+    "id": "KW",
+    "name": "Kuwait City",
+    "lat": 29.38,
+    "lng": 47.99,
+    "continent": "AS"
+  },
+  {
+    "id": "AZ",
+    "name": "Baku",
+    "lat": 40.41,
+    "lng": 49.87,
+    "continent": "AS"
+  },
+  {
+    "id": "BH",
+    "name": "Manama",
+    "lat": 26.23,
+    "lng": 50.59,
+    "continent": "AS"
+  },
+  {
+    "id": "IR",
+    "name": "Tehran",
+    "lat": 35.69,
+    "lng": 51.39,
+    "continent": "AS"
+  },
+  {
+    "id": "QA",
+    "name": "Doha",
+    "lat": 25.29,
+    "lng": 51.53,
+    "continent": "AS"
+  },
+  {
+    "id": "AE",
+    "name": "Abu Dhabi",
+    "lat": 24.45,
+    "lng": 54.38,
+    "continent": "AS"
+  },
+  {
+    "id": "TM",
+    "name": "Ashgabat",
+    "lat": 37.96,
+    "lng": 58.33,
+    "continent": "AS"
+  },
+  {
+    "id": "OM",
+    "name": "Muscat",
+    "lat": 23.59,
+    "lng": 58.41,
+    "continent": "AS"
+  },
+  {
+    "id": "TJ",
+    "name": "Dushanbe",
+    "lat": 38.56,
+    "lng": 68.79,
+    "continent": "AS"
+  },
+  {
+    "id": "AF",
+    "name": "Kabul",
+    "lat": 34.53,
+    "lng": 69.17,
+    "continent": "AS"
+  },
+  {
+    "id": "UZ",
+    "name": "Tashkent",
+    "lat": 41.3,
+    "lng": 69.24,
+    "continent": "AS"
+  },
+  {
+    "id": "KZ",
+    "name": "Nur-Sultan",
+    "lat": 51.17,
+    "lng": 71.43,
+    "continent": "AS"
+  },
+  {
+    "id": "PK",
+    "name": "Islamabad",
+    "lat": 33.68,
+    "lng": 73.05,
+    "continent": "AS"
+  },
+  {
+    "id": "MV",
+    "name": "Male",
+    "lat": 4.18,
+    "lng": 73.51,
+    "continent": "AS"
+  },
+  {
+    "id": "KG",
+    "name": "Bishkek",
+    "lat": 42.87,
+    "lng": 74.59,
+    "continent": "AS"
+  },
+  {
+    "id": "IN",
+    "name": "New Delhi",
+    "lat": 28.61,
+    "lng": 77.21,
+    "continent": "AS"
+  },
+  {
+    "id": "NP",
+    "name": "Kathmandu",
+    "lat": 27.72,
+    "lng": 85.32,
+    "continent": "AS"
+  },
+  {
+    "id": "BT",
+    "name": "Thimphu",
+    "lat": 27.47,
+    "lng": 89.64,
+    "continent": "AS"
+  },
+  {
+    "id": "BD",
+    "name": "Dhaka",
+    "lat": 23.81,
+    "lng": 90.41,
+    "continent": "AS"
+  },
+  {
+    "id": "MM",
+    "name": "Nay Pyi Taw",
+    "lat": 19.76,
+    "lng": 96.08,
+    "continent": "AS"
+  },
+  {
+    "id": "TH",
+    "name": "Bangkok",
+    "lat": 13.76,
+    "lng": 100.5,
+    "continent": "AS"
+  },
+  {
+    "id": "LA",
+    "name": "Vientiane",
+    "lat": 17.98,
+    "lng": 102.63,
+    "continent": "AS"
+  },
+  {
+    "id": "SG",
+    "name": "Singapore",
+    "lat": 1.29,
+    "lng": 103.85,
+    "continent": "AS"
+  },
+  {
+    "id": "KH",
+    "name": "Phnom Penh",
+    "lat": 11.56,
+    "lng": 104.92,
+    "continent": "AS"
+  },
+  {
+    "id": "VN",
+    "name": "Hanoi",
+    "lat": 21.03,
+    "lng": 105.85,
+    "continent": "AS"
+  },
+  {
+    "id": "MN",
+    "name": "Ulaanbaatar",
+    "lat": 47.89,
+    "lng": 106.91,
+    "continent": "AS"
+  },
+  {
+    "id": "BN",
+    "name": "Bandar Seri Begawan",
+    "lat": 4.9,
+    "lng": 114.94,
+    "continent": "AS"
+  },
+  {
+    "id": "CN",
+    "name": "Beijing",
+    "lat": 39.9,
+    "lng": 116.41,
+    "continent": "AS"
+  },
+  {
+    "id": "PH",
+    "name": "Manila",
+    "lat": 14.6,
+    "lng": 120.98,
+    "continent": "AS"
+  },
+  {
+    "id": "TW",
+    "name": "Taipei",
+    "lat": 25.03,
+    "lng": 121.57,
+    "continent": "AS"
+  },
+  {
+    "id": "KP",
+    "name": "Pyongyang",
+    "lat": 39.04,
+    "lng": 125.76,
+    "continent": "AS"
+  },
+  {
+    "id": "KR",
+    "name": "Seoul",
+    "lat": 37.57,
+    "lng": 126.98,
+    "continent": "AS"
+  },
+  {
+    "id": "JP",
+    "name": "Tokyo",
+    "lat": 35.68,
+    "lng": 139.69,
+    "continent": "AS"
+  },
+  {
+    "id": "IS",
+    "name": "Reykjavík",
+    "lat": 64.15,
+    "lng": -21.94,
+    "continent": "EU"
+  },
+  {
+    "id": "PT",
+    "name": "Lissabon",
+    "lat": 38.72,
+    "lng": -9.14,
+    "continent": "EU"
+  },
+  {
+    "id": "FO",
+    "name": "Tórshavn",
+    "lat": 62.01,
+    "lng": -6.77,
+    "continent": "EU"
+  },
+  {
+    "id": "IE",
+    "name": "Dublin",
+    "lat": 53.35,
+    "lng": -6.26,
+    "continent": "EU"
+  },
+  {
+    "id": "ES",
+    "name": "Madrid",
+    "lat": 40.42,
+    "lng": -3.7,
+    "continent": "EU"
+  },
+  {
+    "id": "GB",
+    "name": "London",
+    "lat": 51.51,
+    "lng": -0.13,
+    "continent": "EU"
+  },
+  {
+    "id": "AD",
+    "name": "Andorra la Vella",
+    "lat": 42.51,
+    "lng": 1.52,
+    "continent": "EU"
+  },
+  {
+    "id": "FR",
+    "name": "Paris",
+    "lat": 48.86,
+    "lng": 2.35,
+    "continent": "EU"
+  },
+  {
+    "id": "BE",
+    "name": "Bruxelles",
+    "lat": 50.85,
+    "lng": 4.35,
+    "continent": "EU"
+  },
+  {
+    "id": "NL",
+    "name": "Amsterdam",
+    "lat": 52.37,
+    "lng": 4.9,
+    "continent": "EU"
+  },
+  {
+    "id": "LU",
+    "name": "Luxembourg",
+    "lat": 49.61,
+    "lng": 6.13,
+    "continent": "EU"
+  },
+  {
+    "id": "MC",
+    "name": "Monaco",
+    "lat": 43.73,
+    "lng": 7.42,
+    "continent": "EU"
+  },
+  {
+    "id": "CH",
+    "name": "Bern",
+    "lat": 46.95,
+    "lng": 7.45,
+    "continent": "EU"
+  },
+  {
+    "id": "LI",
+    "name": "Vaduz",
+    "lat": 47.14,
+    "lng": 9.52,
+    "continent": "EU"
+  },
+  {
+    "id": "NO",
+    "name": "Oslo",
+    "lat": 59.91,
+    "lng": 10.75,
+    "continent": "EU"
+  },
+  {
+    "id": "SM",
+    "name": "San Marino",
+    "lat": 43.94,
+    "lng": 12.45,
+    "continent": "EU"
+  },
+  {
+    "id": "IT",
+    "name": "Rom",
+    "lat": 41.9,
+    "lng": 12.5,
+    "continent": "EU"
+  },
+  {
+    "id": "DK",
+    "name": "København",
+    "lat": 55.68,
+    "lng": 12.57,
+    "continent": "EU"
+  },
+  {
+    "id": "DE",
+    "name": "Berlin",
+    "lat": 52.52,
+    "lng": 13.4,
+    "continent": "EU"
+  },
+  {
+    "id": "CZ",
+    "name": "Prag",
+    "lat": 50.08,
+    "lng": 14.44,
+    "continent": "EU"
+  },
+  {
+    "id": "MT",
+    "name": "Valletta",
+    "lat": 35.9,
+    "lng": 14.51,
+    "continent": "EU"
+  },
+  {
+    "id": "SI",
+    "name": "Ljubljana",
+    "lat": 46.06,
+    "lng": 14.51,
+    "continent": "EU"
+  },
+  {
+    "id": "HR",
+    "name": "Zagreb",
+    "lat": 45.81,
+    "lng": 15.98,
+    "continent": "EU"
+  },
+  {
+    "id": "AT",
+    "name": "Wien",
+    "lat": 48.21,
+    "lng": 16.37,
+    "continent": "EU"
+  },
+  {
+    "id": "SK",
+    "name": "Bratislava",
+    "lat": 48.15,
+    "lng": 17.11,
+    "continent": "EU"
+  },
+  {
+    "id": "SE",
+    "name": "Stockholm",
+    "lat": 59.33,
+    "lng": 18.07,
+    "continent": "EU"
+  },
+  {
+    "id": "BA",
+    "name": "Sarajevo",
+    "lat": 43.86,
+    "lng": 18.41,
+    "continent": "EU"
+  },
+  {
+    "id": "HU",
+    "name": "Budapest",
+    "lat": 47.5,
+    "lng": 19.04,
+    "continent": "EU"
+  },
+  {
+    "id": "ME",
+    "name": "Podgorica",
+    "lat": 42.44,
+    "lng": 19.26,
+    "continent": "EU"
+  },
+  {
+    "id": "AL",
+    "name": "Tirana",
+    "lat": 41.33,
+    "lng": 19.82,
+    "continent": "EU"
+  },
+  {
+    "id": "RS",
+    "name": "Beograd",
+    "lat": 44.79,
+    "lng": 20.45,
+    "continent": "EU"
+  },
+  {
+    "id": "PL",
+    "name": "Warszawa",
+    "lat": 52.23,
+    "lng": 21.01,
+    "continent": "EU"
+  },
+  {
+    "id": "XK",
+    "name": "Pristina",
+    "lat": 42.66,
+    "lng": 21.17,
+    "continent": "EU"
+  },
+  {
+    "id": "MK",
+    "name": "Skopje",
+    "lat": 42,
+    "lng": 21.43,
+    "continent": "EU"
+  },
+  {
+    "id": "BG",
+    "name": "Sofia",
+    "lat": 42.7,
+    "lng": 23.32,
+    "continent": "EU"
+  },
+  {
+    "id": "GR",
+    "name": "Athen",
+    "lat": 37.98,
+    "lng": 23.73,
+    "continent": "EU"
+  },
+  {
+    "id": "LV",
+    "name": "Riga",
+    "lat": 56.95,
+    "lng": 24.11,
+    "continent": "EU"
+  },
+  {
+    "id": "EE",
+    "name": "Tallinn",
+    "lat": 59.44,
+    "lng": 24.75,
+    "continent": "EU"
+  },
+  {
+    "id": "FI",
+    "name": "Helsinki",
+    "lat": 60.17,
+    "lng": 24.94,
+    "continent": "EU"
+  },
+  {
+    "id": "LT",
+    "name": "Vilnius",
+    "lat": 54.69,
+    "lng": 25.28,
+    "continent": "EU"
+  },
+  {
+    "id": "RO",
+    "name": "Bukarest",
+    "lat": 44.43,
+    "lng": 26.1,
+    "continent": "EU"
+  },
+  {
+    "id": "BY",
+    "name": "Minsk",
+    "lat": 53.9,
+    "lng": 27.57,
+    "continent": "EU"
+  },
+  {
+    "id": "MD",
+    "name": "Chisinau",
+    "lat": 47.01,
+    "lng": 28.86,
+    "continent": "EU"
+  },
+  {
+    "id": "UA",
+    "name": "Kyiv",
+    "lat": 50.45,
+    "lng": 30.52,
+    "continent": "EU"
+  },
+  {
+    "id": "CY",
+    "name": "Nicosia",
+    "lat": 35.17,
+    "lng": 33.36,
+    "continent": "EU"
+  },
+  {
+    "id": "RU",
+    "name": "Moskva",
+    "lat": 55.76,
+    "lng": 37.62,
+    "continent": "EU"
+  },
+  {
+    "id": "MX",
+    "name": "Mexico City",
+    "lat": 19.43,
+    "lng": -99.13,
+    "continent": "NA"
+  },
+  {
+    "id": "GT",
+    "name": "Guatemala City",
+    "lat": 14.63,
+    "lng": -90.51,
+    "continent": "NA"
+  },
+  {
+    "id": "SV",
+    "name": "San Salvador",
+    "lat": 13.69,
+    "lng": -89.22,
+    "continent": "NA"
+  },
+  {
+    "id": "BZ",
+    "name": "Belmopan",
+    "lat": 17.25,
+    "lng": -88.77,
+    "continent": "NA"
+  },
+  {
+    "id": "HN",
+    "name": "Tegucigalpa",
+    "lat": 14.07,
+    "lng": -87.19,
+    "continent": "NA"
+  },
+  {
+    "id": "NI",
+    "name": "Managua",
+    "lat": 12.11,
+    "lng": -86.24,
+    "continent": "NA"
+  },
+  {
+    "id": "CR",
+    "name": "San Jose",
+    "lat": 9.93,
+    "lng": -84.08,
+    "continent": "NA"
+  },
+  {
+    "id": "CU",
+    "name": "Havana",
+    "lat": 23.11,
+    "lng": -82.37,
+    "continent": "NA"
+  },
+  {
+    "id": "PA",
+    "name": "Panama City",
+    "lat": 8.98,
+    "lng": -79.52,
+    "continent": "NA"
+  },
+  {
+    "id": "BS",
+    "name": "Nassau",
+    "lat": 25.05,
+    "lng": -77.35,
+    "continent": "NA"
+  },
+  {
+    "id": "US",
+    "name": "Washington, D.C.",
+    "lat": 38.9,
+    "lng": -77.04,
+    "continent": "NA"
+  },
+  {
+    "id": "JM",
+    "name": "Kingston",
+    "lat": 17.97,
+    "lng": -76.79,
+    "continent": "NA"
+  },
+  {
+    "id": "CA",
+    "name": "Ottawa",
+    "lat": 45.42,
+    "lng": -75.7,
+    "continent": "NA"
+  },
+  {
+    "id": "HT",
+    "name": "Port-au-Prince",
+    "lat": 18.54,
+    "lng": -72.34,
+    "continent": "NA"
+  },
+  {
+    "id": "DO",
+    "name": "Santo Domingo",
+    "lat": 18.49,
+    "lng": -69.93,
+    "continent": "NA"
+  },
+  {
+    "id": "PR",
+    "name": "San Juan",
+    "lat": 18.47,
+    "lng": -66.11,
+    "continent": "NA"
+  },
+  {
+    "id": "KN",
+    "name": "Basseterre",
+    "lat": 17.3,
+    "lng": -62.73,
+    "continent": "NA"
+  },
+  {
+    "id": "AG",
+    "name": "St. John's",
+    "lat": 17.12,
+    "lng": -61.85,
+    "continent": "NA"
+  },
+  {
+    "id": "GD",
+    "name": "St. George's",
+    "lat": 12.06,
+    "lng": -61.75,
+    "continent": "NA"
+  },
+  {
+    "id": "TT",
+    "name": "Port of Spain",
+    "lat": 10.65,
+    "lng": -61.51,
+    "continent": "NA"
+  },
+  {
+    "id": "DM",
+    "name": "Roseau",
+    "lat": 15.3,
+    "lng": -61.39,
+    "continent": "NA"
+  },
+  {
+    "id": "VC",
+    "name": "Kingstown",
+    "lat": 13.16,
+    "lng": -61.22,
+    "continent": "NA"
+  },
+  {
+    "id": "LC",
+    "name": "Castries",
+    "lat": 14.01,
+    "lng": -60.99,
+    "continent": "NA"
+  },
+  {
+    "id": "BB",
+    "name": "Bridgetown",
+    "lat": 13.1,
+    "lng": -59.62,
+    "continent": "NA"
+  },
+  {
+    "id": "GL",
+    "name": "Nuuk",
+    "lat": 64.18,
+    "lng": -51.72,
+    "continent": "NA"
+  },
+  {
+    "id": "TO",
+    "name": "Nuku'alofa",
+    "lat": -21.14,
+    "lng": -175.2,
+    "continent": "OC"
+  },
+  {
+    "id": "WS",
+    "name": "Apia",
+    "lat": -13.83,
+    "lng": -171.76,
+    "continent": "OC"
+  },
+  {
+    "id": "TL",
+    "name": "Dili",
+    "lat": -8.56,
+    "lng": 125.57,
+    "continent": "OC"
+  },
+  {
+    "id": "PW",
+    "name": "Melekeok",
+    "lat": 7.5,
+    "lng": 134.62,
+    "continent": "OC"
+  },
+  {
+    "id": "PG",
+    "name": "Port Moresby",
+    "lat": -9.44,
+    "lng": 147.18,
+    "continent": "OC"
+  },
+  {
+    "id": "AU",
+    "name": "Canberra",
+    "lat": -35.28,
+    "lng": 149.13,
+    "continent": "OC"
+  },
+  {
+    "id": "FM",
+    "name": "Palikir",
+    "lat": 6.92,
+    "lng": 158.16,
+    "continent": "OC"
+  },
+  {
+    "id": "SB",
+    "name": "Honiara",
+    "lat": -9.43,
+    "lng": 159.95,
+    "continent": "OC"
+  },
+  {
+    "id": "NR",
+    "name": "Yaren",
+    "lat": -0.55,
+    "lng": 166.92,
+    "continent": "OC"
+  },
+  {
+    "id": "VU",
+    "name": "Port Vila",
+    "lat": -17.73,
+    "lng": 168.32,
+    "continent": "OC"
+  },
+  {
+    "id": "MH",
+    "name": "Majuro",
+    "lat": 7.12,
+    "lng": 171.18,
+    "continent": "OC"
+  },
+  {
+    "id": "KI",
+    "name": "Tarawa",
+    "lat": 1.45,
+    "lng": 173,
+    "continent": "OC"
+  },
+  {
+    "id": "NZ",
+    "name": "Wellington",
+    "lat": -41.29,
+    "lng": 174.78,
+    "continent": "OC"
+  },
+  {
+    "id": "FJ",
+    "name": "Suva",
+    "lat": -18.14,
+    "lng": 178.44,
+    "continent": "OC"
+  },
+  {
+    "id": "TV",
+    "name": "Funafuti",
+    "lat": -8.52,
+    "lng": 179.2,
+    "continent": "OC"
+  },
+  {
+    "id": "EC",
+    "name": "Quito",
+    "lat": -0.18,
+    "lng": -78.47,
+    "continent": "SA"
+  },
+  {
+    "id": "PE",
+    "name": "Lima",
+    "lat": -12.05,
+    "lng": -77.04,
+    "continent": "SA"
+  },
+  {
+    "id": "CO",
+    "name": "Bogota",
+    "lat": 4.71,
+    "lng": -74.07,
+    "continent": "SA"
+  },
+  {
+    "id": "CL",
+    "name": "Santiago",
+    "lat": -33.45,
+    "lng": -70.67,
+    "continent": "SA"
+  },
+  {
+    "id": "VE",
+    "name": "Caracas",
+    "lat": 10.48,
+    "lng": -66.9,
+    "continent": "SA"
+  },
+  {
+    "id": "AR",
+    "name": "Buenos Aires",
+    "lat": -34.6,
+    "lng": -58.38,
+    "continent": "SA"
+  },
+  {
+    "id": "GY",
+    "name": "Georgetown",
+    "lat": 6.8,
+    "lng": -58.16,
+    "continent": "SA"
+  },
+  {
+    "id": "PY",
+    "name": "Asuncion",
+    "lat": -25.26,
+    "lng": -57.58,
+    "continent": "SA"
+  },
+  {
+    "id": "UY",
+    "name": "Montevideo",
+    "lat": -34.9,
+    "lng": -56.16,
+    "continent": "SA"
+  },
+  {
+    "id": "SR",
+    "name": "Paramaribo",
+    "lat": 5.85,
+    "lng": -55.2,
+    "continent": "SA"
+  },
+  {
+    "id": "BR",
+    "name": "Brasília",
+    "lat": -15.79,
+    "lng": -47.88,
+    "continent": "SA"
+  }
+]

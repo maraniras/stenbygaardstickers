@@ -1,17 +1,19 @@
 <script setup lang="ts">
-type Metric = 'points' | 'level' | 'badges' | 'stickers' | 'countries'
+type Metric = 'points' | 'level' | 'badges' | 'stickers' | 'countries' | 'bananas'
 const options: { key: Metric, label: string, unit: string }[] = [
   { key: 'points', label: 'Point', unit: 'point' },
   { key: 'level', label: 'Level', unit: 'level' },
   { key: 'badges', label: 'Badges', unit: 'badges' },
   { key: 'stickers', label: 'Stickers', unit: 'stickers' },
   { key: 'countries', label: 'Lande', unit: 'lande' },
+  { key: 'bananas', label: 'Bananer', unit: 'bananer' },
 ]
 const metric = ref<Metric>('points')
 const query = ref('')
 const registeredOnly = ref(false)
 const busy = ref(false)
 const { name: me } = useUser()
+const { people: economies, reloadPeople } = useEconomy()
 const { users, failed: usersFailed, reload: reloadUsers } = useUsers()
 const { stickers, people } = useStickers()
 const { ratings, enabled: ratingsEnabled, reload: reloadRatings } = useRatings()
@@ -20,7 +22,7 @@ useHead({ title: 'Ranglisten · Stenbygaard Stickers' })
 
 async function refresh() {
   busy.value = true
-  try { await Promise.all([reloadUsers(), reloadRatings(), reloadComments()]) }
+  try { await Promise.all([reloadUsers(), reloadRatings(), reloadComments(), reloadPeople()]) }
   finally { busy.value = false }
 }
 onMounted(refresh)
@@ -31,14 +33,14 @@ const rows = computed(() => {
   for (const u of users.value) names.set(key(u.name), { name: u.name, registered: true })
   return [...names.values()].map(person => {
     const mine = stickers.value.filter(s => s.placedBy.some(n => sameName(n, person.name)))
-    const badges = badgesFor(person.name, stickers.value, ratings.value, { comments: commentStats.value })
+    const badges = badgesFor(person.name, stickers.value, ratings.value, { comments: commentStats.value, economy: economies.value })
     const points = totalPoints(badges)
     const level = levelFor(points)
-    return { ...person, points, level: level.level, title: level.title, badges: earnedCount(badges), stickers: mine.length, countries: new Set(mine.map(s => s.countryCode)).size }
+    return { ...person, bananas: economies.value[key(person.name)]?.balance ?? null, points, level: level.level, title: level.title, badges: earnedCount(badges), stickers: mine.length, countries: new Set(mine.map(s => s.countryCode)).size }
   })
 })
 const ranked = computed(() => {
-  const sorted = rows.value.filter(p => !registeredOnly.value || p.registered).sort((a, b) => b[metric.value] - a[metric.value] || b.points - a.points || a.name.localeCompare(b.name, 'da'))
+  const sorted = rows.value.filter(p => (!registeredOnly.value || p.registered) && (metric.value !== 'bananas' || p.bananas !== null)).sort((a, b) => (b[metric.value] ?? 0) - (a[metric.value] ?? 0) || b.points - a.points || a.name.localeCompare(b.name, 'da'))
   let rank = 0
   return sorted.map((p, i) => {
     if (i === 0 || p[metric.value] !== sorted[i - 1]![metric.value]) rank = i + 1
@@ -49,8 +51,8 @@ const ranked = computed(() => {
 const shown = computed(() => ranked.value.filter(p => key(p.name).includes(key(query.value.trim()))))
 const mine = computed(() => ranked.value.find(p => me.value && sameName(p.name, me.value)))
 const selected = computed(() => options.find(o => o.key === metric.value)!)
-const format = (n: number) => n.toLocaleString('da-DK')
-function unit(n: number) {
+const format = (n: number | null) => n === null ? '—' : n.toLocaleString('da-DK')
+function unit(n: number | null) {
   if (n === 1 && metric.value === 'stickers') return 'sticker'
   if (n === 1 && metric.value === 'countries') return 'land'
   if (n === 1 && metric.value === 'badges') return 'badge'
@@ -75,7 +77,7 @@ function back() {
 
     <div class="controls">
       <label class="field"><span>Søg efter en person</span><input v-model="query" type="search" placeholder="Fx Mathias" autocomplete="off"></label>
-      <label class="field"><span>Rangér efter</span><select v-model="metric"><option v-for="o in options" :key="o.key" :value="o.key">{{ o.label }}</option><option disabled>Bananer · kommer</option></select></label>
+      <label class="field"><span>Rangér efter</span><select v-model="metric"><option v-for="o in options" :key="o.key" :value="o.key">{{ o.label }}</option></select></label>
     </div>
     <label class="registered"><input v-model="registeredOnly" type="checkbox">Kun oprettede brugere</label>
 
@@ -97,7 +99,7 @@ function back() {
       </ol>
       <p v-else class="empty">{{ query ? 'Ingen navne matcher din søgning.' : registeredOnly ? 'Ingen oprettede brugere fundet her. Navne på stickers er ikke nødvendigvis oprettede brugere.' : 'Ingen profiler endnu.' }}</p>
     </template>
-    <div class="banana-note"><span aria-hidden="true">🍌</span><div><b>Plads til bananbaronerne</b><p>Bananer kommer på ranglisten, når valutaen åbner.</p></div></div>
+    <p v-if="metric === 'bananas'" class="footnote">Her vises oprettede brugere med en hentet saldo. Navne fra stickers får deres belønninger, når de opretter sig.</p>
     <p class="footnote">Samme resultat deler placering. Badges tælles som på profilen; et højere trin tæller stadig som én badge.</p>
   </div>
 </template>

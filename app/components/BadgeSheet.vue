@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { bananaRewardFor } from '../../shared/utils/economy'
 // Detaljer om én badge: navn, beskrivelse, hvornår og med hvilken sticker den blev
 // opnået, alle trin for trin-badges, fremskridt for dem man mangler, og hvem der
 // har rekorden lige nu.
@@ -6,6 +7,13 @@ const props = defineProps<{ badge: Badge, person: string }>()
 const emit = defineEmits<{ close: [] }>()
 
 const b = computed(() => props.badge)
+const bananasText = computed(() => {
+  const x = b.value
+  if (x.kind === 'record') return x.id.startsWith('year-') ? '200 bananer, når året er slut' : 'Ingen bananer for rekorder, der kan mistes'
+  if (x.id === 'pioneer') return '60 bananer pr. nyt land'
+  if (x.kind === 'tier') return 'Bananer udbetales én gang pr. trin'
+  return `${bananaRewardFor(x)} bananer · én gang`
+})
 const pct = (value: number, target: number) => `${Math.min(100, Math.round(value / target * 100))}%`
 
 const status = computed(() => {
@@ -51,6 +59,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <h2>{{ b.name }}</h2>
         <p class="desc">{{ b.about ?? b.desc }}</p>
         <span class="pts" :class="{ got: b.points > 0 }">{{ pointsText }}</span>
+        <p class="note">🍌 {{ bananasText }}</p>
       </div>
 
       <!-- Hvornår -->
@@ -78,6 +87,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
             </span>
             <span class="step-date">
               <b>{{ s.points }} p</b>
+              <span>🍌 {{ bananaRewardFor(b, i + 1) }}</span>
               <span v-if="s.reachedAt">{{ formatDate(s.reachedAt) }}</span>
             </span>
           </li>

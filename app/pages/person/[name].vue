@@ -4,6 +4,7 @@ const route = useRoute()
 const { stickers, people, stickersBy } = useStickers()
 const { ratings } = useRatings()
 const { commentStats } = useCommentStats()
+const { people: economy } = useEconomy()
 const { name: me, isMe, markSeen } = useUser()
 const router = useRouter()
 const name = computed(() => String(route.params.name))
@@ -19,7 +20,7 @@ const countryList = computed(() => {
   }
   return [...map.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
 })
-const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value, { history: true, comments: commentStats.value }))
+const badges = computed(() => badgesFor(name.value, stickers.value, ratings.value, { history: true, comments: commentStats.value, economy: economy.value }))
 const openBadge = ref<string>()
 const openedBadge = computed(() => badges.value.find(b => b.id === openBadge.value))
 const badgeTab = ref<'earned' | 'missing'>('earned')
@@ -71,6 +72,7 @@ function back() {
       <span v-if="isMe(displayName)" class="chip you">Det er dig</span>    </header>
 
     <LevelCard :points="totalPoints(badges)" />
+    <BananaWallet :person="displayName" :own="isMe(displayName)" />
     <NuxtLink class="ranking-link" to="/rangliste">Se alle profiler og ranglisten <span aria-hidden="true">↗</span></NuxtLink>
 
     <div class="grid">

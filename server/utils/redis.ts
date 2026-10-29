@@ -11,6 +11,17 @@ export const redisEnabled = Boolean(url && token)
 // vi bruger har nøglen som første argument.
 export const isPreview = process.env.VERCEL_ENV === 'preview'
 
+/** Lua keys are prefixed explicitly: EVAL's first argument is the script, not a key. */
+export async function redisEval(script: string, keys: string[], args: string[]) {
+  const prefixed = keys.map(k => isPreview ? `dev:${k}` : k)
+  const response = await $fetch<{ result: unknown, error?: string }[]>(`${url}/pipeline`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, timeout: 15_000,
+    body: [['EVAL', script, keys.length, ...prefixed, ...args]],
+  })
+  if (response[0]?.error) throw new Error(response[0].error)
+  return response[0]?.result
+}
+
 export async function redis(cmds: (string | number)[][]) {
   const body = isPreview ? cmds.map(([cmd, key, ...rest]) => [cmd!, `dev:${key}`, ...rest]) : cmds
   const res = await $fetch<{ result: unknown, error?: string }[]>(`${url}/pipeline`, {

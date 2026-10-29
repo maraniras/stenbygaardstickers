@@ -8,12 +8,14 @@ const { name, seen, markSeen } = useUser()
 const { stickers } = useStickers()
 const { ratings, ready: ratingsReady } = useRatings()
 const { commentStats } = useCommentStats()
+const { people: economy, loading: economyLoading } = useEconomy()
+const gameAnimation = useState('daily-game-animation', () => false)
 const route = useRoute()
 const router = useRouter()
 
 const badges = computed(() => {
   if (!name.value || !seen.value || !ratingsReady.value) return undefined
-  return badgesFor(name.value, stickers.value, ratings.value, { comments: commentStats.value })
+  return badgesFor(name.value, stickers.value, ratings.value, { comments: commentStats.value, economy: economy.value })
 })
 
 const unseen = computed(() => {
@@ -42,7 +44,7 @@ const levelUp = computed(() => {
 
 // Ikke midt i en upload/admin, og ikke mens en badge er åben (fx fra en notifikation)
 const sheetOpen = useState('badge-sheet-open', () => false)
-const blocked = computed(() => route.path.startsWith('/admin') || route.path === '/upload' || route.query.badge !== undefined || sheetOpen.value)
+const blocked = computed(() => route.path.startsWith('/admin') || route.path === '/upload' || route.query.badge !== undefined || sheetOpen.value || gameAnimation.value || economyLoading.value)
 
 const mode = computed<'level' | 'badges' | undefined>(() => (levelUp.value ? 'level' : unseen.value.length ? 'badges' : undefined))
 

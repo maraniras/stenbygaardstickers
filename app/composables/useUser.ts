@@ -162,5 +162,5 @@ export function useUser() {
   /** Er det her mig? */
   const isMe = (other: string) => Boolean(name.value && sameName(name.value, other))
 
-  return { name, ready, seen, badgePush, notify, claim, pair, createCode, logout, setAvatar, removeAvatar, syncPush, setBadgePush, setNotify, markSeen, isMe }
+  return { name, ready, seen, badgePush, notify, claim, pair, createCode, logout, setAvatar, removeAvatar, syncPush, setBadgePush, setNotify, markSeen, isMe, refreshMe: () => loadMe().catch(() => {}) }
 }

@@ -18,7 +18,8 @@ async function badgeLookup(): Promise<Lookup> {
   const stickers = withDistance(approved)
   const ratings = ratingsEnabled ? await getRatings() : {}
   const comments = await commentStats()
-  return name => badgesFor(name, stickers, ratings, { comments })
+  const economy = await publicEconomies()
+  return name => badgesFor(name, stickers, ratings, { comments, economy })
 }
 
 /** Første gang: alt man allerede har tæller som set, så man ikke får 20 beskeder */
@@ -91,6 +92,7 @@ export async function mutedEndpoints(type: NotifyType) {
 /** Finder nye og mistede badges og nye levels for alle brugere og sender besked */
 export async function syncBadges() {
   try {
+    await syncAllEconomies()
     const users = await listUsers()
     if (!users.length) return
     const lookup = await badgeLookup()

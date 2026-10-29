@@ -1,6 +1,17 @@
 # Spil og valuta — brainstorm
 
-Opdateret 29. oktober 2026. Idéer til senere; spillene er ikke bestilt til implementering endnu.
+Opdateret 29. oktober 2026. Valuta og de to daglige spil er nu bestilt og implementeret på dev. Casino og børs er fortsat idéer til senere.
+
+## Implementeret økonomi og daglige spil (gælder over tidligere forslag nedenfor)
+
+- 250 bananer ved oprettelse, også én gang til eksisterende konti. Konto og saldo bevares ved logud.
+- Godkendt sticker: DK 250 uanset afstand. Udland glidende fra 500 til 5.000: afstand fra Aalborg 0/1.000/2.000/4.000/6.000/8.000 km → 500/750/1.250/2.500/3.750/5.000. Afrundes til nærmeste 50; 3.000 km giver 1.900. Hver navngiven person får fuld belønning én gang pr. sticker.
+- Gamle badges: 20 bananer pr. levelpoint, hvert trin én gang. Pioner 60 pr. land. Ingen bananer for rekorder, der kan mistes. Årets Dengse 200, når kalenderåret er slut i dansk tid. Godkendte historiske stickers og allerede optjente badges krediteres også.
+- Byspil: fem gæt med seks fælles svarmuligheder; 50/40/30/20/10 ved korrekt svar, nul ved tab. Luftfoto gennem serveren, udzoomning efter forkert gæt. Alle seks byer udelukkes fra de næste 20 dage; 192 byer i 32 grupper. Ikke de faktiske stickers.
+- Gratis dagligt hjul: 0/1/10/25/50/100/500 bananer med 35/10/30/18/5/1,5/0,5 % chance. Gennemsnit 14,1 pr. spin. Kun nul tæller som nitte.
+- Ny dag kl. 04.00 Europe/Copenhagen inkl. sommertid. Forsøg, saldo og udfald er fælles for brugerens enheder, serverberegnede og atomisk gemt. Genindlæsning giver aldrig ekstra spil/belønninger. Se x67–75 i badges.md for alle nye badges og bonusser.
+- Ingen direkte XP pr. spil; XP gives kun ved nye spilbadgetrin (1/2/3/4/5), singles 2/1/1. Formue giver ingen XP. Den lave faste XP-grænse lader stickers beholde vægten i levelsystemet.
+- Bananer skal bruges til kosmetik og måske senere rigtige Emil-stickers i forskellige varianter. Butik, priser, casino og børs er ikke bygget nu.
 
 ## Valuta
 

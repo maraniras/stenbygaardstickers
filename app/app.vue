@@ -6,6 +6,7 @@ const { ready, failed, reload } = useStickers()
 const { theme } = useTheme()
 watchEffect(() => { document.documentElement.dataset.theme = theme.value })
 const { dark } = useAppearance()
+useEconomy()
 useHead(() => ({ meta: [{ name: 'theme-color', content: dark.value ? '#141418' : '#f4f4f6' }] }))
 
 // Det er .content og ikke vinduet der scroller, så Vue Router kan ikke selv nulstille.

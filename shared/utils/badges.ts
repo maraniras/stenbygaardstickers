@@ -9,6 +9,9 @@
 // Med { history: true } afspilles personens stickers i datoorden for at finde, hvornår
 // (og med hvilken sticker) hver badge og hvert trin blev opnået – til badge-modalen.
 
+import type { EconomyPublic } from '../types/economy'
+import { economyBadges } from './economy-badges'
+
 export type BadgeKind = 'tier' | 'single' | 'record'
 
 export interface BadgeStep {
@@ -220,7 +223,8 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
   const favorite = crowdFavorite(all, ratings)
 
   const years: number[] = []
-  for (let y = FIRST_YEAR; y <= now.getFullYear(); y++) years.push(y)
+  const currentYear = Number(new Intl.DateTimeFormat('en', { timeZone: 'Europe/Copenhagen', year: 'numeric' }).format(now))
+  for (let y = FIRST_YEAR; y <= currentYear; y++) years.push(y)
 
   return [
     tier('stickers', '🎯', ['Første klister', 'Klistrelus', 'Klistrefnat', 'Sticker-mester', 'Sticker-legende'], unit('sticker', 'stickers'), [1, 5, 10, 25, 50], mine.length,
@@ -301,7 +305,7 @@ function compute(name: string, mine: Sticker[], all: Sticker[], ratings: Record<
     ...years.map((y) => {
       const w = yearWinners(all, y)
       return record(`year-${y}`, '🏆', `Årets Dengse ${y}`, `Flest stickers i ${y} – ved lighed den der nåede antallet først`,
-        w.names.some(n => sameName(n, name)), w.names, y < now.getFullYear())
+        w.names.some(n => sameName(n, name)), w.names, y < currentYear)
     }),
   ]
 }
@@ -310,12 +314,12 @@ export function badgesFor(
   name: string,
   all: Sticker[],
   ratings: Record<string, RatingSummary> = {},
-  opts: { now?: Date, history?: boolean, comments?: Record<string, CommentStats> } = {},
+  opts: { now?: Date, history?: boolean, comments?: Record<string, CommentStats>, economy?: Record<string, EconomyPublic> } = {},
 ): Badge[] {
   const now = opts.now ?? new Date()
   const mine = all.filter(s => hasName(s, name)).sort(byFirst)
   const cs = opts.comments?.[name.toLocaleLowerCase('da')] ?? NO_COMMENTS
-  const badges = compute(name, mine, all, ratings, now, cs)
+  const badges = [...compute(name, mine, all, ratings, now, cs), ...economyBadges(opts.economy?.[name.toLocaleLowerCase('da')])]
   if (!opts.history) return score(badges)
 
   // Afspil stickers i datoorden: første gang en badge (eller et trin) er opnået,
@@ -375,6 +379,9 @@ export function earnedCount(badges: Badge[]) {
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
+  'banana-baron': [0, 0, 0, 0, 0],
+  'city-guide': [1, 2, 3, 4, 5], 'city-gps': [1, 2, 3, 4, 5], 'city-streak': [1, 2, 3, 4, 5],
+  'wheel-spins': [1, 2, 3, 4, 5], 'wheel-streak': [1, 2, 3, 4, 5],
   'stickers': [1, 2, 4, 8, 16],
   'cities': [2, 4, 8, 12, 16],
   'countries': [3, 6, 12, 20],
@@ -388,6 +395,7 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'wheel-jackpot': 2, 'city-last': 1, 'wheel-nits': 1,
   'commenter': 1, 'tagged': 1, 'hit': 2, 'viral': 4,
   'home': 1, 'team': 1, 'regular': 1, 'turbo': 1, 'director': 1, 'spring': 1, 'summer': 1, 'autumn': 1, 'winter': 1,
   'roadtrip': 2, 'weekend': 2, 'denmark': 2, 'paaske': 2, 'halloween': 2, 'jul': 2, 'newyear': 2, 'birthday': 2, 'comeback': 2,
