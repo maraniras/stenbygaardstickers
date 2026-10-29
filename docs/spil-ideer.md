@@ -40,6 +40,7 @@ Opdateret 29. oktober 2026. Idéer til senere; spillene er ikke bestilt til impl
 
 ## Emiljack og øvrige idéer
 
+- **Roulette**: brugeren har tilføjet roulette som casinoidé. Singleplayer med bananer ligesom de øvrige casinospil. Regler, indsatser, udbetalinger og badges er ikke fastlagt; intet skal bygges endnu. Muligt navn: **Emillette** (forslag, ikke besluttet).
 - Blackjack med Emil som dealer, vennerne som billedkort og eventuelt et særligt Emil-kort.
 - Fiktive væddemål om næste stickers land, kontinent eller hvem der sætter den op; kan afgøres ved godkendelse.
 - Kosmetik og spilbadges som mulige anvendelser af valuta og aktivitet.
@@ -78,3 +79,9 @@ Opdateret 29. oktober 2026. Idéer til senere; spillene er ikke bestilt til impl
 - Hele kurvens årsafkast efter gebyr (5./50./95. percentil; gennemsnit; andel i plus): uden vækst **[-36,5; -8,5; +51,8] %; -0,8 %; 20/50**. Beskeden vækst **[-27,2; +4,0; +71,0] %; +13,6 %; 33/50**. Risikokompensation **[+1,9; +50,0; +173,3] %; +69,7 %; 48/50**. Dette er kun 50 kontrolkurve, ikke præcise fremtidige sandsynligheder. Aktierne har uafhængig støj/regimer; der er endnu ingen fælles markedsfaktor, hvilket gør spredning af risiko særlig effektiv.
 - Ingen af de testede vækstvarianter ramte loftet 2.500. Risikokompensation nåede maksimalt ca. 1.124,76, beskeden vækst ca. 874,89 på tværs af de to seeds. Rare hændelser kan forekomme uden at være set i disse prøver.
 - Foreløbig vurdering: beskeden vækst er et mere rimeligt udgangspunkt for bananøkonomien end fuld risikokompensation. Den løser ikke fuldt ud det store typiske langtidstab på individuelle højrisikoaktier. Risikokompensation retter typisk individuelt årsafkast, men tilfører meget mere valuta og gør en simpel diversificeret kurv meget stærk. Modellen er stadig ikke endeligt valgt eller implementeret.
+
+## Status til næste gang
+
+- Brugeren ønsker at gemme arbejdet og fortsætte senere. Der er ikke bestilt mere simulering eller implementering nu.
+- Arbejd videre fra den dæmpede model med beskeden vækst som foreløbig kandidat; den er ikke endeligt godkendt. Afklar især individuelle højrisikoaktiers langtidstab, fælles markedsbevægelser og hvor meget valuta børsen må tilføre.
+- Simulationskode, input og sammenfattede resultater er arkiveret i [`docs/experiments/market-growth/`](experiments/market-growth/), så de følger repoet til andre pc'er. Timekurver er udeladt fra de arkiverede resultater; de kan genskabes med koden. Python med NumPy kræves. Kør `python docs/experiments/market-growth/simulate-market-growth.py --seed 20261101 --reps 50` og tilsvarende med seed `20261102`, derefter `python docs/experiments/market-growth/check-growth-portfolios.py`. Filer genereres ved siden af scripts. Det er analyseværktøjer, ikke appens marked.

@@ -1,0 +1,104 @@
+{
+  "stocks": [
+    {
+      "name": "Bananboden",
+      "base": 1.0,
+      "risk": "Lav"
+    },
+    {
+      "name": "Emils Sokker",
+      "base": 2.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Knæ Holding",
+      "base": 3.0,
+      "risk": "Høj"
+    },
+    {
+      "name": "Lygtepæl A/S",
+      "base": 4.0,
+      "risk": "Lav"
+    },
+    {
+      "name": "Stickerpost",
+      "base": 5.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Norsk Offshore",
+      "base": 7.0,
+      "risk": "Høj"
+    },
+    {
+      "name": "Aalborg Lim",
+      "base": 10.0,
+      "risk": "Lav"
+    },
+    {
+      "name": "Motława Mad",
+      "base": 13.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Emil Airways",
+      "base": 16.0,
+      "risk": "Høj"
+    },
+    {
+      "name": "Klister & Co",
+      "base": 20.0,
+      "risk": "Lav"
+    },
+    {
+      "name": "Rom Express",
+      "base": 25.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Skrigeteknik",
+      "base": 30.0,
+      "risk": "Høj"
+    },
+    {
+      "name": "Nicole Design",
+      "base": 38.0,
+      "risk": "Lav"
+    },
+    {
+      "name": "Mathias Montage",
+      "base": 45.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Bananraketten",
+      "base": 52.0,
+      "risk": "Høj"
+    },
+    {
+      "name": "Stenbygaard Fragt",
+      "base": 60.0,
+      "risk": "Lav"
+    },
+    {
+      "name": "Colosseum Kiosk",
+      "base": 70.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Mikkels Månebase",
+      "base": 80.0,
+      "risk": "Høj"
+    },
+    {
+      "name": "Verdenslim",
+      "base": 90.0,
+      "risk": "Mellem"
+    },
+    {
+      "name": "Emil Global",
+      "base": 100.0,
+      "risk": "Høj"
+    }
+  ]
+}
