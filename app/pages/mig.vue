@@ -152,7 +152,7 @@ function doLogout() {
 
       <section class="card">
         <h2>Log ud</h2>
-        <p class="hint">Logger kun denne enhed ud. Er det din eneste enhed, bliver navnet ledigt igen, så andre kan vælge det.</p>
+        <p class="hint">Logger kun denne enhed ud. Din profil og dit navn bliver bevaret. For at logge ind igen skal du bruge en kode fra en anden enhed eller få hjælp af admin.</p>
         <button v-if="!confirmLogout" class="btn secondary" @click="confirmLogout = true">Log ud</button>
         <div v-else class="row">
           <button class="btn danger" :disabled="busy" @click="doLogout">Ja, log ud</button>

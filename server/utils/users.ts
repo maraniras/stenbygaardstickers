@@ -19,6 +19,8 @@ interface UserDevice {
 export interface UserRecord {
   name: string
   createdAt: string
+  /** Sidst set bevares også, når den sidste enhed logger ud. */
+  lastSeen?: string
   /** Profilbillede (Blob-URL eller /api/media/ under dev) */
   avatar?: string
   /** Nøglehash → enhed */
@@ -190,27 +192,24 @@ async function getUser(key: string) {
   return json ? JSON.parse(json) as UserRecord : undefined
 }
 
-/** Logger enheden ud. Var det den sidste enhed, bliver navnet ledigt igen –
- *  så gives brugeren tilbage, så profilbilledet kan slettes. */
+/** Logger kun enheden ud. Kontoen og det reserverede navn bevares, også uden enheder. */
 export async function removeDevice(key: string, hash: string) {
   const user = await getUser(key)
-  if (!user) return undefined
+  if (!user) return
+  user.lastSeen = [user.lastSeen ?? user.createdAt, ...Object.values(user.devices).map(d => d.lastSeen)].sort().at(-1)
   delete user.devices[hash]
-  const empty = !Object.keys(user.devices).length
   if (!redisEnabled) {
     const data = await readLocal()
     delete data.tokens[hash]
-    if (empty) delete data.users[key]
-    else data.users[key] = user
+    data.users[key] = user
     await writeLocal(data)
   }
   else {
     await redis([
       ['HDEL', 'user-tokens', hash],
-      empty ? ['HDEL', 'users', key] : ['HSET', 'users', key, JSON.stringify(user)],
+      ['HSET', 'users', key, JSON.stringify(user)],
     ])
   }
-  return empty ? user : undefined
 }
 
 /** Sletter brugeren og alle dens enheder (admin) */
