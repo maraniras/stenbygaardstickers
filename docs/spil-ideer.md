@@ -40,7 +40,13 @@ Opdateret 29. oktober 2026. Idéer til senere; spillene er ikke bestilt til impl
 
 ## Emiljack og øvrige idéer
 
-- **Roulette**: brugeren har tilføjet roulette som casinoidé. Singleplayer med bananer ligesom de øvrige casinospil. Regler, indsatser, udbetalinger og badges er ikke fastlagt; intet skal bygges endnu. Muligt navn: **Emillette** (forslag, ikke besluttet).
+- **Roulette — fælles bord**: brugeren er begejstret for hele forslaget om fælles runder og sociale funktioner nedenfor. Navnet er åbent; **Emillette er ikke vedtaget**. Det er stadig en gemt idé, ikke en bestilling på implementering.
+  - Samme runde, nedtælling og resultat for alle brugere/enheder, en runde hvert minut. Foreslået rytme: 0–45 sek. placér/ret indsatser, 45–55 sek. låst/spin, 55–60 sek. resultat og gevinst.
+  - Serverens ur, rundestatus og resultat er autoritative. Genindlæsning må aldrig give et nyt resultat eller forlænge fristen. Resultatet skal holdes hemmeligt, indtil indsatserne er låst.
+  - Indsatser og saldo knyttes til brugeren på tværs af enheder. Anonyme kan kigge med; det kræver en bruger at spille med bananer. Afregning sker præcis én gang, også hvis spilleren lukker appen; debit/indsats og afregning skal være atomiske.
+  - Foreslået teknik: klienterne henter små statusopdateringer med få sekunders mellemrum og synkroniserer nedtællingen til servertid. Tidsbaserede runder og afregning ved serverkontakt kan undgå et job hvert minut; faktisk baggrundsafregning uden nogen serverkontakt kræver en særskilt mekanisme. Teknologien er ikke valgt endnu.
+  - Socialt: vis deltagere (fx »Mathias, Nicole og 2 andre spiller med«), venners indsatser som jetoner med profilbilleder og seneste resultater. Alle funktionerne er ønskede; foreslået første version er fælles runder, deltagere og egne indsatser, derefter synlige jetoner for venner, med fokus på mobilbrug.
+  - Roulettevariant, indsatsgrænser, udbetalinger og badges skal stadig fastlægges.
 - Blackjack med Emil som dealer, vennerne som billedkort og eventuelt et særligt Emil-kort.
 - Fiktive væddemål om næste stickers land, kontinent eller hvem der sætter den op; kan afgøres ved godkendelse.
 - Kosmetik og spilbadges som mulige anvendelser af valuta og aktivitet.
