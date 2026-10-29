@@ -2,6 +2,7 @@
 
 - **Mobile map controls (Oct 2026)**: map title/logo stay at the top, with only an active person filter below. `Kortvalg` opens `MapToolsSheet.vue` (native modal dialog: overview, aerial-map toggle, journey). No fixed farthest-sticker chip on the map. `UploadButton.vue` is a 56 px floating + above the bottom navigation, shared by map/list; on the map it hides while a sticker sheet or journey is open. No manual refresh buttons on map/list: `useStickers()` refreshes automatically and the update plugin detects builds. The list reserves extra bottom space for the floating button.
 - **Game brainstorm**: agreed ideas and open proposals for bananas and daily games are in `docs/spil-ideer.md`; no game implementation yet.
+- **Name-prompt regression checks**: `node --test tests/name-prompt.test.mjs` covers logging in on Mig while the popup waits, dismissing an already open popup after external login, and preserving the notification question after login inside the popup. NamePrompt watches the shared user name and cancels pending timers; it hides on login/upload/admin routes.
 
 Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to the user in Danish; the app UI is Danish. Mobile first, deployed on Vercel.
 

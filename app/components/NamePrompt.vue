@@ -17,6 +17,9 @@ const route = useRoute()
 const input = ref('')
 const busy = ref(false)
 const error = ref('')
+// Login i selve boksen skal stadig kunne fortsætte til notifikationsspørgsmålet.
+const claimingHere = ref(false)
+let openTimer: ReturnType<typeof setTimeout> | undefined
 
 const free = computed(() => people.value.map(p => p.name).filter(n => !isTaken(n)).slice(0, 8))
 const taken = computed(() => Boolean(input.value.trim() && isTaken(input.value.trim())))
@@ -32,29 +35,47 @@ function remember() {
 
 const busyRoute = computed(() => ['/mig', '/upload', '/notifikationer'].includes(route.path) || route.path.startsWith('/admin'))
 
-onMounted(() => {
-  const stop = watch(ready, (r) => {
-    if (!r) return
-    stop()
-    if (name.value || asked()) {
-      state.value = 'done'
-      return
-    }
-    const tryOpen = () => {
-      if (state.value !== 'pending') return
-      if (installOpen.value || busyRoute.value) return void setTimeout(tryOpen, 2000)
-      state.value = 'open'
-    }
-    setTimeout(tryOpen, 2500)
-  }, { immediate: true })
-})
+function cancelOpen() {
+  clearTimeout(openTimer)
+  openTimer = undefined
+}
+
+function tryOpen() {
+  openTimer = undefined
+  if (state.value !== 'pending') return
+  // Man kan have valgt sit navn på »Mig«, mens boksen ventede.
+  if (name.value || asked()) return close()
+  if (installOpen.value || busyRoute.value) {
+    openTimer = setTimeout(tryOpen, 2000)
+    return
+  }
+  state.value = 'open'
+}
+
+watch([ready, name], ([r, n]) => {
+  if (!r) return
+  if (n) {
+    remember()
+    cancelOpen()
+    if (!claimingHere.value) state.value = 'done'
+    return
+  }
+  if (asked()) return close()
+  if (state.value === 'pending' && !openTimer) openTimer = setTimeout(tryOpen, 2500)
+}, { immediate: true })
+
+onBeforeUnmount(cancelOpen)
 
 function close() {
+  cancelOpen()
   remember()
   state.value = 'done'
 }
 
 async function submit() {
+  if (busy.value) return
+  if (name.value) return close()
+  claimingHere.value = true
   busy.value = true
   error.value = ''
   try {
@@ -74,6 +95,7 @@ async function submit() {
     error.value = err?.data?.statusMessage || 'Det lykkedes ikke – prøv igen'
   }
   finally {
+    claimingHere.value = false
     busy.value = false
   }
 }
@@ -106,7 +128,7 @@ function skipPush() {
 
 <template>
   <Transition name="pop">
-    <div v-if="state === 'open'" class="prompt glass" role="dialog" aria-labelledby="name-prompt-title">
+    <div v-if="state === 'open' && !busyRoute && (step !== 'name' || !name)" class="prompt glass" role="dialog" aria-labelledby="name-prompt-title">
       <template v-if="step === 'name'">
         <div class="head">
           <span class="icon">👋</span>
