@@ -1,9 +1,10 @@
 <script setup lang="ts">
 const route = useRoute()
 const { name } = useUser()
+const { readyCount } = useDailyAvailability()
 const tab = computed(() => {
   if (route.path === '/') return 'map'
-  if (route.path === '/spil' || route.path.startsWith('/spil/')) return 'games'
+  if (route.path === '/spil' || route.path.startsWith('/spil/') || route.path === '/rangliste') return 'games'
   if (route.path === '/mig' || (name.value && route.path === personUrl(name.value))) return 'me'
   return 'list'
 })
@@ -19,7 +20,8 @@ const tab = computed(() => {
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="7" rx="2" /><rect x="4" y="14" width="16" height="6" rx="2" /></svg>
       Stickers
     </NuxtLink>
-    <NuxtLink to="/spil" :class="{ on: tab === 'games' }" :aria-current="tab === 'games' ? 'page' : undefined">
+    <NuxtLink to="/spil" :class="{ on: tab === 'games' }" :aria-current="tab === 'games' ? 'page' : undefined" :aria-label="readyCount ? `Spil – ${readyCount} daglige spil klar` : 'Spil'">
+      <span v-if="readyCount" class="ready-dot" aria-hidden="true" />
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8c3 0 4 3 5 9 .5 3-2 4-4 1l-1-1H8l-1 1c-2 3-4.5 2-4-1C4 9 5 6 8 6Z" /><path d="M8 9v5m-2.5-2.5h5" /><circle cx="16" cy="10" r=".8" /><circle cx="18" cy="13" r=".8" /></svg>
       Spil
     </NuxtLink>
@@ -46,6 +48,7 @@ const tab = computed(() => {
   transform: translateX(-50%);
 }
 a {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -61,6 +64,7 @@ a {
   color: var(--muted);
   transition: background .2s, color .2s;
 }
+.ready-dot { position: absolute; top: 5px; left: calc(50% + 8px); width: 9px; height: 9px; border: 2px solid var(--surface); border-radius: 50%; background: var(--accent); }
 a.on {
   background: var(--ink);
   color: #fff;

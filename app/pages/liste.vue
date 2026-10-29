@@ -49,9 +49,9 @@ const groups = computed(() => {
       </NuxtLink>
 
       <section v-if="people.length" class="people">
-        <span class="eyebrow">Sat op af</span>
+        <div class="people-heading"><span class="eyebrow">Sat op af</span><NuxtLink to="/rangliste">Alle profiler og rangliste ›</NuxtLink></div>
         <div class="row">
-          <NuxtLink v-for="p in people" :key="p.name" class="chip person" :to="personUrl(p.name)">
+          <NuxtLink v-for="p in people.slice(0, 5)" :key="p.name" class="chip person" :to="personUrl(p.name)">
             <UserAvatar class="avatar" :name="p.name" />
             {{ p.name }}
             <span class="n">{{ p.count }}</span>
@@ -87,6 +87,7 @@ const groups = computed(() => {
 </template>
 
 <style scoped>
+.people-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }.people-heading a { min-height: 44px; display: inline-flex; align-items: center; color: var(--muted); font-size: 11px; font-weight: 700; text-decoration: none; }
 .page {
   max-width: 640px;
   margin: 0 auto;

@@ -4,15 +4,16 @@ let loading: Promise<void> | undefined
 
 export function useCommentStats() {
   const commentStats = useState<Record<string, CommentStats>>('comment-stats', () => ({}))
+  const failed = useState('comment-stats-failed', () => false)
 
   function reload() {
     loading = $fetch<Record<string, CommentStats>>('/api/comment-stats')
-      .then((r) => { commentStats.value = r })
-      .catch(() => {})
+      .then((r) => { commentStats.value = r; failed.value = false })
+      .catch(() => { failed.value = true })
     return loading
   }
 
   if (!loading && import.meta.client) reload()
 
-  return { commentStats, reload }
+  return { commentStats, failed, reload }
 }

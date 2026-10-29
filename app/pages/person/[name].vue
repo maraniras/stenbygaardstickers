@@ -71,6 +71,7 @@ function back() {
       <span v-if="isMe(displayName)" class="chip you">Det er dig</span>    </header>
 
     <LevelCard :points="totalPoints(badges)" />
+    <NuxtLink class="ranking-link" to="/rangliste">Se alle profiler og ranglisten <span aria-hidden="true">↗</span></NuxtLink>
 
     <div class="grid">
       <div class="stat"><b>{{ stats.count }}</b><span>{{ stats.count === 1 ? 'sticker' : 'stickers' }}</span></div>
@@ -127,6 +128,7 @@ function back() {
 </template>
 
 <style scoped>
+.ranking-link { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; margin: 10px 3px 0; color: var(--muted); font-size: 12px; font-weight: 700; text-decoration: none; }
 .page {
   position: relative;
   max-width: 640px;

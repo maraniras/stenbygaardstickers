@@ -34,7 +34,7 @@ export function useRatings() {
       query: { device: deviceId() },
       headers: { 'x-user-token': userToken() },
     })
-      .then((r) => { ratings.value = r })
+      .then((r) => { ratings.value = r; enabled.value = true })
       .catch(() => { enabled.value = false })
       .finally(() => { ready.value = true })
     return loading

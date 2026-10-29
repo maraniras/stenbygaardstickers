@@ -7,9 +7,10 @@ const selected = ref<'city' | 'wheel' | null>(null)
   <div class="daily-page">
     <header>
       <div class="brand"><img src="/marker.png" alt=""><span>Stenbygaard Stickers</span><span class="preview">Smugkig</span></div>
-      <h1>Dagens spil<span class="title-dot">.</span></h1>
+      <div class="heading-line"><h1>Dagens spil<span class="title-dot">.</span></h1><NuxtLink class="ranking-link" to="/rangliste">Rangliste <span aria-hidden="true">↗</span></NuxtLink></div>
       <p class="lead">En lille pause. Måske flere bananer.</p>
     </header>
+
 
     <div class="daily-reset"><span class="reset-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></span><div><b>En ny chance hver dag</b><span>Spildøgnet skifter kl. 04.00 dansk tid</span></div></div>
 
@@ -43,6 +44,7 @@ const selected = ref<'city' | 'wheel' | null>(null)
 .preview { margin-left: auto; padding: 3px 8px; border: 1px solid var(--hairline); border-radius: 7px; font-size: 10px; }
 h1 { margin-top: 15px; font-size: 36px; letter-spacing: -.045em; }.title-dot { color: var(--accent); }
 .lead { margin: 10px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.heading-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 15px; }.heading-line h1 { margin-top: 0; }.ranking-link { display: inline-flex; align-items: center; gap: 5px; flex: none; min-height: 44px; color: var(--muted); font-size: 11px; font-weight: 700; text-decoration: none; }.ranking-link:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 .daily-reset { display: flex; align-items: center; gap: 10px; margin: 20px 0; }.reset-icon { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-sm); }.daily-reset b { display: block; font-size: 12px; }.daily-reset div > span { display: block; color: var(--muted); font-size: 11px; margin-top: 1px; }
 svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .game-card { overflow: hidden; border-radius: 24px; background: var(--surface); box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline); }
@@ -56,5 +58,5 @@ svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width:
 .wheel-bottom { grid-column: 1 / -1; padding: 0 18px 9px; }.wheel-bottom .game-meta { font-weight: 600; }
 .daily-footer { display: flex; align-items: center; gap: 10px; padding: 22px 5px 0; }.daily-footer img { width: 36px; height: 36px; object-fit: contain; }.daily-footer b { font-size: 12px; }.daily-footer p { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
 @media (prefers-reduced-motion: reduce) { .game-link svg { transition: none; } }
-@media (max-width: 350px) { .daily-page { padding-right: 14px; padding-left: 14px; }.visual-title { font-size: 24px; }.wheel-copy h2 { font-size: 24px; }.wheel-kicker { max-width: 120px; } }
+@media (max-width: 350px) { .daily-page { padding-right: 14px; padding-left: 14px; }.heading-line h1 { font-size: 32px; }.visual-title { font-size: 24px; }.wheel-copy h2 { font-size: 24px; }.wheel-kicker { max-width: 120px; } }
 </style>

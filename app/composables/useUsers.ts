@@ -4,11 +4,12 @@ let loading: Promise<void> | undefined
 
 export function useUsers() {
   const users = useState<PublicUser[]>('users', () => [])
+  const failed = useState('users-failed', () => false)
 
   function reload() {
     loading = $fetch<PublicUser[]>('/api/users')
-      .then((r) => { users.value = r })
-      .catch(() => {})
+      .then((r) => { users.value = r; failed.value = false })
+      .catch(() => { failed.value = true })
     return loading
   }
 
@@ -18,6 +19,7 @@ export function useUsers() {
 
   return {
     users,
+    failed,
     reload,
     isTaken: (name: string) => Boolean(find(name)),
     avatarFor: (name: string) => find(name)?.avatar,
