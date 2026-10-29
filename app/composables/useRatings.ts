@@ -31,6 +31,8 @@ export function useRatings() {
 
   function reload() {
     loading = $fetch<Record<string, RatingSummary>>('/api/ratings', {
+      timeout: 10_000,
+      retry: 0,
       query: { device: deviceId() },
       headers: { 'x-user-token': userToken() },
     })

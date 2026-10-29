@@ -10,7 +10,7 @@ const options: { key: Metric, label: string, unit: string }[] = [
 const metric = ref<Metric>('points')
 const query = ref('')
 const registeredOnly = ref(false)
-const busy = ref(true)
+const busy = ref(false)
 const { name: me } = useUser()
 const { users, failed: usersFailed, reload: reloadUsers } = useUsers()
 const { stickers, people } = useStickers()
@@ -71,7 +71,7 @@ function back() {
       <p class="intro">Små stickers. Store ambitioner.</p>
     </header>
 
-    <div v-if="mine && !busy && !usersFailed" class="your-rank"><span class="rank-number">#{{ mine.rank }}</span><div><b>Din placering</b><span>{{ metric === 'level' ? `Level ${mine.level}` : `${format(mine[metric])} ${unit(mine[metric])}` }} · {{ mine.title }}</span></div><LevelBadge :level="mine.level" :size="36" /></div>
+    <div v-if="mine && !usersFailed" class="your-rank"><span class="rank-number">#{{ mine.rank }}</span><div><b>Din placering</b><span>{{ metric === 'level' ? `Level ${mine.level}` : `${format(mine[metric])} ${unit(mine[metric])}` }} · {{ mine.title }}</span></div><LevelBadge :level="mine.level" :size="36" /></div>
 
     <div class="controls">
       <label class="field"><span>Søg efter en person</span><input v-model="query" type="search" placeholder="Fx Mathias" autocomplete="off"></label>
@@ -79,10 +79,12 @@ function back() {
     </div>
     <label class="registered"><input v-model="registeredOnly" type="checkbox">Kun oprettede brugere</label>
 
-    <div class="list-heading"><span>{{ busy ? 'Henter profiler…' : `${shown.length} ${shown.length === 1 ? 'profil' : 'profiler'}` }}</span><span>{{ selected.label }}</span></div>
-    <p v-if="busy" class="empty" role="status">Henter fællesskabet…</p>
-    <div v-else-if="usersFailed" class="empty" role="alert"><p>Kunne ikke hente brugerne.</p><button class="btn secondary" @click="refresh">Prøv igen</button></div>
+    <div class="list-heading"><span>{{ busy && !rows.length ? 'Henter profiler…' : `${shown.length} ${shown.length === 1 ? 'profil' : 'profiler'}` }}</span><span>{{ selected.label }}</span></div>
+    <p v-if="busy && !rows.length" class="empty" role="status">Henter fællesskabet…</p>
+    <div v-else-if="usersFailed && !rows.length" class="empty" role="alert"><p>Kunne ikke hente brugerne.</p><button class="btn secondary" @click="refresh">Prøv igen</button></div>
     <template v-else>
+      <p v-if="busy" class="updating" role="status">Opdaterer profiler og tal…</p>
+      <div v-if="usersFailed" class="warning" role="status">Brugerne kunne ikke opdateres. Der kan mangle profiler. <button :disabled="busy" @click="refresh">Prøv igen</button></div>
       <div v-if="commentsFailed || !ratingsEnabled" class="warning" role="status">Point og badges kan være ufuldstændige, fordi nogle tal ikke kunne hentes. <button @click="refresh">Prøv igen</button></div>
       <ol v-if="shown.length" class="ranking" aria-label="Profiler sorteret efter den valgte kategori">
         <li v-for="p in shown" :key="key(p.name)">
@@ -93,7 +95,7 @@ function back() {
           </NuxtLink>
         </li>
       </ol>
-      <p v-else class="empty">{{ query ? 'Ingen navne matcher din søgning.' : registeredOnly ? 'Ingen oprettede brugere endnu.' : 'Ingen profiler endnu.' }}</p>
+      <p v-else class="empty">{{ query ? 'Ingen navne matcher din søgning.' : registeredOnly ? 'Ingen oprettede brugere fundet her. Navne på stickers er ikke nødvendigvis oprettede brugere.' : 'Ingen profiler endnu.' }}</p>
     </template>
     <div class="banana-note"><span aria-hidden="true">🍌</span><div><b>Plads til bananbaronerne</b><p>Bananer kommer på ranglisten, når valutaen åbner.</p></div></div>
     <p class="footnote">Samme resultat deler placering. Badges tælles som på profilen; et højere trin tæller stadig som én badge.</p>
@@ -101,6 +103,7 @@ function back() {
 </template>
 
 <style scoped>
+.updating { margin: 0 0 10px; color: var(--muted); font-size: 11px; }
 .rank-page { max-width: 600px; margin: 0 auto; padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px); }
 .back { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--surface); color: var(--text); cursor: pointer; box-shadow: var(--shadow-sm); }
 .back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }

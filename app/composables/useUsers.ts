@@ -7,7 +7,7 @@ export function useUsers() {
   const failed = useState('users-failed', () => false)
 
   function reload() {
-    loading = $fetch<PublicUser[]>('/api/users')
+    loading = $fetch<PublicUser[]>('/api/users', { timeout: 10_000, retry: 0 })
       .then((r) => { users.value = r; failed.value = false })
       .catch(() => { failed.value = true })
     return loading

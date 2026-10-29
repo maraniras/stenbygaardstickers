@@ -7,7 +7,7 @@ export function useCommentStats() {
   const failed = useState('comment-stats-failed', () => false)
 
   function reload() {
-    loading = $fetch<Record<string, CommentStats>>('/api/comment-stats')
+    loading = $fetch<Record<string, CommentStats>>('/api/comment-stats', { timeout: 10_000, retry: 0 })
       .then((r) => { commentStats.value = r; failed.value = false })
       .catch(() => { failed.value = true })
     return loading
