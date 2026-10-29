@@ -88,6 +88,6 @@ Opdateret 29. oktober 2026. Idéer til senere; spillene er ikke bestilt til impl
 
 ## Status til næste gang
 
-- Brugeren ønsker at gemme arbejdet og fortsætte senere. Der er ikke bestilt mere simulering eller implementering nu.
+- Aktie-/casinoarbejdet er gemt til senere. Efterfølgende har brugeren bestilt **design og adgang til siden med daglige spil**; `/spil` er nu et smugkig på dev via en ny Spil-fane i bundmenuen. By-gættespil og lykkehjul har illustrationer og beskrivelser i paneler. Ingen faktiske spil, belønninger eller saldi er implementeret. Mere simulering og rigtig spilfunktionalitet er ikke bestilt endnu.
 - Arbejd videre fra den dæmpede model med beskeden vækst som foreløbig kandidat; den er ikke endeligt godkendt. Afklar især individuelle højrisikoaktiers langtidstab, fælles markedsbevægelser og hvor meget valuta børsen må tilføre.
 - Simulationskode, input og sammenfattede resultater er arkiveret i [`docs/experiments/market-growth/`](experiments/market-growth/), så de følger repoet til andre pc'er. Timekurver er udeladt fra de arkiverede resultater; de kan genskabes med koden. Python med NumPy kræves. Kør `python docs/experiments/market-growth/simulate-market-growth.py --seed 20261101 --reps 50` og tilsvarende med seed `20261102`, derefter `python docs/experiments/market-growth/check-growth-portfolios.py`. Filer genereres ved siden af scripts. Det er analyseværktøjer, ikke appens marked.
