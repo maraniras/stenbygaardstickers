@@ -12,6 +12,7 @@ const CUSTOM = new Set([
   'continent-europa', 'continent-afrika', 'continent-asien', 'continent-nordamerika', 'continent-sydamerika', 'continent-oceanien',
   'home', 'regular', 'team', 'cities', 'countries', 'capitals',
   'commenter', 'tagged', 'likes', 'hit', 'viral', 'fivestar',
+  'director', 'filmstar', 'author', 'photographer', 'magnet', 'peoples',
 ])
 
 export function badgeIcon(id: string) {
