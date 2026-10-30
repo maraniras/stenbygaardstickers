@@ -12,6 +12,21 @@ export const WHEEL_PRIZES = [
   { value: 100, weight: 150, color: '#bcd59a' },
   { value: 500, weight: 50, color: '#f7edaf' },
 ] as const
+/** Chance of today's shared jackpot amount, not of winning a spin. */
+export const DAILY_JACKPOTS = [
+  { value: 400, weight: 800 }, { value: 450, weight: 1800 },
+  { value: 500, weight: 3200 }, { value: 550, weight: 2000 },
+  { value: 600, weight: 1000 }, { value: 650, weight: 500 },
+  { value: 700, weight: 300 }, { value: 750, weight: 150 },
+  { value: 800, weight: 100 }, { value: 850, weight: 70 },
+  { value: 900, weight: 50 }, { value: 1000, weight: 30 },
+] as const
+export function dailyJackpotFor(ticket: number) {
+  if (!Number.isInteger(ticket) || ticket < 0 || ticket >= 10000) throw new Error('Ugyldigt jackpotlod')
+  let end = 0
+  for (const amount of DAILY_JACKPOTS) { end += amount.weight; if (ticket < end) return amount.value }
+  throw new Error('Jackpotfordelingen skal summere til 10000')
+}
 export const GAME_BADGE_REWARDS: Record<string, number[]> = {
   'banana-baron': [50, 100, 200, 400, 800],
   'city-guide': [20, 40, 80, 160, 320],
@@ -35,10 +50,11 @@ export function stickerBananas(countryCode: string, km: number) {
   }
   return 5000
 }
-export function wheelPrizeFor(ticket: number) {
+export function wheelPrizeFor(ticket: number, jackpot = 500) {
+  if (!DAILY_JACKPOTS.some(p => p.value === jackpot)) throw new Error('Ugyldig jackpot')
   if (!Number.isInteger(ticket) || ticket < 0 || ticket >= 10000) throw new Error('Ugyldigt lod')
   let end = 0
-  for (const prize of WHEEL_PRIZES) { end += prize.weight; if (ticket < end) return prize.value }
+  for (const prize of WHEEL_PRIZES) { end += prize.weight; if (ticket < end) return prize.value === 500 ? jackpot : prize.value }
   return 0
 }
 /** Full reward per tier, never a second points-based reward for game badges. */

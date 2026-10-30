@@ -1,5 +1,6 @@
 <script setup lang="ts">
 defineProps<{ kind: 'city' | 'wheel' }>()
+const { state } = useEconomy()
 </script>
 
 <template>
@@ -17,7 +18,7 @@ defineProps<{ kind: 'city' | 'wheel' }>()
     </template>
     <template v-else>
       <span class="spark spark-a">✦</span><span class="spark spark-b">✧</span>
-      <div class="wheel-wrap"><WheelFace compact /></div>
+      <div class="wheel-wrap"><WheelFace compact :jackpot="state?.wheelJackpot" /></div>
     </template>
   </div>
 </template>

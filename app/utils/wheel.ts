@@ -22,7 +22,8 @@ export const WHEEL_SLOTS = values.map((value, index) => ({
 
 /** Sample only selects a visual slot, never the prize or its probability. */
 export function wheelTarget(value: number, sample = 0) {
-  const matching = WHEEL_SLOTS.filter(slot => slot.value === value)
+  // Legacy 500 wins and every new daily jackpot use the same logical gold slot.
+  const matching = WHEEL_SLOTS.filter(slot => slot.value === (value >= 400 ? 500 : value))
   if (!matching.length) throw new Error('Ukendt hjulgevinst')
   const slot = matching[Math.min(matching.length - 1, Math.max(0, Math.floor(sample * matching.length)))]!
   return 360 - slot.middle

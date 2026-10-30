@@ -8,7 +8,7 @@ function trimGameDays(record: EconomyRecord, day: string) {
   for (const key of Object.keys(record.days)) if (Date.parse(`${key}T12:00:00Z`) < cutoff) delete record.days[key]
 }
 export async function dailyResponse(record: EconomyRecord, day = gameDay()): Promise<DailyResponse> {
-  const challenge = await dailyChallenge(day)
+  const [challenge, wheelJackpot] = await Promise.all([dailyChallenge(day), dailyWheelJackpot(day)])
   const city = record.days[day]?.city ?? emptyCityRun()
   const wallet = publicEconomy(record)
   // Return current streaks without removing the permanent best streak.
@@ -16,7 +16,7 @@ export async function dailyResponse(record: EconomyRecord, day = gameDay()): Pro
   wallet.stats = { ...wallet.stats,
     cityStreak: wallet.stats.lastCityWinDay && wallet.stats.lastCityWinDay >= previous ? wallet.stats.cityStreak : 0,
     wheelStreak: wallet.stats.lastWheelDay && wallet.stats.lastWheelDay >= previous ? wallet.stats.wheelStreak : 0 }
-  return { day, nextResetAt: nextGameReset(), wallet, history: record.history,
+  return { day, nextResetAt: nextGameReset(), wallet, history: record.history, wheelJackpot,
     city: { ...city, options: challenge.options.map(c => ({ id: c.id, name: c.name })), ...(city.finished ? { answer: { id: challenge.answer.id, name: challenge.answer.name } } : {}) },
     wheel: record.days[day]?.wheel ?? null }
 }
@@ -45,21 +45,22 @@ export function applyCityGuess(record: EconomyRecord, day: string, choice: strin
   }
   trimGameDays(record, day)
 }
-export function applyWheelSpin(record: EconomyRecord, day: string, name: string, context: EconomyContext, now = new Date(), ticket = () => randomInt(10000)) {
+export function applyWheelSpin(record: EconomyRecord, day: string, name: string, context: EconomyContext, now = new Date(), ticket = () => randomInt(10000), jackpot = 500) {
   if (gameDay(now) !== day) throw createError({ statusCode: 409, statusMessage: 'Et nyt spildøgn er startet. Hent dagens spil igen.' })
   const daily = record.days[day] ??= {}
   if (daily.wheel) return
-  const prize = wheelPrizeFor(ticket())
-  daily.wheel = { prize }
+  const prize = wheelPrizeFor(ticket(), jackpot)
+  const isJackpot = prize === jackpot
+  daily.wheel = { prize, jackpot: isJackpot, jackpotAmount: jackpot }
   const stats = record.stats
   stats.wheelSpins++
   stats.wheelStreak = stats.lastWheelDay === previousGameDay(day) ? stats.wheelStreak + 1 : 1
   stats.bestWheelStreak = Math.max(stats.bestWheelStreak, stats.wheelStreak)
   stats.lastWheelDay = day
-  if (prize === 500) stats.wheelJackpots++
+  if (isJackpot) stats.wheelJackpots++
   stats.nitStreak = prize === 0 ? stats.nitStreak + 1 : 0
   stats.bestNitStreak = Math.max(stats.bestNitStreak, stats.nitStreak)
-  if (prize) creditBananas(record, `wheel:${day}`, prize, prize === 500 ? 'Lykkehjulet · jackpot!' : 'Dagens lykkehjul', now)
+  if (prize) creditBananas(record, `wheel:${day}`, prize, isJackpot ? 'Lykkehjulet · jackpot!' : 'Dagens lykkehjul', now)
   settleEconomy(record, name, context, now)
   trimGameDays(record, day)
 }

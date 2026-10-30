@@ -95,7 +95,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikonet er 
 | x70 | På rette spor → Aldrig faret vild (`city-streak`) | 3/7/14/30/100 spildøgn med rigtigt svar i træk | 10/25/50/100/250 |
 | x71 | En omgang mere → Hjulminister (`wheel-spins`) | 7/30/100/200/365 spins | 25/50/100/200/400 |
 | x72 | Fast inventar → Møder altid op (`wheel-streak`) | 3/7/14/30/100 spildøgn med spin i træk | 10/25/50/100/250 |
-| x73 | Hjulets udvalgte (`wheel-jackpot`) | Ram 500 på hjulet | 250 |
+| x73 | Hjulets udvalgte (`wheel-jackpot`) | Ram dagens jackpot (400–1.000) på hjulet | 250 |
 | x74 | I sidste øjeblik (`city-last`) | Rigtigt svar på femte gæt | 25 |
 | x75 | Nitteekspert (`wheel-nits`) | Tre nitter i på hinanden følgende spins | 25 |
 

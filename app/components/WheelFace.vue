@@ -1,5 +1,5 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ rotation?: number, spinning?: boolean, compact?: boolean }>(), { rotation: 0, spinning: false, compact: false })
+withDefaults(defineProps<{ rotation?: number, spinning?: boolean, compact?: boolean, jackpot?: number }>(), { rotation: 0, spinning: false, compact: false })
 const pointerId = useId()
 const background = `conic-gradient(${WHEEL_SLOTS.map(s => `${s.color} ${s.start}deg ${s.end - .5}deg, #fff2 ${s.end - .5}deg ${s.end}deg`).join(',')})`
 </script>
@@ -7,7 +7,7 @@ const background = `conic-gradient(${WHEEL_SLOTS.map(s => `${s.color} ${s.start}
 <div class="wheel-stage" :class="{ compact, running: spinning }">
         <div class="rim" aria-hidden="true" />
         <div class="disk" :class="{ spinning }" :style="{ background, '--spin-duration': WHEEL_SPIN_MS + 'ms', transform: `rotate(${rotation}deg)` }">
-          <span v-for="segment in WHEEL_SLOTS" :key="segment.index" class="prize-label" :class="{ miv: segment.value === 0, grand: segment.value === 500 }" :style="{ left: `${50 + Math.sin(segment.middle * Math.PI / 180) * 39}%`, top: `${50 - Math.cos(segment.middle * Math.PI / 180) * 39}%`, transform: `translate(-50%, -50%) rotate(${segment.middle}deg)`, color: segment.ink }">{{ segment.value === 0 ? 'Miv' : segment.value }}<span v-if="segment.value === 500" class="tiny-star" aria-hidden="true">★</span></span>
+          <span v-for="segment in WHEEL_SLOTS" :key="segment.index" class="prize-label" :class="{ miv: segment.value === 0, grand: segment.value === 500 }" :style="{ left: `${50 + Math.sin(segment.middle * Math.PI / 180) * 39}%`, top: `${50 - Math.cos(segment.middle * Math.PI / 180) * 39}%`, transform: `translate(-50%, -50%) rotate(${segment.middle}deg)`, color: segment.ink }">{{ segment.value === 0 ? 'Miv' : segment.value === 500 ? (jackpot ?? '★') : segment.value }}<span v-if="segment.value === 500" class="tiny-star" aria-hidden="true">★</span></span>
         </div>
         <div class="wheel-gloss" aria-hidden="true" />
         <span v-for="n in 20" :key="n" class="bulb" :style="{ left: `${50 + Math.sin((n - 1) * Math.PI / 10) * 47}%`, top: `${50 - Math.cos((n - 1) * Math.PI / 10) * 47}%`, '--light-delay': `${n * -.12}s` }" aria-hidden="true" />

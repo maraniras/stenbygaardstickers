@@ -20,6 +20,21 @@ async function gameSecret() {
   return secretPromise
 }
 export async function gameBackup() { return { secret: await gameSecret() } }
+/** One shared, persisted amount per 04:00 Danish game day. Independent of city choice. */
+export async function dailyWheelJackpot(day: string): Promise<number> {
+  const key = `games:jackpot:${day}`
+  const storage = useStorage('data')
+  const existing = redisEnabled ? (await redis([['GET', key]]))[0] : await storage.getItem<number | string>(key)
+  if (existing !== null && existing !== undefined) return Number(existing)
+  const hash = createHmac('sha256', await gameSecret()).update(`wheel-jackpot-v1:${day}`).digest()
+  const amount = dailyJackpotFor(hash.readUInt32BE(0) % 10000)
+  if (redisEnabled) {
+    await redis([['SET', key, amount, 'NX', 'EX', 40 * 86400]])
+    return Number((await redis([['GET', key]]))[0])
+  }
+  await storage.setItem(key, amount)
+  return amount
+}
 export async function dailyChallenge(day: string) {
   const storage = useStorage('data')
   const key = `games:challenge:${day}`

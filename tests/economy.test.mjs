@@ -153,4 +153,37 @@ test('equal visual wheel slots always land on the server prize, including repeat
     assert.equal(visited.size,slots.filter(s=>s.value===prize.value).length)
   }
   assert.equal(exports.WHEEL_SPIN_MS,6500)
+  for(const {value} of a.DAILY_JACKPOTS) assert.equal(exports.wheelTarget(value),exports.wheelTarget(500))
+})
+
+test('daily jackpot distribution is exact, peaks at 500 and preserves spin odds', () => {
+  const {api:a}=setup(); const amounts=new Map(); let total=0
+  for(let i=0;i<10000;i++){const v=a.dailyJackpotFor(i);amounts.set(v,(amounts.get(v)??0)+1);total+=v}
+  assert.deepEqual([...amounts.keys()],[400,450,500,550,600,650,700,750,800,850,900,1000])
+  assert.deepEqual([...amounts.values()],[800,1800,3200,2000,1000,500,300,150,100,70,50,30])
+  assert.equal(total/10000,529.2)
+  assert.equal([...amounts.values()].reduce((n,v)=>n+v,0),10000)
+  for(const {value} of a.DAILY_JACKPOTS){let jackpots=0;for(let i=0;i<10000;i++)jackpots+=Number(a.wheelPrizeFor(i,value)===value);assert.equal(jackpots,50)}
+  assert.throws(()=>a.wheelPrizeFor(9999,1000000))
+})
+for(const remote of [false,true]) test(`daily jackpot persists and is shared across users (${remote?'Redis':'local'})`,async()=>{
+  const {api:a}=setup(remote),day=a.gameDay();const values=await Promise.all(Array.from({length:12},()=>a.dailyWheelJackpot(day)))
+  assert.equal(new Set(values).size,1)
+  assert.ok(a.DAILY_JACKPOTS.some(p=>p.value===values[0]))
+  const alice=await a.dailyResponse(a.freshEconomy(),day),bob=await a.dailyResponse(a.freshEconomy(),day)
+  assert.equal(alice.wheelJackpot,bob.wheelJackpot);assert.equal(alice.wheelJackpot,values[0])
+  for(let i=0;i<50;i++){const d=new Date(Date.UTC(2026,9,1+i)).toISOString().slice(0,10);assert.equal(await a.dailyWheelJackpot(d),await a.dailyWheelJackpot(d))}
+})
+test('variable jackpot credits and badge are atomic; past results never change with the next amount',()=>{
+  const {api:a}=setup(),r=a.freshEconomy(),day='2026-10-30'
+  a.settleEconomy(r,'Test',empty,at(day))
+  a.applyWheelSpin(r,day,'Test',empty,at(day),()=>9999,400)
+  assert.equal(r.balance,900);assert.equal(r.stats.wheelJackpots,1);assert.equal(r.days[day].wheel.jackpot,true)
+  assert.equal(r.days[day].wheel.jackpotAmount,400)
+  a.applyWheelSpin(r,day,'Test',empty,at(day),()=>9999,1000)
+  assert.equal(r.balance,900);assert.equal(r.days[day].wheel.prize,400)
+  a.applyWheelSpin(r,'2026-10-31','Test',empty,at('2026-10-31'),()=>9999,1000)
+  assert.equal(r.balance,1950);assert.equal(r.stats.wheelJackpots,2)
+  assert.equal(r.history.filter(t=>t.id==='badge:wheel-jackpot').length,1)
+  assert.equal(r.days[day].wheel.prize,400)
 })

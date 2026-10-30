@@ -21,7 +21,7 @@ export interface EconomyPublic {
   milestones: Record<string, string>
 }
 export interface CityRun { guesses: string[], finished: boolean, won: boolean, reward: number }
-export interface WheelRun { prize: number }
+export interface WheelRun { prize: number, jackpot?: boolean, jackpotAmount?: number }
 export interface EconomyRecord extends EconomyPublic {
   version: 1
   claims: Record<string, true>
@@ -39,4 +39,5 @@ export interface DailyResponse {
   history: BananaTransaction[]
   city: DailyCityState
   wheel: WheelRun | null
+  wheelJackpot: number
 }
