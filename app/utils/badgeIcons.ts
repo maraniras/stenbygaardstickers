@@ -14,6 +14,7 @@ const CUSTOM = new Set([
   'commenter', 'tagged', 'likes', 'hit', 'viral', 'fivestar',
   'director', 'filmstar', 'author', 'photographer', 'magnet', 'peoples',
   'continents', 'neighbour', 'far', 'world', 'north', 'south',
+  'spring', 'summer', 'autumn', 'winter', 'halloween', 'jul',
 ])
 
 export function badgeIcon(id: string) {

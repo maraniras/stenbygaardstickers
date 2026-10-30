@@ -15,8 +15,9 @@ const ids=['banana-baron','city-guide','city-gps','city-streak','wheel-spins','w
   'home','regular','team','cities','countries','capitals',
   'commenter','tagged','likes','hit','viral','fivestar',
   'director','filmstar','author','photographer','magnet','peoples',
-  'continents','neighbour','far','world','north','south']
-test('all 57 custom badge motifs exist, fit retina medals and have real transparency',async()=>{
+  'continents','neighbour','far','world','north','south',
+  'spring','summer','autumn','winter','halloween','jul']
+test('all 63 custom badge motifs exist, fit retina medals and have real transparency',async()=>{
   for(const id of ids){const file=exports.badgeIcon(id);assert.equal(file,`/badges/custom/${id}.webp`);const image=sharp('public'+file),meta=await image.metadata(),stats=await image.stats();assert.ok(meta.hasAlpha);assert.equal(Math.max(meta.width,meta.height),256);assert.equal(stats.channels.at(-1).min,0)}
 })
 test('currency banana remains separate and other badge families keep their original icons',()=>{
