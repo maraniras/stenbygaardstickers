@@ -11,6 +11,7 @@ const name = computed(() => String(route.params.name))
 const list = computed(() => stickersBy(name.value))
 const displayName = computed(() => people.value.find(p => sameName(p.name, name.value))?.name ?? name.value)
 const stats = computed(() => statsFor(list.value))
+const jackStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.jack)
 const countryList = computed(() => {
   const map = new Map<string, { code: string, name: string, count: number }>()
   for (const s of list.value) {
@@ -73,6 +74,7 @@ function back() {
 
     <LevelCard :points="totalPoints(badges)" />
     <BananaWallet :person="displayName" :own="isMe(displayName)" />
+    <JackProfileStats v-if="jackStats?.rounds" :stats="jackStats" />
     <NuxtLink class="ranking-link" to="/rangliste">Se alle profiler og ranglisten <span aria-hidden="true">↗</span></NuxtLink>
 
     <div class="grid">

@@ -2,6 +2,7 @@ import { randomInt } from 'node:crypto'
 import type { EconomyRecord } from '../../shared/types/economy'
 import type { JackGame, JackHand, JackAction, JackPublic } from '../../shared/types/bananjack'
 import { JACK_BETS, JACK_MAX_BET, jackRank, jackValue, jackScore } from '../../shared/utils/bananjack'
+import { syncJackStats } from './jack-stats'
 
 function jackError(message: string, statusCode = 400): never { throw createError({ statusCode, statusMessage: message }) }
 export function jackDeck() {
@@ -53,6 +54,7 @@ function settleJack(record: EconomyRecord) {
   }
   game.status = 'finished'
   if (game.payout) transaction(record, `bananjack:${game.id}:payout`, game.payout, 'Bananjack · udbetaling inkl. indsats')
+  syncJackStats(record)
 }
 function advanceJack(record: EconomyRecord) {
   const game = record.bananjack!
@@ -88,6 +90,7 @@ export function actJack(record: EconomyRecord, id: string, revision: number, act
   if (action === 'hit') { hand.cards.push(draw(game)); classifyHand(hand) }
   if (action === 'stand') hand.status = 'stood'
   if (action === 'double') {
+    hand.doubled = true
     transaction(record, `bananjack:${id}:double:${game.revision}`, -hand.bet, 'Bananjack · fordobling')
     game.staked += hand.bet; hand.bet *= 2; hand.cards.push(draw(game)); hand.status = jackScore(hand.cards).total > 21 ? 'bust' : 'stood'
   }

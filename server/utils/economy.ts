@@ -1,4 +1,5 @@
 import type { EconomyRecord } from '../../shared/types/economy'
+import { syncJackStats } from './jack-stats'
 
 export async function economyContext() {
   const stickers = withDistance((await listStickers()).filter(s => s.status === 'approved').map(publicSticker))
@@ -18,6 +19,7 @@ export function creditBananas(record: EconomyRecord, id: string, amount: number,
 }
 /** Idempotent migration + future rewards. Wallet is never erased on logout. */
 export function settleEconomy(record: EconomyRecord, name: string, context: EconomyContext, now = new Date()) {
+  syncJackStats(record)
   creditBananas(record, 'welcome', STARTING_BANANAS, 'Velkommen · startsaldo', now)
   for (const s of context.stickers) {
     if (s.placedBy.some(n => sameName(n, name))) creditBananas(record, `sticker:${s.id}`, stickerBananas(s.countryCode, s.distanceKm), `Sticker · ${s.title}`, now)

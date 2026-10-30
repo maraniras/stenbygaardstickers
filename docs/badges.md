@@ -2,7 +2,7 @@
 
 Faste numre, så vi nemt kan tale om en badge ("ret x18"). Nye badges får næste ledige
 nummer – numrene flytter sig aldrig, selvom rækkefølgen i appen ændres.
-Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner vælges af `app/utils/badgeIcons.ts`: egne 3D-motiver i `public/badges/custom/`, ellers Fluent Emoji 3D i `public/badges/`. De ti klassiske prøvesæt i `docs/designs/legacy-badges-preview*.md` er nu installeret (62 motiver); de ni spil-/valutamotiver er også i brug. Alle 75 badge-numre bruger nu custom design (71 forskellige motiver; jubilarer deler ikon).
+Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner vælges af `app/utils/badgeIcons.ts`: egne 3D-motiver i `public/badges/custom/`, ellers Fluent Emoji 3D i `public/badges/`. De ti klassiske prøvesæt i `docs/designs/legacy-badges-preview*.md` er nu installeret (62 motiver); de ni spil-/valutamotiver er også i brug. De otte Bananjack-motiver er også aktive. Alle 83 badge-numre bruger nu custom design (79 forskellige motiver; jubilarer deler ikon).
 
 ## Trin-badges
 
@@ -101,9 +101,9 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner væ
 
 Hvert trin udbetales én gang. Formuebadge giver ingen levelpoint; spiltrin giver 1/2/3/4/5 point, og x73–75 giver 2/1/1 point. Gamle badges giver 20 bananer pr. point pr. trin, Pioner 60 pr. land, og Årets Dengse 200 efter årets udgang. Midlertidige rekorder giver ingen bananer.
 
-## Bananjack — motiver klargjort, endnu ikke aktive
+## Bananjack
 
-Numrene er reserveret. Ikonerne ligger i `public/badges/custom/` og er koblet til `badgeIcon()`. Statistik, badgekrav og udbetalinger skal implementeres særskilt, før de vises på profiler. Generelle casino-badges kommer senere.
+Alle otte er aktive med statistik, profilvisning, notifikationer og engangsbelønninger pr. trin. Ikonerne ligger i `public/badges/custom/`. Generelle casino-badges kommer senere.
 
 | Nr. | Badge (id) | Krav | Bananer | Point |
 |---|---|---|---|---|

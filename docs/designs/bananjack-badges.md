@@ -2,7 +2,7 @@
 
 Genereret med indbygget image_gen den 30. oktober 2026. Originale PNG-filer, `oversigt.png` og `index.html` ligger i `bananjack-badges/`. Appikoner ligger som optimeret WebP i `public/badges/custom/`, klar via `badgeIcon()`. Installeret efter visuel kontrol med `node scripts/install-badge-art.mjs docs/designs/bananjack-badges`.
 
-Dette er artwork og ikon-routing. De otte badgekrav, statistik, point og belønninger aktiveres senere. x76–83 er reserveret i `docs/badges.md`; generelle casino-badges er ikke med i dette sæt. Trinmotiverne bruger appens eksisterende farvede medaljekanter, ikke indbyggede tier-kanter i billedet.
+x76–83 er nu aktive med statistik, point, belønninger, profilvisning og den fælles notifikationslogik. Den aftalte tabel står i `docs/badges.md`; generelle casino-badges er ikke med i dette sæt. Trinmotiverne bruger appens eksisterende farvede medaljekanter, ikke indbyggede tier-kanter i billedet.
 
 ## Fælles prompt og referencer
 

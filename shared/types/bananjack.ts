@@ -3,6 +3,7 @@ export interface JackHand {
   cards: number[]
   bet: number
   fromSplit: boolean
+  doubled?: boolean
   status: 'playing' | 'stood' | 'bust'
   result?: 'blackjack' | 'win' | 'lose' | 'push'
   payout?: number

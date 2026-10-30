@@ -11,6 +11,7 @@
 
 import type { EconomyPublic } from '../types/economy'
 import { economyBadges } from './economy-badges'
+import { jackBadges } from './jackBadges'
 
 export type BadgeKind = 'tier' | 'single' | 'record'
 
@@ -319,7 +320,8 @@ export function badgesFor(
   const now = opts.now ?? new Date()
   const mine = all.filter(s => hasName(s, name)).sort(byFirst)
   const cs = opts.comments?.[name.toLocaleLowerCase('da')] ?? NO_COMMENTS
-  const badges = [...compute(name, mine, all, ratings, now, cs), ...economyBadges(opts.economy?.[name.toLocaleLowerCase('da')])]
+  const wallet = opts.economy?.[name.toLocaleLowerCase('da')]
+  const badges = [...compute(name, mine, all, ratings, now, cs), ...economyBadges(wallet), ...jackBadges(wallet)]
   if (!opts.history) return score(badges)
 
   // Afspil stickers i datoorden: første gang en badge (eller et trin) er opnået,
@@ -379,6 +381,7 @@ export function earnedCount(badges: Badge[]) {
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
+  'jack-rounds': [1,2,3,4,5], 'jack-wins': [1,2,3,4,5], 'jack-naturals': [1,2,3,4,5], 'jack-doubles': [1,2,3,4,5],
   'banana-baron': [0, 0, 0, 0, 0],
   'city-guide': [1, 2, 3, 4, 5], 'city-gps': [1, 2, 3, 4, 5], 'city-streak': [1, 2, 3, 4, 5],
   'wheel-spins': [1, 2, 3, 4, 5], 'wheel-streak': [1, 2, 3, 4, 5],
@@ -395,6 +398,7 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'jack-split':2, 'jack-back-to-back':4, 'jack-five-card':3, 'jack-dealer-bust':1,
   'wheel-jackpot': 2, 'city-last': 1, 'wheel-nits': 1,
   'commenter': 1, 'tagged': 1, 'hit': 2, 'viral': 4,
   'home': 1, 'team': 1, 'regular': 1, 'turbo': 1, 'director': 1, 'spring': 1, 'summer': 1, 'autumn': 1, 'winter': 1,

@@ -2,7 +2,8 @@ import type { JackPublic } from '../../shared/types/bananjack'
 import { jackFrames } from '../utils/jackFrames'
 
 export function useJackPresentation() {
-  const shown = ref<JackPublic | null>(null), animating = ref(false), caption = ref('')
+  const shown = ref<JackPublic | null>(null), caption = ref('')
+  const animating = useState('bananjack-animation', () => false)
   let generation = 0, disposed = false
   let timer: ReturnType<typeof setTimeout> | undefined, release: (() => void) | undefined
   function cancel() { generation++; clearTimeout(timer); release?.(); release = undefined; animating.value = false; caption.value = '' }

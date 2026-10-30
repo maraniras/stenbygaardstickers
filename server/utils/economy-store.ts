@@ -1,5 +1,6 @@
 import type { EconomyRecord, EconomyPublic } from '../../shared/types/economy'
 import { emptyDailyStats } from '../../shared/utils/economy'
+import { publicJackStats } from './jack-stats'
 
 export const ECONOMY_CAS = `if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
 redis.call('HSET', KEYS[1], ARGV[1], ARGV[3]); return 1`
@@ -51,7 +52,7 @@ export async function mutateEconomy<T>(name: string, change: (record: EconomyRec
   throw createError({ statusCode: 409, statusMessage: 'Saldoen blev opdateret fra en anden enhed. Prøv igen.' })
 }
 export function publicEconomy(record: EconomyRecord): EconomyPublic {
-  return { balance: record.balance, peakBalance: record.peakBalance, stats: record.stats, milestones: record.milestones }
+  return { balance: record.balance, peakBalance: record.peakBalance, stats: record.stats, milestones: record.milestones, jack: publicJackStats(record) }
 }
 export async function allEconomyRecords(): Promise<Record<string, EconomyRecord>> {
   if (!redisEnabled) {

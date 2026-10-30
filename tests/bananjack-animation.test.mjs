@@ -9,7 +9,7 @@ const planner={};vm.runInNewContext(transpile('app/utils/jackFrames.ts'),{export
 function round(overrides={}){return {id:'round-a',sequence:1,revision:0,status:'playing',dealer:[8,null],hands:[{cards:[0,9],bet:10,fromSplit:false,status:'playing'}],active:0,staked:10,payout:0,actions:['hit','stand'],...overrides}}
 function animator(reduced=false){
   const timers=[],unmount=[],exports={}
-  vm.runInNewContext(transpile('app/composables/useJackPresentation.ts'),{exports,require:()=>planner,ref,onBeforeUnmount:fn=>unmount.push(fn),window:{matchMedia:()=>({matches:reduced})},setTimeout:(fn,ms)=>{const t={fn,ms,cancelled:false};timers.push(t);return t},clearTimeout:t=>{if(t)t.cancelled=true}})
+  vm.runInNewContext(transpile('app/composables/useJackPresentation.ts'),{exports,require:()=>planner,ref,useState:()=>ref(false),onBeforeUnmount:fn=>unmount.push(fn),window:{matchMedia:()=>({matches:reduced})},setTimeout:(fn,ms)=>{const t={fn,ms,cancelled:false};timers.push(t);return t},clearTimeout:t=>{if(t)t.cancelled=true}})
   return {...exports.useJackPresentation(),timers,unmount:()=>unmount.forEach(f=>f())}
 }
 test('opening deal alternates player/dealer/player/dealer, without early scores or result',()=>{
