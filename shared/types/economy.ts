@@ -23,6 +23,7 @@ export interface EconomyPublic {
 export interface CityRun { guesses: string[], finished: boolean, won: boolean, reward: number }
 export interface WheelRun { prize: number, jackpot?: boolean, jackpotAmount?: number }
 export interface EconomyRecord extends EconomyPublic {
+  bananjack?: import('./bananjack').JackGame
   version: 1
   claims: Record<string, true>
   history: BananaTransaction[]

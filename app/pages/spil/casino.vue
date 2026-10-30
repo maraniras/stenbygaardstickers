@@ -12,8 +12,8 @@ const { state } = useEconomy()
     </header>
     <GameSectionNav section="casino" />
 
-    <article class="bananjack-card" aria-labelledby="bananjack-title">
-      <div class="card-top"><span class="table-label">EMILS SPILLEBORD</span><span class="status">Undervejs</span></div>
+    <NuxtLink to="/spil/bananjack" class="bananjack-card" aria-labelledby="bananjack-title">
+      <div class="card-top"><span class="table-label">EMILS SPILLEBORD</span><span class="status">Spil nu →</span></div>
       <div class="table-art" aria-hidden="true">
         <div class="table-ring" />
         <div class="playing-card ace"><b>A</b><svg viewBox="0 0 32 40"><path d="M16 2C11 9 2 14 2 22c0 7 8 10 13 5-1 5-3 8-6 10h14c-3-2-5-5-6-10 5 5 13 2 13-5C30 14 21 9 16 2Z" /></svg><b class="corner">A</b></div>
@@ -22,8 +22,8 @@ const { state } = useEconomy()
         <img class="banana" src="/badges/banana-baron.webp" alt="">
       </div>
       <div class="game-copy"><span class="eyebrow">Første spil i casinoet</span><h2 id="bananjack-title">Banan<span>jack</span></h2><p>Kom tæt på 21. Hold hovedet koldt, selv når Emil ikke gør.</p><div class="game-details"><span>Én spiller</span><span>10–50 🍌 pr. hånd</span></div></div>
-    </article>
-    <p class="coming-note">Vi gør kortene klar. Bananjack bliver det første spil, du kan spille her.</p>
+    </NuxtLink>
+    <p class="coming-note">Kortene er klar. Hvor langt tør du gå mod 21?</p>
     <NuxtLink class="daily-link" to="/spil"><span>Mens du venter</span><b>Tag dagens gratis spil <span aria-hidden="true">→</span></b></NuxtLink>
     <NuxtLink class="wallet-link" to="/spil/bananer">Dit bananlager og dine belønninger <span aria-hidden="true">↗</span></NuxtLink>
   </div>
@@ -42,3 +42,4 @@ const { state } = useEconomy()
 .coming-note { margin:14px 6px 18px; color:var(--muted); font-size:12px; line-height:1.6; text-align:center; }.daily-link { display:flex; flex-direction:column; justify-content:center; gap:3px; min-height:70px; padding:12px 16px; border:1px solid var(--hairline); border-radius:17px; background:var(--surface); text-decoration:none; color:var(--text); }.daily-link > span { font-size:10px; color:var(--muted); }.daily-link b { display:flex; justify-content:space-between; gap:8px; font-size:13px; }.wallet-link { display:flex; align-items:center; justify-content:space-between; min-height:48px; margin-top:8px; color:var(--muted); font-size:12px; text-decoration:none; }a:focus-visible { outline:2px solid var(--text); outline-offset:3px; }
 @media(max-width:350px) { .casino-page { padding-left:14px; padding-right:14px; }h1 { font-size:32px; }.table-art { height:185px; }.playing-card { top:20px; }.chip-one,.chip-three { top:142px; }.chip-two { top:151px; }.banana { top:132px; }h2 { font-size:38px; } }
 </style>
+<style scoped>.bananjack-card{display:block;text-decoration:none}</style>
