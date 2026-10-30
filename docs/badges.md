@@ -101,4 +101,19 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner væ
 
 Hvert trin udbetales én gang. Formuebadge giver ingen levelpoint; spiltrin giver 1/2/3/4/5 point, og x73–75 giver 2/1/1 point. Gamle badges giver 20 bananer pr. point pr. trin, Pioner 60 pr. land, og Årets Dengse 200 efter årets udgang. Midlertidige rekorder giver ingen bananer.
 
-Næste ledige nummer: **x76**
+## Bananjack — motiver klargjort, endnu ikke aktive
+
+Numrene er reserveret. Ikonerne ligger i `public/badges/custom/` og er koblet til `badgeIcon()`. Statistik, badgekrav og udbetalinger skal implementeres særskilt, før de vises på profiler. Generelle casino-badges kommer senere.
+
+| Nr. | Badge (id) | Krav | Bananer | Point |
+|---|---|---|---|---|
+| x76 | Ved bordet (`jack-rounds`) | 1/10/50/100/500 runder | 10/20/40/75/150 | 1/2/3/4/5 |
+| x77 | Bananbanker (`jack-wins`) | 1/10/25/100/250 vundne hænder | 10/25/50/100/200 | 1/2/3/4/5 |
+| x78 | Bananjack! (`jack-naturals`) | 1/5/15/50/100 naturlige blackjacks | 20/40/75/150/300 | 1/2/3/4/5 |
+| x79 | Is i maven (`jack-doubles`) | 1/5/15/30/75 sejre efter fordobling | 15/30/60/100/200 | 1/2/3/4/5 |
+| x80 | Del og hersk (`jack-split`) | Vind begge hænder efter ét split | 50 | 2 |
+| x81 | To modne i træk (`jack-back-to-back`) | Naturlig blackjack i to runder i træk | 100 | 4 |
+| x82 | På stregen (`jack-five-card`) | Præcis 21 med mindst fem kort | 75 | 3 |
+| x83 | Emil gik over (`jack-dealer-bust`) | Vind med højst 16, fordi dealeren går over | 25 | 1 |
+
+Næste ledige nummer: **x84**

@@ -7,3 +7,5 @@ Filerne er WebP med ægte alpha, op til256px på længste led og12px gennemsigti
 Reference, id-mapping og genereringsprompt: `docs/designs/custom-badges.md`.
 
 De klassiske motiver er dokumenteret i `docs/designs/legacy-badges-preview.md` og `legacy-badges-preview-2.md` til `legacy-badges-preview-10.md`. De ti sæt er nu i brug via badgeIcon(). `year.webp` deles af alle `year-<år>` badges. De fem jubilarer deler nu custom jubilee.webp. Rundt i Danmark bruger custom denmark.webp med Dannebrog; flaget er fallback ved billedfejl. Alle 75 badge-numre dækkes af 71 motiver.
+
+Bananjack-motiver: yderligere otte klargjorte ikoner til x76–83 (i alt 79 custom motiver). Kilder, galleri og prompts i docs/designs/bananjack-badges.md. Disse otte badgekrav/statistik og udbetalinger er endnu ikke aktive; de 75 eksisterende badges er uændrede.

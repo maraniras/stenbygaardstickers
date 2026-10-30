@@ -15,6 +15,7 @@ const CUSTOM = new Set([
   'continents', 'neighbour', 'far', 'world', 'north', 'south',
   'spring', 'summer', 'autumn', 'winter', 'halloween', 'jul',
   'denmark', 'birthday', 'turbo', 'weekend', 'streak', 'paaske', 'newyear', 'jubilee',
+  'jack-rounds', 'jack-wins', 'jack-naturals', 'jack-doubles', 'jack-split', 'jack-back-to-back', 'jack-five-card', 'jack-dealer-bust',
 ])
 
 export function badgeIcon(id: string) {
