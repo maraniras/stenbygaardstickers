@@ -14,14 +14,15 @@ const ids=['banana-baron','city-guide','city-gps','city-streak','wheel-spins','w
   'continent-europa','continent-afrika','continent-asien','continent-nordamerika','continent-sydamerika','continent-oceanien',
   'home','regular','team','cities','countries','capitals',
   'commenter','tagged','likes','hit','viral','fivestar',
-  'director','filmstar','author','photographer','magnet','peoples']
-test('all 51 custom badge motifs exist, fit retina medals and have real transparency',async()=>{
+  'director','filmstar','author','photographer','magnet','peoples',
+  'continents','neighbour','far','world','north','south']
+test('all 57 custom badge motifs exist, fit retina medals and have real transparency',async()=>{
   for(const id of ids){const file=exports.badgeIcon(id);assert.equal(file,`/badges/custom/${id}.webp`);const image=sharp('public'+file),meta=await image.metadata(),stats=await image.stats();assert.ok(meta.hasAlpha);assert.equal(Math.max(meta.width,meta.height),256);assert.equal(stats.channels.at(-1).min,0)}
 })
 test('currency banana remains separate and other badge families keep their original icons',()=>{
   assert.notEqual(exports.badgeIcon('banana-baron'),'/badges/banana-baron.webp')
   assert.ok(readFileSync('public/badges/banana-baron.webp').length>0)
-  assert.equal(exports.badgeIcon('world'),'/badges/world.webp')
+  assert.equal(exports.badgeIcon('birthday'),'/badges/birthday.webp')
   assert.equal(exports.badgeIcon('jubilee-10'),'/badges/jubilee.webp')
   assert.equal(exports.badgeIcon('year-2026'),'/badges/custom/year.webp')
   assert.equal(exports.badgeIcon('year-2027'),'/badges/custom/year.webp')

@@ -2,7 +2,7 @@
 
 Faste numre, så vi nemt kan tale om en badge ("ret x18"). Nye badges får næste ledige
 nummer – numrene flytter sig aldrig, selvom rækkefølgen i appen ændres.
-Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner vælges af `app/utils/badgeIcons.ts`: egne 3D-motiver i `public/badges/custom/`, ellers Fluent Emoji 3D i `public/badges/`. De syv klassiske prøvesæt i `docs/designs/legacy-badges-preview*.md` er nu installeret (42 motiver); de ni spil-/valutamotiver er også i brug.
+Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner vælges af `app/utils/badgeIcons.ts`: egne 3D-motiver i `public/badges/custom/`, ellers Fluent Emoji 3D i `public/badges/`. De otte klassiske prøvesæt i `docs/designs/legacy-badges-preview*.md` er nu installeret (48 motiver); de ni spil-/valutamotiver er også i brug.
 
 ## Trin-badges
 

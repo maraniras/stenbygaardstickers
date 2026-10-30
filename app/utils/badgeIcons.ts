@@ -13,6 +13,7 @@ const CUSTOM = new Set([
   'home', 'regular', 'team', 'cities', 'countries', 'capitals',
   'commenter', 'tagged', 'likes', 'hit', 'viral', 'fivestar',
   'director', 'filmstar', 'author', 'photographer', 'magnet', 'peoples',
+  'continents', 'neighbour', 'far', 'world', 'north', 'south',
 ])
 
 export function badgeIcon(id: string) {
