@@ -6,10 +6,10 @@ export const BANANA_STORAGE_STAGES = [
   { at: 2500, name: 'En fyldt kasse', count: 20 },
   { at: 5000, name: 'Kasser på stribe', count: 28 },
   { at: 10000, name: 'Emils bananskur', count: 40 },
-  { at: 25000, name: 'Det store lager', count: 54 },
-  { at: 50000, name: 'Banan-engros', count: 70 },
-  { at: 100000, name: 'Bananbaronens hal', count: 90 },
-  { at: 250000, name: 'Bananimperiet', count: 110 },
+  { at: 25000, name: 'Bananterminalen', count: 54 },
+  { at: 50000, name: 'Bananbanken', count: 70 },
+  { at: 100000, name: 'Bananfabrikken', count: 90 },
+  { at: 250000, name: 'Emils bananplanet', count: 110 },
 ] as const
 
 /** Purely cosmetic: current balance controls the scene; it never changes rewards. */
