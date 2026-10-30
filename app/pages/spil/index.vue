@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useHead({ title: 'Dagens spil · Stenbygaard Stickers' })
+useHead({ title: 'Daglige spil · Stenbygaard Stickers' })
 const { name, ready } = useUser()
 const { state, error, loading, reload } = useEconomy()
 const cityDone = computed(() => Boolean(state.value?.city.finished))
@@ -7,7 +7,8 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
 </script>
 <template>
   <div class="daily-page">
-    <header><div class="brand"><img src="/marker.png" alt=""><span>Stenbygaard Stickers</span><NuxtLink v-if="state" class="balance" to="/spil/bananer">🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink></div><div class="heading-line"><h1>Dagens spil<span>.</span></h1><NuxtLink class="ranking-link" to="/rangliste">Rangliste ↗</NuxtLink></div><p class="lead">En lille pause. Måske flere bananer.</p></header>
+    <header><div class="brand"><img src="/marker.png" alt=""><span>Stenbygaard Stickers</span><NuxtLink v-if="state" class="balance" to="/spil/bananer">🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink></div><div class="heading-line"><h1>Spil<span>.</span></h1><NuxtLink class="ranking-link" to="/rangliste">Rangliste ↗</NuxtLink></div><p class="lead">En lille pause. Måske flere bananer.</p></header>
+    <GameSectionNav section="daily" />
     <div class="daily-reset"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg><div><b>{{ cityDone && wheelDone ? 'Du er med igen i morgen' : 'En ny chance hver dag' }}</b><span>Nye spil kl. 04.00 dansk tid</span></div></div>
     <div v-if="ready && !name" class="login-box"><b>Hvem spiller med?</b><p>Vælg dit navn, og få 250 bananer i startsaldo. Dine spil og bananer følger dig på alle dine enheder.</p><NuxtLink class="btn" to="/mig">Vælg mit navn</NuxtLink></div>
     <div v-if="error" class="error" role="alert">{{ error }} <button @click="reload">Prøv igen</button></div><p v-if="loading && !state && name" class="lead" role="status">Henter dine bananer og dagens spil…</p>
