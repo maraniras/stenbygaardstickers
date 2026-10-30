@@ -5,8 +5,8 @@ const { isTaken } = useUsers()
 const wallet = computed(() => props.own && state.value ? state.value.wallet : people.value[props.person.toLocaleLowerCase('da')])
 </script>
 <template>
-  <NuxtLink v-if="own && wallet" class="wallet-link" to="/spil/bananer"><BananaStorage :balance="wallet.balance" :peak="wallet.peakBalance" own /></NuxtLink>
-  <BananaStorage v-else-if="wallet" class="wallet-public" :balance="wallet.balance" :peak="wallet.peakBalance" />
+  <NuxtLink v-if="own && wallet" class="wallet-link" to="/spil/bananer"><BananaStorage compact :balance="wallet.balance" :peak="wallet.peakBalance" own /></NuxtLink>
+  <BananaStorage v-else-if="wallet" compact class="wallet-public" :balance="wallet.balance" :peak="wallet.peakBalance" />
   <div v-else class="wallet-empty"><span aria-hidden="true">🍌</span><div><b>{{ isTaken(person) ? 'Henter bananlager…' : 'Intet bananlager endnu' }}</b><small>{{ isTaken(person) ? 'Saldoen følger brugeren på alle enheder.' : 'Bananer starter, når personen har valgt sin bruger.' }}</small><button v-if="own && error" @click="reload">Prøv igen</button><button v-else-if="isTaken(person)" @click="reloadPeople">Hent saldo</button></div></div>
 </template>
 <style scoped>

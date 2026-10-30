@@ -11,7 +11,7 @@ const background = `conic-gradient(${WHEEL_SLOTS.map(s => `${s.color} ${s.start}
         </div>
         <div class="wheel-gloss" aria-hidden="true" />
         <span v-for="n in 20" :key="n" class="bulb" :style="{ left: `${50 + Math.sin((n - 1) * Math.PI / 10) * 47}%`, top: `${50 - Math.cos((n - 1) * Math.PI / 10) * 47}%`, '--light-delay': `${n * -.12}s` }" aria-hidden="true" />
-        <div class="hub"><img src="/marker.png" alt="Emil på lykkehjulet"></div>
+        <div class="hub"><img src="/marker.png" alt="Emil på lykkehjulet" draggable="false"></div>
         <div class="pointer" aria-hidden="true"><svg viewBox="0 0 40 56"><defs><linearGradient :id="pointerId" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff6c7"/><stop offset=".5" stop-color="#ffd979"/><stop offset="1" stop-color="#bd7d31"/></linearGradient></defs><path d="M5 4h30v21L20 51 5 25Z" :fill="'url(#' + pointerId + ')'" stroke="#fff0ac" stroke-width="2"/><circle cx="20" cy="16" r="5" fill="#65422c"/><circle cx="19" cy="15" r="2" fill="#ffe7a3"/></svg></div>
       </div>
 </template>

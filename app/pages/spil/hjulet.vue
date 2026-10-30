@@ -18,7 +18,7 @@ const reacted = ref(false)
 watch(() => state.value?.day, () => { reacted.value = false })
 watch(prize, value => { if (value !== undefined && !spinning.value) rotation.value = wheelTarget(value) }, { immediate: true })
 onBeforeUnmount(() => { alive = false; finishAnimation?.(); animation.value = false })
-async function play() {
+async function play(direction: 1 | -1 = 1) {
   if (spinning.value || !state.value || state.value.wheel) return
   const owner = name.value
   spinning.value = true
@@ -28,7 +28,10 @@ async function play() {
     const response = await spin()
     if (!alive || name.value !== owner) return
     const value = response.wheel!.prize
-    rotation.value = Math.ceil(rotation.value / 360) * 360 + 360 * 9 + wheelTarget(value, Math.random())
+    const target = wheelTarget(value, Math.random())
+    rotation.value = direction < 0
+      ? Math.floor(rotation.value / 360) * 360 - 360 * 9 + target - 360
+      : Math.ceil(rotation.value / 360) * 360 + 360 * 9 + target
     const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 100 : WHEEL_SPIN_MS
     await new Promise<void>(resolve => { const timer = setTimeout(resolve, duration); finishAnimation = () => { clearTimeout(timer); resolve() } })
     if (alive && name.value === owner && state.value?.day === response.day) { reacted.value = true; if (value > 0) void shootConfetti(response.wheel!.jackpot ? 'normal' : 'small').catch(() => {}) }
@@ -43,14 +46,14 @@ async function play() {
 
     <section class="arcade" :class="{ running: spinning, jackpot: jackpotWon && !spinning }" aria-label="Lykkehjulet">
       <div class="marquee"><span class="jackpot-label">Mulig jackpot i dag</span><b>{{ jackpotToday ?? '…' }} <img src="/badges/banana-baron.webp" alt="bananer"></b><small>0,5 % chance pr. spin</small></div>
-      <div class="wheel-fit"><WheelFace fit :rotation="rotation" :spinning="spinning" :jackpot="wheelJackpot" /></div>
+      <div class="wheel-fit"><WheelInput :rotation="rotation" :spinning="spinning" :jackpot="wheelJackpot" :enabled="!!name && !!state && !state.wheel && !spinning" @spin="play" /></div>
     </section>
 
     <div v-if="ready && !name" class="status"><p>Vælg dit navn, så dit spin og dine bananer bliver gemt.</p><NuxtLink class="btn" to="/mig">Vælg mit navn</NuxtLink></div>
     <div v-else-if="!state" class="status"><p>{{ walletError || 'Henter dit daglige spin…' }}</p><button v-if="walletError" class="btn secondary" @click="reload">Prøv igen</button></div>
     <template v-else>
       <div v-if="state.wheel && !spinning" class="result" :class="{ big: jackpotWon, miv: prize === 0 }" role="status"><WheelResultReaction :kind="prize === 0 ? 'miv' : jackpotWon ? 'jackpot' : 'win'" :animate="reacted" /><span class="result-label">Dagens resultat</span><h2>{{ jackpotWon ? 'JACKPOT!' : prize === 0 ? 'Miv…' : prize === 1 ? 'Én er bedre end ingen' : 'Direkte på lageret!' }}</h2><strong>{{ prize ? `+${prize}` : '0' }}<img src="/badges/banana-baron.webp" alt="bananer"></strong><p>{{ prize ? 'Gevinsten er gemt · badgebonusser kommer oveni.' : 'Emil påtager sig intet ansvar.' }}</p></div>
-      <button v-else class="play" :disabled="spinning" @click="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8a8 8 0 1 0 1 7M19 3v5h-5"/></svg><span>{{ spinning ? 'Kom så, Emil…' : 'Drej hjulet' }}<small>{{ spinning ? 'Lidt spænding må der være' : 'Gratis · ingen indsats' }}</small></span><span class="play-arrow" aria-hidden="true">↗</span></button>
+      <button v-else class="play" :disabled="spinning" @click="play()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8a8 8 0 1 0 1 7M19 3v5h-5"/></svg><span>{{ spinning ? 'Kom så, Emil…' : 'Drej hjulet' }}<small>{{ spinning ? 'Lidt spænding må der være' : 'Tryk her eller træk i hjulet' }}</small></span><span class="play-arrow" aria-hidden="true">↗</span></button>
       <p v-if="error" class="error" role="alert">{{ error }}</p>
 
 

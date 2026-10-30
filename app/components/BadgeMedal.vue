@@ -36,7 +36,7 @@ const sub = computed(() => {
     <div class="medal" :style="{ background: ring }">
       <span class="face">
         <CountryFlag v-if="badge.flag" :code="badge.flag" />
-        <img v-else-if="icon && !broken" class="icon" :src="icon" alt="" draggable="false" @error="broken = true">
+        <img v-else-if="icon && !broken" class="icon" :class="{ custom: icon.includes('/custom/') }" :src="icon" alt="" draggable="false" @error="broken = true">
         <template v-else>{{ badge.emoji }}</template>
       </span>
       <span v-if="badge.kind === 'tier'" class="pips">
@@ -87,6 +87,7 @@ const sub = computed(() => {
   user-select: none;
 }
 .badge:not(.earned) .face { filter: grayscale(1); opacity: .45; }
+.icon.custom { width:80%; height:80%; }
 .earned .medal { box-shadow: 0 4px 12px rgba(0, 0, 0, .14); }
 .pips {
   position: absolute;

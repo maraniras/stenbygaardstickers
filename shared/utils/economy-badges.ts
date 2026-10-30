@@ -15,7 +15,7 @@ export function economyBadges(economy?: EconomyPublic): Badge[] {
   return [
     make('banana-baron', '🍌', ['Et bundt', 'Bananhandler', 'Bananlager', 'Bananbaron', 'Bananimperium'], [1000, 5000, 10000, 25000, 50000], economy?.peakBalance ?? 0, 'Højeste banansaldo'),
     make('city-guide', '🌍', ['Rejseleder', 'Stifinder', 'Bykender', 'Emils rejseleder', 'Verdensguide'], [1, 10, 30, 100, 250], s.cityWins, 'Gæt dagens by rigtigt'),
-    make('city-gps', '📍', ['Uden GPS', 'Lokalkendt', 'Menneskelig GPS', 'Indbygget kompas', 'Emils navigatør'], [1, 5, 10, 25, 50], s.cityFirstWins, 'Gæt rigtigt i første forsøg'),
+    make('city-gps', '📍', ['Uden GPS', 'Lokalkendt', 'Menneskelig GPS', 'Indbygget kompas', 'Local Legend'], [1, 5, 10, 25, 50], s.cityFirstWins, 'Gæt rigtigt i første forsøg'),
     make('city-streak', '🔥', ['På rette spor', 'Sporsans', 'Kurs mod Emil', 'Altid på rette spor', 'Aldrig faret vild'], [3, 7, 14, 30, 100], s.bestCityStreak, 'Spildøgn i træk med rigtigt bygæt'),
     make('wheel-spins', '🎡', ['En omgang mere', 'Hjulbenet', 'Rundtosset', 'Drejeskiven', 'Hjulminister'], [7, 30, 100, 200, 365], s.wheelSpins, 'Spins i alt'),
     make('wheel-streak', '📅', ['Fast inventar', 'Daglig gæst', 'Stamspiller', 'En del af hjulet', 'Møder altid op'], [3, 7, 14, 30, 100], s.bestWheelStreak, 'Spildøgn i træk med et spin'),

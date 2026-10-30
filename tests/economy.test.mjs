@@ -125,6 +125,7 @@ test('new game badges use explicit rewards, wealth gives no XP and higher tiers 
   const badges=a.badgesFor('Test',[],{},{economy:{test:a.publicEconomy(r)}})
   assert.equal(badges.find(b=>b.id==='banana-baron').points,0)
   assert.equal(badges.find(b=>b.id==='city-guide').points,15)
+  assert.equal(badges.find(b=>b.id==='city-gps').name,'Local Legend')
   assert.equal(r.history.find(t=>t.id==='badge:city-guide:5').amount,320)
 })
 test('Preview EVAL prefixes keys only and preserves Lua/arguments', async () => {

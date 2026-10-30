@@ -91,7 +91,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikonet er 
 |---|---|---|---|
 | x67 | Et bundt → Bananimperium (`banana-baron`) | Højeste saldo 1.000/5.000/10.000/25.000/50.000 | 50/100/200/400/800 |
 | x68 | Rejseleder → Verdensguide (`city-guide`) | 1/10/30/100/250 rigtige byer | 20/40/80/160/320 |
-| x69 | Uden GPS → Emils navigatør (`city-gps`) | 1/5/10/25/50 rigtige på første gæt | 20/40/80/160/320 |
+| x69 | Uden GPS → Local Legend (`city-gps`) | 1/5/10/25/50 rigtige på første gæt | 20/40/80/160/320 |
 | x70 | På rette spor → Aldrig faret vild (`city-streak`) | 3/7/14/30/100 spildøgn med rigtigt svar i træk | 10/25/50/100/250 |
 | x71 | En omgang mere → Hjulminister (`wheel-spins`) | 7/30/100/200/365 spins | 25/50/100/200/400 |
 | x72 | Fast inventar → Møder altid op (`wheel-streak`) | 3/7/14/30/100 spildøgn med spin i træk | 10/25/50/100/250 |
