@@ -10,6 +10,8 @@ const CUSTOM = new Set([
   'arctic', 'equator', 'farthest', 'live', 'stardust', 'comeback',
   'gang', 'network', 'roadtrip', 'longhaul', 'border', 'nordic',
   'continent-europa', 'continent-afrika', 'continent-asien', 'continent-nordamerika', 'continent-sydamerika', 'continent-oceanien',
+  'home', 'regular', 'team', 'cities', 'countries', 'capitals',
+  'commenter', 'tagged', 'likes', 'hit', 'viral', 'fivestar',
 ])
 
 export function badgeIcon(id: string) {
