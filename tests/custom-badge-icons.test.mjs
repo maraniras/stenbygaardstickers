@@ -16,16 +16,25 @@ const ids=['banana-baron','city-guide','city-gps','city-streak','wheel-spins','w
   'commenter','tagged','likes','hit','viral','fivestar',
   'director','filmstar','author','photographer','magnet','peoples',
   'continents','neighbour','far','world','north','south',
-  'spring','summer','autumn','winter','halloween','jul']
-test('all 63 custom badge motifs exist, fit retina medals and have real transparency',async()=>{
+  'spring','summer','autumn','winter','halloween','jul',
+  'denmark','birthday','turbo','weekend','streak','paaske','newyear','jubilee']
+test('all 71 custom badge motifs exist, fit retina medals and have real transparency',async()=>{
   for(const id of ids){const file=exports.badgeIcon(id);assert.equal(file,`/badges/custom/${id}.webp`);const image=sharp('public'+file),meta=await image.metadata(),stats=await image.stats();assert.ok(meta.hasAlpha);assert.equal(Math.max(meta.width,meta.height),256);assert.equal(stats.channels.at(-1).min,0)}
 })
-test('currency banana remains separate and other badge families keep their original icons',()=>{
+test('currency banana stays separate and shared badge families resolve to custom art',()=>{
   assert.notEqual(exports.badgeIcon('banana-baron'),'/badges/banana-baron.webp')
   assert.ok(readFileSync('public/badges/banana-baron.webp').length>0)
-  assert.equal(exports.badgeIcon('birthday'),'/badges/birthday.webp')
-  assert.equal(exports.badgeIcon('jubilee-10'),'/badges/jubilee.webp')
+  assert.equal(exports.badgeIcon('birthday'),'/badges/custom/birthday.webp')
+  for(const n of [10,25,50,75,100])assert.equal(exports.badgeIcon(`jubilee-${n}`),'/badges/custom/jubilee.webp')
   assert.equal(exports.badgeIcon('year-2026'),'/badges/custom/year.webp')
   assert.equal(exports.badgeIcon('year-2027'),'/badges/custom/year.webp')
-  assert.equal(exports.badgeIcon('denmark'),undefined)
+  assert.equal(exports.badgeIcon('denmark'),'/badges/custom/denmark.webp')
+})
+
+test('every badge in the fixed numbered catalogue has a custom asset, including aliases',()=>{
+  const catalogue=readFileSync('docs/badges.md','utf8').split(/\r?\n/).filter(row=>/^\| x\d+ \|/.test(row)).map(row=>row.match(/`([^`]+)`/))
+  assert.equal(catalogue.length,75)
+  const files=new Set()
+  for(const [,id]of catalogue){const icon=exports.badgeIcon(id.replace('<år>','2026'));assert.ok(icon.startsWith('/badges/custom/'),id);assert.ok(readFileSync('public'+icon).length>0,id);files.add(icon)}
+  assert.equal(files.size,71)
 })

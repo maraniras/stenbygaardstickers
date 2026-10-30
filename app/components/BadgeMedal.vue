@@ -35,7 +35,7 @@ const sub = computed(() => {
   <div class="badge" :class="[badge.kind, { earned: badge.earned, big }]" :title="`${badge.name}: ${badge.desc}`">
     <div class="medal" :style="{ background: ring }">
       <span class="face">
-        <CountryFlag v-if="badge.flag" :code="badge.flag" />
+        <CountryFlag v-if="badge.flag && (!icon || broken)" :code="badge.flag" />
         <img v-else-if="icon && !broken" class="icon" :class="{ custom: icon.includes('/custom/') }" :src="icon" alt="" draggable="false" @error="broken = true">
         <template v-else>{{ badge.emoji }}</template>
       </span>
