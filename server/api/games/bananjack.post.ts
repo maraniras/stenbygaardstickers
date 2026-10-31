@@ -1,4 +1,5 @@
 import { dealJack, actJack, jackPublic } from '../../utils/bananjack'
+import { jackDailyLimit } from '../../utils/jack-limit'
 import type { JackAction } from '../../../shared/types/bananjack'
 export default defineEventHandler(async event => {
   const { user } = await economyUser(event)
@@ -15,5 +16,6 @@ export default defineEventHandler(async event => {
     settleEconomy(r, user.name, context)
   })
   await syncBadgesLater(event)
-  return { game: jackPublic(record), balance: record.balance }
+  const now = new Date()
+  return { game: jackPublic(record, now), balance: record.balance, dailyLimit: jackDailyLimit(record, now) }
 })

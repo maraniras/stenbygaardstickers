@@ -1,5 +1,7 @@
 export const JACK_BETS = [10, 20, 30, 40, 50] as const
 export const JACK_MAX_BET = 50
+// Temporary. Set to null to remove the daily wagering limit.
+export const JACK_DAILY_WAGER_LIMIT: number | null = 1000
 export function jackRank(card: number) { return card % 13 }
 export function jackValue(card: number) { return Math.min(jackRank(card) + 1, 10) }
 export function jackScore(cards: number[]) {

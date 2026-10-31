@@ -8,6 +8,11 @@ const data = ref<JackResponse | null>(null)
 const shownBalance = ref<number | null>(null)
 const busy = ref(false), loading = ref(false), error = ref(''), bet = ref(10)
 const rules = ref<HTMLDialogElement>()
+const dailyLimit = computed(() => data.value?.dailyLimit)
+const limitReached = computed(() => Boolean(dailyLimit.value && dailyLimit.value.remaining < JACK_BETS[0]))
+const canBet = (amount: number) => Boolean(data.value && data.value.balance >= amount && (!dailyLimit.value || dailyLimit.value.remaining >= amount))
+const resetTime = computed(() => dailyLimit.value ? new Date(dailyLimit.value.nextResetAt).toLocaleString('da-DK',{timeZone:'Europe/Copenhagen',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '')
+let limitTimer: ReturnType<typeof setTimeout> | undefined
 const { shown: game, animating, caption, present, reset } = useJackPresentation()
 const locked = computed(() => busy.value || loading.value || animating.value)
 const playing = computed(() => game.value?.status === 'playing')
@@ -27,8 +32,10 @@ async function accept(response: JackResponse, animate = false) {
   if (old && next && (next.sequence < old.sequence || (next.sequence === old.sequence && next.revision < old.revision))) return
   const changed = !old || !next || next.sequence !== old.sequence || next.id !== old.id || next.revision !== old.revision
   data.value = response
+  clearTimeout(limitTimer)
+  if (response.dailyLimit) limitTimer = setTimeout(() => { void refresh() }, Math.max(250, Date.parse(response.dailyLimit.nextResetAt) - Date.now() + 100))
   if (!animate || !changed) shownBalance.value = response.balance
-  if (!changed && game.value) return
+  if (!changed && game.value) { game.value = next; return }
   const finished = await present(next, animate)
   if (finished) shownBalance.value = response.balance
   if (finished && animate && next?.status === 'finished' && next.payout > next.staked) void shootConfetti(next.hands[0]?.result === 'blackjack' ? 'normal' : 'small')
@@ -59,10 +66,11 @@ async function play(action: JackAction | 'deal') {
   } finally { busy.value=false; if(name.value && (owner!==name.value || token!==userToken()))queueMicrotask(refresh) }
 }
 watch([name,ready],()=>{reset();data.value=null;shownBalance.value=null;error.value='';void refresh()},{immediate:true})
+watch([name,ready],()=>clearTimeout(limitTimer))
 function visibleRefresh(){if(document.visibilityState==='visible')void refresh()}
 let timer:ReturnType<typeof setInterval>
 onMounted(()=>{window.addEventListener('focus',visibleRefresh);document.addEventListener('visibilitychange',visibleRefresh);timer=setInterval(visibleRefresh,30000)})
-onBeforeUnmount(()=>{clearInterval(timer);window.removeEventListener('focus',visibleRefresh);document.removeEventListener('visibilitychange',visibleRefresh)})
+onBeforeUnmount(()=>{clearInterval(timer);clearTimeout(limitTimer);window.removeEventListener('focus',visibleRefresh);document.removeEventListener('visibilitychange',visibleRefresh)})
 </script>
 
 <template>
@@ -86,9 +94,10 @@ onBeforeUnmount(()=>{clearInterval(timer);window.removeEventListener('focus',vis
     </section>
     <div v-if="completed" :key="game!.id" class="round-result" :class="outcome" role="status" aria-live="polite"><span class="result-kicker">Runden er slut</span><div><b>{{ resultText }}</b><strong>{{ net > 0 ? '+' : '' }}{{ net }} 🍌</strong></div><span>{{ game!.payout }} 🍌 udbetalt inkl. indsats</span></div>
     <div v-else class="status" role="status" aria-live="polite"><b>{{ animating ? caption : busy ? 'Kortene er på vej…' : resultText }}</b></div>
-    <div v-if="playing" class="actions"><button v-for="action in (['hit','stand','double','split'] as const)" :key="action" :disabled="locked || !game?.actions.includes(action)" @click="play(action)">{{ {hit:'Træk kort',stand:'Stå',double:'Fordobl',split:'Split'}[action] }}</button><p>Fordobl: ét kort og stå. Maks. 50 🍌 pr. hånd.</p></div>
-    <div v-else-if="name" class="bet-panel"><fieldset :disabled="busy || loading"><legend>Din indsats</legend><div class="bets"><button v-for="amount in JACK_BETS" :key="amount" :aria-pressed="bet===amount" :class="{selected:bet===amount}" :disabled="!data || amount>data.balance" @click="bet=amount">{{ amount }} 🍌</button></div></fieldset><button class="deal-button" :disabled="busy || loading || !data || data.balance<bet" @click="play('deal')">{{ game ? 'Spil næste hånd' : 'Giv kort' }} · {{ bet }} 🍌</button><NuxtLink v-if="data && data.balance < 10" class="note" to="/spil">Flere bananer? Tag dagens gratis spil →</NuxtLink></div>
-    <dialog ref="rules" class="rules" @click="($event.target === rules) && rules?.close()"><div><button class="close" aria-label="Luk regler" @click="rules?.close()">✕</button><h2>Sådan spiller du Bananjack</h2><ul><li>Kom tættere på 21 end Emil. Over 21 taber.</li><li>Es er 1 eller 11. Billedkort er 10.</li><li>Seks kortspil blandes på ny til hver runde. Dealeren tjekker for blackjack og står på alle 17, også soft 17.</li><li>Bananjack er es + et 10-kort på de to første kort og giver 3:2. Almindelig sejr giver 1:1. Ved lige op får du indsatsen tilbage.</li><li>Vælg 10–50 bananer i trin på 10. Fordobl på de første to kort, hvis du har råd, og hånden højst kommer på 50. Du får ét kort og står.</li><li>Split to kort med samme værdi. Maks. fire hænder. Hver ekstra hånd koster samme indsats. Split-esser får kun ét kort hver. 21 efter split giver almindelig sejr.</li><li>Ingen forsikring eller surrender. Din igangværende hånd gemmes, når du forlader siden.</li></ul><button class="deal-button" @click="rules?.close()">Tilbage til bordet</button></div></dialog>
+    <div v-if="playing" class="actions"><button v-for="action in (['hit','stand','double','split'] as const)" :key="action" :disabled="locked || !game?.actions.includes(action)" @click="play(action)">{{ {hit:'Træk kort',stand:'Stå',double:'Fordobl',split:'Split'}[action] }}</button><p>Fordobl: ét kort og stå. Maks. 50 🍌 pr. hånd.<span v-if="dailyLimit" class="limit-inline">Dagens indsatser: {{ dailyLimit.spent.toLocaleString('da-DK') }} / {{ dailyLimit.amount.toLocaleString('da-DK') }} 🍌</span></p></div>
+    <div v-else-if="name && limitReached && !busy" class="daily-cap" role="status"><b>Dagens indsatsgrænse er nået</b><p>{{ dailyLimit!.spent.toLocaleString('da-DK') }} / {{ dailyLimit!.amount.toLocaleString('da-DK') }} 🍌 satset. Nye indsatser {{ resetTime }} dansk tid.</p><NuxtLink to="/spil">Se de daglige spil →</NuxtLink></div>
+    <div v-else-if="name" class="bet-panel"><fieldset :disabled="busy || loading"><legend>Din indsats <span v-if="dailyLimit">{{ dailyLimit.remaining.toLocaleString('da-DK') }} / {{ dailyLimit.amount.toLocaleString('da-DK') }} 🍌 tilbage i dag</span></legend><div class="bets"><button v-for="amount in JACK_BETS" :key="amount" :aria-pressed="bet===amount" :class="{selected:bet===amount}" :disabled="!canBet(amount)" @click="bet=amount">{{ amount }} 🍌</button></div></fieldset><button class="deal-button" :disabled="locked || !canBet(bet)" @click="play('deal')">{{ game ? 'Spil næste hånd' : 'Giv kort' }} · {{ bet }} 🍌</button><NuxtLink v-if="data && data.balance < 10" class="note" to="/spil">Flere bananer? Tag dagens gratis spil →</NuxtLink></div>
+    <dialog ref="rules" class="rules" @click="($event.target === rules) && rules?.close()"><div><button class="close" aria-label="Luk regler" @click="rules?.close()">✕</button><h2>Sådan spiller du Bananjack</h2><ul><li>Kom tættere på 21 end Emil. Over 21 taber.</li><li>Es er 1 eller 11. Billedkort er 10.</li><li>Seks kortspil blandes på ny til hver runde. Dealeren tjekker for blackjack og står på alle 17, også soft 17.</li><li>Bananjack er es + et 10-kort på de to første kort og giver 3:2. Almindelig sejr giver 1:1. Ved lige op får du indsatsen tilbage.</li><li>Vælg 10–50 bananer i trin på 10. Fordobl på de første to kort, hvis du har råd, og hånden højst kommer på 50. Du får ét kort og står.</li><li>Split to kort med samme værdi. Maks. fire hænder. Hver ekstra hånd koster samme indsats. Split-esser får kun ét kort hver. 21 efter split giver almindelig sejr.</li><li v-if="dailyLimit">Midlertidig grænse: {{ dailyLimit.amount.toLocaleString('da-DK') }} bananer i samlede indsatser pr. dag, inklusive split og fordobling. Gevinster giver ikke mere plads. Nulstilles kl. 04.00 dansk tid.</li><li>Ingen forsikring eller surrender. Din igangværende hånd gemmes, når du forlader siden.</li></ul><button class="deal-button" @click="rules?.close()">Tilbage til bordet</button></div></dialog>
   </div>
 </template>
 
@@ -100,4 +109,7 @@ onBeforeUnmount(()=>{clearInterval(timer);window.removeEventListener('focus',vis
 
 
 .table{padding-top:12px;padding-bottom:12px}.cards,.cards.dealer{min-height:96px;padding-top:6px;padding-bottom:2px}.table-caption{margin:8px 0}.hand{padding:6px}.round-result{padding:12px 14px}.round-result>div{margin:5px 0}.round-result b{font-size:20px}
+</style>
+<style scoped>
+.bet-panel legend{width:100%;display:flex;justify-content:space-between;align-items:center;gap:6px}.bet-panel legend>span{font-size:10px;font-variant-numeric:tabular-nums}.limit-inline{display:block;margin-top:3px;font-variant-numeric:tabular-nums}.daily-cap{padding:14px 15px;border:1px solid var(--hairline);border-radius:15px;background:var(--surface);font-size:13px}.daily-cap p{font-size:11px;line-height:1.6;color:var(--muted);margin:7px 0}.daily-cap a{display:inline-flex;align-items:center;min-height:44px;color:var(--text);font-size:12px;font-weight:700;text-decoration:none}
 </style>

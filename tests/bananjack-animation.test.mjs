@@ -55,7 +55,7 @@ test('animation stays locked through final dealer card and settles once timers f
 
 test('page holds payout balance and confetti until animation finishes, never replaying a restored result',async()=>{
   const shown=ref(null),shots=[],pending=[]
-  const context=vm.createContext({exports:{},require:()=>({}),ref,computed,watch:()=>{},useHead:()=>{},onMounted:()=>{},onBeforeUnmount:()=>{},
+  const context=vm.createContext({exports:{},require:()=>({}),clearTimeout:()=>{},ref,computed,watch:()=>{},useHead:()=>{},onMounted:()=>{},onBeforeUnmount:()=>{},
     useUser:()=>({name:ref('Test'),ready:ref(false)}),useEconomy:()=>({}),
     useJackPresentation:()=>({shown,animating:ref(false),caption:ref(''),reset:()=>{},present:(next,animated)=>animated?new Promise(resolve=>pending.push({next,resolve})):Promise.resolve((shown.value=next,true))}),
     shootConfetti:async size=>shots.push(size)})
