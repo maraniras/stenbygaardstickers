@@ -2,6 +2,19 @@
 useHead({ title: 'Dit bananlager · Stenbygaard Stickers' })
 const { name, ready } = useUser()
 const { state, error, loading, reload } = useEconomy()
+const visibleCount = ref(20)
+const history = computed(() => state.value?.history.slice(0, 250) ?? [])
+const visibleHistory = computed(() => history.value.slice(0, visibleCount.value))
+const hasMore = computed(() => visibleHistory.value.length < history.value.length)
+watch(name, () => {
+  visibleCount.value = 20
+})
+function loadMore() {
+  visibleCount.value = Math.min(250, visibleCount.value + 20)
+}
+function amountText(amount: number) {
+  return (amount > 0 ? '+' : amount < 0 ? '−' : '') + Math.abs(amount).toLocaleString('da-DK')
+}
 const time = (at: string) =>
   new Date(at).toLocaleString('da-DK', {
     timeZone: 'Europe/Copenhagen',
@@ -68,19 +81,38 @@ const time = (at: string) =>
       </section>
       <section class="history">
         <h2>Seneste bevægelser</h2>
-        <p class="hint">Op til 250 udbetalinger. Alle beløb er gemt på din bruger.</p>
+        <p class="hint">
+          Viser {{ visibleHistory.length }} af {{ history.length }} bevægelser. De seneste 250
+          gemmes på din bruger.
+        </p>
+        <p
+          v-if="!history.length"
+          class="hint"
+        >
+          Ingen bevægelser endnu.
+        </p>
         <ol>
           <li
-            v-for="entry in state.history"
+            v-for="entry in visibleHistory"
             :key="entry.id"
           >
             <div>
               <b>{{ entry.label }}</b
               ><time :datetime="entry.at">{{ time(entry.at) }}</time>
             </div>
-            <span>+{{ entry.amount.toLocaleString('da-DK') }} 🍌</span>
+            <span :class="{ positive: entry.amount > 0, negative: entry.amount < 0 }"
+              >{{ amountText(entry.amount) }} 🍌</span
+            >
           </li>
         </ol>
+        <button
+          v-if="hasMore"
+          type="button"
+          class="load-more btn secondary"
+          @click="loadMore"
+        >
+          Indlæs flere
+        </button>
       </section>
       <div class="future">
         <b>Noget at spare op til</b>
@@ -198,6 +230,16 @@ li > span {
   flex: none;
   font-size: 13px;
   font-weight: 800;
+}
+.positive {
+  color: light-dark(#287343, #95d7ac);
+}
+.negative {
+  color: light-dark(#b5404e, #f3a0a9);
+}
+.load-more {
+  width: 100%;
+  margin-top: 14px;
 }
 .future {
   margin-top: 24px;

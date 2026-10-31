@@ -103,3 +103,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Bananjack client request/state logic lives in useBananjack.ts; page owns markup/styles.
 - Quality scripts: npm test, npm run lint, npm run format:check, npm run typecheck, npm run build. Prettier formats source; ESLint checks JS/TS/Vue essentials (Nuxt globals checked by typecheck). GitHub Checks runs all five on dev/main/PRs with Node22.22. Never format or commit user-local AGENTS.md.
 - Daily backup cron performs the full badge/economy sync after authorization/rate checks, so annual awards settle without making public reads expensive.
+
+- Banana ledger shows20 transactions initially, expands by20 up to250, resets pagination when the account changes; credits use muted green, debits muted red with a single minus sign (both color schemes).
