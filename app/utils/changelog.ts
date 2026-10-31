@@ -10,6 +10,7 @@ export interface Release {
 export const CHANGELOG: Release[] = [
   {
     version: '2.2',
+    date: '2026-10-31',
     notes: [
       'Daglige spil: Gæt dagens by, og drej lykkehjulet',
       'Optjen bananer fra stickers, badges og daglige spil',
