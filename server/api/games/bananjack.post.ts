@@ -2,6 +2,8 @@ import { dealJack, actJack, jackPublic } from '../../utils/bananjack'
 import { jackDailyLimit } from '../../utils/jack-limit'
 import type { JackAction } from '../../../shared/types/bananjack'
 export default defineEventHandler(async (event) => {
+  if (!useRuntimeConfig(event).public.bananjackEnabled)
+    throw createError({ statusCode: 403, statusMessage: 'Bananjack kommer snart.' })
   const { user } = await economyUser(event)
   const body = await readBody(event)
   if (!body || typeof body.id !== 'string' || !/^[a-zA-Z0-9_-]{16,80}$/.test(body.id))

@@ -4,6 +4,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   ssr: false,
   devtools: { enabled: false },
+  runtimeConfig: {
+    public: {
+      bananjackEnabled:
+        process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'preview',
+    },
+  },
   nitro: {
     // JSON-filerne er startdata, som serveren kopierer ind i databasen (server/utils/stickers.ts)
     serverAssets: [

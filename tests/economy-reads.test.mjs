@@ -27,6 +27,7 @@ test('public balances do not settle wallets or compute badges on read', async ()
 })
 test('resuming Bananjack does not sync badges for the community', async () => {
   const handler = route('server/api/games/bananjack.get.ts', {
+    useRuntimeConfig: () => ({ public: { bananjackEnabled: true } }),
     require: () => ({ jackPublic: () => null, jackDailyLimit: () => ({ remaining: 1000 }) }),
     economyUser: async () => ({ user: { name: 'Nicole' } }),
     syncEconomy: async () => ({ balance: 250 }),
@@ -38,3 +39,17 @@ test('resuming Bananjack does not sync badges for the community', async () => {
   assert.equal(response.balance, 250)
   assert.equal(response.dailyLimit.remaining, 1000)
 })
+
+for (const method of ['get', 'post']) {
+  test(`unreleased Bananjack rejects ${method.toUpperCase()} before reading or changing a wallet`, async () => {
+    const handler = route(`server/api/games/bananjack.${method}.ts`, {
+      require: () => ({}),
+      useRuntimeConfig: () => ({ public: { bananjackEnabled: false } }),
+      createError: (value) => Object.assign(new Error(value.statusMessage), value),
+      economyUser: () => {
+        throw Error('Unexpected wallet access')
+      },
+    })
+    await assert.rejects(handler({}), { statusCode: 403, message: 'Bananjack kommer snart.' })
+  })
+}

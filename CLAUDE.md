@@ -91,6 +91,8 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 
 ## Cleanup on dev (31 October 2026)
 
+- Production preparation: Bananjack is disabled by default in production builds. `runtimeConfig.public.bananjackEnabled` defaults on only for local Nuxt dev / Vercel Preview (optional override `NUXT_PUBLIC_BANANJACK_ENABLED`). Casino tab stays visible with a non-clickable coming-soon overlay; route middleware redirects direct game links to casino and GET/POST game APIs reject with 403 before any wallet access. Existing hands, stats, balances and badge progress remain stored. Release 2.2 notes are drafted without a date; set date when promoting to production. Work remains on dev until requested.
+
 - User JSON and user-tokens commit together using USER_CAS; all local user/code mutations share a queue. updateUser callbacks may be retried and must remain synchronous and side-effect free. Avatar changes, last-seen, device pairing/logout and admin deletion use the same mutation path.
 - useUser ignores late responses after logout/pairing/token changes. Ratings claims are marked complete only after success, and failed claims are retried by the next identity refresh. Rating reads are deduplicated and scoped to the captured token.
 - Shared validation in shared/utils/validation.ts: real calendar dates, numeric finite coordinates, NFC-normalized names (1–30 chars, letters/punctuation), 1–12 sticker names deduplicated without case. NameInput uses the same name rules. Existing data is preserved.

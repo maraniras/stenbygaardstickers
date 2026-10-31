@@ -9,6 +9,17 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.2',
+    notes: [
+      'Daglige spil: Gæt dagens by, og drej lykkehjulet',
+      'Optjen bananer fra stickers, badges og daglige spil',
+      'Se dit voksende bananlager og dine seneste bevægelser',
+      'Sammenlign badges, point, bananer og stickers på ranglisten',
+      'Nye badgeikoner og opdaterede navne',
+      'Casino-fanen er klar – Bananjack kommer snart',
+    ],
+  },
+  {
     version: '2.1',
     date: '2026-10-26',
     notes: [

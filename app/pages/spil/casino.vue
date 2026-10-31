@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { NuxtLink } from '#components'
 useHead({ title: 'Casino · Stenbygaard Stickers' })
 const { state } = useEconomy()
+const { bananjackEnabled } = useRuntimeConfig().public
 </script>
 
 <template>
@@ -30,13 +32,16 @@ const { state } = useEconomy()
     </header>
     <GameSectionNav section="casino" />
 
-    <NuxtLink
-      to="/spil/bananjack"
+    <component
+      :is="bananjackEnabled ? NuxtLink : 'article'"
+      :to="bananjackEnabled ? '/spil/bananjack' : undefined"
       class="bananjack-card"
       aria-labelledby="bananjack-title"
+      :aria-describedby="!bananjackEnabled ? 'bananjack-coming-soon' : undefined"
     >
       <div class="card-top">
-        <span class="table-label">CASINOBORDET</span><span class="status">Spil nu →</span>
+        <span class="table-label">CASINOBORDET</span
+        ><span class="status">{{ bananjackEnabled ? 'Spil nu →' : 'På vej' }}</span>
       </div>
       <div
         class="table-art"
@@ -90,7 +95,17 @@ const { state } = useEconomy()
         <h2 id="bananjack-title">Banan<span>jack</span></h2>
         <div class="game-details"><span>Én spiller</span><span>10–50 🍌 pr. hånd</span></div>
       </div>
-    </NuxtLink>
+      <div
+        v-if="!bananjackEnabled"
+        id="bananjack-coming-soon"
+        class="coming-soon"
+      >
+        <div>
+          <span class="soon-label">Bananjack</span><strong>Kommer snart</strong
+          ><span>Vi gør bordet klar.</span>
+        </div>
+      </div>
+    </component>
     <NuxtLink
       class="daily-link"
       to="/spil"
@@ -173,6 +188,40 @@ h1 > span {
   background: radial-gradient(ellipse at 50% 30%, #29594c 0%, #15392f 45%, #102720 100%);
   color: #fff8e8;
   box-shadow: 0 12px 30px #10251e20;
+}
+.coming-soon {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  background: #0b211b88;
+  backdrop-filter: blur(3px);
+  padding: 24px;
+}
+.coming-soon > div {
+  display: grid;
+  gap: 9px;
+  width: 100%;
+  padding: 25px 16px;
+  border: 1px solid #f1d99b66;
+  border-radius: 20px;
+  background: #122d27e8;
+  box-shadow: 0 12px 35px #0003;
+  text-align: center;
+  color: #e2cf9a;
+  font-size: 13px;
+}
+.coming-soon strong {
+  color: #fff2cf;
+  font-size: clamp(28px, 8vw, 36px);
+  line-height: 1.1;
+}
+.soon-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 10px;
+  font-weight: 800;
 }
 .card-top {
   position: relative;

@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { JACK_BETS, jackScore } from '../../../shared/utils/bananjack'
+definePageMeta({
+  middleware: () => {
+    if (!useRuntimeConfig().public.bananjackEnabled)
+      return navigateTo('/spil/casino', { replace: true })
+  },
+})
 useHead({ title: 'Bananjack · Stenbygaard Stickers' })
 const {
   data,
