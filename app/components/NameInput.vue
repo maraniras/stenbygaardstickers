@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { normalizeName, validName } from '../../shared/utils/validation'
 // Navne som chips. Forslag fra dem der allerede har sat stickers op, men man kan
 // også skrive et helt nyt navn og trykke Enter (eller komma).
 const model = defineModel<string[]>({ required: true })
@@ -13,22 +14,33 @@ const query = computed(() => text.value.trim())
 const matches = computed(() => {
   const q = query.value.toLocaleLowerCase('da')
   return props.suggestions
-    .filter(n => !model.value.some(m => sameName(m, n)))
-    .filter(n => !q || n.toLocaleLowerCase('da').includes(q))
-    .sort((a, b) => Number(!a.toLocaleLowerCase('da').startsWith(q)) - Number(!b.toLocaleLowerCase('da').startsWith(q)))
+    .filter((n) => !model.value.some((m) => sameName(m, n)))
+    .filter((n) => !q || n.toLocaleLowerCase('da').includes(q))
+    .sort(
+      (a, b) =>
+        Number(!a.toLocaleLowerCase('da').startsWith(q)) -
+        Number(!b.toLocaleLowerCase('da').startsWith(q)),
+    )
     .slice(0, 6)
 })
-const isNew = computed(() => query.value && !props.suggestions.some(n => sameName(n, query.value)) && !model.value.some(n => sameName(n, query.value)))
+const isNew = computed(
+  () =>
+    query.value &&
+    !props.suggestions.some((n) => sameName(n, query.value)) &&
+    !model.value.some((n) => sameName(n, query.value)),
+)
 const options = computed(() => [...matches.value, ...(isNew.value ? [query.value] : [])])
 
-watch(options, () => { active.value = 0 })
+watch(options, () => {
+  active.value = 0
+})
 
 function add(name: string) {
-  const n = name.trim().replace(/\s+/g, ' ')
-  if (!n) return
+  const n = normalizeName(name)
+  if (!validName(n) || model.value.length >= 12) return
   // Brug den stavemåde der allerede findes
-  const known = props.suggestions.find(s => sameName(s, n)) ?? n
-  if (!model.value.some(m => sameName(m, known))) model.value = [...model.value, known]
+  const known = props.suggestions.find((s) => sameName(s, n)) ?? n
+  if (!model.value.some((m) => sameName(m, known))) model.value = [...model.value, known]
   text.value = ''
   input.value?.focus()
 }
@@ -42,20 +54,16 @@ function onKey(e: KeyboardEvent) {
     e.preventDefault()
     const pick = open.value && options.value.length ? options.value[active.value] : query.value
     if (pick) add(pick)
-  }
-  else if (e.key === 'Backspace' && !text.value && model.value.length) {
+  } else if (e.key === 'Backspace' && !text.value && model.value.length) {
     remove(model.value.length - 1)
-  }
-  else if (e.key === 'ArrowDown') {
+  } else if (e.key === 'ArrowDown') {
     e.preventDefault()
     open.value = true
     active.value = Math.min(active.value + 1, options.value.length - 1)
-  }
-  else if (e.key === 'ArrowUp') {
+  } else if (e.key === 'ArrowUp') {
     e.preventDefault()
     active.value = Math.max(active.value - 1, 0)
-  }
-  else if (e.key === 'Escape') {
+  } else if (e.key === 'Escape') {
     open.value = false
   }
 }
@@ -71,15 +79,31 @@ function onBlur() {
 
 <template>
   <div class="names">
-    <div class="box" @click="input?.focus()">
-      <span v-for="(n, i) in model" :key="n" class="chip tag">
-        <UserAvatar class="avatar" :name="n" />{{ n }}
-        <button type="button" :aria-label="`Fjern ${n}`" @click.stop="remove(i)">
+    <div
+      class="box"
+      @click="input?.focus()"
+    >
+      <span
+        v-for="(n, i) in model"
+        :key="n"
+        class="chip tag"
+      >
+        <UserAvatar
+          class="avatar"
+          :name="n"
+        />{{ n }}
+        <button
+          type="button"
+          :aria-label="`Fjern ${n}`"
+          @click.stop="remove(i)"
+        >
           <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
       </span>
       <input
         ref="input"
+        aria-label="Sat op af"
+        maxlength="30"
         v-model="text"
         :placeholder="model.length ? 'Tilføj flere…' : 'Skriv et navn…'"
         autocomplete="off"
@@ -89,16 +113,30 @@ function onBlur() {
         @input="open = true"
         @keydown="onKey"
         @blur="onBlur"
-      >
+      />
     </div>
-    <ul v-if="open && options.length" class="menu glass">
-      <li v-for="(o, i) in options" :key="o">
-        <button type="button" :class="{ on: i === active }" @mousedown.prevent @click="add(o)">
+    <ul
+      v-if="open && options.length"
+      class="menu glass"
+    >
+      <li
+        v-for="(o, i) in options"
+        :key="o"
+      >
+        <button
+          type="button"
+          :class="{ on: i === active }"
+          @mousedown.prevent
+          @click="add(o)"
+        >
           <template v-if="isNew && o === query">
             <span class="plus">+</span> Tilføj »{{ o }}«
           </template>
           <template v-else>
-            <UserAvatar class="avatar" :name="o" />{{ o }}
+            <UserAvatar
+              class="avatar"
+              :name="o"
+            />{{ o }}
           </template>
         </button>
       </li>
@@ -107,7 +145,9 @@ function onBlur() {
 </template>
 
 <style scoped>
-.names { position: relative; }
+.names {
+  position: relative;
+}
 .box {
   display: flex;
   flex-wrap: wrap;
@@ -121,7 +161,9 @@ function onBlur() {
   box-shadow: var(--shadow-sm);
   cursor: text;
 }
-.box:focus-within { border-color: var(--text); }
+.box:focus-within {
+  border-color: var(--text);
+}
 .box input {
   flex: 1;
   min-width: 120px;
@@ -146,7 +188,15 @@ function onBlur() {
   background: none;
   cursor: pointer;
 }
-.tag svg, .menu svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+.tag svg,
+.menu svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
 .avatar {
   display: grid;
   place-items: center;
@@ -182,7 +232,9 @@ function onBlur() {
   text-align: left;
   cursor: pointer;
 }
-.menu button.on { background: var(--surface-2); }
+.menu button.on {
+  background: var(--surface-2);
+}
 .plus {
   display: grid;
   place-items: center;

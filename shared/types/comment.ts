@@ -36,4 +36,3 @@ export interface CommentStats {
   /** Flest 👍 på én kommentar */
   maxLikes: number
 }
-

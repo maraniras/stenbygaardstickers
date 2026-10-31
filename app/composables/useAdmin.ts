@@ -5,7 +5,9 @@ export function useAdmin() {
   const all = useState<StoredSticker[] | null>('admin-stickers', () => null)
 
   async function check() {
-    admin.value = (await $fetch<{ admin: boolean }>('/api/admin/me').catch(() => ({ admin: false }))).admin
+    admin.value = (
+      await $fetch<{ admin: boolean }>('/api/admin/me').catch(() => ({ admin: false }))
+    ).admin
     return admin.value
   }
 
@@ -27,14 +29,14 @@ export function useAdmin() {
   /** Gemmer og opdaterer både admin-listen og kortet */
   async function save(id: string, body: Record<string, unknown>) {
     const s = await $fetch<StoredSticker>(`/api/admin/stickers/${id}`, { method: 'PUT', body })
-    all.value = (all.value ?? []).map(x => (x.id === id ? s : x))
+    all.value = (all.value ?? []).map((x) => (x.id === id ? s : x))
     await useStickers().reload()
     return s
   }
 
   async function remove(id: string) {
     await $fetch(`/api/admin/stickers/${id}`, { method: 'DELETE' })
-    all.value = (all.value ?? []).filter(x => x.id !== id)
+    all.value = (all.value ?? []).filter((x) => x.id !== id)
     await useStickers().reload()
   }
 

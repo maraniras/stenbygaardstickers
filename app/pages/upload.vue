@@ -12,7 +12,10 @@ function newDraft() {
   return d
 }
 
-const draft = ref<StickerDraft>(newDraft())
+const draftKey = computed(
+  () => 'stenbygaard-upload-draft:' + (me.value?.toLocaleLowerCase('da') ?? 'anonymous'),
+)
+const { draft, restored, clear: clearDraft } = useSavedDraft<StickerDraft>(draftKey, newDraft)
 // Navnet kan først være hentet, efter siden er åbnet
 watch(me, (n) => {
   if (n && !draft.value.placedBy.length) draft.value.placedBy = [n]
@@ -32,17 +35,16 @@ const missing = computed(() => {
 useHead({ title: 'Tilføj sticker · Stenbygaard Stickers' })
 
 async function submit() {
-  if (missing.value || busy.value) return
+  if (missing.value || busy.value || sending.value) return
   sending.value = true
   error.value = ''
   try {
     await $fetch('/api/submissions', { method: 'POST', body: draftBody(draft.value) })
+    clearDraft()
     sent.value = true
-  }
-  catch (err: any) {
+  } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Kunne ikke sende – prøv igen'
-  }
-  finally {
+  } finally {
     sending.value = false
   }
 }
@@ -56,20 +58,44 @@ function back() {
   if (window.history.state?.back) router.back()
   else router.push('/liste')
 }
+function discardDraft() {
+  draft.value = newDraft()
+  clearDraft()
+  restored.value = false
+}
 </script>
 
 <template>
   <div class="page">
-    <button class="back" aria-label="Tilbage" @click="back">
+    <button
+      class="back"
+      aria-label="Tilbage"
+      @click="back"
+    >
       <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
     </button>
 
-    <div v-if="sent" class="done">
-      <img src="/marker.png" alt="">
+    <div
+      v-if="sent"
+      class="done"
+    >
+      <img
+        src="/marker.png"
+        alt=""
+      />
       <h1>Tak!</h1>
       <p>Stickeren kommer på kortet, så snart den er godkendt.</p>
-      <button class="btn" @click="again">Tilføj en til</button>
-      <NuxtLink class="btn secondary" to="/">Til kortet</NuxtLink>
+      <button
+        class="btn"
+        @click="again"
+      >
+        Tilføj en til
+      </button>
+      <NuxtLink
+        class="btn secondary"
+        to="/"
+        >Til kortet</NuxtLink
+      >
     </div>
 
     <template v-else>
@@ -78,20 +104,67 @@ function back() {
         <p class="sub">Har du sat Emil op et nyt sted? Den bliver vist, når den er godkendt.</p>
       </header>
 
-      <StickerForm v-model="draft" v-model:busy="busy" :names="people.map(p => p.name)" locate />
+      <p
+        v-if="restored"
+        class="draft-note"
+        role="status"
+      >
+        Din kladde er gendannet på denne enhed.
+        <button
+          type="button"
+          @click="discardDraft"
+        >
+          Start forfra
+        </button>
+      </p>
+      <StickerForm
+        v-model="draft"
+        v-model:busy="busy"
+        :names="people.map((p) => p.name)"
+        locate
+      />
 
       <div class="submit">
-        <p v-if="error" class="err">{{ error }}</p>
-        <button class="btn" :disabled="Boolean(missing) || busy || sending" @click="submit">
+        <p
+          v-if="error"
+          class="err"
+        >
+          {{ error }}
+        </p>
+        <button
+          class="btn"
+          :disabled="Boolean(missing) || busy || sending"
+          @click="submit"
+        >
           {{ sending ? 'Sender…' : busy ? 'Venter på upload…' : 'Send til godkendelse' }}
         </button>
-        <p v-if="missing" class="hint-text">{{ missing }}</p>
+        <p
+          v-if="missing"
+          class="hint-text"
+        >
+          {{ missing }}
+        </p>
       </div>
     </template>
   </div>
 </template>
 
 <style scoped>
+.draft-note {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 12px;
+  color: var(--muted);
+}
+.draft-note button {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-decoration: underline;
+}
 .page {
   max-width: 640px;
   margin: 0 auto;
@@ -109,10 +182,25 @@ function back() {
   background: none;
   cursor: pointer;
 }
-.back svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-header { margin: 8px 0 22px; }
-h1 { font-size: 34px; }
-.sub { margin: 6px 0 0; color: var(--muted); }
+.back svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+header {
+  margin: 8px 0 22px;
+}
+h1 {
+  font-size: 34px;
+}
+.sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
 .submit {
   display: flex;
   flex-direction: column;
@@ -120,8 +208,16 @@ h1 { font-size: 34px; }
   margin-top: 28px;
   text-align: center;
 }
-.hint-text { margin: 0; font-size: 13px; color: var(--muted); }
-.err { margin: 0; color: #c62828; font-weight: 600; }
+.hint-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.err {
+  margin: 0;
+  color: #c62828;
+  font-weight: 600;
+}
 .done {
   display: flex;
   flex-direction: column;
@@ -130,7 +226,15 @@ h1 { font-size: 34px; }
   padding-top: 60px;
   text-align: center;
 }
-.done img { width: 110px; }
-.done p { margin: 0 0 10px; color: var(--muted); }
-.done .btn { width: 100%; max-width: 320px; }
+.done img {
+  width: 110px;
+}
+.done p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+.done .btn {
+  width: 100%;
+  max-width: 320px;
+}
 </style>

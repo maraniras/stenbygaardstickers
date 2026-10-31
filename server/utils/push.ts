@@ -10,19 +10,22 @@ export type PushList = 'admin' | 'all'
 const REDIS_KEY: Record<PushList, string> = { admin: 'push:subs', all: 'push:all' }
 const LOCAL_KEY: Record<PushList, string> = { admin: 'push-subs', all: 'push-all' }
 
-interface Vapid { publicKey: string, privateKey: string }
+interface Vapid {
+  publicKey: string
+  privateKey: string
+}
 
 let vapid: Promise<Vapid> | undefined
 
 function getVapid() {
   vapid ??= (async () => {
     if (redisEnabled) {
-      const [json] = await redis([['GET', 'push:vapid']]) as [string | null]
+      const [json] = (await redis([['GET', 'push:vapid']])) as [string | null]
       if (json) return JSON.parse(json) as Vapid
       const keys = webpush.generateVAPIDKeys()
       // NX: hvis to servere laver nøgler samtidig, vinder den første
       await redis([['SET', 'push:vapid', JSON.stringify(keys), 'NX']])
-      const [saved] = await redis([['GET', 'push:vapid']]) as [string]
+      const [saved] = (await redis([['GET', 'push:vapid']])) as [string]
       return JSON.parse(saved) as Vapid
     }
     const storage = useStorage('data')
@@ -46,9 +49,10 @@ export async function vapidPublicKey() {
 type LocalSubs = Record<string, PushSubscription>
 
 async function allSubs(list: PushList): Promise<PushSubscription[]> {
-  if (!redisEnabled) return Object.values((await useStorage('data').getItem<LocalSubs>(LOCAL_KEY[list])) ?? {})
-  const [flat] = await redis([['HVALS', REDIS_KEY[list]]]) as [string[]]
-  return flat.map(s => JSON.parse(s))
+  if (!redisEnabled)
+    return Object.values((await useStorage('data').getItem<LocalSubs>(LOCAL_KEY[list])) ?? {})
+  const [flat] = (await redis([['HVALS', REDIS_KEY[list]]])) as [string[]]
+  return flat.map((s) => JSON.parse(s))
 }
 
 export async function addSub(list: PushList, sub: PushSubscription) {
@@ -74,13 +78,18 @@ export async function removeSub(list: PushList, endpoint: string) {
 }
 
 export async function hasSub(list: PushList, endpoint: string) {
-  return (await allSubs(list)).some(s => s.endpoint === endpoint)
+  return (await allSubs(list)).some((s) => s.endpoint === endpoint)
 }
 
 export function cleanSub(body: unknown): PushSubscription {
-  const b = (body ?? {}) as { endpoint?: unknown, keys?: { p256dh?: unknown, auth?: unknown } }
-  if (typeof b.endpoint !== 'string' || !b.endpoint.startsWith('https://') || b.endpoint.length > 1000
-    || typeof b.keys?.p256dh !== 'string' || typeof b.keys?.auth !== 'string') {
+  const b = (body ?? {}) as { endpoint?: unknown; keys?: { p256dh?: unknown; auth?: unknown } }
+  if (
+    typeof b.endpoint !== 'string' ||
+    !b.endpoint.startsWith('https://') ||
+    b.endpoint.length > 1000 ||
+    typeof b.keys?.p256dh !== 'string' ||
+    typeof b.keys?.auth !== 'string'
+  ) {
     throw createError({ statusCode: 400, statusMessage: 'Ugyldigt abonnement' })
   }
   return { endpoint: b.endpoint, keys: { p256dh: b.keys.p256dh, auth: b.keys.auth } }
@@ -100,16 +109,20 @@ export async function sendPush(subs: PushSubscription[], message: PushMessage) {
   if (!subs.length) return gone
   const keys = await getVapid()
   const payload = JSON.stringify(message)
-  await Promise.allSettled(subs.map(sub => webpush
-    .sendNotification(sub, payload, {
-      vapidDetails: { subject: 'https://stenbygaardstickers.vercel.app', ...keys },
-      TTL: 60 * 60 * 24,
-      timeout: 5000,
-    })
-    .catch((err: { statusCode?: number }) => {
-      if (err.statusCode === 404 || err.statusCode === 410) gone.push(sub.endpoint)
-      else console.error('Notifikation fejlede', err)
-    })))
+  await Promise.allSettled(
+    subs.map((sub) =>
+      webpush
+        .sendNotification(sub, payload, {
+          vapidDetails: { subject: 'https://stenbygaardstickers.vercel.app', ...keys },
+          TTL: 60 * 60 * 24,
+          timeout: 5000,
+        })
+        .catch((err: { statusCode?: number }) => {
+          if (err.statusCode === 404 || err.statusCode === 410) gone.push(sub.endpoint)
+          else console.error('Notifikation fejlede', err)
+        }),
+    ),
+  )
   return gone
 }
 
@@ -117,10 +130,12 @@ export async function sendPush(subs: PushSubscription[], message: PushMessage) {
  *  skip: endpoints der ikke skal have den (fx brugere der har slået typen fra). */
 export async function notify(list: PushList, message: PushMessage, skip?: Set<string>) {
   try {
-    const gone = await sendPush((await allSubs(list)).filter(s => !skip?.has(s.endpoint)), message)
+    const gone = await sendPush(
+      (await allSubs(list)).filter((s) => !skip?.has(s.endpoint)),
+      message,
+    )
     for (const endpoint of gone) await removeSub(list, endpoint)
-  }
-  catch (err) {
+  } catch (err) {
     console.error('Kunne ikke sende notifikationer', err)
   }
 }

@@ -39,9 +39,7 @@ export const CHANGELOG: Release[] = [
   {
     version: '1.0.1',
     date: '2026-10-23',
-    notes: [
-      'Opdater-knap på kortet og listen',
-    ],
+    notes: ['Opdater-knap på kortet og listen'],
   },
   {
     version: '1.0',

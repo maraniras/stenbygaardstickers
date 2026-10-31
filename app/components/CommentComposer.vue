@@ -3,8 +3,14 @@
 // ikke tagge sig selv. Forslagene er dem, der har valgt et navn i appen, og alle der
 // står på en sticker (de får først besked, når de vælger deres navn).
 const text = defineModel<string>({ required: true })
-const props = defineProps<{ placeholder?: string, busy?: boolean, submitLabel?: string, autofocus?: boolean, cancelable?: boolean }>()
-const emit = defineEmits<{ submit: [], cancel: [] }>()
+const props = defineProps<{
+  placeholder?: string
+  busy?: boolean
+  submitLabel?: string
+  autofocus?: boolean
+  cancelable?: boolean
+}>()
+const emit = defineEmits<{ submit: []; cancel: [] }>()
 
 const { users } = useUsers()
 const { people } = useStickers()
@@ -12,8 +18,8 @@ const { name: me } = useUser()
 
 const names = computed(() => {
   const out: string[] = []
-  for (const n of [...users.value.map(u => u.name), ...people.value.map(p => p.name)]) {
-    if (!out.some(o => sameName(o, n))) out.push(n)
+  for (const n of [...users.value.map((u) => u.name), ...people.value.map((p) => p.name)]) {
+    if (!out.some((o) => sameName(o, n))) out.push(n)
   }
   return out
 })
@@ -25,13 +31,19 @@ const options = computed(() => {
   if (query.value === null) return []
   const q = query.value.toLocaleLowerCase('da')
   return names.value
-    .filter(n => !(me.value && sameName(n, me.value)))
-    .filter(n => n.toLocaleLowerCase('da').startsWith(q) || (q.length > 1 && n.toLocaleLowerCase('da').includes(q)))
+    .filter((n) => !(me.value && sameName(n, me.value)))
+    .filter(
+      (n) =>
+        n.toLocaleLowerCase('da').startsWith(q) ||
+        (q.length > 1 && n.toLocaleLowerCase('da').includes(q)),
+    )
     .sort((a, b) => a.localeCompare(b, 'da'))
     .slice(0, 5)
 })
 
-watch(options, () => { active.value = 0 })
+watch(options, () => {
+  active.value = 0
+})
 
 /** Ser om markøren står lige efter "@noget" */
 function detect() {
@@ -61,10 +73,25 @@ function pick(name: string) {
 
 function onKey(e: KeyboardEvent) {
   if (options.value.length) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); active.value = (active.value + 1) % options.value.length; return }
-    if (e.key === 'ArrowUp') { e.preventDefault(); active.value = (active.value - 1 + options.value.length) % options.value.length; return }
-    if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); pick(options.value[active.value]!); return }
-    if (e.key === 'Escape') { query.value = null; return }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      active.value = (active.value + 1) % options.value.length
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      active.value = (active.value - 1 + options.value.length) % options.value.length
+      return
+    }
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault()
+      pick(options.value[active.value]!)
+      return
+    }
+    if (e.key === 'Escape') {
+      query.value = null
+      return
+    }
   }
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
     e.preventDefault()
@@ -76,7 +103,9 @@ const max = COMMENT_MAX
 
 // Lad et tryk på et forslag nå frem først
 function onBlur() {
-  setTimeout(() => { query.value = null }, 150)
+  setTimeout(() => {
+    query.value = null
+  }, 150)
 }
 
 function resize() {
@@ -101,10 +130,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <form class="composer" @submit.prevent="emit('submit')">
+  <form
+    class="composer"
+    @submit.prevent="emit('submit')"
+  >
     <div class="field">
       <textarea
         ref="area"
+        :aria-label="placeholder ?? 'Skriv en kommentar'"
         v-model="text"
         rows="1"
         :maxlength="max"
@@ -117,17 +150,43 @@ onMounted(() => {
         @keydown="onKey"
         @blur="onBlur"
       />
-      <ul v-if="options.length" class="menu glass">
-        <li v-for="(o, i) in options" :key="o">
-          <button type="button" :class="{ on: i === active }" @mousedown.prevent @click="pick(o)">
-            <UserAvatar class="avatar" :name="o" />{{ o }}
+      <ul
+        v-if="options.length"
+        class="menu glass"
+      >
+        <li
+          v-for="(o, i) in options"
+          :key="o"
+        >
+          <button
+            type="button"
+            :class="{ on: i === active }"
+            @mousedown.prevent
+            @click="pick(o)"
+          >
+            <UserAvatar
+              class="avatar"
+              :name="o"
+            />{{ o }}
           </button>
         </li>
       </ul>
     </div>
     <div class="buttons">
-      <button v-if="cancelable" type="button" class="link" @click="emit('cancel')">Fortryd</button>
-      <button class="send" :disabled="!text.trim() || busy">{{ busy ? '…' : submitLabel ?? 'Send' }}</button>
+      <button
+        v-if="cancelable"
+        type="button"
+        class="link"
+        @click="emit('cancel')"
+      >
+        Fortryd
+      </button>
+      <button
+        class="send"
+        :disabled="!text.trim() || busy"
+      >
+        {{ busy ? '…' : (submitLabel ?? 'Send') }}
+      </button>
     </div>
   </form>
 </template>
@@ -138,7 +197,9 @@ onMounted(() => {
   flex-direction: column;
   gap: 8px;
 }
-.field { position: relative; }
+.field {
+  position: relative;
+}
 textarea {
   display: block;
   width: 100%;
@@ -153,7 +214,9 @@ textarea {
   resize: none;
   outline: none;
 }
-textarea:focus { border-color: var(--text); }
+textarea:focus {
+  border-color: var(--text);
+}
 .menu {
   position: absolute;
   left: 0;
@@ -178,7 +241,9 @@ textarea:focus { border-color: var(--text); }
   text-align: left;
   cursor: pointer;
 }
-.menu button.on { background: var(--surface-2); }
+.menu button.on {
+  background: var(--surface-2);
+}
 .avatar {
   display: grid;
   place-items: center;
@@ -215,5 +280,8 @@ textarea:focus { border-color: var(--text); }
   font-weight: 700;
   cursor: pointer;
 }
-.send:disabled { opacity: .4; cursor: default; }
+.send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 </style>

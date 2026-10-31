@@ -21,19 +21,31 @@ const error = ref('')
 const claimingHere = ref(false)
 let openTimer: ReturnType<typeof setTimeout> | undefined
 
-const free = computed(() => people.value.map(p => p.name).filter(n => !isTaken(n)).slice(0, 8))
+const free = computed(() =>
+  people.value
+    .map((p) => p.name)
+    .filter((n) => !isTaken(n))
+    .slice(0, 8),
+)
 const taken = computed(() => Boolean(input.value.trim() && isTaken(input.value.trim())))
 
 function asked() {
-  try { return Boolean(localStorage.getItem(ASKED)) }
-  catch { return true }
+  try {
+    return Boolean(localStorage.getItem(ASKED))
+  } catch {
+    return true
+  }
 }
 function remember() {
-  try { localStorage.setItem(ASKED, new Date().toISOString()) }
-  catch {}
+  try {
+    localStorage.setItem(ASKED, new Date().toISOString())
+  } catch {}
 }
 
-const busyRoute = computed(() => ['/mig', '/upload', '/notifikationer'].includes(route.path) || route.path.startsWith('/admin'))
+const busyRoute = computed(
+  () =>
+    ['/mig', '/upload', '/notifikationer'].includes(route.path) || route.path.startsWith('/admin'),
+)
 
 function cancelOpen() {
   clearTimeout(openTimer)
@@ -52,17 +64,21 @@ function tryOpen() {
   state.value = 'open'
 }
 
-watch([ready, name], ([r, n]) => {
-  if (!r) return
-  if (n) {
-    remember()
-    cancelOpen()
-    if (!claimingHere.value) state.value = 'done'
-    return
-  }
-  if (asked()) return close()
-  if (state.value === 'pending' && !openTimer) openTimer = setTimeout(tryOpen, 2500)
-}, { immediate: true })
+watch(
+  [ready, name],
+  ([r, n]) => {
+    if (!r) return
+    if (n) {
+      remember()
+      cancelOpen()
+      if (!claimingHere.value) state.value = 'done'
+      return
+    }
+    if (asked()) return close()
+    if (state.value === 'pending' && !openTimer) openTimer = setTimeout(tryOpen, 2500)
+  },
+  { immediate: true },
+)
 
 onBeforeUnmount(cancelOpen)
 
@@ -85,16 +101,13 @@ async function submit() {
     if (canPush) {
       await all.refresh()
       step.value = all.on.value ? 'welcome' : 'push'
-    }
-    else {
+    } else {
       step.value = 'welcome'
     }
     if (step.value === 'welcome') setTimeout(close, 2500)
-  }
-  catch (err: any) {
+  } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Det lykkedes ikke – prøv igen'
-  }
-  finally {
+  } finally {
     claimingHere.value = false
     busy.value = false
   }
@@ -106,49 +119,99 @@ async function enablePush() {
   try {
     await all.enable()
     await setBadgePush(true)
-    try { localStorage.setItem('stenbygaard-push-asked', new Date().toISOString()) }
-    catch {}
+    try {
+      localStorage.setItem('stenbygaard-push-asked', new Date().toISOString())
+    } catch {}
     step.value = 'welcome'
     setTimeout(close, 2500)
-  }
-  catch (err: any) {
+  } catch (err: any) {
     error.value = err?.message || 'Notifikationer kunne ikke slås til'
-  }
-  finally {
+  } finally {
     busy.value = false
   }
 }
 
 function skipPush() {
-  try { localStorage.setItem('stenbygaard-push-asked', new Date().toISOString()) }
-  catch {}
+  try {
+    localStorage.setItem('stenbygaard-push-asked', new Date().toISOString())
+  } catch {}
   close()
 }
 </script>
 
 <template>
   <Transition name="pop">
-    <div v-if="state === 'open' && !busyRoute && (step !== 'name' || !name)" class="prompt glass" role="dialog" aria-labelledby="name-prompt-title">
+    <div
+      v-if="state === 'open' && !busyRoute && (step !== 'name' || !name)"
+      class="prompt glass"
+      role="dialog"
+      aria-labelledby="name-prompt-title"
+    >
       <template v-if="step === 'name'">
         <div class="head">
           <span class="icon">👋</span>
           <div>
             <b id="name-prompt-title">Hvem er du?</b>
-            <p>Vælg dit navn for at kunne kommentere, blive tagget og få badges. Ingen adgangskode.</p>
+            <p>
+              Vælg dit navn for at kunne kommentere, blive tagget og få badges. Ingen adgangskode.
+            </p>
           </div>
         </div>
-        <div v-if="free.length" class="chips">
-          <button v-for="n in free" :key="n" type="button" class="chip person" :class="{ on: sameName(n, input) }" @click="input = n">
-            <UserAvatar class="mini" :name="n" />{{ n }}
+        <div
+          v-if="free.length"
+          class="chips"
+        >
+          <button
+            v-for="n in free"
+            :key="n"
+            type="button"
+            class="chip person"
+            :class="{ on: sameName(n, input) }"
+            @click="input = n"
+          >
+            <UserAvatar
+              class="mini"
+              :name="n"
+            />{{ n }}
           </button>
         </div>
-        <form class="row" @submit.prevent="submit">
-          <input v-model="input" maxlength="30" autocomplete="given-name" autocapitalize="words" placeholder="Dit navn" :class="{ invalid: taken }">
-          <button class="btn" :disabled="!input.trim() || taken || busy">{{ busy ? '…' : 'Det er mig' }}</button>
+        <form
+          class="row"
+          @submit.prevent="submit"
+        >
+          <input
+            v-model="input"
+            maxlength="30"
+            autocomplete="given-name"
+            autocapitalize="words"
+            placeholder="Dit navn"
+            :class="{ invalid: taken }"
+          />
+          <button
+            class="btn"
+            :disabled="!input.trim() || taken || busy"
+          >
+            {{ busy ? '…' : 'Det er mig' }}
+          </button>
         </form>
-        <p v-if="taken" class="err">{{ input.trim() }} er taget. Er det dig, så brug en kode fra din anden enhed under »Mig«.</p>
-        <p v-else-if="error" class="err">{{ error }}</p>
-        <button class="later" @click="close">Ikke nu</button>
+        <p
+          v-if="taken"
+          class="err"
+        >
+          {{ input.trim() }} er taget. Er det dig, så brug en kode fra din anden enhed under »Mig«.
+        </p>
+        <p
+          v-else-if="error"
+          class="err"
+        >
+          {{ error }}
+        </p>
+        <button
+          class="later"
+          @click="close"
+        >
+          Ikke nu
+        </button>
       </template>
 
       <template v-else-if="step === 'push'">
@@ -156,17 +219,40 @@ function skipPush() {
           <span class="icon">🔔</span>
           <div>
             <b>Hej {{ name }}! Vil du have besked?</b>
-            <p>Når nogen tagger dig, svarer dig, du får en badge – eller Emil lander et nyt sted. Du kan altid vælge typer under Notifikationer.</p>
+            <p>
+              Når nogen tagger dig, svarer dig, du får en badge – eller Emil lander et nyt sted. Du
+              kan altid vælge typer under Notifikationer.
+            </p>
           </div>
         </div>
-        <p v-if="error" class="err">{{ error }}</p>
+        <p
+          v-if="error"
+          class="err"
+        >
+          {{ error }}
+        </p>
         <div class="actions">
-          <button class="btn secondary" :disabled="busy" @click="skipPush">Nej tak</button>
-          <button class="btn" :disabled="busy" @click="enablePush">{{ busy ? 'Vent…' : 'Ja tak' }}</button>
+          <button
+            class="btn secondary"
+            :disabled="busy"
+            @click="skipPush"
+          >
+            Nej tak
+          </button>
+          <button
+            class="btn"
+            :disabled="busy"
+            @click="enablePush"
+          >
+            {{ busy ? 'Vent…' : 'Ja tak' }}
+          </button>
         </div>
       </template>
 
-      <div v-else class="head done">
+      <div
+        v-else
+        class="head done"
+      >
         <span class="icon">🎉</span>
         <b>Velkommen, {{ name }}!</b>
       </div>
@@ -186,11 +272,28 @@ function skipPush() {
   padding: 16px;
   border-radius: var(--radius);
 }
-.head { display: flex; gap: 12px; align-items: flex-start; }
-.head.done { align-items: center; }
-.icon { font-size: 28px; line-height: 1.1; }
-.head b { display: block; font-size: 16px; line-height: 1.3; }
-.head p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+.head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.head.done {
+  align-items: center;
+}
+.icon {
+  font-size: 28px;
+  line-height: 1.1;
+}
+.head b {
+  display: block;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.head p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -203,7 +306,10 @@ function skipPush() {
   box-shadow: var(--shadow-sm);
   font-size: 14px;
 }
-.person.on { background: var(--ink); color: #fff; }
+.person.on {
+  background: var(--ink);
+  color: #fff;
+}
 .mini {
   display: grid;
   place-items: center;
@@ -231,15 +337,27 @@ function skipPush() {
   font-size: 16px;
   outline: none;
 }
-.row input:focus { border-color: var(--text); }
-.row input.invalid { border-color: #c62828; }
-.row .btn { min-height: 44px; padding: 0 16px; font-size: 15px; }
+.row input:focus {
+  border-color: var(--text);
+}
+.row input.invalid {
+  border-color: #c62828;
+}
+.row .btn {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 15px;
+}
 .actions {
   display: flex;
   gap: 8px;
   margin-top: 14px;
 }
-.actions .btn { flex: 1; min-height: 44px; font-size: 15px; }
+.actions .btn {
+  flex: 1;
+  min-height: 44px;
+  font-size: 15px;
+}
 .later {
   display: block;
   margin: 10px auto 0;
@@ -253,7 +371,21 @@ function skipPush() {
   text-underline-offset: 3px;
   cursor: pointer;
 }
-.err { margin: 8px 0 0; color: #c62828; font-size: 13px; font-weight: 600; }
-.pop-enter-active, .pop-leave-active { transition: transform .3s cubic-bezier(.2, .9, .3, 1), opacity .25s; }
-.pop-enter-from, .pop-leave-to { transform: translateY(30px); opacity: 0; }
+.err {
+  margin: 8px 0 0;
+  color: #c62828;
+  font-size: 13px;
+  font-weight: 600;
+}
+.pop-enter-active,
+.pop-leave-active {
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1),
+    opacity 0.25s;
+}
+.pop-enter-from,
+.pop-leave-to {
+  transform: translateY(30px);
+  opacity: 0;
+}
 </style>

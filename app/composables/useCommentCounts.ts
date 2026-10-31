@@ -7,7 +7,9 @@ export function useCommentCounts() {
 
   function reload() {
     loading = $fetch<Record<string, number>>('/api/comment-counts')
-      .then((r) => { counts.value = r })
+      .then((r) => {
+        counts.value = r
+      })
       .catch(() => {})
     return loading
   }

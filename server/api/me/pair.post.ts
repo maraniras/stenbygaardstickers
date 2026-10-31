@@ -6,7 +6,7 @@ export default defineEventHandler(async (event): Promise<LoginResponse> => {
   const res = await redeemPairCode(code, ip)
   if (!res) {
     // Lidt ventetid gør det kedeligt at gætte
-    await new Promise(r => setTimeout(r, 800))
+    await new Promise((r) => setTimeout(r, 800))
     throw createError({ statusCode: 400, statusMessage: 'Koden passer ikke eller er udløbet' })
   }
   return res

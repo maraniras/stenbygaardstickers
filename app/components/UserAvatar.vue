@@ -5,12 +5,23 @@ const props = defineProps<{ name: string }>()
 const { avatarFor } = useUsers()
 const src = computed(() => avatarFor(props.name))
 const failed = ref(false)
-watch(src, () => { failed.value = false })
+watch(src, () => {
+  failed.value = false
+})
 </script>
 
 <template>
-  <span class="user-avatar" :class="{ photo: src && !failed }">
-    <img v-if="src && !failed" :src="src" alt="" loading="lazy" @error="failed = true">
+  <span
+    class="user-avatar"
+    :class="{ photo: src && !failed }"
+  >
+    <img
+      v-if="src && !failed"
+      :src="src"
+      alt=""
+      loading="lazy"
+      @error="failed = true"
+    />
     <template v-else>{{ name[0] }}</template>
   </span>
 </template>
@@ -20,7 +31,9 @@ watch(src, () => { failed.value = false })
   overflow: hidden;
   flex: none;
 }
-.photo { background: var(--surface-2) !important; }
+.photo {
+  background: var(--surface-2) !important;
+}
 img {
   display: block;
   width: 100%;

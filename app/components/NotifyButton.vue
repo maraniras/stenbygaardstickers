@@ -15,7 +15,10 @@ onMounted(refresh)
     aria-label="Notifikationer"
     title="Notifikationer"
   >
-    <svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9Z" /><path d="M10 19a2 2 0 0 0 4 0" /></svg>
+    <svg viewBox="0 0 24 24">
+      <path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9Z" />
+      <path d="M10 19a2 2 0 0 0 4 0" />
+    </svg>
   </NuxtLink>
 </template>
 
@@ -33,8 +36,13 @@ onMounted(refresh)
   box-shadow: var(--shadow-sm);
   color: var(--muted);
 }
-.bell:active { transform: scale(.92); }
-.bell.on { background: var(--accent); color: var(--on-accent); }
+.bell:active {
+  transform: scale(0.92);
+}
+.bell.on {
+  background: var(--accent);
+  color: var(--on-accent);
+}
 svg {
   width: 18px;
   height: 18px;
@@ -44,5 +52,7 @@ svg {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.bell.on svg { fill: currentColor; }
+.bell.on svg {
+  fill: currentColor;
+}
 </style>

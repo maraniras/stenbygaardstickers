@@ -5,7 +5,7 @@ const { name, ready, claim, pair, createCode, logout, setAvatar, removeAvatar } 
 const { people } = useStickers()
 const { isTaken: taken, avatarFor, reload: reloadUsers } = useUsers()
 
-useHead({ title: 'Mig · Stenbygaard Stickers' })
+useHead(() => ({ title: `${name.value ? 'Indstillinger' : 'Vælg navn'} · Stenbygaard Stickers` }))
 
 const mode = ref<'name' | 'code'>('name')
 const input = ref('')
@@ -15,7 +15,7 @@ const busy = ref(false)
 
 onMounted(reloadUsers)
 
-const free = computed(() => people.value.map(p => p.name).filter(n => !taken(n)))
+const free = computed(() => people.value.map((p) => p.name).filter((n) => !taken(n)))
 const isTaken = computed(() => Boolean(input.value.trim() && taken(input.value.trim())))
 
 // Profilbillede
@@ -37,11 +37,9 @@ async function run(fn: () => Promise<unknown>) {
   error.value = ''
   try {
     await fn()
-  }
-  catch (err: any) {
+  } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Noget gik galt – prøv igen'
-  }
-  finally {
+  } finally {
     busy.value = false
   }
 }
@@ -64,8 +62,12 @@ function submitCode() {
 const code = ref<PairCode>()
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval> | undefined
-const secondsLeft = computed(() => (code.value ? Math.max(0, Math.round((Date.parse(code.value.expiresAt) - now.value) / 1000)) : 0))
-const countdown = computed(() => `${Math.floor(secondsLeft.value / 60)}:${String(secondsLeft.value % 60).padStart(2, '0')}`)
+const secondsLeft = computed(() =>
+  code.value ? Math.max(0, Math.round((Date.parse(code.value.expiresAt) - now.value) / 1000)) : 0,
+)
+const countdown = computed(
+  () => `${Math.floor(secondsLeft.value / 60)}:${String(secondsLeft.value % 60).padStart(2, '0')}`,
+)
 
 function newCode() {
   return run(async () => {
@@ -85,7 +87,12 @@ onBeforeUnmount(() => clearInterval(timer))
 
 const router = useRouter()
 function toProfile() {
-  if (window.history.state?.back && name.value && window.history.state.back === personUrl(name.value)) router.back()
+  if (
+    window.history.state?.back &&
+    name.value &&
+    window.history.state.back === personUrl(name.value)
+  )
+    router.back()
   else if (name.value) router.push(personUrl(name.value))
 }
 
@@ -102,36 +109,84 @@ function doLogout() {
     code.value = undefined
   })
 }
+function selectMode(value: 'name' | 'code') {
+  mode.value = value
+  error.value = ''
+}
 </script>
 
 <template>
   <div class="page">
-    <p v-if="!ready" class="empty">Henter…</p>
+    <p
+      v-if="!ready"
+      class="empty"
+    >
+      Henter…
+    </p>
 
     <!-- Logget ind -->
     <template v-else-if="name">
-      <button class="back" aria-label="Tilbage til profilen" @click="toProfile">
+      <button
+        class="back"
+        aria-label="Tilbage til profilen"
+        @click="toProfile"
+      >
         <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
       </button>
       <header>
-        <button class="avatar-btn" :aria-label="hasAvatar ? 'Skift profilbillede' : 'Vælg profilbillede'" :disabled="uploading" @click="fileInput?.click()">
-          <UserAvatar class="avatar" :class="{ dim: uploading }" :name="name" />
+        <button
+          class="avatar-btn"
+          :aria-label="hasAvatar ? 'Skift profilbillede' : 'Vælg profilbillede'"
+          :disabled="uploading"
+          @click="fileInput?.click()"
+        >
+          <UserAvatar
+            class="avatar"
+            :class="{ dim: uploading }"
+            :name="name"
+          />
           <span class="cam">
-            <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg>
+            <svg viewBox="0 0 24 24">
+              <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+              <circle
+                cx="12"
+                cy="13"
+                r="3.5"
+              />
+            </svg>
           </span>
         </button>
-        <input ref="fileInput" type="file" accept="image/*" hidden @change="onFile">
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/*"
+          hidden
+          @change="onFile"
+        />
         <div class="pic-actions">
-          <button class="link" :disabled="uploading" @click="fileInput?.click()">
+          <button
+            class="link"
+            :disabled="uploading"
+            @click="fileInput?.click()"
+          >
             {{ uploading ? 'Uploader…' : hasAvatar ? 'Skift billede' : 'Tilføj profilbillede' }}
           </button>
-          <button v-if="hasAvatar && !uploading" class="link muted" @click="run(removeAvatar)">Fjern</button>
+          <button
+            v-if="hasAvatar && !uploading"
+            class="link muted"
+            @click="run(removeAvatar)"
+          >
+            Fjern
+          </button>
         </div>
         <p class="eyebrow">Du er logget ind som</p>
         <h1>{{ name }}</h1>
       </header>
 
-      <NuxtLink class="card link-row" to="/notifikationer">
+      <NuxtLink
+        class="card link-row"
+        to="/notifikationer"
+      >
         <span class="icon">🔔</span>
         <div>
           <h2>Notifikationer</h2>
@@ -144,44 +199,115 @@ function doLogout() {
 
       <section class="card">
         <h2>Brug appen på en enhed mere</h2>
-        <p class="hint">Fx en ny telefon, din computer eller appen på hjemmeskærmen. Tryk på knappen og skriv koden på den anden enhed under »Jeg har en kode«.</p>
-        <div v-if="code" class="code">
+        <p class="hint">
+          Fx en ny telefon, din computer eller appen på hjemmeskærmen. Tryk på knappen og skriv
+          koden på den anden enhed under »Jeg har en kode«.
+        </p>
+        <div
+          v-if="code"
+          class="code"
+        >
           <span class="digits">{{ code.code.slice(0, 3) }} {{ code.code.slice(3) }}</span>
           <span class="hint">Gælder i {{ countdown }}</span>
         </div>
-        <button v-else class="btn secondary" :disabled="busy" @click="newCode">Vis kode</button>
+        <button
+          v-else
+          class="btn secondary"
+          :disabled="busy"
+          @click="newCode"
+        >
+          Vis kode
+        </button>
       </section>
 
       <section class="card">
         <h2>Log ud</h2>
-        <p class="hint">Logger kun denne enhed ud. Din profil og dit navn bliver bevaret. For at logge ind igen skal du bruge en kode fra en anden enhed eller få hjælp af admin.</p>
-        <button v-if="!confirmLogout" class="btn secondary" @click="confirmLogout = true">Log ud</button>
-        <div v-else class="row">
-          <button class="btn danger" :disabled="busy" @click="doLogout">Ja, log ud</button>
-          <button class="btn secondary" @click="confirmLogout = false">Fortryd</button>
+        <p class="hint">
+          Logger kun denne enhed ud. Din profil og dit navn bliver bevaret. For at logge ind igen
+          skal du bruge en kode fra en anden enhed eller få hjælp af admin.
+        </p>
+        <button
+          v-if="!confirmLogout"
+          class="btn secondary"
+          @click="confirmLogout = true"
+        >
+          Log ud
+        </button>
+        <div
+          v-else
+          class="row"
+        >
+          <button
+            class="btn danger"
+            :disabled="busy"
+            @click="doLogout"
+          >
+            Ja, log ud
+          </button>
+          <button
+            class="btn secondary"
+            @click="confirmLogout = false"
+          >
+            Fortryd
+          </button>
         </div>
       </section>
 
-      <p v-if="error" class="err">{{ error }}</p>
+      <p
+        v-if="error"
+        class="err"
+      >
+        {{ error }}
+      </p>
     </template>
 
     <!-- Ikke logget ind -->
     <template v-else>
       <header>
-        <img class="logo" src="/marker.png" alt="">
+        <img
+          class="logo"
+          src="/marker.png"
+          alt=""
+        />
         <h1>Hvem er du?</h1>
-        <p class="sub">Vælg dit navn, så kan appen kende dig. Det er helt frivilligt – og der er ingen adgangskode.</p>
+        <p class="sub">
+          Vælg dit navn, så kan appen kende dig. Det er helt frivilligt – og der er ingen
+          adgangskode.
+        </p>
       </header>
 
-      <div class="tabs" role="tablist">
-        <button :class="{ on: mode === 'name' }" @click="mode = 'name'; error = ''">Vælg navn</button>
-        <button :class="{ on: mode === 'code' }" @click="mode = 'code'; error = ''">Jeg har en kode</button>
+      <div
+        class="tabs"
+        role="group"
+        aria-label="Vælg loginmetode"
+      >
+        <button
+          :class="{ on: mode === 'name' }"
+          :aria-pressed="mode === 'name'"
+          @click="selectMode('name')"
+        >
+          Vælg navn
+        </button>
+        <button
+          :class="{ on: mode === 'code' }"
+          :aria-pressed="mode === 'code'"
+          @click="selectMode('code')"
+        >
+          Jeg har en kode
+        </button>
       </div>
 
       <AppearanceSettings />
 
-      <form v-if="mode === 'name'" class="form" @submit.prevent="submitName">
-        <div v-if="free.length" class="field">
+      <form
+        v-if="mode === 'name'"
+        class="form"
+        @submit.prevent="submitName"
+      >
+        <div
+          v-if="free.length"
+          class="field"
+        >
           <span class="eyebrow">Er du en af dem?</span>
           <div class="chips">
             <button
@@ -192,27 +318,75 @@ function doLogout() {
               :class="{ on: sameName(n, input) }"
               @click="input = n"
             >
-              <UserAvatar class="mini" :name="n" />{{ n }}
+              <UserAvatar
+                class="mini"
+                :name="n"
+              />{{ n }}
             </button>
           </div>
         </div>
         <label class="field">
           <span class="eyebrow">{{ free.length ? 'Eller skriv dit navn' : 'Dit navn' }}</span>
-          <input v-model="input" maxlength="30" autocomplete="given-name" autocapitalize="words" placeholder="Fx Mathias" :class="{ invalid: isTaken }">
+          <input
+            v-model="input"
+            maxlength="30"
+            autocomplete="given-name"
+            autocapitalize="words"
+            placeholder="Fx Mathias"
+            :class="{ invalid: isTaken }"
+          />
         </label>
-        <p v-if="isTaken" class="err">{{ input.trim() }} er allerede taget. Er det dig, så brug en kode fra din anden enhed.</p>
-        <p v-else-if="error" class="err">{{ error }}</p>
-        <button class="btn" :disabled="!input.trim() || isTaken || busy">{{ busy ? 'Gemmer…' : 'Det er mig' }}</button>
+        <p
+          v-if="isTaken"
+          class="err"
+        >
+          {{ input.trim() }} er allerede taget. Er det dig, så brug en kode fra din anden enhed.
+        </p>
+        <p
+          v-else-if="error"
+          class="err"
+        >
+          {{ error }}
+        </p>
+        <button
+          class="btn"
+          :disabled="!input.trim() || isTaken || busy"
+        >
+          {{ busy ? 'Gemmer…' : 'Det er mig' }}
+        </button>
       </form>
 
-      <form v-else class="form" @submit.prevent="submitCode">
-        <p class="hint">Åbn appen på den enhed, hvor du allerede er logget ind, gå til »Mig« og tryk »Vis kode«.</p>
+      <form
+        v-else
+        class="form"
+        @submit.prevent="submitCode"
+      >
+        <p class="hint">
+          Åbn appen på den enhed, hvor du allerede er logget ind, gå til »Mig« og tryk »Vis kode«.
+        </p>
         <label class="field">
           <span class="eyebrow">Kode</span>
-          <input v-model="codeInput" class="code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123 456">
+          <input
+            v-model="codeInput"
+            class="code-input"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="7"
+            placeholder="123 456"
+          />
         </label>
-        <p v-if="error" class="err">{{ error }}</p>
-        <button class="btn" :disabled="codeInput.replace(/\D/g, '').length !== 6 || busy">{{ busy ? 'Tjekker…' : 'Log ind' }}</button>
+        <p
+          v-if="error"
+          class="err"
+        >
+          {{ error }}
+        </p>
+        <button
+          class="btn"
+          :disabled="codeInput.replace(/\D/g, '').length !== 6 || busy"
+        >
+          {{ busy ? 'Tjekker…' : 'Log ind' }}
+        </button>
       </form>
     </template>
   </div>
@@ -240,7 +414,15 @@ function doLogout() {
   box-shadow: var(--shadow-sm);
   cursor: pointer;
 }
-.back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.back svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 header {
   display: flex;
   flex-direction: column;
@@ -269,8 +451,17 @@ header {
   background: var(--ink);
   color: #fff;
 }
-.cam svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
-.dim { opacity: .5; }
+.cam svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.dim {
+  opacity: 0.5;
+}
 .pic-actions {
   display: flex;
   gap: 14px;
@@ -286,7 +477,9 @@ header {
   text-underline-offset: 3px;
   cursor: pointer;
 }
-.link.muted { color: var(--muted); }
+.link.muted {
+  color: var(--muted);
+}
 .avatar {
   display: grid;
   place-items: center;
@@ -297,16 +490,20 @@ header {
   color: var(--on-accent);
   font-size: 36px;
   font-weight: 800;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .15);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 .logo {
   width: 96px;
   height: 96px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .25));
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
 }
-h1 { font-size: 30px; }
-header .eyebrow { margin: 0 0 2px; }
+h1 {
+  font-size: 30px;
+}
+header .eyebrow {
+  margin: 0 0 2px;
+}
 .sub {
   margin: 6px 0 0;
   color: var(--muted);
@@ -320,17 +517,34 @@ header .eyebrow { margin: 0 0 2px; }
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
-.card h2 { font-size: 18px; }
+.card h2 {
+  font-size: 18px;
+}
 .link-row {
   flex-direction: row;
   align-items: center;
   gap: 14px;
   text-decoration: none;
 }
-.link-row > div { flex: 1; }
-.link-row .hint { margin-top: 2px; }
-.link-row .icon { font-size: 24px; }
-.link-row svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.link-row > div {
+  flex: 1;
+}
+.link-row .hint {
+  margin-top: 2px;
+}
+.link-row .icon {
+  font-size: 24px;
+}
+.link-row svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .hint {
   margin: 0;
   font-size: 14px;
@@ -348,7 +562,7 @@ header .eyebrow { margin: 0 0 2px; }
 .digits {
   font-size: 38px;
   font-weight: 800;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
 }
 .row {
@@ -390,7 +604,10 @@ header .eyebrow { margin: 0 0 2px; }
   box-shadow: var(--shadow-sm);
   font-size: 14px;
 }
-.person.on { background: var(--ink); color: #fff; }
+.person.on {
+  background: var(--ink);
+  color: #fff;
+}
 .mini {
   display: grid;
   place-items: center;
@@ -405,9 +622,16 @@ header .eyebrow { margin: 0 0 2px; }
 .code-input {
   font-size: 24px !important;
   font-weight: 700;
-  letter-spacing: .15em;
+  letter-spacing: 0.15em;
   text-align: center;
 }
-.err { margin: 0; color: #c62828; font-weight: 600; }
-.empty { color: var(--muted); text-align: center; }
+.err {
+  margin: 0;
+  color: #c62828;
+  font-weight: 600;
+}
+.empty {
+  color: var(--muted);
+  text-align: center;
+}
 </style>

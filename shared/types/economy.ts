@@ -13,7 +13,12 @@ export interface DailyStats {
   nitStreak: number
   bestNitStreak: number
 }
-export interface BananaTransaction { id: string, amount: number, label: string, at: string }
+export interface BananaTransaction {
+  id: string
+  amount: number
+  label: string
+  at: string
+}
 export interface EconomyPublic {
   jack?: import('./jackStats').JackStatsPublic
   balance: number
@@ -21,20 +26,29 @@ export interface EconomyPublic {
   stats: DailyStats
   milestones: Record<string, string>
 }
-export interface CityRun { guesses: string[], finished: boolean, won: boolean, reward: number }
-export interface WheelRun { prize: number, jackpot?: boolean, jackpotAmount?: number }
+export interface CityRun {
+  guesses: string[]
+  finished: boolean
+  won: boolean
+  reward: number
+}
+export interface WheelRun {
+  prize: number
+  jackpot?: boolean
+  jackpotAmount?: number
+}
 export interface EconomyRecord extends EconomyPublic {
-  jackDailyWagers?: { day: string, amount: number }
+  jackDailyWagers?: { day: string; amount: number }
   jackStats?: import('./jackStats').JackStats
   bananjack?: import('./bananjack').JackGame
   version: 1
   claims: Record<string, true>
   history: BananaTransaction[]
-  days: Record<string, { city?: CityRun, wheel?: WheelRun }>
+  days: Record<string, { city?: CityRun; wheel?: WheelRun }>
 }
 export interface DailyCityState extends CityRun {
-  options: { id: string, name: string }[]
-  answer?: { id: string, name: string, country: string, countryCode: string }
+  options: { id: string; name: string }[]
+  answer?: { id: string; name: string; country: string; countryCode: string }
 }
 export interface DailyResponse {
   day: string

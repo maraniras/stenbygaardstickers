@@ -1,3 +1,4 @@
+import { singleFlight } from '../utils/requests'
 // 👍 (1–5): hver browser får et tilfældigt id i localStorage og tæller som én. Er man
 // logget ind, tæller man som brugeren i stedet (én stemme på alle ens enheder).
 // Samme id bruges til 👍 på kommentarer, når man ikke er logget ind.
@@ -8,14 +9,16 @@ export function deviceId() {
   try {
     let id = localStorage.getItem(KEY)
     if (!id) {
-      id = typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('')
+      id =
+        typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) =>
+              b.toString(16).padStart(2, '0'),
+            ).join('')
       localStorage.setItem(KEY, id)
     }
     return id
-  }
-  catch {
+  } catch {
     return ''
   }
 }
@@ -30,15 +33,27 @@ export function useRatings() {
   const error = ref('')
 
   function reload() {
-    loading = $fetch<Record<string, RatingSummary>>('/api/ratings', {
-      timeout: 10_000,
-      retry: 0,
-      query: { device: deviceId() },
-      headers: { 'x-user-token': userToken() },
-    })
-      .then((r) => { ratings.value = r; enabled.value = true })
-      .catch(() => { enabled.value = false })
-      .finally(() => { ready.value = true })
+    const token = userToken()
+    loading = singleFlight('ratings:' + token, () =>
+      $fetch<Record<string, RatingSummary>>('/api/ratings', {
+        timeout: 10_000,
+        retry: 0,
+        query: { device: deviceId() },
+        headers: { 'x-user-token': token },
+      }),
+    )
+      .then((r) => {
+        if (token === userToken()) {
+          ratings.value = r
+          enabled.value = true
+        }
+      })
+      .catch(() => {
+        if (token === userToken()) enabled.value = false
+      })
+      .finally(() => {
+        ready.value = true
+      })
     return loading
   }
 
@@ -48,6 +63,7 @@ export function useRatings() {
   async function rate(stickerId: string, thumbs: number) {
     const device = deviceId()
     if (!device) return
+    const token = userToken()
     const prev = ratings.value[stickerId]
     const value = prev?.mine === thumbs ? 0 : thumbs
     // Vis med det samme, ret til når serveren svarer
@@ -59,13 +75,16 @@ export function useRatings() {
     ratings.value = next
     error.value = ''
     try {
-      ratings.value = await $fetch<Record<string, RatingSummary>>('/api/ratings', {
+      const response = await $fetch<Record<string, RatingSummary>>('/api/ratings', {
         method: 'POST',
         body: { stickerId, device, value },
-        headers: { 'x-user-token': userToken() },
+        headers: { 'x-user-token': token },
+        timeout: 15000,
+        retry: 0,
       })
-    }
-    catch (err: any) {
+      if (token === userToken()) ratings.value = response
+    } catch (err: any) {
+      if (token !== userToken()) return
       error.value = err?.data?.statusMessage || 'Kunne ikke gemme'
       const back = { ...ratings.value }
       if (prev) back[stickerId] = prev
@@ -77,7 +96,14 @@ export function useRatings() {
   /** Lige logget ind: enhedens 👍 flyttes over på brugeren */
   async function claim() {
     const device = deviceId()
-    if (device) await $fetch('/api/ratings/claim', { method: 'POST', body: { device }, headers: { 'x-user-token': userToken() } }).catch(() => {})
+    if (device)
+      await $fetch('/api/ratings/claim', {
+        method: 'POST',
+        body: { device },
+        headers: { 'x-user-token': userToken() },
+        timeout: 15000,
+        retry: 0,
+      })
     await reload()
   }
 

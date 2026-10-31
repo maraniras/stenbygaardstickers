@@ -1,1 +1,1 @@
-export default defineEventHandler(event => ({ admin: isAdmin(event) }))
+export default defineEventHandler((event) => ({ admin: isAdmin(event) }))

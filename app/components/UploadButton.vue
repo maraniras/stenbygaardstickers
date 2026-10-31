@@ -1,6 +1,18 @@
 <template>
-  <NuxtLink class="upload glass" to="/upload" aria-label="Tilføj sticker" title="Tilføj sticker">
-    <span class="upload-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8l-6 6Z" /><path d="M14 20v-4a2 2 0 0 1 2-2h4M8 9h6M11 6v6" /></svg></span>
+  <NuxtLink
+    class="upload glass"
+    to="/upload"
+    aria-label="Tilføj sticker"
+    title="Tilføj sticker"
+  >
+    <span class="upload-icon"
+      ><svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M14 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8l-6 6Z" />
+        <path d="M14 20v-4a2 2 0 0 1 2-2h4M8 9h6M11 6v6" /></svg
+    ></span>
     <span>Tilføj sticker</span>
   </NuxtLink>
 </template>
@@ -24,11 +36,26 @@
   font-size: 13px;
   font-weight: 750;
   white-space: nowrap;
-  transition: transform .15s, box-shadow .15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
-.upload-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--ink); color:#fff; }
-.upload:active { transform: scale(.96); }
-.upload:focus-visible { outline: 3px solid var(--text); outline-offset: 4px; }
+.upload-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+}
+.upload:active {
+  transform: scale(0.96);
+}
+.upload:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 4px;
+}
 svg {
   width: 21px;
   height: 21px;
@@ -38,5 +65,9 @@ svg {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-@media(prefers-reduced-motion:reduce) { .upload { transition:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .upload {
+    transition: none;
+  }
+}
 </style>

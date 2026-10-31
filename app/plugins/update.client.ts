@@ -16,11 +16,20 @@ export default defineNuxtPlugin(() => {
       const { id } = await $fetch<{ id: string }>('/api/version', { query: { t: Date.now() } })
       if (!id || id === current) return
       const path = router.currentRoute.value.path
-      const busy = path.startsWith('/upload') || path.startsWith('/admin')
+      const hasText = [
+        ...document.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
+          'textarea, input[type="text"], input:not([type])',
+        ),
+      ].some((input) => Boolean(input.value.trim()))
+      const busy =
+        path.startsWith('/upload') ||
+        path.startsWith('/admin') ||
+        hasText ||
+        useState<boolean>('daily-game-animation').value ||
+        useState<boolean>('bananjack-animation').value
       if (onOpen && !busy) window.location.reload()
       else available.value = true
-    }
-    catch {}
+    } catch {}
   }
 
   document.addEventListener('visibilitychange', () => {

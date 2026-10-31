@@ -5,7 +5,12 @@ const n = computed(() => counts.value[props.stickerId] ?? 0)
 </script>
 
 <template>
-  <span v-if="n" class="comment-count" :title="`${n} ${n === 1 ? 'kommentar' : 'kommentarer'}`">💬 {{ n }}</span>
+  <span
+    v-if="n"
+    class="comment-count"
+    :title="`${n} ${n === 1 ? 'kommentar' : 'kommentarer'}`"
+    >💬 {{ n }}</span
+  >
 </template>
 
 <style scoped>

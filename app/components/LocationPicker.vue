@@ -3,7 +3,7 @@ import type { Map as LMap, Marker } from 'leaflet'
 
 // Kort hvor man trykker (eller trækker nålen) for at vælge stedet. Koordinatet kan
 // også skrives eller indsættes direkte fra Google Maps: "55.676098, 12.568337".
-const model = defineModel<{ lat: number, lng: number } | null>({ required: true })
+const model = defineModel<{ lat: number; lng: number } | null>({ required: true })
 const props = defineProps<{ locate?: boolean }>()
 
 const el = ref<HTMLElement>()
@@ -17,21 +17,25 @@ let map: LMap | undefined
 let marker: Marker | undefined
 let L: typeof import('leaflet') | undefined
 
-function place(lat: number, lng: number, opts: { fly?: boolean, zoom?: number } = {}) {
+function place(lat: number, lng: number, opts: { fly?: boolean; zoom?: number } = {}) {
   model.value = { lat, lng }
   text.value = formatCoords(lat, lng)
   invalid.value = false
   locateError.value = ''
   if (!map || !L) return
   if (!marker) {
-    const icon = L.divIcon({ className: 'head-pin', html: '<div class="pin"><img src="/marker.png" alt=""></div>', iconSize: [48, 48], iconAnchor: [24, 42] })
+    const icon = L.divIcon({
+      className: 'head-pin',
+      html: '<div class="pin"><img src="/marker.png" alt=""></div>',
+      iconSize: [48, 48],
+      iconAnchor: [24, 42],
+    })
     marker = L.marker([lat, lng], { icon, draggable: true }).addTo(map)
     marker.on('dragend', () => {
       const p = marker!.getLatLng()
       place(p.lat, p.lng)
     })
-  }
-  else {
+  } else {
     marker.setLatLng([lat, lng])
   }
   if (opts.fly) map.setView([lat, lng], opts.zoom ?? Math.max(map.getZoom(), 17))
@@ -43,7 +47,7 @@ function onText() {
   if (c) place(c.lat, c.lng, { fly: true })
 }
 
-function locate() {
+function locateDevice() {
   if (!navigator.geolocation) {
     locateError.value = 'Din browser kan ikke finde din position'
     return
@@ -69,21 +73,21 @@ onMounted(async () => {
   map.attributionControl.setPrefix(false)
   attachBasemap(L, map, basemap)
   L.control.zoom({ position: 'bottomright' }).addTo(map)
-  map.on('click', e => place(e.latlng.lat, e.latlng.lng))
+  map.on('click', (e) => place(e.latlng.lat, e.latlng.lng))
 
   if (model.value) {
     map.setView([model.value.lat, model.value.lng], 16)
     place(model.value.lat, model.value.lng)
-  }
-  else {
+  } else {
     map.setView([AALBORG.lat, AALBORG.lng], 5)
-    if (props.locate) locate()
+    if (props.locate) locateDevice()
   }
 })
 
 // Når admin skifter til en anden sticker
 watch(model, (v) => {
-  if (v && marker && (marker.getLatLng().lat !== v.lat || marker.getLatLng().lng !== v.lng)) place(v.lat, v.lng, { fly: true })
+  if (v && marker && (marker.getLatLng().lat !== v.lat || marker.getLatLng().lng !== v.lng))
+    place(v.lat, v.lng, { fly: true })
 })
 
 onBeforeUnmount(() => map?.remove())
@@ -91,16 +95,49 @@ onBeforeUnmount(() => map?.remove())
 
 <template>
   <div class="picker">
-    <div ref="el" class="map" />
-    <button type="button" class="me glass" :disabled="locating" @click="locate">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /><circle cx="12" cy="12" r="7.5" /></svg>
+    <div
+      ref="el"
+      class="map"
+    />
+    <button
+      type="button"
+      class="me glass"
+      :disabled="locating"
+      @click="locateDevice"
+    >
+      <svg viewBox="0 0 24 24">
+        <circle
+          cx="12"
+          cy="12"
+          r="3.5"
+        />
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+        <circle
+          cx="12"
+          cy="12"
+          r="7.5"
+        />
+      </svg>
       {{ locating ? 'Finder dig…' : 'Min position' }}
     </button>
-    <button type="button" class="layers glass" :class="{ on: basemap === 'luftfoto' }" @click="toggleBasemap">
-      <svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>
+    <button
+      type="button"
+      class="layers glass"
+      :class="{ on: basemap === 'luftfoto' }"
+      @click="toggleBasemap"
+    >
+      <svg viewBox="0 0 24 24">
+        <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+        <path d="m3 13 9 5 9-5" />
+      </svg>
       {{ basemap === 'kort' ? 'Luftfoto' : 'Kort' }}
     </button>
-    <p v-if="!model" class="hint">Tryk på kortet, hvor stickeren sidder</p>
+    <p
+      v-if="!model"
+      class="hint"
+    >
+      Tryk på kortet, hvor stickeren sidder
+    </p>
   </div>
   <label class="coords">
     <span class="eyebrow">Koordinat</span>
@@ -112,10 +149,20 @@ onBeforeUnmount(() => map?.remove())
       autocomplete="off"
       @change="onText"
       @paste="nextTick(onText)"
-    >
+    />
   </label>
-  <p v-if="invalid" class="err">Skriv det som i Google Maps, fx 55.676098, 12.568337</p>
-  <p v-else-if="locateError" class="err">{{ locateError }}</p>
+  <p
+    v-if="invalid"
+    class="err"
+  >
+    Skriv det som i Google Maps, fx 55.676098, 12.568337
+  </p>
+  <p
+    v-else-if="locateError"
+    class="err"
+  >
+    {{ locateError }}
+  </p>
 </template>
 
 <style scoped>
@@ -146,7 +193,16 @@ onBeforeUnmount(() => map?.remove())
   font-weight: 700;
   cursor: pointer;
 }
-.me svg, .layers svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.me svg,
+.layers svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .layers {
   position: absolute;
   top: 10px;
@@ -162,7 +218,10 @@ onBeforeUnmount(() => map?.remove())
   font-weight: 700;
   cursor: pointer;
 }
-.layers.on { background: var(--ink); color: #fff; }
+.layers.on {
+  background: var(--ink);
+  color: #fff;
+}
 .hint {
   position: absolute;
   left: 50%;
@@ -185,7 +244,9 @@ onBeforeUnmount(() => map?.remove())
   gap: 6px;
   margin-top: 10px;
 }
-.coords input { font-variant-numeric: tabular-nums; }
+.coords input {
+  font-variant-numeric: tabular-nums;
+}
 .err {
   margin: 6px 0 0;
   color: #c62828;

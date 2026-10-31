@@ -1,3 +1,4 @@
+import { normalizeName, validName, validDate, validCoordinate } from '../../shared/utils/validation'
 // Stickers ligger i Redis-hashen "stickers" (id → JSON) med status pending/approved.
 // JSON-filerne i app/data/stickers er startdata: hver fil kopieres ind én gang
 // (id'et huskes i settet "stickers:seeded"), så ændringer og sletninger i admin
@@ -32,11 +33,11 @@ async function seedFiles(): Promise<StoredSticker[]> {
 const PROD_URL = process.env.PROD_URL || 'https://stenbygaardstickers.vercel.app'
 
 async function copyFromProd() {
-  const [done] = await redis([['GET', 'stickers:prodcopy']]) as [string | null]
+  const [done] = (await redis([['GET', 'stickers:prodcopy']])) as [string | null]
   if (done) return
   const list = await $fetch<StickerData[]>(`${PROD_URL}/api/stickers`, { timeout: 10000 })
   await redis([
-    ...list.map(s => ['HSETNX', 'stickers', s.id, JSON.stringify({ ...s, status: 'approved' })]),
+    ...list.map((s) => ['HSETNX', 'stickers', s.id, JSON.stringify({ ...s, status: 'approved' })]),
     ['SET', 'stickers:prodcopy', new Date().toISOString()],
   ])
 }
@@ -45,12 +46,12 @@ async function copyFromProd() {
 function ensureSeeded() {
   seededIds ??= (async () => {
     if (isPreview && redisEnabled) {
-      await copyFromProd().catch(err => console.error('Kunne ikke kopiere fra prod', err))
+      await copyFromProd().catch((err) => console.error('Kunne ikke kopiere fra prod', err))
     }
     const files = await seedFiles()
     if (!redisEnabled) {
       const data = await readLocal()
-      const fresh = files.filter(s => !data.seeded.includes(s.id))
+      const fresh = files.filter((s) => !data.seeded.includes(s.id))
       if (!fresh.length) return
       for (const s of fresh) {
         data.stickers[s.id] ??= s
@@ -59,13 +60,15 @@ function ensureSeeded() {
       await useStorage('data').setItem('stickers', data)
       return
     }
-    const [seeded] = await redis([['SMEMBERS', 'stickers:seeded']]) as [string[]]
-    const fresh = files.filter(s => !seeded.includes(s.id))
+    const [seeded] = (await redis([['SMEMBERS', 'stickers:seeded']])) as [string[]]
+    const fresh = files.filter((s) => !seeded.includes(s.id))
     if (!fresh.length) return
-    await redis(fresh.flatMap(s => [
-      ['HSETNX', 'stickers', s.id, JSON.stringify(s)],
-      ['SADD', 'stickers:seeded', s.id],
-    ]))
+    await redis(
+      fresh.flatMap((s) => [
+        ['HSETNX', 'stickers', s.id, JSON.stringify(s)],
+        ['SADD', 'stickers:seeded', s.id],
+      ]),
+    )
   })().catch((err) => {
     seededIds = undefined
     throw err
@@ -78,9 +81,8 @@ export async function listStickers() {
   let list: StoredSticker[]
   if (!redisEnabled) {
     list = Object.values((await readLocal()).stickers)
-  }
-  else {
-    const [flat] = await redis([['HGETALL', 'stickers']]) as [string[]]
+  } else {
+    const [flat] = (await redis([['HGETALL', 'stickers']])) as [string[]]
     list = []
     for (let i = 1; i < flat.length; i += 2) list.push(JSON.parse(flat[i]!))
   }
@@ -90,8 +92,8 @@ export async function listStickers() {
 export async function getStored(id: string) {
   await ensureSeeded()
   if (!redisEnabled) return (await readLocal()).stickers[id]
-  const [json] = await redis([['HGET', 'stickers', id]]) as [string | null]
-  return json ? JSON.parse(json) as StoredSticker : undefined
+  const [json] = (await redis([['HGET', 'stickers', id]])) as [string | null]
+  return json ? (JSON.parse(json) as StoredSticker) : undefined
 }
 
 export async function saveSticker(s: StoredSticker) {
@@ -123,32 +125,43 @@ export function publicSticker({ status: _, submittedAt: __, ...s }: StoredSticke
 
 export async function reverseGeocode(lat: number, lng: number) {
   try {
-    const j = await $fetch<{ address?: Record<string, string> }>('https://nominatim.openstreetmap.org/reverse', {
-      query: { format: 'jsonv2', lat, lon: lng, zoom: 18, 'accept-language': 'da' },
-      headers: { 'User-Agent': 'StenbygaardStickers/1.0 (privat hobbyprojekt)' },
-      timeout: 8000,
-    })
+    const j = await $fetch<{ address?: Record<string, string> }>(
+      'https://nominatim.openstreetmap.org/reverse',
+      {
+        query: { format: 'jsonv2', lat, lon: lng, zoom: 18, 'accept-language': 'da' },
+        headers: { 'User-Agent': 'StenbygaardStickers/1.0 (privat hobbyprojekt)' },
+        timeout: 8000,
+      },
+    )
     const a = j.address ?? {}
     return {
-      city: a.city || a.town || a.village || a.municipality || a.hamlet || a.county || a.state || '',
+      city:
+        a.city || a.town || a.village || a.municipality || a.hamlet || a.county || a.state || '',
       country: a.country || '',
       countryCode: (a.country_code || '').toUpperCase(),
     }
-  }
-  catch {
+  } catch {
     return { city: '', country: '', countryCode: '' }
   }
 }
 
-const slug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
-  .replace(/æ/g, 'ae').replace(/ø/g, 'oe').replace(/å/g, 'aa')
-  .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50)
+const slug = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'oe')
+    .replace(/å/g, 'aa')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 50)
 
 /** Id som scriptet laver dem: dato-by-titel, med tal på hvis det er taget */
 export async function newStickerId(date: string, city: string, title: string) {
   const parts = [...new Set([slug(city), slug(title)].filter(Boolean))]
   const base = [date, ...parts].join('-')
-  const taken = new Set((await listStickers()).map(s => s.id))
+  const taken = new Set((await listStickers()).map((s) => s.id))
   let id = base
   for (let n = 2; taken.has(id); n++) id = `${base}-${n}`
   return id
@@ -159,32 +172,41 @@ export function cleanInput(body: unknown) {
   const b = (body ?? {}) as Record<string, unknown>
   const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
   const title = str(b.title, 80)
-  const date = str(b.date, 10)
+  const date = typeof b.date === 'string' ? b.date.trim() : ''
   const description = str(b.description, 3000)
-  const lat = Number(b.lat)
-  const lng = Number(b.lng)
-  const placedBy = Array.isArray(b.placedBy)
-    ? [...new Set(b.placedBy.map(n => str(n, 40).replace(/\s+/g, ' ')).filter(Boolean))].slice(0, 12)
-    : []
+  const lat = b.lat
+  const lng = b.lng
+  const placedBy = Array.isArray(b.placedBy) ? b.placedBy.map(normalizeName) : []
+  if (!placedBy.length || placedBy.length > 12 || placedBy.some((n) => !validName(n)))
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Vælg 1–12 navne med bogstaver (højst 30 tegn pr. navn)',
+    })
+  const names = [...new Map(placedBy.map((n) => [n.toLocaleLowerCase('da'), n])).values()]
   const media = Array.isArray(b.media) ? b.media.slice(0, 20).map(cleanMedia) : []
 
   if (!title) throw createError({ statusCode: 400, statusMessage: 'Mangler titel' })
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) {
+  if (!validDate(date)) {
     throw createError({ statusCode: 400, statusMessage: 'Ugyldig dato' })
   }
-  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+  if (!validCoordinate(lat, 90) || !validCoordinate(lng, 180)) {
     throw createError({ statusCode: 400, statusMessage: 'Ugyldigt koordinat' })
   }
-  return { title, date, description, lat, lng, placedBy, media }
+  return { title, date, description, lat, lng, placedBy: names, media }
 }
 
 function cleanMedia(m: unknown): StickerMedia {
   const o = (m ?? {}) as Record<string, unknown>
   const okSrc = (v: unknown) => typeof v === 'string' && isOwnMedia(v)
-  if (!okSrc(o.src) || (o.poster !== undefined && !okSrc(o.poster)) || (o.type !== 'image' && o.type !== 'video')) {
+  if (
+    !okSrc(o.src) ||
+    (o.poster !== undefined && !okSrc(o.poster)) ||
+    (o.type !== 'image' && o.type !== 'video')
+  ) {
     throw createError({ statusCode: 400, statusMessage: 'Ugyldigt medie' })
   }
-  const dim = (v: unknown) => (typeof v === 'number' && v > 0 && v < 20000 ? Math.round(v) : undefined)
+  const dim = (v: unknown) =>
+    typeof v === 'number' && v > 0 && v < 20000 ? Math.round(v) : undefined
   return {
     type: o.type,
     src: o.src as string,

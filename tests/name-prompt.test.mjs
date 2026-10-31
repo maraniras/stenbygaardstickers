@@ -6,9 +6,13 @@ import ts from 'typescript'
 import { computed, effectScope, nextTick, reactive, ref, watch } from 'vue'
 
 // Kør komponentens rigtige reaktive login-flow med en kontrolleret timer.
-const source = readFileSync(new URL('../app/components/NamePrompt.vue', import.meta.url), 'utf8')
-  .match(/<script setup lang="ts">([\s\S]*?)<\/script>/)[1]
-const script = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText
+const source = readFileSync(
+  new URL('../app/components/NamePrompt.vue', import.meta.url),
+  'utf8',
+).match(/<script setup lang="ts">([\s\S]*?)<\/script>/)[1]
+const script = ts.transpileModule(source, {
+  compilerOptions: { target: ts.ScriptTarget.ES2022 },
+}).outputText
 
 function setup(path = '/', alreadyReady = false) {
   const name = ref(null)
@@ -21,9 +25,19 @@ function setup(path = '/', alreadyReady = false) {
   let claims = 0
   const scope = effectScope()
   const context = vm.createContext({
-    ref, computed, watch,
+    ref,
+    computed,
+    watch,
     useState: () => state,
-    useUser: () => ({ name, ready, claim: async (input) => { claims++; name.value = input }, setBadgePush: async () => {} }),
+    useUser: () => ({
+      name,
+      ready,
+      claim: async (input) => {
+        claims++
+        name.value = input
+      },
+      setBadgePush: async () => {},
+    }),
     useStickers: () => ({ people: ref([]) }),
     useUsers: () => ({ isTaken: () => false }),
     useInstall: () => ({ open: ref(false) }),
@@ -33,17 +47,30 @@ function setup(path = '/', alreadyReady = false) {
     pushSupported: () => true,
     needsHomeScreen: () => false,
     Notification: { permission: 'default' },
-    localStorage: { getItem: k => stored.get(k), setItem: (k, value) => stored.set(k, value) },
-    setTimeout: (fn) => { const id = ++nextTimer; timers.set(id, fn); return id },
-    clearTimeout: id => timers.delete(id),
+    localStorage: { getItem: (k) => stored.get(k), setItem: (k, value) => stored.set(k, value) },
+    setTimeout: (fn) => {
+      const id = ++nextTimer
+      timers.set(id, fn)
+      return id
+    },
+    clearTimeout: (id) => timers.delete(id),
   })
   scope.run(() => vm.runInContext(`${script}\nglobalThis.api = { step, input, submit };`, context))
   return {
-    name, ready, route, state, stored, api: context.api,
-    get claims() { return claims },
+    name,
+    ready,
+    route,
+    state,
+    stored,
+    api: context.api,
+    get claims() {
+      return claims
+    },
     async tick() {
       const batch = [...timers.entries()]
-      for (const [id, fn] of batch) { if (timers.delete(id)) fn() }
+      for (const [id, fn] of batch) {
+        if (timers.delete(id)) fn()
+      }
       await nextTick()
     },
     close: () => scope.stop(),
@@ -64,8 +91,9 @@ test('login på Mig annullerer den ventende popup, også efter navigation', asyn
     assert.ok(t.stored.has('stenbygaard-name-asked'))
     await t.api.submit() // En eventuel forsinket indsendelse må ikke oprette igen.
     assert.equal(t.claims, 0)
+  } finally {
+    t.close()
   }
-  finally { t.close() }
 })
 
 test('en allerede åben popup lukkes ved login andetsteds', async () => {
@@ -76,8 +104,9 @@ test('en allerede åben popup lukkes ved login andetsteds', async () => {
     t.name.value = 'Nicole'
     await nextTick()
     assert.equal(t.state.value, 'done')
+  } finally {
+    t.close()
   }
-  finally { t.close() }
 })
 
 test('login i selve popuppen fortsætter til notifikationsspørgsmålet', async () => {
@@ -91,6 +120,7 @@ test('login i selve popuppen fortsætter til notifikationsspørgsmålet', async 
     assert.equal(t.name.value, 'Norsk')
     assert.equal(t.state.value, 'open')
     assert.equal(t.api.step.value, 'push')
+  } finally {
+    t.close()
   }
-  finally { t.close() }
 })

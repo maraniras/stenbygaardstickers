@@ -2,14 +2,32 @@
 // sticker. Hver modtager får kun én besked pr. kommentar (tag > svar > egen sticker –
 // har man slået en type fra, prøves den næste), og man får aldrig besked om sin egen.
 
-export async function notifyComment(c: CommentData, sticker: StickerData, parent: CommentData | undefined, onlyMentions?: string[]) {
+export async function notifyComment(
+  c: CommentData,
+  sticker: StickerData,
+  parent: CommentData | undefined,
+  onlyMentions?: string[],
+) {
   const url = `/sticker/${sticker.id}?comment=${c.id}`
   const body = snippet(c.text)
-  const candidates: { name: string, type: NotifyType, title: string, text: string }[] = []
-  for (const m of onlyMentions ?? c.mentions) candidates.push({ name: m, type: 'tags', title: `🏷️ ${c.author} har tagget dig`, text: body })
+  const candidates: { name: string; type: NotifyType; title: string; text: string }[] = []
+  for (const m of onlyMentions ?? c.mentions)
+    candidates.push({ name: m, type: 'tags', title: `🏷️ ${c.author} har tagget dig`, text: body })
   if (!onlyMentions) {
-    if (parent) candidates.push({ name: parent.author, type: 'replies', title: `↩️ ${c.author} har svaret dig`, text: body })
-    for (const n of sticker.placedBy) candidates.push({ name: n, type: 'comments', title: `💬 Ny kommentar på ${sticker.title}`, text: `${c.author}: ${body}` })
+    if (parent)
+      candidates.push({
+        name: parent.author,
+        type: 'replies',
+        title: `↩️ ${c.author} har svaret dig`,
+        text: body,
+      })
+    for (const n of sticker.placedBy)
+      candidates.push({
+        name: n,
+        type: 'comments',
+        title: `💬 Ny kommentar på ${sticker.title}`,
+        text: `${c.author}: ${body}`,
+      })
   }
 
   const done = new Set<string>([nameKey(c.author)])
@@ -20,7 +38,13 @@ export async function notifyComment(c: CommentData, sticker: StickerData, parent
     const found = await findUser(cand.name)
     if (!found || !wants(found.user.notify, cand.type)) continue
     done.add(key)
-    jobs.push(notifyUser(cand.name, { title: cand.title, body: cand.text, url, tag: `comment-${c.id}` }, cand.type))
+    jobs.push(
+      notifyUser(
+        cand.name,
+        { title: cand.title, body: cand.text, url, tag: `comment-${c.id}` },
+        cand.type,
+      ),
+    )
   }
   await Promise.all(jobs)
 }
@@ -39,10 +63,14 @@ export async function notifyLike(c: CommentData, likes: CommentLikes, liker: str
   const first = liker ?? 'Nogen'
   const others = likes.count - 1
   const who = others > 0 ? `${first} og ${others} ${others === 1 ? 'anden' : 'andre'}` : first
-  await notifyUser(c.author, {
-    title: `👍 ${who} synes godt om din kommentar`,
-    body: snippet(c.text),
-    url: `/sticker/${c.stickerId}?comment=${c.id}`,
-    tag: `like-${c.id}`,
-  }, 'likes')
+  await notifyUser(
+    c.author,
+    {
+      title: `👍 ${who} synes godt om din kommentar`,
+      body: snippet(c.text),
+      url: `/sticker/${c.stickerId}?comment=${c.id}`,
+      tag: `like-${c.id}`,
+    },
+    'likes',
+  )
 }

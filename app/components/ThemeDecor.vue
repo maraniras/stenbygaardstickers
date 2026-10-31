@@ -4,7 +4,8 @@
 const { theme } = useTheme()
 
 // Faste "tilfældige" værdier, så det ikke hopper ved hver render
-const rand = (i: number, n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1
+const rand = (i: number, n: number) =>
+  (((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1) + 1) % 1
 
 const bats = Array.from({ length: 5 }, (_, i) => ({
   top: `${10 + rand(i, 1) * 55}%`,
@@ -24,7 +25,13 @@ const flakes = Array.from({ length: 36 }, (_, i) => ({
 }))
 
 // Påskeæg i pastelfarver, der svæver langsomt op, og en kylling der løber forbi
-const EGG_COLORS = [['#ffc4d6', '#ff8fb1'], ['#c6f0a8', '#8ad16b'], ['#fbe991', '#f2b705'], ['#c9d8ff', '#8aa8ff'], ['#e6ccff', '#b58cff']]
+const EGG_COLORS = [
+  ['#ffc4d6', '#ff8fb1'],
+  ['#c6f0a8', '#8ad16b'],
+  ['#fbe991', '#f2b705'],
+  ['#c9d8ff', '#8aa8ff'],
+  ['#e6ccff', '#b58cff'],
+]
 const eggs = Array.from({ length: 10 }, (_, i) => ({
   left: `${4 + rand(i, 11) * 92}%`,
   size: `${16 + rand(i, 12) * 14}px`,
@@ -36,22 +43,40 @@ const eggs = Array.from({ length: 10 }, (_, i) => ({
 </script>
 
 <template>
-  <div v-if="theme !== 'normal'" class="decor" aria-hidden="true">
+  <div
+    v-if="theme !== 'normal'"
+    class="decor"
+    aria-hidden="true"
+  >
     <template v-if="theme === 'halloween'">
       <span
         v-for="(b, i) in bats"
         :key="i"
         class="bat"
         :class="{ reverse: b.reverse }"
-        :style="{ top: b.top, fontSize: b.size, animationDuration: b.duration, animationDelay: b.delay }"
-      ><span>🦇</span></span>
+        :style="{
+          top: b.top,
+          fontSize: b.size,
+          animationDuration: b.duration,
+          animationDelay: b.delay,
+        }"
+        ><span>🦇</span></span
+      >
     </template>
     <template v-else-if="theme === 'jul'">
       <span
         v-for="(f, i) in flakes"
         :key="i"
         class="flake"
-        :style="{ left: f.left, width: f.size, height: f.size, opacity: f.opacity, animationDuration: f.duration, animationDelay: f.delay, '--drift': f.drift }"
+        :style="{
+          left: f.left,
+          width: f.size,
+          height: f.size,
+          opacity: f.opacity,
+          animationDuration: f.duration,
+          animationDelay: f.delay,
+          '--drift': f.drift,
+        }"
       />
     </template>
     <template v-else-if="theme === 'paaske'">
@@ -59,7 +84,15 @@ const eggs = Array.from({ length: 10 }, (_, i) => ({
         v-for="(e, i) in eggs"
         :key="i"
         class="egg"
-        :style="{ left: e.left, width: e.size, animationDuration: e.duration, animationDelay: e.delay, '--sway': e.sway, '--egg-a': e.colors[0], '--egg-b': e.colors[1] }"
+        :style="{
+          left: e.left,
+          width: e.size,
+          animationDuration: e.duration,
+          animationDelay: e.delay,
+          '--sway': e.sway,
+          '--egg-a': e.colors[0],
+          '--egg-b': e.colors[1],
+        }"
       />
       <span class="chick"><span>🐥</span></span>
     </template>
@@ -81,28 +114,65 @@ const eggs = Array.from({ length: 10 }, (_, i) => ({
 }
 .bat span {
   display: inline-block;
-  animation: flap .35s ease-in-out infinite alternate;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3));
+  animation: flap 0.35s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
-.bat.reverse { animation-name: fly-back; }
-.bat.reverse span { transform: scaleX(-1); }
+.bat.reverse {
+  animation-name: fly-back;
+}
+.bat.reverse span {
+  transform: scaleX(-1);
+}
 @keyframes fly {
-  0% { transform: translate(-15vw, 0); }
-  25% { transform: translate(20vw, -40px); }
-  50% { transform: translate(50vw, 20px); }
-  75% { transform: translate(80vw, -30px); }
-  100% { transform: translate(115vw, 10px); }
+  0% {
+    transform: translate(-15vw, 0);
+  }
+  25% {
+    transform: translate(20vw, -40px);
+  }
+  50% {
+    transform: translate(50vw, 20px);
+  }
+  75% {
+    transform: translate(80vw, -30px);
+  }
+  100% {
+    transform: translate(115vw, 10px);
+  }
 }
 @keyframes fly-back {
-  0% { transform: translate(115vw, 0); }
-  25% { transform: translate(80vw, 30px); }
-  50% { transform: translate(50vw, -20px); }
-  75% { transform: translate(20vw, 35px); }
-  100% { transform: translate(-15vw, -10px); }
+  0% {
+    transform: translate(115vw, 0);
+  }
+  25% {
+    transform: translate(80vw, 30px);
+  }
+  50% {
+    transform: translate(50vw, -20px);
+  }
+  75% {
+    transform: translate(20vw, 35px);
+  }
+  100% {
+    transform: translate(-15vw, -10px);
+  }
 }
-@keyframes flap { to { transform: scaleY(.6); } }
-.bat.reverse span { animation-name: flap-r; }
-@keyframes flap-r { from { transform: scaleX(-1); } to { transform: scaleX(-1) scaleY(.6); } }
+@keyframes flap {
+  to {
+    transform: scaleY(0.6);
+  }
+}
+.bat.reverse span {
+  animation-name: flap-r;
+}
+@keyframes flap-r {
+  from {
+    transform: scaleX(-1);
+  }
+  to {
+    transform: scaleX(-1) scaleY(0.6);
+  }
+}
 
 .flake {
   position: absolute;
@@ -110,11 +180,15 @@ const eggs = Array.from({ length: 10 }, (_, i) => ({
   border-radius: 50%;
   background: #fff;
   /* Blålig kant, så sneen også kan ses på det lyse kort */
-  box-shadow: 0 0 0 1px rgba(120, 160, 200, .55), 0 1px 4px rgba(30, 60, 100, .35);
+  box-shadow:
+    0 0 0 1px rgba(120, 160, 200, 0.55),
+    0 1px 4px rgba(30, 60, 100, 0.35);
   animation: fall linear infinite;
 }
 @keyframes fall {
-  to { transform: translate(var(--drift), 105vh); }
+  to {
+    transform: translate(var(--drift), 105vh);
+  }
 }
 
 .egg {
@@ -123,17 +197,28 @@ const eggs = Array.from({ length: 10 }, (_, i) => ({
   aspect-ratio: 3 / 4;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   background:
-    repeating-linear-gradient(-20deg, transparent 0 22%, rgba(255, 255, 255, .7) 22% 30%, transparent 30% 52%),
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .7), transparent 40%),
+    repeating-linear-gradient(
+      -20deg,
+      transparent 0 22%,
+      rgba(255, 255, 255, 0.7) 22% 30%,
+      transparent 30% 52%
+    ),
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.7), transparent 40%),
     linear-gradient(160deg, var(--egg-a), var(--egg-b));
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
-  opacity: .9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  opacity: 0.9;
   animation: rise linear infinite;
 }
 @keyframes rise {
-  0% { transform: translate(0, 0) rotate(-10deg); }
-  50% { transform: translate(var(--sway), -55vh) rotate(10deg); }
-  100% { transform: translate(0, -115vh) rotate(-10deg); }
+  0% {
+    transform: translate(0, 0) rotate(-10deg);
+  }
+  50% {
+    transform: translate(var(--sway), -55vh) rotate(10deg);
+  }
+  100% {
+    transform: translate(0, -115vh) rotate(-10deg);
+  }
 }
 .chick {
   position: absolute;
@@ -144,16 +229,27 @@ const eggs = Array.from({ length: 10 }, (_, i) => ({
 }
 .chick span {
   display: inline-block;
-  animation: hop .35s ease-in-out infinite alternate;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .25));
+  animation: hop 0.35s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
 }
 @keyframes run {
-  0% { transform: translateX(-12vw); }
-  40%, 100% { transform: translateX(112vw); }
+  0% {
+    transform: translateX(-12vw);
+  }
+  40%,
+  100% {
+    transform: translateX(112vw);
+  }
 }
-@keyframes hop { to { transform: translateY(-6px); } }
+@keyframes hop {
+  to {
+    transform: translateY(-6px);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .decor { display: none; }
+  .decor {
+    display: none;
+  }
 }
 </style>

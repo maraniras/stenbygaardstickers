@@ -4,13 +4,15 @@
 export default defineEventHandler(async (event) => {
   const secret = process.env.CRON_SECRET
   if (secret) {
-    if (getHeader(event, 'authorization') !== `Bearer ${secret}`) throw createError({ statusCode: 401 })
-  }
-  else if (!import.meta.dev) {
+    if (getHeader(event, 'authorization') !== `Bearer ${secret}`)
+      throw createError({ statusCode: 401 })
+  } else if (!import.meta.dev) {
     const latest = (await listBackups(event))[0]
     if (latest && Date.now() - Date.parse(latest.createdAt) < 20 * 60 * 60 * 1000) {
       return { skipped: true, latest: latest.name }
     }
   }
+  // Settle date-dependent awards daily, rather than on every public read.
+  await syncBadges()
   return storeBackup(event)
 })

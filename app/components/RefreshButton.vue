@@ -9,7 +9,13 @@ function refresh() {
 </script>
 
 <template>
-  <button class="refresh" :class="{ spinning }" aria-label="Opdater" title="Opdater" @click="refresh">
+  <button
+    class="refresh"
+    :class="{ spinning }"
+    aria-label="Opdater"
+    title="Opdater"
+    @click="refresh"
+  >
     <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" /></svg>
   </button>
 </template>
@@ -30,7 +36,9 @@ function refresh() {
   color: var(--muted);
   cursor: pointer;
 }
-.refresh:active { transform: scale(.92); }
+.refresh:active {
+  transform: scale(0.92);
+}
 svg {
   width: 18px;
   height: 18px;
@@ -40,6 +48,12 @@ svg {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.spinning svg { animation: spin .8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.spinning svg {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>

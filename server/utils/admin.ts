@@ -6,7 +6,8 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 const COOKIE = 'stenbygaard-admin'
 const password = process.env.ADMIN_PASSWORD || (import.meta.dev ? 'admin' : '')
 
-const sign = (value: string) => createHmac('sha256', value).update('stenbygaard-admin').digest('hex')
+const sign = (value: string) =>
+  createHmac('sha256', value).update('stenbygaard-admin').digest('hex')
 
 function same(a: string, b: string) {
   const x = Buffer.from(a)

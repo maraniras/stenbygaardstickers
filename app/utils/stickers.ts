@@ -2,12 +2,16 @@
 // sameName i shared/utils/sticker.ts (bruges også af badges på serveren).
 // Selve listen hentes fra serveren med useStickers().
 
-export function googleMapsUrl(s: { lat: number, lng: number }) {
+export function googleMapsUrl(s: { lat: number; lng: number }) {
   return `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`
 }
 
 export function formatDate(date: string) {
-  return new Date(`${date}T12:00:00`).toLocaleDateString('da-DK', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(`${date}T12:00:00`).toLocaleDateString('da-DK', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 
 export function formatKm(km: number) {
@@ -25,17 +29,17 @@ export function thumbnail(s: StickerData) {
   return m.type === 'video' ? m.poster : m.src
 }
 
-
 /** Alle der har sat stickers op, flest først */
 export function countPeople(list: StickerData[]) {
   const counts = new Map<string, number>()
   for (const s of list) {
     for (const n of s.placedBy) {
-      const key = [...counts.keys()].find(k => sameName(k, n)) ?? n
+      const key = [...counts.keys()].find((k) => sameName(k, n)) ?? n
       counts.set(key, (counts.get(key) ?? 0) + 1)
     }
   }
-  return [...counts].map(([name, count]) => ({ name, count }))
+  return [...counts]
+    .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'da'))
 }
 
@@ -51,9 +55,12 @@ export function personUrl(name: string) {
 export function statsFor(list: Sticker[]) {
   return {
     count: list.length,
-    countries: new Set(list.map(s => s.countryCode)).size,
-    cities: new Set(list.map(s => `${s.countryCode}:${s.city}`)).size,
-    farthest: list.reduce<Sticker | undefined>((max, s) => (!max || s.distanceKm > max.distanceKm ? s : max), undefined),
+    countries: new Set(list.map((s) => s.countryCode)).size,
+    cities: new Set(list.map((s) => `${s.countryCode}:${s.city}`)).size,
+    farthest: list.reduce<Sticker | undefined>(
+      (max, s) => (!max || s.distanceKm > max.distanceKm ? s : max),
+      undefined,
+    ),
   }
 }
 
@@ -83,7 +90,7 @@ export interface StickerDraft {
   date: string
   description: string
   placedBy: string[]
-  location: { lat: number, lng: number } | null
+  location: { lat: number; lng: number } | null
   media: StickerMedia[]
   city: string
   country: string
@@ -91,7 +98,17 @@ export interface StickerDraft {
 }
 
 export function emptyDraft(): StickerDraft {
-  return { title: '', date: today(), description: '', placedBy: [], location: null, media: [], city: '', country: '', countryCode: '' }
+  return {
+    title: '',
+    date: today(),
+    description: '',
+    placedBy: [],
+    location: null,
+    media: [],
+    city: '',
+    country: '',
+    countryCode: '',
+  }
 }
 
 export function draftFrom(s: StickerData): StickerDraft {

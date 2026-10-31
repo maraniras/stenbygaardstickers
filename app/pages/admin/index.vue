@@ -7,9 +7,12 @@ const loggingIn = ref(false)
 
 useHead({ title: 'Admin · Stenbygaard Stickers' })
 
-const pending = computed(() => (all.value ?? []).filter(s => s.status === 'pending')
-  .sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? '')))
-const approved = computed(() => (all.value ?? []).filter(s => s.status === 'approved'))
+const pending = computed(() =>
+  (all.value ?? [])
+    .filter((s) => s.status === 'pending')
+    .sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? '')),
+)
+const approved = computed(() => (all.value ?? []).filter((s) => s.status === 'approved'))
 const shown = computed(() => (tab.value === 'pending' ? pending.value : approved.value))
 
 onMounted(async () => {
@@ -23,18 +26,21 @@ async function submit() {
     await login(password.value)
     password.value = ''
     await load()
-  }
-  catch (err: any) {
+  } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Kunne ikke logge ind'
-  }
-  finally {
+  } finally {
     loggingIn.value = false
   }
 }
 
 function submitted(s: StoredSticker) {
   if (!s.submittedAt) return ''
-  return new Date(s.submittedAt).toLocaleString('da-DK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return new Date(s.submittedAt).toLocaleString('da-DK', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 </script>
 
@@ -42,45 +48,120 @@ function submitted(s: StoredSticker) {
   <div class="page">
     <header>
       <h1>Admin</h1>
-      <button v-if="admin" class="chip" @click="logout">Log ud</button>
+      <button
+        v-if="admin"
+        class="chip"
+        @click="logout"
+      >
+        Log ud
+      </button>
     </header>
 
-    <form v-if="admin === false" class="form login" @submit.prevent="submit">
+    <form
+      v-if="admin === false"
+      class="form login"
+      @submit.prevent="submit"
+    >
       <label class="field">
         <span class="eyebrow">Adgangskode</span>
-        <input v-model="password" type="password" autocomplete="current-password">
+        <input
+          v-model="password"
+          type="password"
+          autocomplete="current-password"
+        />
       </label>
-      <p v-if="error" class="err">{{ error }}</p>
-      <button class="btn" :disabled="!password || loggingIn">{{ loggingIn ? 'Logger ind…' : 'Log ind' }}</button>
+      <p
+        v-if="error"
+        class="err"
+      >
+        {{ error }}
+      </p>
+      <button
+        class="btn"
+        :disabled="!password || loggingIn"
+      >
+        {{ loggingIn ? 'Logger ind…' : 'Log ind' }}
+      </button>
     </form>
 
     <template v-else-if="admin && all">
-      <div class="sort" role="tablist">
-        <button :class="{ on: tab === 'pending' }" @click="tab = 'pending'">
-          Venter <span v-if="pending.length" class="n">{{ pending.length }}</span>
+      <div
+        class="sort"
+        role="tablist"
+      >
+        <button
+          :class="{ on: tab === 'pending' }"
+          @click="tab = 'pending'"
+        >
+          Venter
+          <span
+            v-if="pending.length"
+            class="n"
+            >{{ pending.length }}</span
+          >
         </button>
-        <button :class="{ on: tab === 'approved' }" @click="tab = 'approved'">Godkendte</button>
+        <button
+          :class="{ on: tab === 'approved' }"
+          @click="tab = 'approved'"
+        >
+          Godkendte
+        </button>
       </div>
 
-      <p v-if="!shown.length" class="empty">
-        {{ tab === 'pending' ? 'Ingen stickers venter på godkendelse.' : 'Ingen godkendte stickers.' }}
+      <p
+        v-if="!shown.length"
+        class="empty"
+      >
+        {{
+          tab === 'pending' ? 'Ingen stickers venter på godkendelse.' : 'Ingen godkendte stickers.'
+        }}
       </p>
 
       <div class="rows">
-        <NuxtLink v-for="s in shown" :key="s.id" class="row" :to="`/admin/${s.id}`">
-          <img v-if="thumbnail(s)" :src="thumbnail(s)" alt="">
-          <img v-else src="/marker.png" alt="" class="fallback">
+        <NuxtLink
+          v-for="s in shown"
+          :key="s.id"
+          class="row"
+          :to="`/admin/${s.id}`"
+        >
+          <img
+            v-if="thumbnail(s)"
+            :src="thumbnail(s)"
+            alt=""
+          />
+          <img
+            v-else
+            src="/marker.png"
+            alt=""
+            class="fallback"
+          />
           <div class="info">
             <b>{{ s.title }}</b>
-            <span><CountryFlag v-if="s.countryCode" :code="s.countryCode" /> {{ s.city || 'Ukendt sted' }} · {{ formatDate(s.date) }}</span>
-            <span>{{ formatNames(s.placedBy) || 'Ingen navne' }} · {{ s.media.length }} {{ s.media.length === 1 ? 'medie' : 'medier' }}</span>
-            <span v-if="s.status === 'pending' && s.submittedAt" class="when">Indsendt {{ submitted(s) }}</span>
+            <span
+              ><CountryFlag
+                v-if="s.countryCode"
+                :code="s.countryCode"
+              />
+              {{ s.city || 'Ukendt sted' }} · {{ formatDate(s.date) }}</span
+            >
+            <span
+              >{{ formatNames(s.placedBy) || 'Ingen navne' }} · {{ s.media.length }}
+              {{ s.media.length === 1 ? 'medie' : 'medier' }}</span
+            >
+            <span
+              v-if="s.status === 'pending' && s.submittedAt"
+              class="when"
+              >Indsendt {{ submitted(s) }}</span
+            >
           </div>
           <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
         </NuxtLink>
       </div>
 
-      <NuxtLink class="comments-link" to="/admin/kommentarer">
+      <NuxtLink
+        class="comments-link"
+        to="/admin/kommentarer"
+      >
         <span>💬</span>
         <b>Kommentarer</b>
         <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
@@ -91,7 +172,12 @@ function submitted(s: StoredSticker) {
       <AdminBackups />
     </template>
 
-    <p v-else class="empty">Henter…</p>
+    <p
+      v-else
+      class="empty"
+    >
+      Henter…
+    </p>
   </div>
 </template>
 
@@ -107,9 +193,17 @@ header {
   justify-content: space-between;
   margin-bottom: 18px;
 }
-h1 { font-size: 34px; }
-.login { max-width: 360px; }
-.err { margin: 0; color: #c62828; font-weight: 600; }
+h1 {
+  font-size: 34px;
+}
+.login {
+  max-width: 360px;
+}
+.err {
+  margin: 0;
+  color: #c62828;
+  font-weight: 600;
+}
 .sort {
   display: flex;
   gap: 4px;
@@ -145,7 +239,9 @@ h1 { font-size: 34px; }
   color: var(--on-accent);
   font-size: 12px;
 }
-.empty { color: var(--muted); }
+.empty {
+  color: var(--muted);
+}
 .rows {
   display: grid;
   gap: 10px;
@@ -169,7 +265,10 @@ h1 { font-size: 34px; }
   object-fit: cover;
   background: var(--surface-2);
 }
-.row > img.fallback { object-fit: contain; padding: 10px; }
+.row > img.fallback {
+  object-fit: contain;
+  padding: 10px;
+}
 .info {
   display: flex;
   flex-direction: column;
@@ -183,7 +282,10 @@ h1 { font-size: 34px; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.info .when { color: var(--text); font-weight: 600; }
+.info .when {
+  color: var(--text);
+  font-weight: 600;
+}
 .comments-link {
   display: flex;
   align-items: center;
@@ -195,8 +297,29 @@ h1 { font-size: 34px; }
   box-shadow: var(--shadow-sm);
   text-decoration: none;
 }
-.comments-link span { font-size: 22px; }
-.comments-link b { flex: 1; }
-.comments-link svg { width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.row > svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.comments-link span {
+  font-size: 22px;
+}
+.comments-link b {
+  flex: 1;
+}
+.comments-link svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.row > svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 </style>

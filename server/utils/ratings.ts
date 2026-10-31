@@ -37,13 +37,15 @@ export async function getRatings(voter: RatingVoter = {}) {
     }
     return out
   }
-  const [ids] = await redis([['SMEMBERS', 'rated']]) as [string[]]
+  const [ids] = (await redis([['SMEMBERS', 'rated']])) as [string[]]
   if (!ids.length) return out
-  const res = await redis(ids.flatMap(id => [
-    ['HVALS', `rating:${id}`],
-    ['HGET', `rating:${id}`, userField],
-    ['HGET', `rating:${id}`, deviceField],
-  ]))
+  const res = await redis(
+    ids.flatMap((id) => [
+      ['HVALS', `rating:${id}`],
+      ['HGET', `rating:${id}`, userField],
+      ['HGET', `rating:${id}`, deviceField],
+    ]),
+  )
   ids.forEach((id, i) => {
     const values = (res[i * 3] as string[]).map(Number)
     if (!values.length) return
@@ -72,7 +74,10 @@ export async function setRating(stickerId: string, voter: RatingVoter, value: nu
   await redis([
     ...(extra.length ? [['HDEL', `rating:${stickerId}`, ...extra]] : []),
     ...(value
-      ? [['HSET', `rating:${stickerId}`, field, value], ['SADD', 'rated', stickerId]]
+      ? [
+          ['HSET', `rating:${stickerId}`, field, value],
+          ['SADD', 'rated', stickerId],
+        ]
       : [['HDEL', `rating:${stickerId}`, field]]),
   ])
 }
@@ -97,9 +102,14 @@ export async function claimRatings(device: string, userKey: string, own: Set<str
     await useStorage('data').setItem('ratings', data)
     return moved
   }
-  const [ids] = await redis([['SMEMBERS', 'rated']]) as [string[]]
+  const [ids] = (await redis([['SMEMBERS', 'rated']])) as [string[]]
   if (!ids.length) return 0
-  const res = await redis(ids.flatMap(id => [['HGET', `rating:${id}`, device], ['HGET', `rating:${id}`, userField]]))
+  const res = await redis(
+    ids.flatMap((id) => [
+      ['HGET', `rating:${id}`, device],
+      ['HGET', `rating:${id}`, userField],
+    ]),
+  )
   const cmds: (string | number)[][] = []
   ids.forEach((id, i) => {
     const v = res[i * 2] as string | null

@@ -10,7 +10,11 @@ export const blobEnabled = Boolean(readWriteToken || process.env.BLOB_STORE_ID)
 
 export const uploadMode: 'blob' | 'presigned' | 'local' | 'off' = readWriteToken
   ? 'blob'
-  : process.env.BLOB_STORE_ID ? 'presigned' : import.meta.dev ? 'local' : 'off'
+  : process.env.BLOB_STORE_ID
+    ? 'presigned'
+    : import.meta.dev
+      ? 'local'
+      : 'off'
 
 /** OIDC-tokenet som Vercel sender med hver request til funktionen */
 export function blobAuth(event: H3Event) {
@@ -21,8 +25,10 @@ export function blobAuth(event: H3Event) {
 /** Dev-siden uploader til mappen dev/ og må kun slette derfra (se redis.ts) */
 export const blobFolder = isPreview ? 'dev/' : ''
 
-const BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?stickers\/[\w./-]+$/i
-const AVATAR_BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?avatars\/[\w.-]+$/i
+const BLOB_RE =
+  /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?stickers\/[\w./-]+$/i
+const AVATAR_BLOB_RE =
+  /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/(dev\/)?avatars\/[\w.-]+$/i
 const DEV_BLOB_RE = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/dev\//i
 const LOCAL_RE = /^\/api\/media\/[\w.-]+$/
 export const LOCAL_NAME_RE = /^[\w-]{1,80}\.(webp|jpg|jpeg|png|mp4|mov|m4v|webm)$/i
@@ -41,29 +47,32 @@ export async function deleteAvatar(event: H3Event, src: string | undefined) {
   if (!src || !isAvatarFile(src)) return
   try {
     if (AVATAR_BLOB_RE.test(src) && blobEnabled) await del(src, blobAuth(event))
-    else if (LOCAL_RE.test(src)) await useStorage('data').removeItem(`uploads:${src.split('/').pop()}`)
-  }
-  catch (err) {
+    else if (LOCAL_RE.test(src))
+      await useStorage('data').removeItem(`uploads:${src.split('/').pop()}`)
+  } catch (err) {
     console.error('Kunne ikke slette profilbillede', err)
   }
 }
 
 function files(list: StickerMedia[]) {
-  return list.flatMap(m => (m.poster ? [m.src, m.poster] : [m.src]))
+  return list.flatMap((m) => (m.poster ? [m.src, m.poster] : [m.src]))
 }
 
 /** Sletter uploadede filer, som ikke længere bruges */
-export async function deleteUnused(event: H3Event, before: StickerMedia[], after: StickerMedia[] = []) {
+export async function deleteUnused(
+  event: H3Event,
+  before: StickerMedia[],
+  after: StickerMedia[] = [],
+) {
   const keep = new Set(files(after))
-  const gone = files(before).filter(src => !keep.has(src))
+  const gone = files(before).filter((src) => !keep.has(src))
   // Dev har kopier af prod's stickers, som peger på prod's filer – dem må den ikke slette
-  const blobs = gone.filter(src => BLOB_RE.test(src) && (!isPreview || DEV_BLOB_RE.test(src)))
-  const local = gone.filter(src => LOCAL_RE.test(src))
+  const blobs = gone.filter((src) => BLOB_RE.test(src) && (!isPreview || DEV_BLOB_RE.test(src)))
+  const local = gone.filter((src) => LOCAL_RE.test(src))
   try {
     if (blobs.length && blobEnabled) await del(blobs, blobAuth(event))
     for (const src of local) await useStorage('data').removeItem(`uploads:${src.split('/').pop()}`)
-  }
-  catch (err) {
+  } catch (err) {
     console.error('Kunne ikke slette medier', err)
   }
 }

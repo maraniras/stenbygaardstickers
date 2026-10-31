@@ -10,13 +10,17 @@ const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services'
 
 export function useBasemap() {
   const basemap = useState<Basemap>('basemap', () => {
-    try { return localStorage.getItem(KEY) === 'luftfoto' ? 'luftfoto' : 'kort' }
-    catch { return 'kort' }
+    try {
+      return localStorage.getItem(KEY) === 'luftfoto' ? 'luftfoto' : 'kort'
+    } catch {
+      return 'kort'
+    }
   })
   function toggle() {
     basemap.value = basemap.value === 'kort' ? 'luftfoto' : 'kort'
-    try { localStorage.setItem(KEY, basemap.value) }
-    catch {}
+    try {
+      localStorage.setItem(KEY, basemap.value)
+    } catch {}
   }
   return { basemap, toggle }
 }
@@ -33,7 +37,9 @@ export function attachBasemap(L: typeof Leaflet, map: Leaflet.Map, basemap: Ref<
         attribution: 'Luftfoto © Esri, Maxar, Earthstar Geographics',
         maxZoom: 19,
       }),
-      L.tileLayer(`${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 19 }),
+      L.tileLayer(`${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, {
+        maxZoom: 19,
+      }),
     ]),
   }
   let current: Basemap | undefined

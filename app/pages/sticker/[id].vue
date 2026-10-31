@@ -6,7 +6,9 @@ const sticker = computed(() => getSticker(String(route.params.id)))
 const index = ref(0)
 const track = ref<HTMLElement>()
 
-useHead(() => ({ title: sticker.value ? `${sticker.value.title} · Stenbygaard Stickers` : 'Stenbygaard Stickers' }))
+useHead(() => ({
+  title: sticker.value ? `${sticker.value.title} · Stenbygaard Stickers` : 'Stenbygaard Stickers',
+}))
 
 function onScroll() {
   const t = track.value
@@ -29,16 +31,18 @@ async function share() {
   if (!s) return
   const url = `${location.origin}/sticker/${s.id}`
   if (navigator.share) {
-    try { await navigator.share({ title: s.title, text: `Emil i ${s.city}`, url }) }
-    catch {}
+    try {
+      await navigator.share({ title: s.title, text: `Emil i ${s.city}`, url })
+    } catch {}
     return
   }
   try {
     await navigator.clipboard.writeText(url)
     copied.value = true
-    setTimeout(() => { copied.value = false }, 2000)
-  }
-  catch {}
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
+  } catch {}
 }
 
 // Stop videoer der ikke er i fokus
@@ -50,10 +54,25 @@ watch(index, (i) => {
 </script>
 
 <template>
-  <div v-if="sticker" class="page">
-    <div class="hero" :class="{ empty: !sticker.media.length }">
-      <div v-if="sticker.media.length" ref="track" class="track" @scroll.passive="onScroll">
-        <div v-for="(m, i) in sticker.media" :key="m.src" class="slide">
+  <div
+    v-if="sticker"
+    class="page"
+  >
+    <div
+      class="hero"
+      :class="{ empty: !sticker.media.length }"
+    >
+      <div
+        v-if="sticker.media.length"
+        ref="track"
+        class="track"
+        @scroll.passive="onScroll"
+      >
+        <div
+          v-for="(m, i) in sticker.media"
+          :key="m.src"
+          class="slide"
+        >
           <video
             v-if="m.type === 'video'"
             :data-i="i"
@@ -64,27 +83,67 @@ watch(index, (i) => {
             loop
             preload="metadata"
           />
-          <img v-else :src="m.src" :width="m.width" :height="m.height" alt="" :loading="i ? 'lazy' : 'eager'">
+          <img
+            v-else
+            :src="m.src"
+            :width="m.width"
+            :height="m.height"
+            alt=""
+            :loading="i ? 'lazy' : 'eager'"
+          />
         </div>
       </div>
-      <img v-else class="placeholder" src="/marker.png" alt="">
+      <img
+        v-else
+        class="placeholder"
+        src="/marker.png"
+        alt=""
+      />
 
-      <button class="back glass" aria-label="Tilbage" @click="back">
+      <button
+        class="back glass"
+        aria-label="Tilbage"
+        @click="back"
+      >
         <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
       </button>
-      <button class="back share glass" aria-label="Del sticker" title="Del sticker" @click="share">
-        <svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5" /><path d="M7 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1" /></svg>
+      <button
+        class="back share glass"
+        aria-label="Del sticker"
+        title="Del sticker"
+        @click="share"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5" />
+          <path d="M7 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1" />
+        </svg>
       </button>
       <Transition name="fade">
-        <span v-if="copied" class="copied glass">Link kopieret</span>
+        <span
+          v-if="copied"
+          class="copied glass"
+          >Link kopieret</span
+        >
       </Transition>
-      <div v-if="sticker.media.length > 1" class="dots">
-        <button v-for="(m, i) in sticker.media" :key="m.src" :class="{ on: i === index }" :aria-label="`Medie ${i + 1}`" @click="goTo(i)" />
+      <div
+        v-if="sticker.media.length > 1"
+        class="dots"
+      >
+        <button
+          v-for="(m, i) in sticker.media"
+          :key="m.src"
+          :class="{ on: i === index }"
+          :aria-label="`Medie ${i + 1}`"
+          :aria-pressed="i === index"
+          @click="goTo(i)"
+        />
       </div>
     </div>
 
     <article class="body">
-      <div class="place"><CountryFlag :code="sticker.countryCode" /> {{ sticker.city }}, {{ sticker.country }}</div>
+      <div class="place">
+        <CountryFlag :code="sticker.countryCode" /> {{ sticker.city }}, {{ sticker.country }}
+      </div>
       <h1>{{ sticker.title }}</h1>
       <p class="date">{{ formatDate(sticker.date) }}</p>
 
@@ -93,40 +152,103 @@ watch(index, (i) => {
           <span class="eyebrow">Fra Aalborg</span>
           <b>{{ formatKm(sticker.distanceKm) }}</b>
         </div>
-        <div v-if="sticker.placedBy.length" class="fact">
+        <div
+          v-if="sticker.placedBy.length"
+          class="fact"
+        >
           <span class="eyebrow">Sat op af</span>
           <div class="names">
-            <NuxtLink v-for="n in sticker.placedBy" :key="n" class="chip person" :to="personUrl(n)">
-              <UserAvatar class="avatar" :name="n" />{{ n }}
+            <NuxtLink
+              v-for="n in sticker.placedBy"
+              :key="n"
+              class="chip person"
+              :to="personUrl(n)"
+            >
+              <UserAvatar
+                class="avatar"
+                :name="n"
+              />{{ n }}
             </NuxtLink>
           </div>
         </div>
       </div>
 
-      <p v-if="sticker.description" class="desc">{{ sticker.description }}</p>
+      <p
+        v-if="sticker.description"
+        class="desc"
+      >
+        {{ sticker.description }}
+      </p>
 
-      <StarRating :sticker-id="sticker.id" :placed-by="sticker.placedBy" />
+      <StarRating
+        :sticker-id="sticker.id"
+        :placed-by="sticker.placedBy"
+      />
 
       <div class="actions">
-        <a class="btn" :href="googleMapsUrl(sticker)" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+        <a
+          class="btn"
+          :href="googleMapsUrl(sticker)"
+          target="_blank"
+          rel="noopener"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" />
+            <circle
+              cx="12"
+              cy="9.5"
+              r="2.5"
+            />
+          </svg>
           Google Maps
         </a>
-        <NuxtLink class="btn secondary" :to="{ path: '/', query: { s: sticker.id } }">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4Zm0 0v13.5m6-11V20" /></svg>
+        <NuxtLink
+          class="btn secondary"
+          :to="{ path: '/', query: { s: sticker.id } }"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4Zm0 0v13.5m6-11V20" />
+          </svg>
           Vis på kortet
         </NuxtLink>
       </div>
       <p class="coords">{{ sticker.lat.toFixed(5) }}, {{ sticker.lng.toFixed(5) }}</p>
 
-      <CommentsSection :key="sticker.id" :sticker-id="sticker.id" />
+      <CommentsSection
+        :key="sticker.id"
+        :sticker-id="sticker.id"
+      />
     </article>
   </div>
 
-  <div v-else class="missing">
-    <img src="/marker.png" alt="">
+  <div
+    v-else
+    class="missing"
+  >
+    <img
+      src="/marker.png"
+      alt=""
+    />
     <h1>Sticker ikke fundet</h1>
-    <NuxtLink class="btn" to="/">Til kortet</NuxtLink>
+    <NuxtLink
+      class="btn"
+      to="/"
+      >Til kortet</NuxtLink
+    >
   </div>
 </template>
 
@@ -151,7 +273,7 @@ watch(index, (i) => {
   height: 130px;
   object-fit: contain;
   margin-top: var(--safe-t);
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .25));
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.25));
 }
 .track {
   display: flex;
@@ -159,20 +281,25 @@ watch(index, (i) => {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
-.track::-webkit-scrollbar { display: none; }
+.track::-webkit-scrollbar {
+  display: none;
+}
 .slide {
   flex: none;
   width: 100%;
   height: min(68vh, 620px);
   scroll-snap-align: center;
 }
-.slide img, .slide video {
+.slide img,
+.slide video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   background: #0d0d0f;
 }
-.slide video { object-fit: contain; }
+.slide video {
+  object-fit: contain;
+}
 .back {
   position: absolute;
   top: calc(12px + var(--safe-t));
@@ -186,9 +313,24 @@ watch(index, (i) => {
   border-radius: 50%;
   cursor: pointer;
 }
-.back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.share { left: auto; right: 12px; }
-.share svg { width: 20px; height: 20px; stroke-width: 2.1; }
+.back svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.share {
+  left: auto;
+  right: 12px;
+}
+.share svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.1;
+}
 .copied {
   position: absolute;
   top: calc(20px + var(--safe-t));
@@ -198,32 +340,43 @@ watch(index, (i) => {
   font-size: 13px;
   font-weight: 700;
 }
-.fade-enter-active, .fade-leave-active { transition: opacity .2s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 .dots {
   position: absolute;
   left: 50%;
   bottom: 40px;
   display: flex;
-  gap: 6px;
-  padding: 6px 9px;
+  gap: 0;
+  max-width: calc(100% - 20px);
+  overflow-x: auto;
+  padding: 0 3px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, .35);
+  background: rgba(0, 0, 0, 0.35);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: translateX(-50%);
 }
 .dots button {
-  width: 7px;
-  height: 7px;
+  flex: none;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .5);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0 3.5px, transparent 4px);
   cursor: pointer;
-  transition: width .2s;
+  transition: width 0.2s;
 }
-.dots button.on { width: 18px; background: #fff; }
+.dots button.on {
+  background: radial-gradient(circle, #fff 0 5px, transparent 5.5px);
+}
 .body {
   position: relative;
   display: flex;
@@ -234,7 +387,9 @@ watch(index, (i) => {
   border-radius: 28px 28px 0 0;
   background: var(--bg);
 }
-.hero.empty + .body { margin-top: -26px; }
+.hero.empty + .body {
+  margin-top: -26px;
+}
 .place {
   font-size: 14px;
   font-weight: 600;
@@ -264,7 +419,10 @@ h1 {
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
-.fact b { font-size: 18px; white-space: nowrap; }
+.fact b {
+  font-size: 18px;
+  white-space: nowrap;
+}
 .names {
   display: flex;
   flex-wrap: wrap;
@@ -317,5 +475,7 @@ h1 {
   height: 100%;
   padding: 24px;
 }
-.missing img { width: 100px; }
+.missing img {
+  width: 100px;
+}
 </style>

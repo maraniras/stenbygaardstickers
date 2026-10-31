@@ -10,5 +10,9 @@ export function timeAgo(iso: string, now = Date.now()) {
   const yesterday = new Date(now)
   yesterday.setDate(yesterday.getDate() - 1)
   if (d.toDateString() === yesterday.toDateString()) return 'i går'
-  return d.toLocaleDateString('da-DK', { day: 'numeric', month: 'short', ...(d.getFullYear() !== new Date(now).getFullYear() ? { year: 'numeric' } : {}) })
+  return d.toLocaleDateString('da-DK', {
+    day: 'numeric',
+    month: 'short',
+    ...(d.getFullYear() !== new Date(now).getFullYear() ? { year: 'numeric' } : {}),
+  })
 }

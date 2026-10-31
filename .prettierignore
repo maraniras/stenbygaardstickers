@@ -1,0 +1,10 @@
+node_modules
+.nuxt
+.output
+.data
+.vercel
+public
+branding
+docs/designs
+AGENTS.md
+package-lock.json

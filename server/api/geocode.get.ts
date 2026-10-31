@@ -4,6 +4,7 @@ export default defineEventHandler(async (event) => {
   const { lat, lng } = getQuery(event)
   const la = Number(lat)
   const ln = Number(lng)
-  if (!Number.isFinite(la) || !Number.isFinite(ln)) throw createError({ statusCode: 400, statusMessage: 'Ugyldigt koordinat' })
+  if (!Number.isFinite(la) || !Number.isFinite(ln))
+    throw createError({ statusCode: 400, statusMessage: 'Ugyldigt koordinat' })
   return reverseGeocode(la, ln)
 })

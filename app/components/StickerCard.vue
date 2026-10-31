@@ -1,15 +1,45 @@
 <script setup lang="ts">
 const props = defineProps<{ sticker: Sticker }>()
-const thumb = computed(() => thumbnail(props.sticker))
+const brokenThumbnail = ref(false)
+const original = computed(() => thumbnail(props.sticker))
+const thumb = computed(() =>
+  original.value && !brokenThumbnail.value
+    ? '/api/stickers/' + encodeURIComponent(props.sticker.id) + '/thumbnail?width=640'
+    : original.value,
+)
+watch(
+  () => props.sticker.id,
+  () => {
+    brokenThumbnail.value = false
+  },
+)
 </script>
 
 <template>
-  <NuxtLink class="card" :to="`/sticker/${sticker.id}`">
+  <NuxtLink
+    class="card"
+    :to="`/sticker/${sticker.id}`"
+  >
     <div class="media">
-      <img v-if="thumb" :src="thumb" alt="" loading="lazy">
-      <img v-else src="/marker.png" alt="" class="fallback">
+      <img
+        v-if="thumb"
+        :src="thumb"
+        alt=""
+        decoding="async"
+        @error="brokenThumbnail = true"
+        loading="lazy"
+      />
+      <img
+        v-else
+        src="/marker.png"
+        alt=""
+        class="fallback"
+      />
       <span class="flag-badge"><CountryFlag :code="sticker.countryCode" /></span>
-      <span v-if="sticker.media.some(m => m.type === 'video')" class="tag">
+      <span
+        v-if="sticker.media.some((m) => m.type === 'video')"
+        class="tag"
+      >
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg> Video
       </span>
       <div class="over">
@@ -37,9 +67,11 @@ const thumb = computed(() => thumbnail(props.sticker))
   background: var(--surface);
   box-shadow: var(--shadow-sm);
   text-decoration: none;
-  transition: transform .15s;
+  transition: transform 0.15s;
 }
-.card:active { transform: scale(.98); }
+.card:active {
+  transform: scale(0.98);
+}
 .media {
   position: relative;
   aspect-ratio: 4 / 3;
@@ -62,7 +94,7 @@ const thumb = computed(() => thumbnail(props.sticker))
   place-items: center;
   padding: 5px 6px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, .85);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   font-size: 14px;
@@ -77,27 +109,31 @@ const thumb = computed(() => thumbnail(props.sticker))
   gap: 4px;
   padding: 4px 10px 4px 8px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, .45);
+  background: rgba(0, 0, 0, 0.45);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
 }
-.tag svg { width: 12px; height: 12px; fill: currentColor; }
+.tag svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
 .over {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   padding: 48px 16px 14px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, .65));
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
   color: #fff;
 }
 .place {
   font-size: 13px;
   font-weight: 600;
-  opacity: .9;
+  opacity: 0.9;
 }
 h3 {
   font-size: 22px;
@@ -112,7 +148,9 @@ h3 {
   font-weight: 600;
   color: var(--muted);
 }
-.dot { opacity: .5; }
+.dot {
+  opacity: 0.5;
+}
 .right {
   display: inline-flex;
   gap: 10px;

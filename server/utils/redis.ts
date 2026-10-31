@@ -13,9 +13,11 @@ export const isPreview = process.env.VERCEL_ENV === 'preview'
 
 /** Lua keys are prefixed explicitly: EVAL's first argument is the script, not a key. */
 export async function redisEval(script: string, keys: string[], args: string[]) {
-  const prefixed = keys.map(k => isPreview ? `dev:${k}` : k)
-  const response = await $fetch<{ result: unknown, error?: string }[]>(`${url}/pipeline`, {
-    method: 'POST', headers: { Authorization: `Bearer ${token}` }, timeout: 15_000,
+  const prefixed = keys.map((k) => (isPreview ? `dev:${k}` : k))
+  const response = await $fetch<{ result: unknown; error?: string }[]>(`${url}/pipeline`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    timeout: 15_000,
     body: [['EVAL', script, keys.length, ...prefixed, ...args]],
   })
   if (response[0]?.error) throw new Error(response[0].error)
@@ -24,7 +26,7 @@ export async function redisEval(script: string, keys: string[], args: string[]) 
 
 export async function redis(cmds: (string | number)[][]) {
   const body = isPreview ? cmds.map(([cmd, key, ...rest]) => [cmd!, `dev:${key}`, ...rest]) : cmds
-  const res = await $fetch<{ result: unknown, error?: string }[]>(`${url}/pipeline`, {
+  const res = await $fetch<{ result: unknown; error?: string }[]>(`${url}/pipeline`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body,

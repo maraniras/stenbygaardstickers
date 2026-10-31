@@ -1,6 +1,19 @@
-const DK_TIME = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' })
+const DK_TIME = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Copenhagen',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hourCycle: 'h23',
+})
 function localParts(now: Date) {
-  return Object.fromEntries(DK_TIME.formatToParts(now).filter(p => p.type !== 'literal').map(p => [p.type, Number(p.value)])) as Record<string, number>
+  return Object.fromEntries(
+    DK_TIME.formatToParts(now)
+      .filter((p) => p.type !== 'literal')
+      .map((p) => [p.type, Number(p.value)]),
+  ) as Record<string, number>
 }
 /** Danish calendar day with a 04:00 boundary, independent of server timezone. */
 export function gameDay(now = new Date()) {

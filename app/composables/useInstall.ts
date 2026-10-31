@@ -12,8 +12,11 @@ let deferred: DeferredPrompt | undefined
 let listening = false
 
 export function isStandalone() {
-  return import.meta.client
-    && (window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true)
+  return (
+    import.meta.client &&
+    (window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as any).standalone === true)
+  )
 }
 
 export function useInstall() {

@@ -22,17 +22,21 @@ onMounted(async () => {
 
 /** Får denne enhed overhovedet notifikationer */
 const deviceOn = computed(() => all.on.value || (Boolean(name.value) && badgePush.value))
-const types = computed(() => (name.value ? NOTIFY_TYPES : NOTIFY_TYPES.filter(t => t.type === 'stickers')))
+const types = computed(() =>
+  name.value ? NOTIFY_TYPES : NOTIFY_TYPES.filter((t) => t.type === 'stickers'),
+)
 
 async function run(fn: () => Promise<unknown>) {
   busy.value = true
   error.value = ''
-  try { await fn() }
-  catch (err: any) {
+  try {
+    await fn()
+  } catch (err: any) {
     if (supported.value && Notification.permission === 'denied') blocked.value = true
     else error.value = err?.data?.statusMessage || err?.message || 'Det lykkedes ikke'
+  } finally {
+    busy.value = false
   }
-  finally { busy.value = false }
 }
 
 function toggleDevice() {
@@ -40,8 +44,7 @@ function toggleDevice() {
     if (deviceOn.value) {
       await all.disable()
       if (name.value) await setBadgePush(false)
-    }
-    else {
+    } else {
       await all.enable()
       if (name.value) await setBadgePush(true)
     }
@@ -60,7 +63,11 @@ function back() {
 
 <template>
   <div class="page">
-    <button class="back" aria-label="Tilbage" @click="back">
+    <button
+      class="back"
+      aria-label="Tilbage"
+      @click="back"
+    >
       <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
     </button>
 
@@ -69,20 +76,43 @@ function back() {
       <p class="sub">Vælg hvad du vil have besked om.</p>
     </header>
 
-    <p v-if="!ready" class="hint">Henter…</p>
+    <p
+      v-if="!ready"
+      class="hint"
+    >
+      Henter…
+    </p>
 
     <template v-else>
-      <div v-if="homeScreenFirst" class="note">
+      <div
+        v-if="homeScreenFirst"
+        class="note"
+      >
         <span>📲</span>
-        <p>På iPhone kan der kun komme besked fra appen på hjemmeskærmen: tryk på Del <b>⬆︎</b> i Safari, vælg »Føj til hjemmeskærm«, og åbn appen derfra.</p>
+        <p>
+          På iPhone kan der kun komme besked fra appen på hjemmeskærmen: tryk på Del <b>⬆︎</b> i
+          Safari, vælg »Føj til hjemmeskærm«, og åbn appen derfra.
+        </p>
       </div>
-      <div v-else-if="!supported" class="note">
+      <div
+        v-else-if="!supported"
+        class="note"
+      >
         <span>🔕</span>
-        <p>Denne browser kan ikke vise notifikationer. Prøv Chrome, eller føj appen til hjemmeskærmen.</p>
+        <p>
+          Denne browser kan ikke vise notifikationer. Prøv Chrome, eller føj appen til
+          hjemmeskærmen.
+        </p>
       </div>
-      <div v-else-if="blocked" class="note">
+      <div
+        v-else-if="blocked"
+        class="note"
+      >
         <span>🔕</span>
-        <p>Notifikationer er blokeret. Slå dem til for appen (eller browseren) i telefonens indstillinger, og kom tilbage hertil.</p>
+        <p>
+          Notifikationer er blokeret. Slå dem til for appen (eller browseren) i telefonens
+          indstillinger, og kom tilbage hertil.
+        </p>
       </div>
 
       <section class="card main">
@@ -104,9 +134,16 @@ function back() {
         </div>
       </section>
 
-      <section class="card types" :class="{ dim: !deviceOn }">
+      <section
+        class="card types"
+        :class="{ dim: !deviceOn }"
+      >
         <h2 class="eyebrow">Hvad vil du have besked om?</h2>
-        <div v-for="t in types" :key="t.type" class="row">
+        <div
+          v-for="t in types"
+          :key="t.type"
+          class="row"
+        >
           <span class="emoji">{{ t.emoji }}</span>
           <div class="text">
             <b>{{ t.label }}</b>
@@ -125,16 +162,37 @@ function back() {
             <span />
           </button>
         </div>
-        <p v-if="!deviceOn" class="hint">Slå notifikationer til på denne enhed for at få dem.</p>
-        <p v-else-if="name" class="hint">Valgene gælder alle dine enheder.</p>
+        <p
+          v-if="!deviceOn"
+          class="hint"
+        >
+          Slå notifikationer til på denne enhed for at få dem.
+        </p>
+        <p
+          v-else-if="name"
+          class="hint"
+        >
+          Valgene gælder alle dine enheder.
+        </p>
       </section>
 
-      <NuxtLink v-if="!name" class="card login" to="/mig">
+      <NuxtLink
+        v-if="!name"
+        class="card login"
+        to="/mig"
+      >
         <span>🏅</span>
-        <p><b>Vil du have besked om badges, tags og kommentarer?</b><br>Vælg dit navn under »Mig«.</p>
+        <p>
+          <b>Vil du have besked om badges, tags og kommentarer?</b><br />Vælg dit navn under »Mig«.
+        </p>
       </NuxtLink>
 
-      <p v-if="error" class="err">{{ error }}</p>
+      <p
+        v-if="error"
+        class="err"
+      >
+        {{ error }}
+      </p>
     </template>
   </div>
 </template>
@@ -160,9 +218,22 @@ function back() {
   box-shadow: var(--shadow-sm);
   cursor: pointer;
 }
-.back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-h1 { font-size: 30px; }
-.sub { margin: 4px 0 0; color: var(--muted); }
+.back svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+h1 {
+  font-size: 30px;
+}
+.sub {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
 .card {
   display: flex;
   flex-direction: column;
@@ -172,24 +243,39 @@ h1 { font-size: 30px; }
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
-.types h2 { margin: 2px 0 6px; }
-.types.dim .row { opacity: .5; }
+.types h2 {
+  margin: 2px 0 6px;
+}
+.types.dim .row {
+  opacity: 0.5;
+}
 .row {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 8px 0;
 }
-.types .row + .row { border-top: 1px solid var(--hairline); }
-.emoji { font-size: 22px; width: 28px; text-align: center; }
+.types .row + .row {
+  border-top: 1px solid var(--hairline);
+}
+.emoji {
+  font-size: 22px;
+  width: 28px;
+  text-align: center;
+}
 .text {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
-.text b { font-size: 15px; }
-.text span { font-size: 13px; color: var(--muted); }
+.text b {
+  font-size: 15px;
+}
+.text span {
+  font-size: 13px;
+  color: var(--muted);
+}
 .switch {
   flex: none;
   position: relative;
@@ -200,9 +286,12 @@ h1 { font-size: 30px; }
   border-radius: 999px;
   background: var(--surface-2);
   cursor: pointer;
-  transition: background .2s;
+  transition: background 0.2s;
 }
-.switch:disabled { opacity: .5; cursor: default; }
+.switch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 .switch span {
   position: absolute;
   top: 3px;
@@ -211,12 +300,20 @@ h1 { font-size: 30px; }
   height: 26px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
-  transition: transform .2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
 }
-.switch.on { background: var(--ink); }
-.switch.on span { transform: translateX(20px); }
-.hint { margin: 6px 0 2px; font-size: 13px; color: var(--muted); }
+.switch.on {
+  background: var(--ink);
+}
+.switch.on span {
+  transform: translateX(20px);
+}
+.hint {
+  margin: 6px 0 2px;
+  font-size: 13px;
+  color: var(--muted);
+}
 .note {
   display: flex;
   gap: 12px;
@@ -224,15 +321,29 @@ h1 { font-size: 30px; }
   border-radius: var(--radius);
   background: var(--accent-soft);
 }
-.note span { font-size: 24px; }
-.note p { margin: 0; font-size: 14px; }
+.note span {
+  font-size: 24px;
+}
+.note p {
+  margin: 0;
+  font-size: 14px;
+}
 .login {
   flex-direction: row;
   align-items: center;
   gap: 12px;
   text-decoration: none;
 }
-.login span { font-size: 26px; }
-.login p { margin: 0; font-size: 14px; }
-.err { margin: 0; color: #c62828; font-weight: 600; }
+.login span {
+  font-size: 26px;
+}
+.login p {
+  margin: 0;
+  font-size: 14px;
+}
+.err {
+  margin: 0;
+  color: #c62828;
+  font-weight: 600;
+}
 </style>

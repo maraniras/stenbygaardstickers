@@ -40,7 +40,9 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
 
 async function reverseGeocode() {
   const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&accept-language=da`
-  const res = await fetch(url, { headers: { 'User-Agent': 'StenbygaardStickers/1.0 (privat hobbyprojekt)' } })
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'StenbygaardStickers/1.0 (privat hobbyprojekt)' },
+  })
   if (!res.ok) throw new Error(`Nominatim svarede ${res.status}`)
   const j = await res.json()
   const a = j.address ?? {}
@@ -51,14 +53,21 @@ async function reverseGeocode() {
   }
 }
 
-const geo = (opts.city && opts.country && opts.cc) ? {} : await reverseGeocode()
+const geo = opts.city && opts.country && opts.cc ? {} : await reverseGeocode()
 const city = opts.city || geo.city
 const country = opts.country || geo.country
 const countryCode = (opts.cc || geo.countryCode || '').toUpperCase()
 
-const slug = s => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
-  .replace(/æ/g, 'ae').replace(/ø/g, 'oe').replace(/å/g, 'aa')
-  .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const slug = (s) =>
+  s
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'oe')
+    .replace(/å/g, 'aa')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
 const id = opts.id || `${date}-${slug(city || opts.title)}`
 
 const jsonPath = join('app/data/stickers', `${id}.json`)
@@ -78,17 +87,72 @@ for (const file of files) {
   if (VIDEO.has(extname(file).toLowerCase())) {
     const out = join(mediaDir, `${n}.mp4`)
     const poster = join(mediaDir, `${n}-poster.webp`)
-    execFileSync(ffmpegPath, ['-y', '-loglevel', 'error', '-i', file, '-t', '15',
-      '-vf', "scale='min(1080,iw)':-2", '-c:v', 'libx264', '-preset', 'slow', '-crf', '28',
-      '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', out])
-    const frame = execFileSync(ffmpegPath, ['-loglevel', 'error', '-ss', '0.5', '-i', out, '-frames:v', '1', '-f', 'image2pipe', '-c:v', 'png', '-'], { maxBuffer: 64 * 1024 * 1024 })
+    execFileSync(ffmpegPath, [
+      '-y',
+      '-loglevel',
+      'error',
+      '-i',
+      file,
+      '-t',
+      '15',
+      '-vf',
+      "scale='min(1080,iw)':-2",
+      '-c:v',
+      'libx264',
+      '-preset',
+      'slow',
+      '-crf',
+      '28',
+      '-pix_fmt',
+      'yuv420p',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '96k',
+      '-movflags',
+      '+faststart',
+      out,
+    ])
+    const frame = execFileSync(
+      ffmpegPath,
+      [
+        '-loglevel',
+        'error',
+        '-ss',
+        '0.5',
+        '-i',
+        out,
+        '-frames:v',
+        '1',
+        '-f',
+        'image2pipe',
+        '-c:v',
+        'png',
+        '-',
+      ],
+      { maxBuffer: 64 * 1024 * 1024 },
+    )
     const meta = await sharp(frame).webp({ quality: 75 }).toFile(poster)
-    media.push({ type: 'video', src: `/${out.replace(/\\/g, '/').replace(/^public\//, '')}`, poster: `/${poster.replace(/\\/g, '/').replace(/^public\//, '')}`, width: meta.width, height: meta.height })
-  }
-  else {
+    media.push({
+      type: 'video',
+      src: `/${out.replace(/\\/g, '/').replace(/^public\//, '')}`,
+      poster: `/${poster.replace(/\\/g, '/').replace(/^public\//, '')}`,
+      width: meta.width,
+      height: meta.height,
+    })
+  } else {
     const out = join(mediaDir, `${n}.webp`)
-    const meta = await sharp(file).rotate().resize(1600, 1600, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toFile(out)
-    media.push({ type: 'image', src: `/${out.replace(/\\/g, '/').replace(/^public\//, '')}`, width: meta.width, height: meta.height })
+    const meta = await sharp(file)
+      .rotate()
+      .resize(1600, 1600, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toFile(out)
+    media.push({
+      type: 'image',
+      src: `/${out.replace(/\\/g, '/').replace(/^public\//, '')}`,
+      width: meta.width,
+      height: meta.height,
+    })
   }
   console.log(`  ${file} → ${media[media.length - 1].src}`)
 }
@@ -98,7 +162,10 @@ const sticker = {
   id,
   title: opts.title,
   date,
-  placedBy: (opts.by || '').split(',').map(s => s.trim()).filter(Boolean),
+  placedBy: (opts.by || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
   lat,
   lng,
   country,

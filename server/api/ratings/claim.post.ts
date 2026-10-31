@@ -6,7 +6,11 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<{ device?: unknown }>(event)
   const device = typeof body?.device === 'string' && DEVICE_RE.test(body.device) ? body.device : ''
   if (!device) throw createError({ statusCode: 400 })
-  const own = new Set((await listStickers()).filter(s => s.placedBy.some(n => sameName(n, me.user.name))).map(s => s.id))
+  const own = new Set(
+    (await listStickers())
+      .filter((s) => s.placedBy.some((n) => sameName(n, me.user.name)))
+      .map((s) => s.id),
+  )
   const moved = await claimRatings(device, me.key, own)
   if (moved) await syncBadgesLater(event)
   return { moved }

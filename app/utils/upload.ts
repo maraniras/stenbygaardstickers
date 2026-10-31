@@ -6,11 +6,11 @@ import { upload, uploadPresigned } from '@vercel/blob/client'
 export const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 
 type Mode = 'blob' | 'presigned' | 'local' | 'off'
-let modePromise: Promise<{ mode: Mode, folder: string }> | undefined
+let modePromise: Promise<{ mode: Mode; folder: string }> | undefined
 
 function uploadMode() {
-  modePromise ??= $fetch<{ mode: Mode, folder?: string }>('/api/upload')
-    .then(r => ({ mode: r.mode, folder: r.folder ?? '' }))
+  modePromise ??= $fetch<{ mode: Mode; folder?: string }>('/api/upload')
+    .then((r) => ({ mode: r.mode, folder: r.folder ?? '' }))
     .catch((err) => {
       modePromise = undefined
       throw err
@@ -19,14 +19,25 @@ function uploadMode() {
 }
 
 function randomName() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('')
+  return Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) =>
+    b.toString(16).padStart(2, '0'),
+  ).join('')
 }
 
-async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void, dir: 'stickers' | 'avatars' = 'stickers') {
+async function send(
+  blob: Blob,
+  ext: string,
+  onProgress?: (pct: number) => void,
+  dir: 'stickers' | 'avatars' = 'stickers',
+) {
   const { mode, folder } = await uploadMode()
   if (mode === 'off') throw new Error('Upload er ikke sat op endnu')
   if (mode === 'local') {
-    const r = await $fetch<{ url: string }>('/api/upload/local', { method: 'PUT', query: { name: `f.${ext}` }, body: blob })
+    const r = await $fetch<{ url: string }>('/api/upload/local', {
+      method: 'PUT',
+      query: { name: `f.${ext}` },
+      body: blob,
+    })
     onProgress?.(100)
     return r.url
   }
@@ -37,12 +48,15 @@ async function send(blob: Blob, ext: string, onProgress?: (pct: number) => void,
     onUploadProgress: (e: { percentage: number }) => onProgress?.(e.percentage),
   }
   const pathname = `${folder}${dir}/${randomName()}.${ext}`
-  const r = mode === 'presigned' ? await uploadPresigned(pathname, blob, options) : await upload(pathname, blob, options)
+  const r =
+    mode === 'presigned'
+      ? await uploadPresigned(pathname, blob, options)
+      : await upload(pathname, blob, options)
   return r.url
 }
 
 function canvasBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
-  return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, type, quality))
+  return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality))
 }
 
 /** Tegner billedet ind i max×max og laver webp, eller jpeg hvis browseren ikke kan webp */
@@ -70,8 +84,7 @@ async function loadImage(file: File) {
   try {
     const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' })
     return { source: bmp as CanvasImageSource, w: bmp.width, h: bmp.height }
-  }
-  catch {
+  } catch {
     // Ældre Safari
     const url = URL.createObjectURL(file)
     const img = new Image()
@@ -84,31 +97,33 @@ async function loadImage(file: File) {
 
 /** Første billede i videoen som stillbillede + videoens mål */
 function videoFrame(file: File) {
-  return new Promise<{ source: HTMLVideoElement, w: number, h: number, done: () => void }>((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const video = document.createElement('video')
-    const done = () => URL.revokeObjectURL(url)
-    const timer = setTimeout(() => {
-      done()
-      reject(new Error('Kunne ikke læse videoen'))
-    }, 20000)
-    video.muted = true
-    video.playsInline = true
-    video.preload = 'auto'
-    video.onloadedmetadata = () => {
-      video.currentTime = Math.min(0.5, (video.duration || 1) / 2)
-    }
-    video.onseeked = () => {
-      clearTimeout(timer)
-      resolve({ source: video, w: video.videoWidth, h: video.videoHeight, done })
-    }
-    video.onerror = () => {
-      clearTimeout(timer)
-      done()
-      reject(new Error('Browseren kan ikke afspille denne video'))
-    }
-    video.src = url
-  })
+  return new Promise<{ source: HTMLVideoElement; w: number; h: number; done: () => void }>(
+    (resolve, reject) => {
+      const url = URL.createObjectURL(file)
+      const video = document.createElement('video')
+      const done = () => URL.revokeObjectURL(url)
+      const timer = setTimeout(() => {
+        done()
+        reject(new Error('Kunne ikke læse videoen'))
+      }, 20000)
+      video.muted = true
+      video.playsInline = true
+      video.preload = 'auto'
+      video.onloadedmetadata = () => {
+        video.currentTime = Math.min(0.5, (video.duration || 1) / 2)
+      }
+      video.onseeked = () => {
+        clearTimeout(timer)
+        resolve({ source: video, w: video.videoWidth, h: video.videoHeight, done })
+      }
+      video.onerror = () => {
+        clearTimeout(timer)
+        done()
+        reject(new Error('Browseren kan ikke afspille denne video'))
+      }
+      video.src = url
+    },
+  )
 }
 
 /** Datoen billedet er taget (EXIF), hvis telefonen har gemt den. Skal læses før
@@ -121,28 +136,33 @@ export async function photoDate(file: File) {
     const d = tags?.DateTimeOriginal ?? tags?.CreateDate
     if (!(d instanceof Date) || Number.isNaN(d.getTime()) || d > new Date()) return undefined
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-  }
-  catch {
+  } catch {
     return undefined
   }
 }
 
 /** Profilbillede: midten skæres ud som et kvadrat på 400×400 */
 export async function uploadAvatar(file: File) {
-  if (!file.type.startsWith('image/') && !/\.hei[cf]$/i.test(file.name)) throw new Error('Vælg et billede')
+  if (!file.type.startsWith('image/') && !/\.hei[cf]$/i.test(file.name))
+    throw new Error('Vælg et billede')
   const { source, w, h } = await loadImage(file)
   const side = Math.min(w, h)
   const size = Math.min(400, side)
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
-  canvas.getContext('2d')!.drawImage(source, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size)
+  canvas
+    .getContext('2d')!
+    .drawImage(source, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size)
   const img = await encodeCanvas(canvas)
   return send(img.blob, img.ext, undefined, 'avatars')
 }
 
 /** Komprimerer og uploader én fil. Returnerer det, der skal stå i stickerens media-liste. */
-export async function uploadMedia(file: File, onProgress?: (pct: number) => void): Promise<StickerMedia> {
+export async function uploadMedia(
+  file: File,
+  onProgress?: (pct: number) => void,
+): Promise<StickerMedia> {
   if (file.type.startsWith('video/')) {
     if (file.size > MAX_VIDEO_BYTES) throw new Error('Videoen er over 100 MB')
     const frame = await videoFrame(file).catch(() => undefined)
@@ -154,7 +174,13 @@ export async function uploadMedia(file: File, onProgress?: (pct: number) => void
     }
     const ext = (file.name.split('.').pop() || 'mp4').toLowerCase()
     const src = await send(file, /^(mp4|mov|m4v|webm)$/.test(ext) ? ext : 'mp4', onProgress)
-    return { type: 'video', src, ...(poster ? { poster } : {}), width: frame?.w || undefined, height: frame?.h || undefined }
+    return {
+      type: 'video',
+      src,
+      ...(poster ? { poster } : {}),
+      width: frame?.w || undefined,
+      height: frame?.h || undefined,
+    }
   }
   if (!file.type.startsWith('image/')) throw new Error('Kun billeder og videoer')
   const { source, w, h } = await loadImage(file)

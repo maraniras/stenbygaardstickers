@@ -6,9 +6,18 @@ const reload = () => window.location.reload()
 
 <template>
   <Transition name="pop">
-    <div v-if="available" class="update glass" role="status">
+    <div
+      v-if="available"
+      class="update glass"
+      role="status"
+    >
       <span>✨ Ny version klar</span>
-      <button class="btn" @click="reload">Opdater</button>
+      <button
+        class="btn"
+        @click="reload"
+      >
+        Opdater
+      </button>
     </div>
   </Transition>
 </template>
@@ -29,7 +38,21 @@ const reload = () => window.location.reload()
   white-space: nowrap;
   transform: translateX(-50%);
 }
-.update .btn { min-height: 36px; padding: 0 16px; font-size: 14px; border-radius: 999px; }
-.pop-enter-active, .pop-leave-active { transition: transform .3s cubic-bezier(.2, .9, .3, 1), opacity .25s; }
-.pop-enter-from, .pop-leave-to { transform: translate(-50%, -20px); opacity: 0; }
+.update .btn {
+  min-height: 36px;
+  padding: 0 16px;
+  font-size: 14px;
+  border-radius: 999px;
+}
+.pop-enter-active,
+.pop-leave-active {
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1),
+    opacity 0.25s;
+}
+.pop-enter-from,
+.pop-leave-to {
+  transform: translate(-50%, -20px);
+  opacity: 0;
+}
 </style>

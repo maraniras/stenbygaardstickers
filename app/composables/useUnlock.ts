@@ -4,8 +4,11 @@ const CODE = 'emileric'
 const KEY = 'stenbygaard-unlocked'
 
 function read() {
-  try { return localStorage.getItem(KEY) === CODE }
-  catch { return false }
+  try {
+    return localStorage.getItem(KEY) === CODE
+  } catch {
+    return false
+  }
 }
 
 export function useUnlock() {
@@ -13,8 +16,9 @@ export function useUnlock() {
 
   function tryUnlock(input: string) {
     if (input.trim().toLowerCase() !== CODE) return false
-    try { localStorage.setItem(KEY, CODE) }
-    catch {}
+    try {
+      localStorage.setItem(KEY, CODE)
+    } catch {}
     unlocked.value = true
     return true
   }

@@ -5,7 +5,10 @@ const r = computed(() => ratings.value[props.stickerId])
 </script>
 
 <template>
-  <span v-if="r?.count" class="badge">
+  <span
+    v-if="r?.count"
+    class="badge"
+  >
     👍 {{ r.avg.toLocaleString('da-DK', { maximumFractionDigits: 1, minimumFractionDigits: 1 }) }}
   </span>
 </template>

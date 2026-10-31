@@ -1,36 +1,83 @@
 <script setup lang="ts">
 const props = defineProps<{ sticker: Sticker }>()
 defineEmits<{ close: [] }>()
-const thumb = computed(() => thumbnail(props.sticker))
+const brokenThumbnail = ref(false)
+const original = computed(() => thumbnail(props.sticker))
+const thumb = computed(() =>
+  original.value && !brokenThumbnail.value
+    ? '/api/stickers/' + encodeURIComponent(props.sticker.id) + '/thumbnail?width=160'
+    : original.value,
+)
+watch(
+  () => props.sticker.id,
+  () => {
+    brokenThumbnail.value = false
+  },
+)
 </script>
 
 <template>
-  <NuxtLink class="sheet glass" :to="`/sticker/${sticker.id}`">
-    <div class="thumb">
-      <img v-if="thumb" :src="thumb" alt="">
-      <img v-else src="/marker.png" alt="" class="fallback">
-      <span v-if="sticker.media.length > 1" class="count">+{{ sticker.media.length - 1 }}</span>
-    </div>
-    <div class="info">
-      <div class="place"><CountryFlag :code="sticker.countryCode" /> {{ sticker.city }}, {{ sticker.country }}</div>
-      <h2>{{ sticker.title }}</h2>
-      <div class="meta">
-        {{ formatDate(sticker.date) }}
-        <RatingBadge :sticker-id="sticker.id" />
-        <CommentCount :sticker-id="sticker.id" />
+  <div class="sheet glass">
+    <NuxtLink
+      class="sheet-link"
+      :to="`/sticker/${sticker.id}`"
+    >
+      <div class="thumb">
+        <img
+          v-if="thumb"
+          :src="thumb"
+          alt=""
+          decoding="async"
+          @error="brokenThumbnail = true"
+        />
+        <img
+          v-else
+          src="/marker.png"
+          alt=""
+          class="fallback"
+        />
+        <span
+          v-if="sticker.media.length > 1"
+          class="count"
+          >+{{ sticker.media.length - 1 }}</span
+        >
       </div>
-      <div class="meta">{{ formatKm(sticker.distanceKm) }} fra Aalborg</div>
-      <span class="more">Se sticker
-        <svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
-      </span>
-    </div>
-    <button class="x" aria-label="Luk" @click.prevent.stop="$emit('close')">
+      <div class="info">
+        <div class="place">
+          <CountryFlag :code="sticker.countryCode" /> {{ sticker.city }}, {{ sticker.country }}
+        </div>
+        <h2>{{ sticker.title }}</h2>
+        <div class="meta">
+          {{ formatDate(sticker.date) }}
+          <RatingBadge :sticker-id="sticker.id" />
+          <CommentCount :sticker-id="sticker.id" />
+        </div>
+        <div class="meta">{{ formatKm(sticker.distanceKm) }} fra Aalborg</div>
+        <span class="more"
+          >Se sticker
+          <svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+        </span>
+      </div>
+    </NuxtLink>
+    <button
+      class="x"
+      aria-label="Luk"
+      @click.prevent.stop="$emit('close')"
+    >
       <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
     </button>
-  </NuxtLink>
+  </div>
 </template>
 
 <style scoped>
+.sheet-link {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 14px;
+  color: var(--text);
+  text-decoration: none;
+}
 .sheet {
   position: absolute;
   left: 12px;
@@ -69,7 +116,7 @@ const thumb = computed(() => thumbnail(props.sticker))
   bottom: 6px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, .55);
+  background: rgba(0, 0, 0, 0.55);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   color: #fff;
@@ -101,7 +148,10 @@ h2 {
   font-size: 13px;
   color: var(--muted);
 }
-.meta :deep(.badge), .meta :deep(.comment-count) { color: var(--text); }
+.meta :deep(.badge),
+.meta :deep(.comment-count) {
+  color: var(--text);
+}
 .more {
   display: inline-flex;
   align-items: center;
@@ -110,7 +160,8 @@ h2 {
   font-size: 14px;
   font-weight: 700;
 }
-.more svg, .x svg {
+.more svg,
+.x svg {
   width: 16px;
   height: 16px;
   fill: none;
@@ -130,7 +181,7 @@ h2 {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(17, 17, 20, .06);
+  background: rgba(17, 17, 20, 0.06);
   cursor: pointer;
 }
 </style>

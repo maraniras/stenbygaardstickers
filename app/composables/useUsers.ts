@@ -8,14 +8,19 @@ export function useUsers() {
 
   function reload() {
     loading = $fetch<PublicUser[]>('/api/users', { timeout: 10_000, retry: 0 })
-      .then((r) => { users.value = r; failed.value = false })
-      .catch(() => { failed.value = true })
+      .then((r) => {
+        users.value = r
+        failed.value = false
+      })
+      .catch(() => {
+        failed.value = true
+      })
     return loading
   }
 
   if (!loading && import.meta.client) reload()
 
-  const find = (name: string) => users.value.find(u => sameName(u.name, name))
+  const find = (name: string) => users.value.find((u) => sameName(u.name, name))
 
   return {
     users,

@@ -3,8 +3,9 @@
 export function useTheme() {
   const theme = useState<Theme>('theme', () => {
     // Fjern et evt. valg fra den gamle midlertidige tema-knap
-    try { localStorage.removeItem('stenbygaard-theme') }
-    catch {}
+    try {
+      localStorage.removeItem('stenbygaard-theme')
+    } catch {}
     return themeForDate()
   })
   return { theme }

@@ -5,7 +5,9 @@ export default defineEventHandler(async (event) => {
   const found = await userForToken(readToken(event))
   if (!found) throw createError({ statusCode: 401, statusMessage: 'Ikke logget ind' })
   const body = await readBody<{ keys?: unknown }>(event)
-  const keys = Array.isArray(body?.keys) ? body.keys.filter((k): k is string => typeof k === 'string' && KEY_RE.test(k)).slice(0, 300) : []
+  const keys = Array.isArray(body?.keys)
+    ? body.keys.filter((k): k is string => typeof k === 'string' && KEY_RE.test(k)).slice(0, 300)
+    : []
   const user = await updateUser(found.key, (u) => {
     u.seenKeys = [...new Set([...(u.seenKeys ?? []), ...keys])]
   })

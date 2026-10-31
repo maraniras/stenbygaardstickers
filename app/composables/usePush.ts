@@ -4,19 +4,30 @@
 type List = 'admin' | 'all'
 
 function keyBytes(base64: string) {
-  const b64 = (base64 + '='.repeat((4 - base64.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/')
-  return Uint8Array.from(atob(b64), c => c.charCodeAt(0))
+  const b64 = (base64 + '='.repeat((4 - (base64.length % 4)) % 4))
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+  return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
 }
 
 export function pushSupported() {
-  return import.meta.client && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+  return (
+    import.meta.client &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window
+  )
 }
 
 /** iPhone/iPad i Safari uden at være føjet til hjemmeskærmen – der kan Apple ikke sende besked */
 export function needsHomeScreen() {
   if (!import.meta.client) return false
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  const standalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true
+  const ios =
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const standalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as any).standalone === true
   return ios && !standalone
 }
 
@@ -28,11 +39,20 @@ export async function subscription() {
 /** Spørger om lov (skal ske fra et tryk) og giver browserens push-abonnement */
 export async function ensureSubscription() {
   const permission = await Notification.requestPermission()
-  if (permission !== 'granted') throw new Error('Notifikationer er blokeret. Slå dem til for appen i telefonens indstillinger.')
+  if (permission !== 'granted')
+    throw new Error('Notifikationer er blokeret. Slå dem til for appen i telefonens indstillinger.')
   const { publicKey } = await $fetch<{ publicKey: string }>('/api/push')
-  const reg = (await navigator.serviceWorker.getRegistration('/')) ?? await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+  const reg =
+    (await navigator.serviceWorker.getRegistration('/')) ??
+    (await navigator.serviceWorker.register('/sw.js', { scope: '/' }))
   await navigator.serviceWorker.ready
-  return (await reg.pushManager.getSubscription()) ?? await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) })
+  return (
+    (await reg.pushManager.getSubscription()) ??
+    (await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: keyBytes(publicKey),
+    }))
+  )
 }
 
 export function usePush(list: List) {
@@ -47,7 +67,9 @@ export function usePush(list: List) {
       on.value = false
       return
     }
-    const r = await $fetch<{ subscribed: boolean }>(api, { query: { endpoint: sub.endpoint } }).catch(() => undefined)
+    const r = await $fetch<{ subscribed: boolean }>(api, {
+      query: { endpoint: sub.endpoint },
+    }).catch(() => undefined)
     on.value = Boolean(r?.subscribed)
   }
 
@@ -69,8 +91,11 @@ export function usePush(list: List) {
 
   async function run(fn: () => Promise<void>) {
     busy.value = true
-    try { await fn() }
-    finally { busy.value = false }
+    try {
+      await fn()
+    } finally {
+      busy.value = false
+    }
   }
 
   return { on, busy, refresh, enable: () => run(enable), disable: () => run(disable) }

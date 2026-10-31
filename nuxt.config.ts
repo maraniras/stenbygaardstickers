@@ -6,7 +6,13 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   nitro: {
     // JSON-filerne er startdata, som serveren kopierer ind i databasen (server/utils/stickers.ts)
-    serverAssets: [{ baseName: 'seed', dir: fileURLToPath(new URL('./app/data/stickers', import.meta.url)) }],
+    serverAssets: [
+      {
+        baseName: 'thumbnails',
+        dir: fileURLToPath(new URL('./server/assets/thumbnails', import.meta.url)),
+      },
+      { baseName: 'seed', dir: fileURLToPath(new URL('./app/data/stickers', import.meta.url)) },
+    ],
   },
   css: ['leaflet/dist/leaflet.css', '~/assets/main.css'],
   app: {
@@ -31,7 +37,10 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
+        },
       ],
     },
   },
