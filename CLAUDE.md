@@ -105,3 +105,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Daily backup cron performs the full badge/economy sync after authorization/rate checks, so annual awards settle without making public reads expensive.
 
 - Banana ledger shows20 transactions initially, expands by20 up to250, resets pagination when the account changes; credits use muted green, debits muted red with a single minus sign (both color schemes).
+
+- Wheel and Bananjack presentation are neutral banana/casino themed (31 Oct2026): no Emil portraits or references in WheelFace, card backs, casino card or game copy/animation labels. Nine custom badge motifs replaced in place (wheel-spins + all eight jack badges); originals/prompts in docs/designs/neutral-casino-badges. x83 is Dealeren gik over; stable IDs, rules, rewards and earned progress are preserved. Old dealer-bust ledger labels are normalized only in DailyResponse; stored history is preserved. City game and overall sticker branding remain unchanged.

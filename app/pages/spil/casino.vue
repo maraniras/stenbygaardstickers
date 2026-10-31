@@ -8,7 +8,7 @@ const { state } = useEconomy()
     <header>
       <div class="brand">
         <img
-          src="/marker.png"
+          src="/badges/banana-baron.webp"
           alt=""
         /><span>Stenbygaard Stickers</span
         ><NuxtLink
@@ -36,7 +36,7 @@ const { state } = useEconomy()
       aria-labelledby="bananjack-title"
     >
       <div class="card-top">
-        <span class="table-label">EMILS SPILLEBORD</span><span class="status">Spil nu →</span>
+        <span class="table-label">CASINOBORDET</span><span class="status">Spil nu →</span>
       </div>
       <div
         class="table-art"
@@ -53,10 +53,30 @@ const { state } = useEconomy()
         </div>
         <div class="playing-card king">
           <b>K</b
-          ><img
-            src="/marker.png"
-            alt=""
-          /><b class="corner">K</b>
+          ><svg
+            viewBox="0 0 64 72"
+            aria-hidden="true"
+          >
+            <path
+              d="M9 22 23 35 32 13 41 35 55 22 49 55H15Z"
+              fill="#d3a34e"
+              stroke="#8f6429"
+              stroke-width="3"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M16 61H48"
+              stroke="#8f6429"
+              stroke-width="5"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="32"
+              cy="43"
+              r="4"
+              fill="#78538b"
+            /></svg
+          ><b class="corner">K</b>
         </div>
         <span class="chip chip-one" /><span class="chip chip-two" /><span class="chip chip-three" />
         <img
@@ -238,7 +258,7 @@ h1 > span {
   transform: translateX(-6%) rotate(13deg);
   background: linear-gradient(145deg, #fff8dd, #ead4a1);
 }
-.king img {
+.king svg {
   position: absolute;
   width: 58px;
   height: 78px;

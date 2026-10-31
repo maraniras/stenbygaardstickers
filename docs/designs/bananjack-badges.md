@@ -1,3 +1,5 @@
+> Opdatering 31. oktober 2026: Aktive ikoner er nu uden Emil. Se [neutralt casino-sæt](neutral-casino-badges.md). Materialet nedenfor er det oprindelige designarkiv.
+
 # Bananjack: otte badgemotiver
 
 Genereret med indbygget image_gen den 30. oktober 2026. Originale PNG-filer, `oversigt.png` og `index.html` ligger i `bananjack-badges/`. Appikoner ligger som optimeret WebP i `public/badges/custom/`, klar via `badgeIcon()`. Installeret efter visuel kontrol med `node scripts/install-badge-art.mjs docs/designs/bananjack-badges`.

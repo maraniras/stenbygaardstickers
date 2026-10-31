@@ -126,7 +126,7 @@ export function jackBadges(economy?: EconomyPublic): Badge[] {
     make(
       'jack-dealer-bust',
       '💥',
-      ['Emil gik over'],
+      ['Dealeren gik over'],
       [1],
       stats.dealerBustWins,
       'Vind med højst 16, fordi dealeren går over',

@@ -18,7 +18,7 @@ const symbols = ['♠', '♥', '♦', '♣']
   >
     <img
       v-if="card === null"
-      src="/marker.png"
+      src="/badges/banana-baron.webp"
       alt=""
     />
     <template v-else

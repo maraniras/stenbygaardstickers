@@ -67,8 +67,8 @@ const background = `conic-gradient(${WHEEL_SLOTS.map((s) => `${s.color} ${s.star
     />
     <div class="hub">
       <img
-        src="/marker.png"
-        alt="Emil på lykkehjulet"
+        src="/badges/banana-baron.webp"
+        alt="Banan i lykkehjulets centrum"
         draggable="false"
       />
     </div>

@@ -114,6 +114,6 @@ Alle otte er aktive med statistik, profilvisning, notifikationer og engangsbelø
 | x80 | Del og hersk (`jack-split`) | Vind begge hænder efter ét split | 50 | 2 |
 | x81 | To modne i træk (`jack-back-to-back`) | Naturlig blackjack i to runder i træk | 100 | 4 |
 | x82 | På stregen (`jack-five-card`) | Præcis 21 med mindst fem kort | 75 | 3 |
-| x83 | Emil gik over (`jack-dealer-bust`) | Vind med højst 16, fordi dealeren går over | 25 | 1 |
+| x83 | Dealeren gik over (`jack-dealer-bust`) | Vind med højst 16, fordi dealeren går over | 25 | 1 |
 
 Næste ledige nummer: **x84**

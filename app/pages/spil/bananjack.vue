@@ -93,7 +93,7 @@ const {
       :aria-busy="busy || animating"
     >
       <div class="dealer-label">
-        <b>Emils hånd</b><span class="score">{{ dealerValue }}</span>
+        <b>Dealerens hånd</b><span class="score">{{ dealerValue }}</span>
       </div>
       <TransitionGroup
         v-if="game"
@@ -149,10 +149,10 @@ const {
         class="empty-hand"
       >
         <img
-          src="/marker.png"
+          src="/badges/banana-baron.webp"
           alt=""
         />
-        <p>Emil har blandet kortene.<br />Han ser meget sikker ud. Det gør han altid.</p>
+        <p>Vælg din indsats for at starte.</p>
       </div>
     </section>
     <div
@@ -265,7 +265,7 @@ const {
         </button>
         <h2>Sådan spiller du Bananjack</h2>
         <ul>
-          <li>Kom tættere på 21 end Emil. Over 21 taber.</li>
+          <li>Kom tættere på 21 end dealeren. Over 21 taber.</li>
           <li>Es er 1 eller 11. Billedkort er 10.</li>
           <li>
             Seks kortspil blandes på ny til hver runde. Dealeren tjekker for blackjack og står på

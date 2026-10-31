@@ -34,7 +34,11 @@ export async function dailyResponse(
     day,
     nextResetAt: nextGameReset(),
     wallet,
-    history: record.history,
+    history: record.history.map((entry) =>
+      entry.id === 'badge:jack-dealer-bust'
+        ? { ...entry, label: 'Badge · Dealeren gik over' }
+        : entry,
+    ),
     wheelJackpot,
     city: {
       ...city,

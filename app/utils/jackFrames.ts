@@ -23,15 +23,15 @@ export function jackFrames(previous: JackPublic | null, next: JackPublic): JackF
     stage.hands.forEach((h) => {
       h.cards = []
     })
-    push('Emil giver kort…', 120)
+    push('Dealeren giver kort…', 120)
     stage.hands[0]!.cards.push(next.hands[0]!.cards[0]!)
     push('Dit første kort')
     stage.dealer.push(next.dealer[0]!)
-    push('Emils første kort')
+    push('Dealerens første kort')
     stage.hands[0]!.cards.push(next.hands[0]!.cards[1]!)
     push('Dit andet kort')
     stage.dealer.push(null)
-    push('Emils skjulte kort')
+    push('Dealerens skjulte kort')
   } else {
     const visible = new Set(previous.hands.flatMap((h) => h.cards))
     for (const hand of stage.hands) hand.cards = hand.cards.filter((card) => visible.has(card))
@@ -47,10 +47,10 @@ export function jackFrames(previous: JackPublic | null, next: JackPublic): JackF
   }
   if (next.status === 'finished') {
     stage.dealer = next.dealer.slice(0, 2)
-    push('Emil vender sit kort…', 650)
+    push('Dealeren vender sit kort…', 650)
     for (let i = 2; i < next.dealer.length; i++) {
       stage.dealer.push(next.dealer[i]!)
-      push('Emil trækker et kort…', 650)
+      push('Dealeren trækker et kort…', 650)
     }
   }
   frames.push({ game: copy(next), label: '', delay: 0 })

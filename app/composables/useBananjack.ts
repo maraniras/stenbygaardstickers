@@ -59,7 +59,7 @@ export function useBananjack() {
             ? 'Bananer i hus!'
             : net.value === 0
               ? 'Lige op'
-              : 'Emil tog den her.',
+              : 'Dealeren vandt.',
   )
   const labels = { blackjack: 'Bananjack!', win: 'Vundet', lose: 'Tabt', push: 'Lige op' }
   async function accept(response: JackResponse, animate = false) {

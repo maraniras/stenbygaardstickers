@@ -175,11 +175,7 @@ async function play(direction: 1 | -1 = 1) {
             alt="bananer"
         /></strong>
         <p>
-          {{
-            prize
-              ? 'Gevinsten er gemt · badgebonusser kommer oveni.'
-              : 'Emil påtager sig intet ansvar.'
-          }}
+          {{ prize ? 'Gevinsten er gemt · badgebonusser kommer oveni.' : 'Bedre held næste gang.' }}
         </p>
       </div>
       <button
@@ -194,7 +190,7 @@ async function play(direction: 1 | -1 = 1) {
         >
           <path d="M19 8a8 8 0 1 0 1 7M19 3v5h-5" /></svg
         ><span
-          >{{ spinning ? 'Kom så, Emil…' : 'Drej hjulet'
+          >{{ spinning ? 'Kom så, hjulet…' : 'Drej hjulet'
           }}<small>{{
             spinning ? 'Lidt spænding må der være' : 'Tryk her eller træk i hjulet'
           }}</small></span

@@ -351,3 +351,31 @@ test('variable jackpot credits and badge are atomic; past results never change w
   assert.equal(r.history.filter((t) => t.id === 'badge:wheel-jackpot').length, 1)
   assert.equal(r.days[day].wheel.prize, 400)
 })
+
+test('neutral dealer badge keeps its reward and presents legacy ledger entries without altering stored history', async () => {
+  const { api: a } = setup()
+  const record = a.freshEconomy()
+  record.history = [
+    {
+      id: 'badge:jack-dealer-bust',
+      label: 'Badge · Emil gik over',
+      amount: 25,
+      at: new Date().toISOString(),
+    },
+    {
+      id: 'city:example',
+      label: 'Emil er faret vild · 2. gæt',
+      amount: 40,
+      at: new Date().toISOString(),
+    },
+  ]
+  const response = await a.dailyResponse(record)
+  assert.equal(response.history[0].label, 'Badge · Dealeren gik over')
+  assert.equal(response.history[0].id, 'badge:jack-dealer-bust')
+  assert.equal(response.history[0].amount, 25)
+  assert.equal(record.history[0].label, 'Badge · Emil gik over')
+  assert.equal(response.history[1].label, 'Emil er faret vild · 2. gæt')
+  const badge = a.jackBadges().find((b) => b.id === 'jack-dealer-bust')
+  assert.equal(badge.name, 'Dealeren gik over')
+  assert.equal(a.bananaRewardFor(badge), 25)
+})
