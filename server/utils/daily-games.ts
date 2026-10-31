@@ -17,7 +17,7 @@ export async function dailyResponse(record: EconomyRecord, day = gameDay()): Pro
     cityStreak: wallet.stats.lastCityWinDay && wallet.stats.lastCityWinDay >= previous ? wallet.stats.cityStreak : 0,
     wheelStreak: wallet.stats.lastWheelDay && wallet.stats.lastWheelDay >= previous ? wallet.stats.wheelStreak : 0 }
   return { day, nextResetAt: nextGameReset(), wallet, history: record.history, wheelJackpot,
-    city: { ...city, options: challenge.options.map(c => ({ id: c.id, name: c.name })), ...(city.finished ? { answer: { id: challenge.answer.id, name: challenge.answer.name } } : {}) },
+    city: { ...city, options: challenge.options.map(c => ({ id: c.id, name: c.name })), ...(city.finished ? { answer: { id: challenge.answer.id, name: challenge.answer.name, countryCode: challenge.answer.id, country: new Intl.DisplayNames(['da'], { type: 'region' }).of(challenge.answer.id) ?? challenge.answer.id } } : {}) },
     wheel: record.days[day]?.wheel ?? null }
 }
 export function applyCityGuess(record: EconomyRecord, day: string, choice: string, correct: string, name: string, context: EconomyContext, now = new Date()) {

@@ -80,6 +80,21 @@ test('shared daily challenge: all six options avoid previous 20 days; answers hi
   a.applyCityGuess(r,day,response.city.options[0].id,(await a.dailyChallenge(day)).answer.id,'Test',empty)
   response=await a.dailyResponse(r,day); assert.equal(!!response.city.answer,response.city.finished)
 })
+
+test('finished city games reveal Danish country and flag code for wins and losses only', async () => {
+  const {api:a}=setup(),day=a.gameDay(),challenge=await a.dailyChallenge(day)
+  for(const won of [true,false]){
+    const r=a.freshEconomy()
+    assert.equal((await a.dailyResponse(r,day)).city.answer,undefined)
+    const choices=won?[challenge.answer.id]:challenge.options.filter(c=>c.id!==challenge.answer.id).map(c=>c.id)
+    for(const choice of choices)a.applyCityGuess(r,day,choice,challenge.answer.id,'Test',empty)
+    const response=await a.dailyResponse(r,day)
+    assert.equal(response.city.finished,true);assert.equal(response.city.won,won)
+    assert.equal(response.city.answer.countryCode,challenge.answer.id)
+    assert.equal(response.city.answer.country,new Intl.DisplayNames(['da'],{type:'region'}).of(challenge.answer.id))
+    assert.equal(response.city.answer.lat,undefined)
+  }
+})
 test('new game badges use explicit rewards, wealth gives no XP and higher tiers are incremental', () => {
   const {api:a}=setup(),r=a.freshEconomy(); a.settleEconomy(r,'Test',empty)
   r.stats.cityWins=250; r.stats.cityFirstWins=50; r.stats.bestCityStreak=100

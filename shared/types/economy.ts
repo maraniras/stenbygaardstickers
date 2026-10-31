@@ -34,7 +34,7 @@ export interface EconomyRecord extends EconomyPublic {
 }
 export interface DailyCityState extends CityRun {
   options: { id: string, name: string }[]
-  answer?: { id: string, name: string }
+  answer?: { id: string, name: string, country: string, countryCode: string }
 }
 export interface DailyResponse {
   day: string
