@@ -208,7 +208,7 @@ const CONTINENT_BADGES: { id: Continent; emoji: string; names: string[] }[] = [
   {
     id: 'europa',
     emoji: '🏰',
-    names: ['Interrail-turist', 'Euro-Emil', 'Europa-ekspert', 'Europamester', 'Europas konge'],
+    names: ['Interrail-turist', 'Europafarer', 'Europa-ekspert', 'Europamester', 'Europas konge'],
   },
   {
     id: 'afrika',
@@ -218,7 +218,7 @@ const CONTINENT_BADGES: { id: Continent; emoji: string; names: string[] }[] = [
   {
     id: 'asien',
     emoji: '🏯',
-    names: ['Backpacker', 'Rickshaw-rytter', 'Østens Emil', 'Shogun', 'Dragekejser'],
+    names: ['Backpacker', 'Rickshaw-rytter', 'Østens eventyrer', 'Shogun', 'Dragekejser'],
   },
   {
     id: 'nordamerika',
@@ -228,12 +228,12 @@ const CONTINENT_BADGES: { id: Continent; emoji: string; names: string[] }[] = [
   {
     id: 'sydamerika',
     emoji: '🦜',
-    names: ['Sydamerika-turist', 'Samba-Emil', 'Gaucho', 'Amazonas-ekspert', 'Inka-kongen'],
+    names: ['Sydamerika-turist', 'Sambakonge', 'Gaucho', 'Amazonas-ekspert', 'Inka-kongen'],
   },
   {
     id: 'oceanien',
     emoji: '🦘',
-    names: ['Down Under', 'Kænguru-ven', 'Surfer', 'Crocodile Emil', 'Kænguru-kongen'],
+    names: ['Down Under', 'Kænguru-ven', 'Surfer', 'Krokodillejæger', 'Kænguru-kongen'],
   },
 ]
 const CONTINENT_NAMES: Record<Continent, string> = {
@@ -520,7 +520,7 @@ function compute(
     single(
       'birthday',
       '🎂',
-      'Emils fødselsdag',
+      'Fødselsdagsfest',
       'En sticker den 27. juli',
       mine.some((s) => s.date.endsWith('-07-27')),
     ),
@@ -930,7 +930,7 @@ export const LEVELS = [
   { at: 220, title: 'Globetrotter' },
   { at: 290, title: 'Verdensstjerne' },
   { at: 370, title: 'Mester-klistrer' },
-  { at: 450, title: 'Stenbygaard-legende' },
+  { at: 450, title: 'Klisterlegende' },
 ]
 
 /** Sætter points (opnået) og worth (hvad den giver) på alle badges */

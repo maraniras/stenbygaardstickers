@@ -2,6 +2,18 @@ import { randomInt } from 'node:crypto'
 import type { EconomyRecord, DailyResponse, CityRun } from '../../shared/types/economy'
 import type { EconomyContext } from './economy'
 
+// Keep previously credited rewards readable under the current badge names.
+const renamedBadgeLabels: Record<string, string> = {
+  'badge:jack-dealer-bust': 'Dealeren gik over',
+  'badge:continent-europa:2': 'Europafarer',
+  'badge:continent-asien:3': 'Østens eventyrer',
+  'badge:continent-sydamerika:2': 'Sambakonge',
+  'badge:continent-oceanien:4': 'Krokodillejæger',
+  'badge:birthday': 'Fødselsdagsfest',
+  'badge:city-guide:4': 'Verdensrejsende',
+  'badge:city-streak:3': 'Sikker kurs',
+}
+
 export function emptyCityRun(): CityRun {
   return { guesses: [], finished: false, won: false, reward: 0 }
 }
@@ -35,8 +47,8 @@ export async function dailyResponse(
     nextResetAt: nextGameReset(),
     wallet,
     history: record.history.map((entry) =>
-      entry.id === 'badge:jack-dealer-bust'
-        ? { ...entry, label: 'Badge · Dealeren gik over' }
+      renamedBadgeLabels[entry.id]
+        ? { ...entry, label: `Badge · ${renamedBadgeLabels[entry.id]}` }
         : entry,
     ),
     wheelJackpot,

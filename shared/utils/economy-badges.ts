@@ -56,7 +56,7 @@ export function economyBadges(economy?: EconomyPublic): Badge[] {
     make(
       'city-guide',
       '🌍',
-      ['Rejseleder', 'Stifinder', 'Bykender', 'Emils rejseleder', 'Verdensguide'],
+      ['Rejseleder', 'Stifinder', 'Bykender', 'Verdensrejsende', 'Verdensguide'],
       [1, 10, 30, 100, 250],
       s.cityWins,
       'Gæt dagens by rigtigt',
@@ -72,7 +72,7 @@ export function economyBadges(economy?: EconomyPublic): Badge[] {
     make(
       'city-streak',
       '🔥',
-      ['På rette spor', 'Sporsans', 'Kurs mod Emil', 'Altid på rette spor', 'Aldrig faret vild'],
+      ['På rette spor', 'Sporsans', 'Sikker kurs', 'Altid på rette spor', 'Aldrig faret vild'],
       [3, 7, 14, 30, 100],
       s.bestCityStreak,
       'Spildøgn i træk med rigtigt bygæt',

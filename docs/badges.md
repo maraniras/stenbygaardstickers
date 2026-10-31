@@ -15,12 +15,12 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner væ
 | x5 | 🕸️ Netværk (`network`) | Social 2 · Netværker 3 · Samlingspunkt 5 · Kendt af alle 10 |
 | x6 | 🏛️ Hovedstæder (`capitals`) | Hovedstads-turist 1 · Hovedstadsjæger 3 · Diplomat 5 · Verdensambassadør 10 |
 | x7 | 🌐 Kontinenter (`continents`) | Interkontinental 2 · Verdensfarer 3 · Jordomrejsende 4 · Kosmopolit 5 · Hele kloden 6 |
-| x8 | 🏰 Europa (`continent-europa`) | Interrail-turist · Euro-Emil · Europa-ekspert · Europamester · Europas konge (1/3/5/10/15, ikke DK) |
+| x8 | 🏰 Europa (`continent-europa`) | Interrail-turist · Europafarer · Europa-ekspert · Europamester · Europas konge (1/3/5/10/15, ikke DK) |
 | x9 | 🦁 Afrika (`continent-afrika`) | Afrika-turist · Safari · Savannekender · Løvetæmmer · Løvernes konge |
-| x10 | 🏯 Asien (`continent-asien`) | Backpacker · Rickshaw-rytter · Østens Emil · Shogun · Dragekejser |
+| x10 | 🏯 Asien (`continent-asien`) | Backpacker · Rickshaw-rytter · Østens eventyrer · Shogun · Dragekejser |
 | x11 | 🗽 Nordamerika (`continent-nordamerika`) | Amerika-turist · Road trip · American Dream · Cowboy · Mr. President |
-| x12 | 🦜 Sydamerika (`continent-sydamerika`) | Sydamerika-turist · Samba-Emil · Gaucho · Amazonas-ekspert · Inka-kongen |
-| x13 | 🦘 Oceanien (`continent-oceanien`) | Down Under · Kænguru-ven · Surfer · Crocodile Emil · Kænguru-kongen |
+| x12 | 🦜 Sydamerika (`continent-sydamerika`) | Sydamerika-turist · Sambakonge · Gaucho · Amazonas-ekspert · Inka-kongen |
+| x13 | 🦘 Oceanien (`continent-oceanien`) | Down Under · Kænguru-ven · Surfer · Krokodillejæger · Kænguru-kongen |
 | x53 | 👍 Likes (`likes`) | Liket 1 · Populær 5 · Folkets stemme 10 · Influencer 25 · Sindssygt 50 👍 på kommentarer |
 
 ## Enkelt-badges
@@ -38,7 +38,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner væ
 | x22 | 🛣️ Roadtrip (`roadtrip`) | 3 byer inden for 2 uger |
 | x23 | 🧳 Langtur (`longhaul`) | To stickers over 5.000 km fra hinanden |
 | x24 | 🔄 Comeback (`comeback`) | Ny sticker efter et halvt års pause |
-| x25 | 🎂 Emils fødselsdag (`birthday`) | 27. juli |
+| x25 | 🎂 Fødselsdagsfest (`birthday`) | 27. juli |
 | x26 | 👨‍👩‍👧‍👦 Hele banden (`gang`) | Sat op af 4 eller flere |
 | x27 | 🔁 Stamkunde (`regular`) | 2 stickers i samme by |
 | x28 | 🛫 Langt hjemmefra (`far`) | Over 1.000 km fra Aalborg |
@@ -90,9 +90,9 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner væ
 | Nr. | Badge (id) | Krav | Bananer pr. trin |
 |---|---|---|---|
 | x67 | Et bundt → Bananimperium (`banana-baron`) | Højeste saldo 1.000/5.000/10.000/25.000/50.000 | 50/100/200/400/800 |
-| x68 | Rejseleder → Verdensguide (`city-guide`) | 1/10/30/100/250 rigtige byer | 20/40/80/160/320 |
+| x68 | Rejseleder → Verdensguide (`city-guide`) | 1/10/30/100/250 rigtige byer; Rejseleder · Stifinder · Bykender · Verdensrejsende · Verdensguide | 20/40/80/160/320 |
 | x69 | Uden GPS → Local Legend (`city-gps`) | 1/5/10/25/50 rigtige på første gæt | 20/40/80/160/320 |
-| x70 | På rette spor → Aldrig faret vild (`city-streak`) | 3/7/14/30/100 spildøgn med rigtigt svar i træk | 10/25/50/100/250 |
+| x70 | På rette spor → Aldrig faret vild (`city-streak`) | 3/7/14/30/100 spildøgn med rigtigt svar i træk; På rette spor · Sporsans · Sikker kurs · Altid på rette spor · Aldrig faret vild | 10/25/50/100/250 |
 | x71 | En omgang mere → Hjulminister (`wheel-spins`) | 7/30/100/200/365 spins | 25/50/100/200/400 |
 | x72 | Fast inventar → Møder altid op (`wheel-streak`) | 3/7/14/30/100 spildøgn med spin i træk | 10/25/50/100/250 |
 | x73 | Hjulets udvalgte (`wheel-jackpot`) | Ram dagens jackpot (400–1.000) på hjulet | 250 |

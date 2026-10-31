@@ -379,3 +379,31 @@ test('neutral dealer badge keeps its reward and presents legacy ledger entries w
   assert.equal(badge.name, 'Dealeren gik over')
   assert.equal(a.bananaRewardFor(badge), 25)
 })
+
+test('renamed badge rewards retain their IDs, amounts and stored history', async () => {
+  const { api: a } = setup()
+  const record = a.freshEconomy()
+  const names = [
+    ['continent-europa:2', 'Euro-Emil', 'Europafarer'],
+    ['continent-asien:3', 'Østens Emil', 'Østens eventyrer'],
+    ['continent-sydamerika:2', 'Samba-Emil', 'Sambakonge'],
+    ['continent-oceanien:4', 'Crocodile Emil', 'Krokodillejæger'],
+    ['birthday', 'Emils fødselsdag', 'Fødselsdagsfest'],
+    ['city-guide:4', 'Emils rejseleder', 'Verdensrejsende'],
+    ['city-streak:3', 'Kurs mod Emil', 'Sikker kurs'],
+  ]
+  record.history = names.map(([key, oldName], index) => ({
+    id: `badge:${key}`,
+    label: `Badge · ${oldName}`,
+    amount: 20 + index,
+    at: new Date().toISOString(),
+  }))
+  const stored = structuredClone(record.history)
+  const response = await a.dailyResponse(record)
+  response.history.forEach((entry, index) => {
+    assert.equal(entry.label, `Badge · ${names[index][2]}`)
+    assert.equal(entry.id, stored[index].id)
+    assert.equal(entry.amount, stored[index].amount)
+  })
+  assert.deepEqual(record.history, stored)
+})
