@@ -1,5 +1,5 @@
 // Notifikationer (Web Push) til to lister: "admin" (nye indsendte stickers – slås til
-// på /admin) og "all" (alle der har sagt ja til besked om nye godkendte stickers).
+// på /admin) og "all" (offentlige beskeder om nye stickers og appopdateringer).
 // VAPID-nøgleparret laves automatisk første gang og gemmes i databasen, så der ikke
 // skal sættes noget op på Vercel.
 // Redis: "push:vapid" (JSON med nøglerne), hashen "push:subs" (admins) og "push:all"
@@ -48,11 +48,35 @@ export async function vapidPublicKey() {
 
 type LocalSubs = Record<string, PushSubscription>
 
-async function allSubs(list: PushList): Promise<PushSubscription[]> {
+export async function allSubs(list: PushList): Promise<PushSubscription[]> {
   if (!redisEnabled)
     return Object.values((await useStorage('data').getItem<LocalSubs>(LOCAL_KEY[list])) ?? {})
   const [flat] = (await redis([['HVALS', REDIS_KEY[list]]])) as [string[]]
   return flat.map((s) => JSON.parse(s))
+}
+
+/** Anonymous devices have preferences too; registered users use their account preferences. */
+export async function publicPushPrefs(): Promise<Record<string, NotifyPrefs>> {
+  if (!redisEnabled)
+    return (await useStorage('data').getItem<Record<string, NotifyPrefs>>('push-preferences')) ?? {}
+  const [flat] = (await redis([['HGETALL', 'push:preferences']])) as [string[]]
+  const prefs: Record<string, NotifyPrefs> = {}
+  for (let i = 0; i < flat.length; i += 2) prefs[flat[i]!] = JSON.parse(flat[i + 1]!)
+  return prefs
+}
+
+export async function setPublicPushPrefs(endpoint: string, changes: NotifyPrefs) {
+  if (redisEnabled) {
+    const [raw] = (await redis([['HGET', 'push:preferences', endpoint]])) as [string | null]
+    const prefs = { ...(raw ? JSON.parse(raw) : {}), ...changes }
+    await redis([['HSET', 'push:preferences', endpoint, JSON.stringify(prefs)]])
+    return prefs as NotifyPrefs
+  }
+  const storage = useStorage('data')
+  const prefs = await publicPushPrefs()
+  prefs[endpoint] = { ...prefs[endpoint], ...changes }
+  await storage.setItem('push-preferences', prefs)
+  return prefs[endpoint]!
 }
 
 export async function addSub(list: PushList, sub: PushSubscription) {

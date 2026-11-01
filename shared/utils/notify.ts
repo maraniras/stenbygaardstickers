@@ -1,10 +1,24 @@
 // Typer af notifikationer man kan slå til og fra (gemt på brugeren, standard: til).
-// "stickers" virker også uden login – de andre kræver et navn.
+// "stickers" og "updates" virker også uden login – de andre kræver et navn.
 export type NotifyType =
-  'stickers' | 'badges' | 'levels' | 'records' | 'tags' | 'replies' | 'comments' | 'likes'
+  | 'stickers'
+  | 'updates'
+  | 'badges'
+  | 'levels'
+  | 'records'
+  | 'tags'
+  | 'replies'
+  | 'comments'
+  | 'likes'
 
 export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; desc: string }[] = [
   { type: 'stickers', emoji: '📍', label: 'Nye stickers', desc: 'Når Emil lander et nyt sted' },
+  {
+    type: 'updates',
+    emoji: '🆕',
+    label: 'Appopdateringer',
+    desc: 'Når en ny version af appen udgives',
+  },
   {
     type: 'badges',
     emoji: '🏅',

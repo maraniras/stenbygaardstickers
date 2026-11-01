@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Notifikationer: hovedkontakt for denne enhed og en kontakt pr. type (gemt på
-// brugeren, så de gælder alle ens enheder). Uden navn kan man kun få nye stickers.
+// brugeren, så de gælder alle ens enheder). Uden navn gemmes de på enheden.
 const router = useRouter()
 const { name, ready, badgePush, notify, setBadgePush, setNotify } = useUser()
 const all = usePush('all')
@@ -23,8 +23,11 @@ onMounted(async () => {
 /** Får denne enhed overhovedet notifikationer */
 const deviceOn = computed(() => all.on.value || (Boolean(name.value) && badgePush.value))
 const types = computed(() =>
-  name.value ? NOTIFY_TYPES : NOTIFY_TYPES.filter((t) => t.type === 'stickers'),
+  name.value
+    ? NOTIFY_TYPES
+    : NOTIFY_TYPES.filter((t) => t.type === 'stickers' || t.type === 'updates'),
 )
+const preferences = computed(() => (name.value ? notify.value : all.notify.value))
 
 async function run(fn: () => Promise<unknown>) {
   busy.value = true
@@ -52,7 +55,11 @@ function toggleDevice() {
 }
 
 function toggleType(type: NotifyType) {
-  return run(() => setNotify(type, !wants(notify.value, type)))
+  return run(async () => {
+    const value = !wants(preferences.value, type)
+    if (name.value) await setNotify(type, value)
+    else if (type === 'stickers' || type === 'updates') await all.setNotify(type, value)
+  })
 }
 
 function back() {
@@ -150,13 +157,12 @@ function back() {
             <span>{{ t.desc }}</span>
           </div>
           <button
-            v-if="name"
             class="switch"
-            :class="{ on: wants(notify, t.type) }"
+            :class="{ on: wants(preferences, t.type) }"
             role="switch"
-            :aria-checked="wants(notify, t.type)"
+            :aria-checked="wants(preferences, t.type)"
             :aria-label="t.label"
-            :disabled="busy"
+            :disabled="busy || (!name && !deviceOn)"
             @click="toggleType(t.type)"
           >
             <span />

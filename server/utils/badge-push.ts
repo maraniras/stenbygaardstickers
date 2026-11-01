@@ -104,10 +104,16 @@ async function pushToUser(key: string, user: UserRecord, messages: PushMessage[]
 /** Enheder hvor brugeren har slået en type fra – til lister som "nye stickers" */
 export async function mutedEndpoints(type: NotifyType) {
   const out = new Set<string>()
+  const registered = new Set<string>()
   for (const u of await listUsers()) {
-    if (wants(u.notify, type)) continue
-    for (const d of Object.values(u.devices)) if (d.push) out.add(d.push.endpoint)
+    for (const d of Object.values(u.devices))
+      if (d.push) {
+        registered.add(d.push.endpoint)
+        if (!wants(u.notify, type)) out.add(d.push.endpoint)
+      }
   }
+  for (const [endpoint, prefs] of Object.entries(await publicPushPrefs()))
+    if (!registered.has(endpoint) && !wants(prefs, type)) out.add(endpoint)
   return out
 }
 

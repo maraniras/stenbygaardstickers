@@ -9,6 +9,14 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.3',
+    notes: [
+      'Få en mobilnotifikation, når en ny version af appen udgives',
+      'Vælg Appopdateringer til eller fra under Notifikationer',
+      'Bananformue-badgen har fået et nyt motiv uden Emil',
+    ],
+  },
+  {
     version: '2.2',
     date: '2026-10-31',
     notes: [

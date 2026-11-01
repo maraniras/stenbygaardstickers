@@ -1,5 +1,5 @@
 // Web Push i browseren. "admin" = besked om nye indsendte stickers (/admin),
-// "all" = besked om nye godkendte stickers (pop-up første gang + klokken på listen).
+// "all" = besked om nye godkendte stickers og appopdateringer.
 // Begge bruger samme service worker (public/sw.js), men hvert sit abonnement på serveren.
 type List = 'admin' | 'all'
 
@@ -58,6 +58,7 @@ export async function ensureSubscription() {
 export function usePush(list: List) {
   const api = list === 'admin' ? '/api/admin/push' : '/api/push'
   const on = useState(`push-on-${list}`, () => false)
+  const notify = useState<NotifyPrefs>(`push-notify-${list}`, () => ({}))
   const busy = ref(false)
 
   async function refresh() {
@@ -67,10 +68,20 @@ export function usePush(list: List) {
       on.value = false
       return
     }
-    const r = await $fetch<{ subscribed: boolean }>(api, {
+    const r = await $fetch<{ subscribed: boolean; notify?: NotifyPrefs }>(api, {
       query: { endpoint: sub.endpoint },
     }).catch(() => undefined)
     on.value = Boolean(r?.subscribed)
+    notify.value = r?.notify ?? {}
+  }
+
+  async function setNotify(type: 'stickers' | 'updates', value: boolean) {
+    const sub = await subscription()
+    if (!sub || !on.value) throw new Error('Slå notifikationer til først.')
+    notify.value = await $fetch<NotifyPrefs>('/api/push', {
+      method: 'PUT',
+      body: { ...sub.toJSON(), notify: { [type]: value } },
+    })
   }
 
   /** Spørger om lov (skal ske fra et tryk) og melder telefonen til */
@@ -98,5 +109,13 @@ export function usePush(list: List) {
     }
   }
 
-  return { on, busy, refresh, enable: () => run(enable), disable: () => run(disable) }
+  return {
+    on,
+    notify,
+    setNotify,
+    busy,
+    refresh,
+    enable: () => run(enable),
+    disable: () => run(disable),
+  }
 }
