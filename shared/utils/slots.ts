@@ -11,14 +11,16 @@ export const SLOT_SYMBOLS: { id: SlotSymbol; name: string }[] = [
   { id: 'banana-leaf', name: 'Bananblad' },
 ]
 export const SLOT_PRIZES = [
-  { multiplier: 0, weight: 6400, name: 'Miv', symbol: null },
+  { multiplier: 0, weight: 6500, name: 'Miv', symbol: null },
   { multiplier: 1, weight: 2000, name: 'Indsatsen tilbage', symbol: null },
-  { multiplier: 2, weight: 1000, name: 'Lille gevinst', symbol: 'lemon' },
+  { multiplier: 2, weight: 900, name: 'Lille gevinst', symbol: 'lemon' },
   { multiplier: 5, weight: 380, name: 'Frugtfest', symbol: 'strawberry' },
   { multiplier: 10, weight: 170, name: 'Bananboost', symbol: 'mix-max' },
   { multiplier: 25, weight: 40, name: 'Guldbundt', symbol: 'faxe-kondi' },
   { multiplier: 100, weight: 10, name: 'Jackpot!', symbol: 'crowned-banana' },
 ] as const
+export const SLOT_RTP =
+  SLOT_PRIZES.reduce((sum, prize) => sum + prize.weight * prize.multiplier, 0) / 100
 export function slotPrizeFor(ticket: number) {
   if (!Number.isInteger(ticket) || ticket < 0 || ticket >= 10000) throw Error('Ugyldigt spinlod')
   let end = 0

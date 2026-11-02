@@ -17,12 +17,14 @@ function deferred() {
   })
   return { promise, resolve, reject }
 }
-function setup(fetch, claim = async () => {}) {
+function setup(fetch, claim = async () => {}, existingStorage) {
   const states = new Map(),
-    storage = new Map([
-      ['stenbygaard-user-token', 'token-a'],
-      ['stenbygaard-ratings-claimed', 'Nicole'],
-    ])
+    storage =
+      existingStorage ??
+      new Map([
+        ['stenbygaard-user-token', 'token-a'],
+        ['stenbygaard-ratings-claimed', 'Nicole'],
+      ])
   const requests = {}
   vm.runInNewContext(code('app/utils/requests.ts'), { exports: requests })
   const api = {}
@@ -113,4 +115,64 @@ test('shared reads deduplicate concurrent work and retry after failure', async (
   pending.reject(Error('Offline'))
   await Promise.allSettled([first, second])
   assert.equal(await api.singleFlight('a', async () => 42), 42)
+})
+
+test('a stale identity response cannot resurrect dismissed badges', async () => {
+  const identity = deferred()
+  const { user } = setup((path, options) =>
+    path.endsWith('/seen') ? Promise.resolve({ seen: options.body.keys }) : identity.promise,
+  )
+  const loading = user.refreshMe()
+  await new Promise(setImmediate)
+  await user.markSeen(['slot-spins:1', 'level:2'])
+  identity.resolve({ name: 'Nicole', seen: [] })
+  await loading
+  assert.deepEqual([...user.seen.value].sort(), ['level:2', 'slot-spins:1'])
+  assert.equal(user.seen.value.includes('slot-spins:2'), false)
+})
+
+test('offline dismissals survive reload and are retried without leaking to another account', async () => {
+  const first = setup(async () => {
+    throw Error('Offline')
+  })
+  await first.user.markSeen(['slot-wins:1'])
+  const saved = []
+  const reloaded = setup(
+    async (path, options) => {
+      if (path.endsWith('/seen')) {
+        saved.push(...options.body.keys)
+        return { seen: [...saved] }
+      }
+      return { name: 'Nicole', seen: [] }
+    },
+    undefined,
+    first.storage,
+  )
+  await reloaded.user.refreshMe()
+  await new Promise(setImmediate)
+  assert.deepEqual([...reloaded.user.seen.value], ['slot-wins:1'])
+  assert.deepEqual(saved, ['slot-wins:1'])
+  await reloaded.user.logout()
+  first.storage.set('stenbygaard-user-token', 'token-b')
+  const other = setup(
+    async () => ({ name: 'Mathias', seen: ['commenter'] }),
+    undefined,
+    first.storage,
+  )
+  await other.user.refreshMe()
+  assert.deepEqual([...other.user.seen.value], ['commenter'])
+})
+
+test('seen badges are saved in batches within the server limit', async () => {
+  const batches = [],
+    saved = []
+  const { user } = setup(async (_path, options) => {
+    batches.push(options.body.keys.length)
+    saved.push(...options.body.keys)
+    return { seen: [...saved] }
+  })
+  const keys = Array.from({ length: 601 }, (_, i) => `badge-${i}`)
+  await user.markSeen(keys)
+  assert.deepEqual(batches, [300, 300, 1])
+  assert.deepEqual([...user.seen.value], keys)
 })

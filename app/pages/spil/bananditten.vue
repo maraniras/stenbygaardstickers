@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SLOT_BETS, SLOT_PRIZES, SLOT_SYMBOLS } from '../../../shared/utils/slots'
+import { SLOT_BETS, SLOT_PRIZES, SLOT_SYMBOLS, SLOT_RTP } from '../../../shared/utils/slots'
 definePageMeta({
   middleware: () => {
     if (!useRuntimeConfig().public.banandittenEnabled)
@@ -91,7 +91,9 @@ const resetLabel = computed(() =>
           @spin="spin"
         />
       </div>
-      <div class="machine-bottom"><span>ÉN GEVINSTLINJE</span><span>96 % RTP</span></div>
+      <div class="machine-bottom">
+        <span>ÉN GEVINSTLINJE</span><span>{{ SLOT_RTP }} % RTP</span>
+      </div>
     </section>
     <div
       class="outcome"
@@ -206,9 +208,9 @@ const resetLabel = computed(() =>
         </li>
       </ul>
       <p>
-        Udbetalingen inkluderer indsatsen. 96 % er den teoretiske tilbagebetaling over mange spins,
-        før engangsbonusser fra badges. Det er ikke et løfte for dine spins. Gevinstchancerne følger
-        tabellen ovenfor; symbolerne er ikke lige sandsynlige.
+        Udbetalingen inkluderer indsatsen. {{ SLOT_RTP }} % er den teoretiske tilbagebetaling over
+        mange spins, før engangsbonusser fra badges. Det er ikke et løfte for dine spins.
+        Gevinstchancerne følger tabellen ovenfor; symbolerne er ikke lige sandsynlige.
       </p>
       <p>
         Indsatser: 5–25 bananer. Du kan sætte i alt 500 bananer pr. spildøgn. Gevinster genskaber

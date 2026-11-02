@@ -7,6 +7,25 @@ const PUSH_OFF_KEY = 'stenbygaard-badge-push-off'
 // Hvilket navn enhedens 👍 sidst er flyttet over til
 const CLAIMED_KEY = 'stenbygaard-ratings-claimed'
 
+function seenCacheKey(owner: string) {
+  return `stenbygaard-seen:${encodeURIComponent(owner.toLocaleLowerCase('da'))}`
+}
+function cachedSeen(owner: string): string[] {
+  try {
+    const value = JSON.parse(localStorage.getItem(seenCacheKey(owner)) ?? '[]')
+    return Array.isArray(value) ? value.filter((key): key is string => typeof key === 'string') : []
+  } catch {
+    return []
+  }
+}
+function rememberSeen(owner: string, keys: string[]) {
+  const merged = [...new Set([...cachedSeen(owner), ...keys])]
+  try {
+    localStorage.setItem(seenCacheKey(owner), JSON.stringify(merged))
+  } catch {}
+  return merged
+}
+
 /** Enhedens nøgle – sendes som x-user-token, når serveren skal vide, hvem man er */
 export function userToken() {
   try {
@@ -60,12 +79,16 @@ export function useUser() {
       }),
     )
     if (!current()) return
+    const previousSeen = name.value === r.name ? (seen.value ?? []) : []
     name.value = r.name
-    seen.value = r.seen ?? null
+    seen.value = r.name ? rememberSeen(r.name, [...(r.seen ?? []), ...previousSeen]) : null
     badgePush.value = Boolean(r.push)
     notify.value = r.notify ?? {}
     // Navnet er frigivet i admin: glem nøglen
     if (!r.name) return writeToken(null)
+    const saved = new Set(r.seen ?? [])
+    const pending = (seen.value ?? []).filter((key) => !saved.has(key))
+    if (pending.length) void markSeen(pending)
     syncPush()
     // Én gang pr. enhed: enhedens 👍 flyttes over på brugeren (også for dem, der
     // loggede ind, før 👍 fulgte brugeren)
@@ -234,18 +257,22 @@ export function useUser() {
   async function markSeen(keys: string[]) {
     if (!name.value || !keys.length) return
     const token = readToken(),
-      revision = sessionRevision
-    seen.value = [...new Set([...(seen.value ?? []), ...keys])]
+      revision = sessionRevision,
+      owner = name.value
+    seen.value = rememberSeen(owner, [...(seen.value ?? []), ...keys])
     try {
-      const r = await $fetch<{ seen: string[] }>('/api/me/seen', {
-        method: 'POST',
-        body: { keys },
-        headers: { 'x-user-token': token },
-        timeout: 15000,
-        retry: 0,
-      })
-      if (token === readToken() && revision === sessionRevision)
-        seen.value = [...new Set([...(seen.value ?? []), ...r.seen])]
+      for (let offset = 0; offset < keys.length; offset += 300) {
+        if (token !== readToken() || revision !== sessionRevision) return
+        const r = await $fetch<{ seen: string[] }>('/api/me/seen', {
+          method: 'POST',
+          body: { keys: keys.slice(offset, offset + 300) },
+          headers: { 'x-user-token': token },
+          timeout: 15000,
+          retry: 0,
+        })
+        if (token === readToken() && revision === sessionRevision)
+          seen.value = rememberSeen(owner, [...(seen.value ?? []), ...r.seen])
+      }
     } catch {}
   }
 

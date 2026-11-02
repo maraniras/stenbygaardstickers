@@ -17,7 +17,7 @@ const request = (r, bet = 10) => ({
   bet,
 })
 
-test('all 10000 tickets give exactly 96 percent RTP and the agreed probabilities', () => {
+test('all 10000 tickets give exactly 94 percent RTP and the agreed probabilities', () => {
   const a = harness(),
     counts = new Map()
   let payout = 0
@@ -29,24 +29,25 @@ test('all 10000 tickets give exactly 96 percent RTP and the agreed probabilities
   assert.deepEqual(
     [...counts],
     [
-      [0, 6400],
+      [0, 6500],
       [1, 2000],
-      [2, 1000],
+      [2, 900],
       [5, 380],
       [10, 170],
       [25, 40],
       [100, 10],
     ],
   )
-  assert.equal(payout / 10000, 0.96)
+  assert.equal(payout / 10000, 0.94)
+  assert.equal(a.SLOT_RTP, 94)
   for (const ticket of [-1, 10000, NaN, Infinity, 0.5]) assert.throws(() => a.slotPrizeFor(ticket))
 })
 test('persisted reel symbols agree with payouts, net stats and ledger including returned stake', () => {
   const a = harness()
   for (const [ticket, multiplier, symbol] of [
     [0, 0, null],
-    [6400, 1, null],
-    [8400, 2, 'lemon'],
+    [6500, 1, null],
+    [8500, 2, 'lemon'],
     [9400, 5, 'strawberry'],
     [9780, 10, 'mix-max'],
     [9950, 25, 'faxe-kondi'],
@@ -76,7 +77,7 @@ test('persisted reel symbols agree with payouts, net stats and ledger including 
 test('the last five bananas of wallet and daily budget can fund a minimum spin', () => {
   const a = harness(),
     r = fresh(a)
-  a.spinSlots(r, request(r, 25), now, () => 6400)
+  a.spinSlots(r, request(r, 25), now, () => 6500)
   r.slotGame.daily.spent = 495
   r.balance = 5
   a.spinSlots(r, request(r, 5), now, () => 0)
@@ -94,7 +95,7 @@ test('invalid, unfunded, stale and over-budget wagers never debit, draw or chang
     assert.equal(JSON.stringify(r), before)
   }
   const r = fresh(a)
-  for (let i = 0; i < 20; i++) a.spinSlots(r, request(r, 25), now, () => 6400)
+  for (let i = 0; i < 20; i++) a.spinSlots(r, request(r, 25), now, () => 6500)
   assert.equal(a.slotResponse(r, now).dailyLimit.remaining, 0)
   assert.equal(r.balance, 5000)
   const saved = JSON.stringify(r)
@@ -118,12 +119,12 @@ test('invalid, unfunded, stale and over-budget wagers never debit, draw or chang
 test('profit streaks exclude refunds; big wins and jackpot count once with exact badge rewards', () => {
   const a = harness(),
     r = fresh(a)
-  for (const ticket of [8400, 9780, 9990]) a.spinSlots(r, request(r), now, () => ticket)
+  for (const ticket of [8500, 9780, 9990]) a.spinSlots(r, request(r), now, () => ticket)
   assert.equal(r.slotGame.stats.bestProfitStreak, 3)
   assert.equal(r.slotGame.stats.wins, 3)
   assert.equal(r.slotGame.stats.bigWins, 2)
   assert.equal(r.slotGame.stats.jackpots, 1)
-  a.spinSlots(r, request(r), now, () => 6400)
+  a.spinSlots(r, request(r), now, () => 6500)
   assert.equal(r.slotGame.stats.profitStreak, 0)
   a.settleEconomy(r, 'Test', empty, now)
   const balance = r.balance,
@@ -170,7 +171,7 @@ test('daily allowance resets at Danish 04:00 including DST; old outcomes remain 
     const after = new Date(boundary),
       before = new Date(after.getTime() - 1),
       r = fresh(a)
-    for (let i = 0; i < 20; i++) a.spinSlots(r, request(r, 25), before, () => 6400)
+    for (let i = 0; i < 20; i++) a.spinSlots(r, request(r, 25), before, () => 6500)
     assert.equal(a.slotResponse(r, before).dailyLimit.remaining, 0)
     assert.equal(a.slotResponse(r, after).dailyLimit.remaining, 500)
     const last = r.slotGame.last

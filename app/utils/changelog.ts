@@ -15,6 +15,7 @@ export const CHANGELOG: Release[] = [
       'Få en mobilnotifikation, når en ny version af appen udgives',
       'Vælg Appopdateringer til eller fra under Notifikationer',
       'Badge-push springes over på enheder, hvor appen er åben',
+      'Lukkede badge-popups huskes også ved netværksfejl og genåbning af appen',
       'Lykkehjulets baggrund følger nu lyst og mørkt tema',
       'Bananformue-badgen har fået et nyt motiv uden Emil',
     ],
