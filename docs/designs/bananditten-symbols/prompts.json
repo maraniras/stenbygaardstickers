@@ -1,0 +1,35 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "common": "Use case: stylized-concept. Create ONE standalone reel symbol for the mobile banana-themed slot game Bananditten, part of a coherent seven-symbol set. Premium playful polished 3D game asset, richly colored, rounded sculpted shapes, detailed but clean at 64px, glossy highlights, soft warm studio light from upper left, three-quarter view, centered and fully contained with 10% transparent padding. Genuine transparent alpha background. No pedestal, floor, cast shadow outside the object, frame, badge ring, text, letters, numbers, face, human, Emil, extra objects or scenery. Rich golden yellow fruit palette with purple accents only where specified; green leaves and red strawberry keep their natural vibrant colors. Consistent toy-like rendering and camera across the set. ",
+  "specs": [
+    [
+      "lemon",
+      "A single plump bright lemon-yellow lemon with clearly pointed ends, subtle dimpled citrus peel and one small fresh green leaf. Tilt diagonally. Recognizable lemon silhouette; fruit rather than metallic gold."
+    ],
+    [
+      "strawberry",
+      "One large glossy ruby-red strawberry, rounded heart-shaped fruit with visible small cream-gold seeds and a tidy lush green leafy cap. Rich red dominates. No other fruit."
+    ],
+    [
+      "peeled-banana",
+      "One clearly curved ripe yellow banana partially peeled, shown SIDEWAYS in a broad horizontal C curve, tipped diagonally about 25 degrees. Cream-colored curved fruit visible along the curve, three short golden-yellow peel flaps curled away underneath. Read unmistakably as a banana even at small size. Avoid upright straight stalks, phallic forms or flesh-colored pink tones."
+    ],
+    [
+      "banana-bunch",
+      "A large tightly joined bunch of FIVE ripe golden-yellow whole unpeeled curved bananas sharing one small green-brown stem. Wide fan-shaped silhouette, subtle banana ridges, premium glossy fruit texture. No crown, no peeled fruit, no coins or trophy."
+    ],
+    [
+      "crowned-banana",
+      "The jackpot symbol: ONE magnificent broadly curved C-shaped banana made of polished warm METALLIC GOLD, placed sideways diagonally, topped by a small ornate gold crown with deep purple enamel and three amethyst jewels. Clear banana silhouette, extremely readable crown, premium casino 3D finish. No bundle, no peeled fruit, no upright straight shape. Few restrained specular glints, no separate floating stars."
+    ],
+    [
+      "banana-peel",
+      "One EMPTY golden-yellow banana peel with THREE thick flaps spreading outward and curling downward, a low wide silhouette with a small brown tip. Pale cream INNER peel surfaces visible, golden yellow outer surfaces. Clearly empty: absolutely no edible banana fruit or upright white column inside. A playful glossy 3D fruit peel, no face or limbs."
+    ],
+    [
+      "banana-leaf",
+      "One large elegant tropical BANANA LEAF, vivid emerald and lime green with a clearly defined center rib, parallel side veins, gently folded thick leaf surface and two small natural edge splits. Long broad tapered silhouette angled diagonally across the square. Glossy sculpted 3D game icon, no fruit, no stalk cluster, no crown."
+    ]
+  ]
+}
