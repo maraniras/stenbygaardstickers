@@ -28,7 +28,7 @@ test('public balances do not settle wallets or compute badges on read', async ()
 test('resuming Bananjack does not sync badges for the community', async () => {
   const handler = route('server/api/games/bananjack.get.ts', {
     useRuntimeConfig: () => ({ public: { bananjackEnabled: true } }),
-    require: () => ({ jackPublic: () => null, jackDailyLimit: () => ({ remaining: 1000 }) }),
+    require: () => ({ jackPublic: () => null, jackDailyLimit: () => ({ remaining: 500 }) }),
     economyUser: async () => ({ user: { name: 'Nicole' } }),
     syncEconomy: async () => ({ balance: 250 }),
     syncBadgesLater: () => {
@@ -37,7 +37,7 @@ test('resuming Bananjack does not sync badges for the community', async () => {
   })
   const response = await handler({})
   assert.equal(response.balance, 250)
-  assert.equal(response.dailyLimit.remaining, 1000)
+  assert.equal(response.dailyLimit.remaining, 500)
 })
 
 for (const method of ['get', 'post']) {
