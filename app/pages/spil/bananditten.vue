@@ -24,6 +24,14 @@ const {
   result,
 } = useBananditten()
 const rules = ref<HTMLDialogElement>()
+const prizeExamples = SLOT_PRIZES.map((prize) => ({
+  ...prize,
+  symbols: prize.symbol
+    ? [prize.symbol, prize.symbol, prize.symbol]
+    : prize.multiplier === 1
+      ? ['lemon', 'lemon', 'banana-leaf']
+      : ['strawberry', 'banana-peel', 'banana-leaf'],
+}))
 const net = computed(() => (result.value ? result.value.payout - result.value.bet : 0))
 const outcome = computed(() => SLOT_PRIZES.find((p) => p.multiplier === result.value?.multiplier))
 const resultNames = computed(() =>
@@ -200,17 +208,42 @@ const resetLabel = computed(() =>
       </p>
       <ul>
         <li
-          v-for="prize in SLOT_PRIZES"
+          v-for="prize in prizeExamples"
           :key="prize.multiplier"
         >
-          <span>{{ prize.name }} · {{ prize.multiplier }}×</span
-          ><b>{{ (prize.weight / 100).toLocaleString('da-DK') }} %</b>
+          <div class="prize-heading">
+            <span>{{ prize.name }} · {{ prize.multiplier }}×</span>
+            <b>{{ (prize.weight / 100).toLocaleString('da-DK') }} %</b>
+          </div>
+          <div class="prize-example">
+            <div class="prize-symbols">
+              <span
+                v-for="(symbol, index) in prize.symbols"
+                :key="index"
+              >
+                <img
+                  :src="`/games/bananditten/${symbol}.webp`"
+                  :alt="SLOT_SYMBOLS.find((item) => item.id === symbol)?.name ?? ''"
+                  loading="lazy"
+                />
+              </span>
+            </div>
+            <strong>{{ (bet * prize.multiplier).toLocaleString('da-DK') }} 🍌</strong>
+          </div>
+          <small v-if="prize.multiplier <= 1">
+            {{
+              prize.multiplier === 1
+                ? 'Eksempel: to ens + blad eller skræl, i vilkårlig rækkefølge'
+                : 'Eksempel: tre forskellige'
+            }}
+          </small>
         </li>
       </ul>
       <p>
-        Udbetalingen inkluderer indsatsen. {{ SLOT_RTP }} % er den teoretiske tilbagebetaling over
-        mange spins, før engangsbonusser fra badges. Det er ikke et løfte for dine spins.
-        Gevinstchancerne følger tabellen ovenfor; symbolerne er ikke lige sandsynlige.
+        Beløbene er vist for din valgte indsats på {{ bet }} 🍌. Udbetalingen inkluderer indsatsen.
+        {{ SLOT_RTP }} % er den teoretiske tilbagebetaling over mange spins, før engangsbonusser fra
+        badges. Det er ikke et løfte for dine spins. Gevinstchancerne følger tabellen ovenfor;
+        symbolerne er ikke lige sandsynlige.
       </p>
       <p>
         Indsatser: 5–25 bananer. Du kan sætte i alt 500 bananer pr. spildøgn. Gevinster genskaber
@@ -506,12 +539,47 @@ dialog ul {
   padding: 0;
 }
 dialog li {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 9px 0;
+  display: grid;
+  gap: 8px;
+  padding: 12px 0;
   font-size: 12px;
   border-bottom: 1px solid var(--hairline);
+}
+.prize-heading,
+.prize-example {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.prize-heading b {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.prize-symbols {
+  display: flex;
+  gap: 5px;
+}
+.prize-symbols span {
+  display: grid;
+  place-items: center;
+  width: clamp(36px, 11vw, 48px);
+  height: clamp(36px, 11vw, 48px);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface-alt, var(--surface));
+}
+.prize-symbols img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+.prize-example strong {
+  white-space: nowrap;
+}
+dialog li small {
+  color: var(--muted);
+  line-height: 1.5;
 }
 .close {
   position: absolute;

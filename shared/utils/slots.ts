@@ -15,8 +15,8 @@ export const SLOT_PRIZES = [
   { multiplier: 1, weight: 2000, name: 'Indsatsen tilbage', symbol: null },
   { multiplier: 2, weight: 900, name: 'Lille gevinst', symbol: 'lemon' },
   { multiplier: 5, weight: 380, name: 'Frugtfest', symbol: 'strawberry' },
-  { multiplier: 10, weight: 170, name: 'Bananboost', symbol: 'mix-max' },
-  { multiplier: 25, weight: 40, name: 'Guldbundt', symbol: 'faxe-kondi' },
+  { multiplier: 10, weight: 170, name: 'Mix Maxing', symbol: 'mix-max' },
+  { multiplier: 25, weight: 40, name: "Skal du ha' en Faxe?", symbol: 'faxe-kondi' },
   { multiplier: 100, weight: 10, name: 'Jackpot!', symbol: 'crowned-banana' },
 ] as const
 export const SLOT_RTP =
