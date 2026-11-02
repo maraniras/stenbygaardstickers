@@ -46,7 +46,7 @@ const strip = Array.from({ length: 63 }, (_, i) => SLOT_SYMBOLS[i % SLOT_SYMBOLS
   position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
+  gap: 8px;
   border: 5px solid #c99a4f;
   border-radius: 19px;
   background: #b08747;
@@ -82,8 +82,8 @@ const strip = Array.from({ length: 63 }, (_, i) => SLOT_SYMBOLS[i % SLOT_SYMBOLS
   place-items: center;
 }
 .symbol img {
-  width: 100%;
-  height: 100%;
+  width: 90%;
+  height: 90%;
   object-fit: contain;
   user-select: none;
 }
