@@ -55,7 +55,7 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       </div>
       <div class="game-copy">
         <h2 id="slots-title">Banan<span>ditten</span></h2>
-        <div class="game-details"><span>10–50 🍌 pr. spin</span><span>96 % RTP</span></div>
+        <div class="game-details"><span>5–25 🍌 pr. spin</span><span>96 % RTP</span></div>
       </div>
       <div
         v-if="!banandittenEnabled"

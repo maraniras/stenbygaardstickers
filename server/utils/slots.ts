@@ -69,7 +69,7 @@ export function spinSlots(
       statusMessage: 'Spillet er ændret fra en anden enhed. Hent det igen.',
     })
   if (!SLOT_BETS.some((bet) => bet === request.bet))
-    throw createError({ statusCode: 400, statusMessage: 'Vælg en indsats fra 10 til 50 bananer.' })
+    throw createError({ statusCode: 400, statusMessage: 'Vælg en indsats fra 5 til 25 bananer.' })
   if (request.bet > slotResponse(record, now).dailyLimit.remaining)
     throw createError({
       statusCode: 409,

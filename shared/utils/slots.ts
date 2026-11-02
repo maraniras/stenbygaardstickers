@@ -1,5 +1,5 @@
 import type { SlotStats, SlotSymbol } from '../types/slots'
-export const SLOT_BETS = [10, 20, 30, 40, 50] as const
+export const SLOT_BETS = [5, 10, 15, 20, 25] as const
 export const SLOT_DAILY_LIMIT = 500
 export const SLOT_SYMBOLS: { id: SlotSymbol; name: string }[] = [
   { id: 'lemon', name: 'Citron' },

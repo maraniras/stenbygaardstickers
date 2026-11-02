@@ -148,7 +148,7 @@ const resetLabel = computed(() =>
         ><span aria-hidden="true">↻</span>
       </button>
       <p
-        v-if="budget && budget.remaining < 10"
+        v-if="budget && budget.remaining < SLOT_BETS[0]"
         class="hint"
       >
         Dagens indsatsgrænse er nået. Nyt budget {{ resetLabel }}.
@@ -192,8 +192,9 @@ const resetLabel = computed(() =>
       <h2 id="slot-rules-title">Gevinster &amp; regler</h2>
       <p>
         Den midterste række er gevinstlinjen. Tre ens citroner giver 2×, jordbær 5×, Mix Max 10×,
-        Faxe Kondi 25× og guldbananer 100×. Præcis to ens giver indsatsen tilbage. Tre forskellige
-        giver Miv. Bananskræl og bananblad er fyldmotiver.
+        Faxe Kondi 25× og guldbananer 100×. To ens citroner, jordbær, Mix Max eller Faxe Kondi
+        sammen med et bananblad eller en bananskræl giver indsatsen tilbage, uanset placeringen. Tre
+        forskellige giver Miv. Bananskræl og bananblad er fyldmotiver.
       </p>
       <ul>
         <li
@@ -210,7 +211,7 @@ const resetLabel = computed(() =>
         tabellen ovenfor; symbolerne er ikke lige sandsynlige.
       </p>
       <p>
-        Indsatser: 10–50 bananer. Du kan sætte i alt 500 bananer pr. spildøgn. Gevinster genskaber
+        Indsatser: 5–25 bananer. Du kan sætte i alt 500 bananer pr. spildøgn. Gevinster genskaber
         ikke dagsbudgettet. Det nulstilles kl. 04.00 dansk tid, og budget og saldo deles mellem dine
         enheder.
       </p>

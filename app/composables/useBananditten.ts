@@ -8,7 +8,7 @@ export function useBananditten() {
     shownBalance = ref<number | null>(null)
   const busy = ref(false),
     error = ref(''),
-    bet = ref(10)
+    bet = ref(5)
   const presentation = useSlotPresentation()
   const animation = useState('slot-animation', () => false)
   const locked = computed(() => busy.value || presentation.rolling.value)
