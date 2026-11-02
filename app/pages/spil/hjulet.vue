@@ -347,10 +347,10 @@ header p {
   color: var(--muted);
 }
 .arcade {
-  --wheel-glow: #b999ff26;
+  --wheel-glow: #b794dc38;
   --wheel-texture: #57417006;
-  --wheel-surface: var(--surface);
-  --wheel-border: var(--hairline);
+  --wheel-surface: #e5deed;
+  --wheel-border: #ad96c34d;
   --wheel-shadow: var(--shadow-sm);
   --wheel-label: var(--muted);
   --wheel-amount: #825a21;
