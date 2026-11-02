@@ -116,4 +116,16 @@ Alle otte er aktive med statistik, profilvisning, notifikationer og engangsbelø
 | x82 | På stregen (`jack-five-card`) | Præcis 21 med mindst fem kort | 75 | 3 |
 | x83 | Dealeren gik over (`jack-dealer-bust`) | Vind med højst 16, fordi dealeren går over | 25 | 1 |
 
-Næste ledige nummer: **x84**
+## Bananditten
+
+| Nr. | Badge (id) | Krav | Bananer pr. trin | Point pr. trin |
+|---|---|---|---|---|
+| x84 | Ved håndtaget → En tur mere → Fast spiller → Maskinkender → Maskinmester (`slot-spins`) | 1/25/100/500/2.000 spins | 10/20/40/75/150 | 1/2/3/4/5 |
+| x85 | Den betaler → Gevinstjæger → Bananbonus → Maskinen giver → Bananregn (`slot-wins`) | 1/10/50/100/500 spins med overskud | 10/25/50/100/200 | 1/2/3/4/5 |
+| x86 | Guldrush → Guldfeber → Guldgraver → Guldåren → Det rene guld (`slot-big-wins`) | 1/5/15/30/75 spins med mindst 10× | 15/30/60/100/200 | 1/2/3/4/5 |
+| x87 | Banandittens udvalgte (`slot-jackpot`) | Jackpot 100× | 250 | 5 |
+| x88 | Tre på stribe (`slot-streak`) | Tre profitable spins i træk; 0× og 1× bryder rækken | 50 | 2 |
+
+Samlet 1.385 bananer og 52 point. Engangsbelønning pr. trin, også efter genindlæsning. Generelle casino-badges er fortsat udskudt.
+
+Næste ledige nummer: **x89**

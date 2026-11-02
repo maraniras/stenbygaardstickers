@@ -20,6 +20,7 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  slots?: import('./slots').SlotStats
   jack?: import('./jackStats').JackStatsPublic
   balance: number
   peakBalance: number
@@ -38,6 +39,7 @@ export interface WheelRun {
   jackpotAmount?: number
 }
 export interface EconomyRecord extends EconomyPublic {
+  slotGame?: import('./slots').SlotRecord
   jackDailyWagers?: { day: string; amount: number }
   jackStats?: import('./jackStats').JackStats
   bananjack?: import('./bananjack').JackGame

@@ -12,6 +12,7 @@
 import type { EconomyPublic } from '../types/economy'
 import { economyBadges } from './economy-badges'
 import { jackBadges } from './jackBadges'
+import { slotBadges } from './slotBadges'
 
 export type BadgeKind = 'tier' | 'single' | 'record'
 
@@ -778,6 +779,7 @@ export function badgesFor(
     ...compute(name, mine, all, ratings, now, cs),
     ...economyBadges(wallet),
     ...jackBadges(wallet),
+    ...slotBadges(wallet),
   ]
   if (!opts.history) return score(badges)
 
@@ -840,6 +842,9 @@ export function earnedCount(badges: Badge[]) {
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
+  'slot-spins': [1, 2, 3, 4, 5],
+  'slot-wins': [1, 2, 3, 4, 5],
+  'slot-big-wins': [1, 2, 3, 4, 5],
   'jack-rounds': [1, 2, 3, 4, 5],
   'jack-wins': [1, 2, 3, 4, 5],
   'jack-naturals': [1, 2, 3, 4, 5],
@@ -863,6 +868,8 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'slot-jackpot': 5,
+  'slot-streak': 2,
   'jack-split': 2,
   'jack-back-to-back': 4,
   'jack-five-card': 3,

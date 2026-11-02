@@ -2,7 +2,7 @@
 import { NuxtLink } from '#components'
 useHead({ title: 'Casino · Stenbygaard Stickers' })
 const { state } = useEconomy()
-const { bananjackEnabled } = useRuntimeConfig().public
+const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 </script>
 
 <template>
@@ -31,6 +31,42 @@ const { bananjackEnabled } = useRuntimeConfig().public
       <p class="lead">Lidt held. Lidt taktik. En håndfuld bananer.</p>
     </header>
     <GameSectionNav section="casino" />
+
+    <component
+      :is="banandittenEnabled ? NuxtLink : 'article'"
+      :to="banandittenEnabled ? '/spil/bananditten' : undefined"
+      class="slots-card"
+      aria-labelledby="slots-title"
+    >
+      <div class="card-top">
+        <span class="table-label">BANANDITTEN</span
+        ><span class="status">{{ banandittenEnabled ? 'Spil nu →' : 'På vej' }}</span>
+      </div>
+      <div
+        class="mini-reels"
+        aria-hidden="true"
+      >
+        <img
+          v-for="id in ['lemon', 'faxe-kondi', 'crowned-banana']"
+          :key="id"
+          :src="`/games/bananditten/${id}.webp`"
+          alt=""
+        />
+      </div>
+      <div class="game-copy">
+        <h2 id="slots-title">Banan<span>ditten</span></h2>
+        <div class="game-details"><span>10–50 🍌 pr. spin</span><span>96 % RTP</span></div>
+      </div>
+      <div
+        v-if="!banandittenEnabled"
+        class="coming-soon"
+      >
+        <div>
+          <span class="soon-label">Bananditten</span><strong>Kommer snart</strong
+          ><span>Vi gør hjulene klar.</span>
+        </div>
+      </div>
+    </component>
 
     <component
       :is="bananjackEnabled ? NuxtLink : 'article'"
@@ -188,6 +224,35 @@ h1 > span {
   background: radial-gradient(ellipse at 50% 30%, #29594c 0%, #15392f 45%, #102720 100%);
   color: #fff8e8;
   box-shadow: 0 12px 30px #10251e20;
+}
+.slots-card {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  border: 1px solid #cda75f55;
+  border-radius: 26px;
+  background: radial-gradient(ellipse at 50% 20%, #594267, #231a30 75%);
+  color: #fff8e8;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 18px;
+}
+.slots-card .mini-reels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin: 22px 24px 14px;
+  padding: 9px;
+  border: 3px solid #d5ac65;
+  border-radius: 16px;
+  background: #7d5d87;
+}
+.mini-reels img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: linear-gradient(#f1e5f7, #fff7db, #e2d1ec);
+  border-radius: 7px;
 }
 .coming-soon {
   position: absolute;

@@ -26,7 +26,8 @@ export default defineNuxtPlugin(() => {
         path.startsWith('/admin') ||
         hasText ||
         useState<boolean>('daily-game-animation').value ||
-        useState<boolean>('bananjack-animation').value
+        useState<boolean>('bananjack-animation').value ||
+        useState<boolean>('slot-animation').value
       if (onOpen && !busy) window.location.reload()
       else available.value = true
     } catch {}

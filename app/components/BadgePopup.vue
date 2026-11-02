@@ -11,6 +11,7 @@ const { commentStats } = useCommentStats()
 const { people: economy, loading: economyLoading } = useEconomy()
 const gameAnimation = useState('daily-game-animation', () => false)
 const jackAnimation = useState('bananjack-animation', () => false)
+const slotAnimation = useState('slot-animation', () => false)
 const route = useRoute()
 const router = useRouter()
 
@@ -60,6 +61,7 @@ const blocked = computed(
     sheetOpen.value ||
     gameAnimation.value ||
     jackAnimation.value ||
+    slotAnimation.value ||
     economyLoading.value,
 )
 

@@ -1,6 +1,7 @@
 import type { Badge } from './badges'
 import type { DailyStats } from '../types/economy'
 import { JACK_BADGE_REWARDS } from './jackBadges'
+import { SLOT_BADGE_REWARDS } from './slotBadges'
 
 export const STARTING_BANANAS = 250
 export const CITY_REWARDS = [50, 40, 30, 20, 10]
@@ -96,6 +97,8 @@ export function wheelPrizeFor(ticket: number, jackpot = 500) {
 }
 /** Full reward per tier, never a second points-based reward for game badges. */
 export function bananaRewardFor(badge: Badge, level = badge.kind === 'tier' ? badge.level : 1) {
+  const slots = SLOT_BADGE_REWARDS[badge.id]
+  if (slots) return slots[level - 1] ?? 0
   const jack = JACK_BADGE_REWARDS[badge.id]
   if (jack) return jack[level - 1] ?? 0
   const game = GAME_BADGE_REWARDS[badge.id]

@@ -1,0 +1,27 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "common": "Use case: stylized-concept. One standalone badge icon for Bananditten banana-themed casino slot game, matching premium glossy detailed 3D app badges. Purple enamel, polished warm metallic gold, mint/emerald accents. Rich materials, rounded clean forms, soft warm upper-left studio lighting, readable at 64px. Centered square composition, full object contained with padding, genuine transparent alpha background. No faces, human portraits, Emil, text, letters, numbers, outer medal ring, floor or backdrop. ",
+  "specs": [
+    [
+      "slot-spins",
+      "A small elegant purple-and-gold three-reel slot machine, three curved gold bananas aligned across its display, substantial shiny gold lever with a purple ball on the right, small mint indicator lights. Wide clean miniature machine silhouette."
+    ],
+    [
+      "slot-wins",
+      "A generous curved golden banana bunch resting in a small open purple casino token tray, with a cascading neat stack of thick gold/purple chips and two mint upward arrows. Celebratory but compact; no trophy or machine."
+    ],
+    [
+      "slot-big-wins",
+      "A purple mine cart with gold wheels overflowing with golden banana-shaped nuggets and a few faceted gold crystals, mint sparkle ornaments. Distinctive playful banana gold-rush treasure icon; no people or faces."
+    ],
+    [
+      "slot-jackpot",
+      "A magnificent polished curved golden banana wearing a purple-and-gold crown with amethyst jewels, above a small purple pedestal encircled by mint laurels and three gold ray shapes. Premium jackpot trophy, clear crown and banana silhouette."
+    ],
+    [
+      "slot-streak",
+      "Three overlapping thick purple-and-gold casino chips, each bearing a large embossed mint check mark. Arrange in a clean rising diagonal connected by a flowing golden arrow, with one small curved golden banana below. Exactly three chips; no numbers or letters."
+    ]
+  ]
+}

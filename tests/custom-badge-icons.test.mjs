@@ -13,6 +13,11 @@ vm.runInNewContext(
   { exports },
 )
 const ids = [
+  'slot-spins',
+  'slot-wins',
+  'slot-big-wins',
+  'slot-jackpot',
+  'slot-streak',
   'banana-baron',
   'city-guide',
   'city-gps',
@@ -93,7 +98,7 @@ const ids = [
   'jack-five-card',
   'jack-dealer-bust',
 ]
-test('all 79 custom badge motifs exist, fit retina medals and have real transparency', async () => {
+test('all 84 custom badge motifs exist, fit retina medals and have real transparency', async () => {
   for (const id of ids) {
     const file = exports.badgeIcon(id)
     assert.equal(file, `/badges/custom/${id}.webp`)
@@ -121,7 +126,7 @@ test('every badge in the fixed numbered catalogue has a custom asset, including 
     .split(/\r?\n/)
     .filter((row) => /^\| x\d+ \|/.test(row))
     .map((row) => row.match(/`([^`]+)`/))
-  assert.equal(catalogue.length, 83)
+  assert.equal(catalogue.length, 88)
   const files = new Set()
   for (const [, id] of catalogue) {
     const icon = exports.badgeIcon(id.replace('<år>', '2026'))
@@ -129,5 +134,5 @@ test('every badge in the fixed numbered catalogue has a custom asset, including 
     assert.ok(readFileSync('public' + icon).length > 0, id)
     files.add(icon)
   }
-  assert.equal(files.size, 79)
+  assert.equal(files.size, 84)
 })

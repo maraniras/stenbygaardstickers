@@ -80,6 +80,7 @@ export function publicEconomy(record: EconomyRecord): EconomyPublic {
     stats: record.stats,
     milestones: record.milestones,
     jack: publicJackStats(record),
+    slots: record.slotGame?.stats,
   }
 }
 export async function allEconomyRecords(): Promise<Record<string, EconomyRecord>> {

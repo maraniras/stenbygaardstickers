@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   runtimeConfig: {
     public: {
+      banandittenEnabled: true,
       bananjackEnabled:
         process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'preview',
     },
