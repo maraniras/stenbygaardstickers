@@ -13,6 +13,7 @@ export const CHANGELOG: Release[] = [
     notes: [
       'Få en mobilnotifikation, når en ny version af appen udgives',
       'Vælg Appopdateringer til eller fra under Notifikationer',
+      'Badge-push springes over på enheder, hvor appen er åben',
       'Bananformue-badgen har fået et nyt motiv uden Emil',
     ],
   },

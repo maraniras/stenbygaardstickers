@@ -82,17 +82,26 @@ const personUrl = (name: string) => `/person/${encodeURIComponent(name)}`
 export async function notifyUser(name: string, message: PushMessage, type: NotifyType) {
   try {
     const found = await findUser(name)
-    if (found && wants(found.user.notify, type)) await pushToUser(found.key, found.user, [message])
+    if (found && wants(found.user.notify, type))
+      await pushToUser(found.key, found.user, [{ type, message }])
   } catch (err) {
     console.error('Kunne ikke sende besked', err)
   }
 }
 
-async function pushToUser(key: string, user: UserRecord, messages: PushMessage[]) {
-  const subs = Object.values(user.devices).flatMap((d) => (d.push ? [d.push] : []))
+async function pushToUser(key: string, user: UserRecord, messages: Typed[]) {
+  const devices = Object.entries(user.devices).filter(([, device]) => device.push)
+  const subs = devices.flatMap(([, device]) => (device.push ? [device.push] : []))
   if (!subs.length || !messages.length) return
+  const visible = messages.some((m) => m.type === 'badges')
+    ? await visibleDeviceHashes(user)
+    : new Set<string>()
+  const background = devices.flatMap(([hash, device]) =>
+    !visible.has(hash) && device.push ? [device.push] : [],
+  )
   const gone = new Set<string>()
-  for (const m of messages) for (const e of await sendPush(subs, m)) gone.add(e)
+  for (const { type, message } of messages)
+    for (const e of await sendPush(type === 'badges' ? background : subs, message)) gone.add(e)
   if (gone.size) {
     await updateUser(key, (u) => {
       for (const d of Object.values(u.devices))
@@ -216,7 +225,7 @@ export async function syncBadges(names?: string[]) {
         await pushToUser(
           key,
           updated,
-          out.filter((o) => wants(updated.notify, o.type)).map((o) => o.message),
+          out.filter((o) => wants(updated.notify, o.type)),
         )
     }
   } catch (err) {
