@@ -352,17 +352,17 @@ h1 span {
   color: var(--muted);
 }
 .outcome.won strong {
-  color: var(--banana-positive, #328064);
+  color: light-dark(#287343, #95d7ac);
 }
 .outcome .negative {
-  color: var(--muted);
+  color: light-dark(#b5404e, #f3a0a9);
 }
 .outcome.jackpot {
   background: linear-gradient(135deg, #fff1b9, #e6b864);
   color: #48301a;
 }
 .outcome.jackpot strong {
-  color: #48301a;
+  color: #287343;
 }
 .machine.jackpot {
   box-shadow: 0 0 25px #e5b75b70;
