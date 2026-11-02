@@ -347,18 +347,37 @@ header p {
   color: var(--muted);
 }
 .arcade {
+  --wheel-glow: #b999ff26;
+  --wheel-texture: #57417006;
+  --wheel-surface: var(--surface);
+  --wheel-border: var(--hairline);
+  --wheel-shadow: var(--shadow-sm);
+  --wheel-label: var(--muted);
+  --wheel-amount: #825a21;
+  --wheel-caption: var(--muted);
   position: relative;
   isolation: isolate;
   overflow: hidden;
   padding: 20px 12px 0;
-  border: 1px solid #fff2;
+  border: 1px solid var(--wheel-border);
   border-radius: 28px;
   background:
-    radial-gradient(ellipse at 50% 45%, #57417080, transparent 66%),
-    repeating-linear-gradient(0deg, #ffffff02 0 1px, transparent 1px 4px), #201b30;
+    radial-gradient(ellipse at 50% 45%, var(--wheel-glow), transparent 66%),
+    repeating-linear-gradient(0deg, var(--wheel-texture) 0 1px, transparent 1px 4px),
+    var(--wheel-surface);
   box-shadow:
-    0 12px 30px #130e2225,
+    var(--wheel-shadow),
     inset 0 1px 0 #ffffff24;
+}
+:global(html[data-appearance='dark'] .arcade) {
+  --wheel-glow: #57417080;
+  --wheel-texture: #ffffff02;
+  --wheel-surface: #201b30;
+  --wheel-border: #fff2;
+  --wheel-shadow: 0 12px 30px #130e2225;
+  --wheel-label: #b8abc5;
+  --wheel-amount: #d6c29c;
+  --wheel-caption: #8e809f;
 }
 .arcade::before {
   content: '';
@@ -384,7 +403,7 @@ header p {
   gap: 5px 8px;
   margin: 0 0 19px;
   padding: 0 6px;
-  color: #b8abc5;
+  color: var(--wheel-label);
 }
 .jackpot-label {
   font-size: 10px;
@@ -393,7 +412,7 @@ header p {
   display: flex;
   align-items: center;
   gap: 3px;
-  color: #d6c29c;
+  color: var(--wheel-amount);
   font-size: 13px;
   font-weight: 600;
 }
@@ -404,7 +423,7 @@ header p {
 }
 .marquee small {
   flex-basis: 100%;
-  color: #8e809f;
+  color: var(--wheel-caption);
   text-align: center;
   font-size: 9px;
 }
