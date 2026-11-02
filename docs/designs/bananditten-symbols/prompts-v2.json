@@ -1,0 +1,19 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "replaces": {
+    "peeled-banana": "mix-max",
+    "banana-bunch": "faxe-kondi"
+  },
+  "common": "Use case: stylized-concept. Create ONE isolated premium glossy 3D slot-machine reel symbol for the mobile game Bananditten. Match colorful sculpted 3D fruit symbols: rounded clean shapes, rich color, warm studio key light upper left, polished surfaces, readable small-size silhouette and brand lettering. Three-quarter product view, centered, fully visible with at least 10 percent empty padding on all sides. Square composition. Genuine transparent alpha background; no floor, shadow outside object, backdrop, badge ring, border, hands, people, face, pedestal, extra props, watermark, price or numbers. Brand lettering explicitly requested below is allowed and must be readable. ",
+  "specs": [
+    [
+      "mix-max",
+      "One individually wrapped BALCONI MIX MAX chocolate sponge snack cake, horizontal rectangular pillow-pack slightly tilted diagonally. Recognizable classic red-and-white wrapper, white center panel with red BALCONI logo above bold dark-brown 'Mix Max' lettering, glossy bright red sealed crimped ends. The right end is opened slightly, revealing a neat chocolate-coated rectangular sponge cake with a thin cocoa cream filling seam. Main identity is the red/white branded wrapped single cake, not a multipack, no plate. Exact prominent words: 'BALCONI' and 'Mix Max'. Keep packaging graphics clear and simplified for a small slot icon; no invented text."
+    ],
+    [
+      "faxe-kondi",
+      "One classic FAXE KONDI ORIGINAL lemon-lime soda can, compact 330ml can silhouette, not an energy-drink can. Rich vivid green aluminum body with light green bubble motifs, silver aluminum top and base, visible pull tab. Recognizable classic big italic yellow 'FAXE' over 'KONDI' lettering on the front with dark outline, colorful curved pink/yellow/blue swoosh beneath, small 'Med druesukker' below if legible. Slight jaunty 12 degree tilt, three-quarter angle with front logo facing viewer. Glossy sculpted premium 3D game-icon finish with a few condensation beads, clean silhouette. No Booster branding, no bottles, no fruit props, no straw. Exact prominent words: 'FAXE' and 'KONDI'."
+    ]
+  ]
+}
