@@ -12,7 +12,7 @@ Optimerede transparente 384 × 384 WebP-filer ligger i `public/games/bananditten
 | faxe-kondi-bottle | Faxe Kondi-flaske (internt ID `faxe-kondi`) | 25× |
 | crowned-banana | Guldbanan med lilla/guld-krone | Jackpot 100× |
 | banana-peel | Tom bananskræl | Fyldmotiv |
-| heineken-00 | Heineken 0.0-dåse (internt ID `banana-leaf`) | Fyldmotiv |
+| heineken-00-v2 | Heineken 0.0-dåse med mindre 0.0-markering (internt ID `banana-leaf`) | Fyldmotiv |
 
 [index.html](index.html) viser motiverne enkeltvis og følger systemets farvetema. [oversigt.png](oversigt.png) og [oversigt-lys.png](oversigt-lys.png) viser alle syv samlet. Gevinstmærkaterne er designoplæg; spil, odds og badgefunktioner er ikke implementeret i denne designændring.
 
@@ -25,3 +25,5 @@ Visuel emballagereference: [Balconi Mix Max Classic](https://www.cerinicoffee.co
 5. november 2026: Bananbladet er erstattet af en Heineken 0.0-dåse, tydeligt markeret alkoholfri. Genereret med indbygget image_gen med transparent baggrund; original heineken-00.png og prompt-heineken-00.json er gemt her. 384x384 WebP er trimmet og skaleret med sharp. Det interne ID banana-leaf bevares for eksisterende spins og mappes til heineken-00.webp. Det er stadig et fyldmotiv og kan indgå sammen med et par for at give indsatsen tilbage. Odds og RTP ændres ikke. Gamle bananblad-filer bevares som designarkiv.
 
 5. november 2026: Faxe Kondi-dåsen er erstattet af en grøn 500 ml-flaske med smal hals og skruelåg, så silhuetten er tydeligt forskellig fra Heineken 0.0-dåsen. Genereret med indbygget image_gen og transparent baggrund; original faxe-kondi-bottle.png og prompt-faxe-kondi-bottle.json er gemt her. Optimeret WebP er 384x384 med alpha. Internt ID faxe-kondi og gevinst på 25x bevares. Gamle dåsefiler bevares som designarkiv.
+
+Heineken 0.0, revision 2: 0.0-markeringen er gjort væsentligt mindre, så Heineken-navnet er den primære tekst. Redigeret med indbygget image_gen; heineken-00-v2.png og prompt-heineken-00-v2.json er gemt her. Den aktive fil er heineken-00-v2.webp, 384x384 med alpha. Første udgave er bevaret som designarkiv.

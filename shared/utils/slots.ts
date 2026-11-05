@@ -28,7 +28,7 @@ export function slotSymbolImage(id: string) {
     id === 'lemon'
       ? 'limoncello'
       : id === 'banana-leaf'
-        ? 'heineken-00'
+        ? 'heineken-00-v2'
         : id === 'faxe-kondi'
           ? 'faxe-kondi-bottle'
           : id

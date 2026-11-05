@@ -135,3 +135,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Bananditten filler updated: Heineken 0.0 replaces banana leaf visually, with legacy banana-leaf ID preserved and mapped by slotSymbolImage to heineken-00.webp. Same filler/refund role and unchanged 94% RTP. Transparent source/prompt in docs/designs/bananditten-symbols/.
 
 - Bananditten Faxe Kondi artwork is now a green 500 ml bottle to distinguish it from the Heineken 0.0 can. slotSymbolImage maps the retained faxe-kondi ID to faxe-kondi-bottle.webp; payout remains 25x. Source and built-in image_gen prompt in docs/designs/bananditten-symbols/.
+
+- Heineken 0.0 artwork revision: slotSymbolImage maps banana-leaf to heineken-00-v2.webp, with a much smaller 0.0 label under the main Heineken wordmark. Prior artwork remains archived; original/prompt are in docs/designs/bananditten-symbols/.
