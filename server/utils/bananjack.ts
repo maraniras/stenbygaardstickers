@@ -9,7 +9,12 @@ import {
   jackScore,
 } from '../../shared/utils/bananjack'
 import { syncJackStats } from './jack-stats'
-import { jackDailyLimit, reserveJackWager } from './jack-limit'
+import {
+  casinoDailyLimit,
+  checkCasinoWager,
+  prepareCasinoDay,
+  recordCasinoResult,
+} from './casino-limit'
 
 function jackError(message: string, statusCode = 400): never {
   throw createError({ statusCode, statusMessage: message })
@@ -72,10 +77,10 @@ export function jackPublic(record: EconomyRecord, now = new Date()): JackPublic 
     staked: game.staked,
     payout: game.payout,
     dealer: game.dealer.map((card, i) => (game.status === 'playing' && i > 0 ? null : card)),
-    actions: jackActions(game, record.balance, jackDailyLimit(record, now)?.remaining ?? Infinity),
+    actions: jackActions(game, record.balance, casinoDailyLimit(record, now).remaining),
   }
 }
-function settleJack(record: EconomyRecord) {
+function settleJack(record: EconomyRecord, now: Date) {
   const game = record.bananjack!
   if (game.status === 'finished') return
   const dealerBlackjack = game.dealer.length === 2 && jackScore(game.dealer).total === 21
@@ -124,13 +129,15 @@ function settleJack(record: EconomyRecord) {
       `bananjack:${game.id}:payout`,
       game.payout,
       'Bananjack · udbetaling inkl. indsats',
+      now,
     )
+  recordCasinoResult(record, game.staked - game.payout, now)
   syncJackStats(record)
 }
-function advanceJack(record: EconomyRecord) {
+function advanceJack(record: EconomyRecord, now: Date) {
   const game = record.bananjack!
   const next = game.hands.findIndex((h) => h.status === 'playing')
-  if (next < 0) settleJack(record)
+  if (next < 0) settleJack(record, now)
   else game.active = next
 }
 function classifyHand(hand: JackHand) {
@@ -152,7 +159,8 @@ export function dealJack(
   if (!(JACK_BETS as readonly number[]).includes(bet))
     jackError('Vælg 10, 20, 30, 40 eller 50 bananer.')
   if (record.balance < bet) jackError('Du har ikke bananer nok til den indsats.')
-  reserveJackWager(record, bet, now)
+  checkCasinoWager(record, bet, now)
+  prepareCasinoDay(record, now)
   const game: JackGame = {
     id,
     sequence: (old?.sequence ?? 0) + 1,
@@ -174,7 +182,7 @@ export function dealJack(
   transaction(record, `bananjack:${id}:bet`, -bet, 'Bananjack · indsats', now)
   if (jackScore(hand.cards).total === 21 || jackScore(game.dealer).total === 21) {
     hand.status = 'stood'
-    settleJack(record)
+    settleJack(record, now)
   }
 }
 export function actJack(
@@ -190,7 +198,8 @@ export function actJack(
   if (revision !== game.revision) jackError('Hent den seneste hånd igen.', 409)
   if (!jackActions(game, record.balance).includes(action)) jackError('Det træk er ikke muligt nu.')
   const hand = game.hands[game.active]!
-  if (action === 'double' || action === 'split') reserveJackWager(record, hand.bet, now)
+  if (action === 'double' || action === 'split') checkCasinoWager(record, hand.bet, now)
+  prepareCasinoDay(record, now)
   game.revision++
   if (action === 'hit') {
     hand.cards.push(draw(game))
@@ -238,5 +247,5 @@ export function actJack(
     }
     game.hands.splice(game.active + 1, 0, other)
   }
-  advanceJack(record)
+  advanceJack(record, now)
 }

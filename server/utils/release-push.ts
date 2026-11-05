@@ -1,4 +1,5 @@
 import { CHANGELOG } from '../../app/utils/changelog'
+import { releaseRank, latestPublishedRelease } from '../../shared/utils/releases'
 
 // 2.2 predates release notifications and must never generate a retrospective push.
 const BASELINE = '2.2'
@@ -10,23 +11,11 @@ redis.call('SET', KEYS[1], ARGV[1])
 return 1
 `
 
-export function releaseRank(version: string) {
-  if (!/^\d{1,3}\.\d{1,3}(\.\d{1,3})?$/.test(version)) return 0
-  const [major = 0, minor = 0, patch = 0] = version.split('.').map(Number)
-  return major * 1_000_000 + minor * 1000 + patch
-}
-
 /** Redis claim is shared across cold starts, deployments and simultaneous requests. */
 export async function announceRelease() {
   if (process.env.VERCEL_ENV !== 'production' || !redisEnabled) return
-  const release = CHANGELOG[0]
-  const today = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Europe/Copenhagen',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
-  if (!release?.date || release.date > today) return
+  const release = latestPublishedRelease(CHANGELOG)
+  if (!release) return
   const rank = releaseRank(release.version)
   if (rank <= releaseRank(BASELINE)) return
 

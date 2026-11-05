@@ -1,6 +1,7 @@
 import { randomInt } from 'node:crypto'
 import type { EconomyRecord, DailyResponse, CityRun } from '../../shared/types/economy'
 import type { EconomyContext } from './economy'
+import { casinoDailyLimit } from './casino-limit'
 
 // Keep previously credited rewards readable under the current badge names.
 const renamedBadgeLabels: Record<string, string> = {
@@ -43,6 +44,7 @@ export async function dailyResponse(
         : 0,
   }
   return {
+    casinoLimit: casinoDailyLimit(record),
     day,
     nextResetAt: nextGameReset(),
     wallet,

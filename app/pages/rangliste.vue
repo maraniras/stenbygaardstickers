@@ -18,7 +18,7 @@ const { users, failed: usersFailed, reload: reloadUsers } = useUsers()
 const { stickers, people } = useStickers()
 const { ratings, enabled: ratingsEnabled, reload: reloadRatings } = useRatings()
 const { commentStats, failed: commentsFailed, reload: reloadComments } = useCommentStats()
-useHead({ title: 'Ranglisten · Stenbygaard Stickers' })
+useHead({ title: 'Brugere & rangliste · Stenbygaard Stickers' })
 
 async function refresh() {
   busy.value = true
@@ -111,7 +111,7 @@ function back() {
       <div class="heading-row">
         <div>
           <span class="eyebrow">Hele fællesskabet</span>
-          <h1>Ranglisten</h1>
+          <h1>Brugere &amp; rangliste</h1>
         </div>
         <img
           class="world"
@@ -119,7 +119,7 @@ function back() {
           alt=""
         />
       </div>
-      <p class="intro">Små stickers. Store ambitioner.</p>
+      <p class="intro">Find en bruger, eller sammenlign badges, level, stickers og bananer.</p>
     </header>
 
     <div

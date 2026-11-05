@@ -1,5 +1,6 @@
 import type { EconomyRecord } from '../../shared/types/economy'
 import { syncJackStats } from './jack-stats'
+import { prepareCasinoDay } from './casino-limit'
 
 export async function economyContext() {
   const stickers = withDistance(
@@ -35,6 +36,7 @@ export function settleEconomy(
   context: EconomyContext,
   now = new Date(),
 ) {
+  prepareCasinoDay(record, now)
   syncJackStats(record)
   creditBananas(record, 'welcome', STARTING_BANANAS, 'Velkommen · startsaldo', now)
   for (const s of context.stickers) {

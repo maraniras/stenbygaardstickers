@@ -1,6 +1,5 @@
 import type { SlotStats, SlotSymbol } from '../types/slots'
 export const SLOT_BETS = [5, 10, 15, 20, 25] as const
-export const SLOT_DAILY_LIMIT = 500
 export const SLOT_SYMBOLS: { id: SlotSymbol; name: string }[] = [
   // Keep the original ID so previously saved spins remain readable.
   { id: 'lemon', name: 'Limoncello' },

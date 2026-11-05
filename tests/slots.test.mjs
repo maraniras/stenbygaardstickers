@@ -78,7 +78,7 @@ test('the last five bananas of wallet and daily budget can fund a minimum spin',
   const a = harness(),
     r = fresh(a)
   a.spinSlots(r, request(r, 25), now, () => 6500)
-  r.slotGame.daily.spent = 495
+  r.casinoDaily.netLoss = 295
   r.balance = 5
   a.spinSlots(r, request(r, 5), now, () => 0)
   assert.equal(r.balance, 0)
@@ -95,9 +95,9 @@ test('invalid, unfunded, stale and over-budget wagers never debit, draw or chang
     assert.equal(JSON.stringify(r), before)
   }
   const r = fresh(a)
-  for (let i = 0; i < 20; i++) a.spinSlots(r, request(r, 25), now, () => 6500)
+  for (let i = 0; i < 12; i++) a.spinSlots(r, request(r, 25), now, () => 0)
   assert.equal(a.slotResponse(r, now).dailyLimit.remaining, 0)
-  assert.equal(r.balance, 5000)
+  assert.equal(r.balance, 4700)
   const saved = JSON.stringify(r)
   assert.throws(
     () =>
@@ -171,9 +171,9 @@ test('daily allowance resets at Danish 04:00 including DST; old outcomes remain 
     const after = new Date(boundary),
       before = new Date(after.getTime() - 1),
       r = fresh(a)
-    for (let i = 0; i < 20; i++) a.spinSlots(r, request(r, 25), before, () => 6500)
+    for (let i = 0; i < 12; i++) a.spinSlots(r, request(r, 25), before, () => 0)
     assert.equal(a.slotResponse(r, before).dailyLimit.remaining, 0)
-    assert.equal(a.slotResponse(r, after).dailyLimit.remaining, 500)
+    assert.equal(a.slotResponse(r, after).dailyLimit.remaining, 300)
     const last = r.slotGame.last
     a.spinSlots(
       r,
@@ -183,7 +183,7 @@ test('daily allowance resets at Danish 04:00 including DST; old outcomes remain 
         throw Error('No redraw')
       },
     )
-    assert.equal(a.slotResponse(r, after).dailyLimit.remaining, 500)
+    assert.equal(a.slotResponse(r, after).dailyLimit.remaining, 300)
     a.spinSlots(r, request(r), after, () => 0)
     assert.equal(a.slotResponse(r, after).dailyLimit.spent, 10)
   }
@@ -193,21 +193,21 @@ for (const remote of [false, true])
     const a = harness(remote),
       r = fresh(a)
     a.spinSlots(r, request(r, 25), now, () => 0)
-    r.slotGame.daily.spent = 490
+    r.casinoDaily.netLoss = 290
     await a.mutateEconomy('Test', (saved) => Object.assign(saved, r))
     const before = await a.readEconomy('Test'),
       req = request(before)
     const out = await Promise.allSettled(
       Array.from({ length: 8 }, (_, i) =>
         a.mutateEconomy('Test', (saved) =>
-          a.spinSlots(saved, { ...req, id: `competing-${i}` }, now, () => 9999),
+          a.spinSlots(saved, { ...req, id: `competing-${i}` }, now, () => 0),
         ),
       ),
     )
     assert.equal(out.filter((v) => v.status === 'fulfilled').length, 1)
     const saved = await a.readEconomy('Test')
     assert.equal(saved.slotGame.stats.spins, 2)
-    assert.equal(saved.slotGame.stats.jackpots, 1)
+    assert.equal(saved.slotGame.stats.jackpots, 0)
     assert.equal(a.slotResponse(saved, now).dailyLimit.remaining, 0)
     const balance = saved.balance,
       last = saved.slotGame.last

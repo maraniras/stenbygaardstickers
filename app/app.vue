@@ -66,6 +66,7 @@ useNuxtApp().hook('page:finish', () => {
     </main>
     <BottomNav />
     <ThemeDecor />
+    <ReleaseNews />
     <InstallPrompt />
     <NamePrompt />
     <PushPrompt />

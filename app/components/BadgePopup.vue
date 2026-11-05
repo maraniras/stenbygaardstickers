@@ -12,6 +12,7 @@ const { people: economy, loading: economyLoading } = useEconomy()
 const gameAnimation = useState('daily-game-animation', () => false)
 const jackAnimation = useState('bananjack-animation', () => false)
 const slotAnimation = useState('slot-animation', () => false)
+const releaseNews = useState('release-news-pending', () => false)
 const route = useRoute()
 const router = useRouter()
 
@@ -62,6 +63,7 @@ const blocked = computed(
     gameAnimation.value ||
     jackAnimation.value ||
     slotAnimation.value ||
+    releaseNews.value ||
     economyLoading.value,
 )
 

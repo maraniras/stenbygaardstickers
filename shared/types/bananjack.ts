@@ -24,14 +24,8 @@ export interface JackPublic extends Omit<JackGame, 'deck' | 'dealer'> {
   dealer: (number | null)[]
   actions: JackAction[]
 }
-export interface JackDailyLimit {
-  amount: number
-  spent: number
-  remaining: number
-  nextResetAt: string
-}
 export interface JackResponse {
   game: JackPublic | null
   balance: number
-  dailyLimit?: JackDailyLimit | null
+  dailyLimit?: import('./casino').CasinoDailyLimit | null
 }

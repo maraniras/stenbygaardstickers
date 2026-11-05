@@ -26,12 +26,16 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         <NuxtLink
           class="ranking-link"
           to="/rangliste"
-          >Rangliste ↗</NuxtLink
+          >Brugere &amp; rangliste ↗</NuxtLink
         >
       </div>
       <p class="lead">Lidt held. Lidt taktik. En håndfuld bananer.</p>
     </header>
     <GameSectionNav section="casino" />
+    <CasinoLimit
+      class="casino-budget"
+      :limit="state?.casinoLimit"
+    />
 
     <component
       :is="bananjackEnabled ? NuxtLink : 'article'"
@@ -164,6 +168,9 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
   max-width: 480px;
   margin: 0 auto;
   padding: calc(22px + var(--safe-t)) 18px calc(var(--nav-space) + 18px);
+}
+.casino-budget {
+  margin-bottom: 18px;
 }
 .brand {
   display: flex;

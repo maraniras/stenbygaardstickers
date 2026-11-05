@@ -27,7 +27,8 @@ export default defineNuxtPlugin(() => {
         hasText ||
         useState<boolean>('daily-game-animation').value ||
         useState<boolean>('bananjack-animation').value ||
-        useState<boolean>('slot-animation').value
+        useState<boolean>('slot-animation').value ||
+        useState<boolean>('release-news-open').value
       if (onOpen && !busy) window.location.reload()
       else available.value = true
     } catch {}

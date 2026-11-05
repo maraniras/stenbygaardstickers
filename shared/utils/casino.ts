@@ -1,0 +1,1 @@
+export const CASINO_DAILY_LOSS_LIMIT = 300

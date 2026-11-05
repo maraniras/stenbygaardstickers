@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CASINO_DAILY_LOSS_LIMIT } from '../../../shared/utils/casino'
 import {
   SLOT_BETS,
   SLOT_PRIZES,
@@ -140,7 +141,7 @@ const resetLabel = computed(() =>
     >
       <div class="bet-label">
         <span>Din indsats</span
-        ><span v-if="budget">{{ budget.remaining }} / {{ budget.amount }} 🍌 tilbage i dag</span>
+        ><span v-if="budget">{{ budget.remaining.toLocaleString('da-DK') }} 🍌 til rådighed</span>
       </div>
       <div
         class="bets"
@@ -169,7 +170,7 @@ const resetLabel = computed(() =>
         v-if="budget && budget.remaining < SLOT_BETS[0]"
         class="hint"
       >
-        Dagens indsatsgrænse er nået. Nyt budget {{ resetLabel }}.
+        Ikke plads til et spin i dagens fælles tabsgrænse. Grænsen nulstilles {{ resetLabel }}.
       </p>
       <p
         v-else-if="data && data.balance < bet"
@@ -191,8 +192,9 @@ const resetLabel = computed(() =>
         Hent resultat igen
       </button>
     </div>
+    <CasinoLimit :limit="budget" />
     <footer>
-      <span>Nyt dagsbudget kl. 04.00</span
+      <span>Ny tabsgrænse kl. 04.00</span
       ><button
         :aria-pressed="soundEnabled"
         aria-label="Spillyd"
@@ -260,9 +262,10 @@ const resetLabel = computed(() =>
         symbolerne er ikke lige sandsynlige.
       </p>
       <p>
-        Indsatser: 5–25 bananer. Du kan sætte i alt 500 bananer pr. spildøgn. Gevinster genskaber
-        ikke dagsbudgettet. Det nulstilles kl. 04.00 dansk tid, og budget og saldo deles mellem dine
-        enheder.
+        Indsatser: 5–25 bananer. Du kan højst tabe {{ CASINO_DAILY_LOSS_LIMIT }} bananer netto pr.
+        dag på tværs af casinoet og dine enheder. Gevinster giver plads tilbage; badges og daglige
+        spil tæller ikke med. Indsatser i en aktiv Bananjack-hånd reserveres også i grænsen. Den
+        nulstilles kl. 04.00 dansk tid.
       </p>
     </dialog>
   </div>

@@ -92,6 +92,7 @@ const groups = computed(() => {
         <span class="km">{{ formatKm(stats.farthest.distanceKm) }}</span>
       </NuxtLink>
 
+      <CommunityLink />
       <details
         v-if="people.length"
         class="people"

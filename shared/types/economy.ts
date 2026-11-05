@@ -41,6 +41,7 @@ export interface WheelRun {
 export interface EconomyRecord extends EconomyPublic {
   slotGame?: import('./slots').SlotRecord
   jackDailyWagers?: { day: string; amount: number }
+  casinoDaily?: { day: string; netLoss: number }
   jackStats?: import('./jackStats').JackStats
   bananjack?: import('./bananjack').JackGame
   version: 1
@@ -53,6 +54,7 @@ export interface DailyCityState extends CityRun {
   answer?: { id: string; name: string; country: string; countryCode: string }
 }
 export interface DailyResponse {
+  casinoLimit?: import('./casino').CasinoDailyLimit
   day: string
   nextResetAt: string
   wallet: EconomyPublic

@@ -34,7 +34,10 @@ function setup({ env = 'production', version = '2.3', date = '2026-01-01', db, n
       : Date,
     process: { env: { VERCEL_ENV: env } },
     redisEnabled: true,
-    require: () => ({ CHANGELOG: [{ version, date, push }] }),
+    require: (path) =>
+      path.includes('changelog')
+        ? { CHANGELOG: [{ version, date, push }] }
+        : load('shared/utils/releases.ts', { Date: context.Date }),
     wants: (p, t) => p?.[t] !== false,
     listUsers: async () => users,
     publicPushPrefs: async () => prefs,

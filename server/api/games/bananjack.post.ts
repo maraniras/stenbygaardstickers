@@ -1,5 +1,5 @@
 import { dealJack, actJack, jackPublic } from '../../utils/bananjack'
-import { jackDailyLimit } from '../../utils/jack-limit'
+import { casinoDailyLimit } from '../../utils/casino-limit'
 import type { JackAction } from '../../../shared/types/bananjack'
 export default defineEventHandler(async (event) => {
   if (!useRuntimeConfig(event).public.bananjackEnabled)
@@ -32,6 +32,6 @@ export default defineEventHandler(async (event) => {
   return {
     game: jackPublic(record, now),
     balance: record.balance,
-    dailyLimit: jackDailyLimit(record, now),
+    dailyLimit: casinoDailyLimit(record, now),
   }
 })

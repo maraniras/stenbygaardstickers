@@ -27,10 +27,11 @@ export interface SlotSpin {
 export interface SlotRecord {
   last: SlotSpin
   stats: SlotStats
-  daily: { day: string; spent: number }
+  /** Legacy gross-wager counter, retained only for migration. */
+  daily?: { day: string; spent: number }
 }
 export interface SlotResponse {
   spin: SlotSpin | null
   balance: number
-  dailyLimit: { amount: number; spent: number; remaining: number; nextResetAt: string }
+  dailyLimit: import('./casino').CasinoDailyLimit
 }

@@ -56,7 +56,7 @@ try {
   const token = login.data.token
   const initial = await request('/api/games/slots', { token })
   assert.equal(initial.data.balance, 250)
-  assert.equal(initial.data.dailyLimit.remaining, 500)
+  assert.equal(initial.data.dailyLimit.remaining, 300)
   assert.equal((await request('/api/games/slots', { token, body: { id: 'bad' } })).status, 400)
   const body = {
     id: 'http-slots-round-one',
@@ -76,7 +76,7 @@ try {
   for (const reply of replies) assert.deepEqual(reply.data.spin, spin)
   const restored = await request('/api/games/slots', { token })
   assert.deepEqual(restored.data.spin, spin)
-  assert.equal(restored.data.dailyLimit.spent, 10)
+  assert.equal(restored.data.dailyLimit.netLoss, 10 - spin.payout)
   const wallet = (await request('/api/economy/me', { token })).data
   assert.equal(wallet.history.filter((t) => t.id === 'slots:1:bet').length, 1)
   assert.equal(wallet.history.filter((t) => t.id === 'badge:slot-spins:1').length, 1)

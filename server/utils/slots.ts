@@ -3,25 +3,23 @@ import type { EconomyRecord } from '../../shared/types/economy'
 import type { SlotResponse, SlotSymbol } from '../../shared/types/slots'
 import {
   SLOT_BETS,
-  SLOT_DAILY_LIMIT,
   SLOT_SYMBOLS,
   SLOT_PRIZES,
   slotPrizeFor,
   emptySlotStats,
 } from '../../shared/utils/slots'
-import { gameDay, nextGameReset } from '../../shared/utils/game-day'
+import {
+  casinoDailyLimit,
+  checkCasinoWager,
+  prepareCasinoDay,
+  recordCasinoResult,
+} from './casino-limit'
 
 export function slotResponse(record: EconomyRecord, now = new Date()): SlotResponse {
-  const spent = record.slotGame?.daily.day === gameDay(now) ? record.slotGame.daily.spent : 0
   return {
     spin: record.slotGame?.last ?? null,
     balance: record.balance,
-    dailyLimit: {
-      amount: SLOT_DAILY_LIMIT,
-      spent,
-      remaining: Math.max(0, SLOT_DAILY_LIMIT - spent),
-      nextResetAt: nextGameReset(now),
-    },
+    dailyLimit: casinoDailyLimit(record, now),
   }
 }
 function slotReels(multiplier: number): [SlotSymbol, SlotSymbol, SlotSymbol] {
@@ -70,14 +68,11 @@ export function spinSlots(
     })
   if (!SLOT_BETS.some((bet) => bet === request.bet))
     throw createError({ statusCode: 400, statusMessage: 'Vælg en indsats fra 5 til 25 bananer.' })
-  if (request.bet > slotResponse(record, now).dailyLimit.remaining)
-    throw createError({
-      statusCode: 409,
-      statusMessage: 'Dagens indsatsgrænse er nået. Nyt budget kl. 04.00.',
-    })
+  checkCasinoWager(record, request.bet, now)
   if (record.balance < request.bet)
     throw createError({ statusCode: 400, statusMessage: 'Du har ikke nok bananer til indsatsen.' })
   const prize = slotPrizeFor(draw())
+  prepareCasinoDay(record, now)
   const spin = {
     id: request.id,
     sequence: request.sequence,
@@ -97,10 +92,6 @@ export function spinSlots(
   if (prize.multiplier >= 10) stats.bigWins++
   if (prize.multiplier === 100) stats.jackpots++
   stats.net += spin.payout - spin.bet
-  const daily = {
-    day: gameDay(now),
-    spent: slotResponse(record, now).dailyLimit.spent + request.bet,
-  }
   // Stake and payout commit with stats and replay protection in the wallet CAS.
   record.balance -= spin.bet
   record.history.unshift({
@@ -120,6 +111,7 @@ export function spinSlots(
   }
   record.peakBalance = Math.max(record.peakBalance, record.balance)
   record.history = record.history.slice(0, 250)
-  record.slotGame = { last: spin, stats, daily }
+  record.slotGame = { last: spin, stats }
+  recordCasinoResult(record, spin.bet - spin.payout, now)
   return spin
 }

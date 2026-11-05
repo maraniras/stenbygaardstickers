@@ -25,7 +25,7 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
         <NuxtLink
           class="ranking-link"
           to="/rangliste"
-          >Rangliste ↗</NuxtLink
+          >Brugere &amp; rangliste ↗</NuxtLink
         >
       </div>
       <p class="lead">En lille pause. Måske flere bananer.</p>

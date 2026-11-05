@@ -208,25 +208,17 @@ const {
       >
         {{ { hit: 'Træk kort', stand: 'Stå', double: 'Fordobl', split: 'Split' }[action] }}
       </button>
-      <p>
-        Fordobl: ét kort og stå. Maks. 50 🍌 pr. hånd.<span
-          v-if="dailyLimit"
-          class="limit-inline"
-          >Dagens indsatser: {{ dailyLimit.spent.toLocaleString('da-DK') }} /
-          {{ dailyLimit.amount.toLocaleString('da-DK') }} 🍌</span
-        >
-      </p>
+      <p>Fordobl: ét kort og stå. Maks. 50 🍌 pr. hånd.</p>
     </div>
     <div
       v-else-if="name && limitReached && !busy"
       class="daily-cap"
       role="status"
     >
-      <b>Dagens indsatsgrænse er nået</b>
+      <b>Ikke plads til en ny hånd i dagens tabsgrænse</b>
       <p>
-        {{ dailyLimit!.spent.toLocaleString('da-DK') }} /
-        {{ dailyLimit!.amount.toLocaleString('da-DK') }} 🍌 satset. Nye indsatser
-        {{ resetTime }} dansk tid.
+        {{ dailyLimit!.remaining.toLocaleString('da-DK') }} 🍌 tilbage til nye indsatser. Mindste
+        indsats er 10 🍌. Casinoets fælles grænse nulstilles {{ resetTime }} dansk tid.
       </p>
       <NuxtLink to="/spil">Se de daglige spil →</NuxtLink>
     </div>
@@ -238,8 +230,7 @@ const {
         <legend>
           Din indsats
           <span v-if="dailyLimit"
-            >{{ dailyLimit.remaining.toLocaleString('da-DK') }} /
-            {{ dailyLimit.amount.toLocaleString('da-DK') }} 🍌 tilbage i dag</span
+            >{{ dailyLimit.remaining.toLocaleString('da-DK') }} 🍌 til rådighed</span
           >
         </legend>
         <div class="bets">
@@ -268,6 +259,7 @@ const {
         >Flere bananer? Tag dagens gratis spil →</NuxtLink
       >
     </div>
+    <CasinoLimit :limit="dailyLimit" />
     <dialog
       ref="rules"
       class="rules"
@@ -302,9 +294,11 @@ const {
             Split-esser får kun ét kort hver. 21 efter split giver almindelig sejr.
           </li>
           <li v-if="dailyLimit">
-            Midlertidig grænse: {{ dailyLimit.amount.toLocaleString('da-DK') }} bananer i samlede
-            indsatser pr. dag, inklusive split og fordobling. Gevinster giver ikke mere plads.
-            Nulstilles kl. 04.00 dansk tid.
+            Fælles tabsgrænse: {{ dailyLimit.amount.toLocaleString('da-DK') }} bananer i nettotab
+            pr. dag på tværs af casinoet og dine enheder. Gevinster giver plads tilbage; badges og
+            daglige spil tæller ikke med. Aktive hænder reserverer deres fulde indsats, også ved
+            double og split. En hånd, der krydser kl. 04.00, tælles med på den dag, den afsluttes.
+            Grænsen nulstilles kl. 04.00 dansk tid.
           </li>
           <li>
             Ingen forsikring eller surrender. Din igangværende hånd gemmes, når du forlader siden.
@@ -806,11 +800,6 @@ button:focus-visible {
 }
 .bet-panel legend > span {
   font-size: 10px;
-  font-variant-numeric: tabular-nums;
-}
-.limit-inline {
-  display: block;
-  margin-top: 3px;
   font-variant-numeric: tabular-nums;
 }
 .daily-cap {
