@@ -17,6 +17,8 @@ const {
   error,
   bet,
   canSpin,
+  soundEnabled,
+  toggleSound,
   refresh,
   spin,
   positions,
@@ -185,6 +187,12 @@ const resetLabel = computed(() =>
     </div>
     <footer>
       <span>Nyt dagsbudget kl. 04.00</span
+      ><button
+        :aria-pressed="soundEnabled"
+        aria-label="Spillyd"
+        @click="toggleSound"
+      >
+        Lyd {{ soundEnabled ? 'til' : 'fra' }}</button
       ><button @click="rules?.showModal()">Gevinster &amp; regler ⓘ</button>
     </footer>
     <dialog
@@ -274,7 +282,7 @@ h1 {
   letter-spacing: -0.055em;
 }
 h1 span {
-  color: var(--title, var(--text));
+  color: light-dark(#987023, #efcc7f);
 }
 .back {
   display: grid;

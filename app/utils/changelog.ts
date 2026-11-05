@@ -12,6 +12,7 @@ export const CHANGELOG: Release[] = [
     version: '2.3',
     notes: [
       'Spil Bananditten i casinoet med fem nye badges og banangevinster',
+      'Bananditten har lyde til spin, hjulstop og gevinster – med mulighed for at slå lyden fra',
       'Få en mobilnotifikation, når en ny version af appen udgives',
       'Vælg Appopdateringer til eller fra under Notifikationer',
       'Badge-push springes over på enheder, hvor appen er åben',

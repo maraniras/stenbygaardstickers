@@ -10,6 +10,7 @@ export function useBananditten() {
     error = ref(''),
     bet = ref(5)
   const presentation = useSlotPresentation()
+  const sound = useSlotSound()
   const animation = useState('slot-animation', () => false)
   const locked = computed(() => busy.value || presentation.rolling.value)
   const canSpin = computed(
@@ -74,6 +75,7 @@ export function useBananditten() {
     error.value = ''
     animation.value = true
     shownBalance.value = before.balance - bet.value
+    sound.start()
     try {
       const response = await $fetch<SlotResponse>('/api/games/slots', {
         method: 'POST',
@@ -83,12 +85,14 @@ export function useBananditten() {
         retry: 0,
       })
       if (owner !== revision || token !== userToken()) return
+      sound.play(response.spin?.multiplier ?? 0)
       await accept(response, true)
       if (owner === revision && token === userToken()) {
         void economy.reload()
         void useUser().refreshMe()
       }
     } catch (e: any) {
+      sound.stop()
       if (owner !== revision || token !== userToken()) return
       error.value =
         e?.data?.statusMessage ||
@@ -113,6 +117,7 @@ export function useBananditten() {
     [name, ready],
     () => {
       revision++
+      sound.stop()
       presentation.reset()
       data.value = null
       shownBalance.value = null
@@ -143,6 +148,8 @@ export function useBananditten() {
     error,
     bet,
     canSpin,
+    soundEnabled: sound.enabled,
+    toggleSound: sound.toggle,
     refresh,
     spin,
     ...presentation,
