@@ -15,6 +15,7 @@ useHead(() => ({ meta: [{ name: 'theme-color', content: dark.value ? '#141418' :
 // Nye sider starter øverst; med tilbage-knappen kommer man tilbage hvor man var.
 const content = ref<HTMLElement>()
 const router = useRouter()
+const mapView = computed(() => router.currentRoute.value.path === '/')
 const saved = new Map<string, number>()
 let back = false
 if (import.meta.client)
@@ -55,6 +56,7 @@ useNuxtApp().hook('page:finish', () => {
   <div
     v-else
     class="shell"
+    :class="{ 'map-view': mapView }"
   >
     <main
       ref="content"
@@ -76,6 +78,16 @@ useNuxtApp().hook('page:finish', () => {
 .shell {
   position: relative;
   height: 100%;
+}
+/* On the map, pinch belongs to Leaflet rather than the browser viewport.
+   Allow ordinary scrolling in sheets and filters; other pages keep browser zoom. */
+.shell.map-view,
+.shell.map-view :deep(*) {
+  touch-action: pan-x pan-y;
+}
+.shell.map-view :deep(.leaflet-container),
+.shell.map-view :deep(.leaflet-container *) {
+  touch-action: none;
 }
 .content {
   height: 100%;

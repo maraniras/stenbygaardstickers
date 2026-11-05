@@ -11,6 +11,13 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.3.1',
+    notes: [
+      'Kortet zoomes med to fingre uden at forstørre knapper og bundmenu',
+      'Mere luft mellem spillene i casino-menuen',
+    ],
+  },
+  {
     version: '2.3',
     date: '2026-11-05',
     push: {
