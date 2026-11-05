@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { SLOT_BETS, SLOT_PRIZES, SLOT_SYMBOLS, SLOT_RTP } from '../../../shared/utils/slots'
+import {
+  SLOT_BETS,
+  SLOT_PRIZES,
+  SLOT_SYMBOLS,
+  SLOT_RTP,
+  slotSymbolImage,
+} from '../../../shared/utils/slots'
 definePageMeta({
   middleware: () => {
     if (!useRuntimeConfig().public.banandittenEnabled)
@@ -209,10 +215,10 @@ const resetLabel = computed(() =>
       </button>
       <h2 id="slot-rules-title">Gevinster &amp; regler</h2>
       <p>
-        Den midterste række er gevinstlinjen. Tre ens citroner giver 2×, jordbær 5×, Mix Max 10×,
-        Faxe Kondi 25× og guldbananer 100×. To ens citroner, jordbær, Mix Max eller Faxe Kondi
-        sammen med et bananblad eller en bananskræl giver indsatsen tilbage, uanset placeringen. Tre
-        forskellige giver Miv. Bananskræl og bananblad er fyldmotiver.
+        Den midterste række er gevinstlinjen. Tre ens jordbær giver 2×, limoncello-flasker 5×, Mix
+        Max 10×, Faxe Kondi 25× og guldbananer 100×. To ens limoncello-flasker, jordbær, Mix Max
+        eller Faxe Kondi sammen med et bananblad eller en bananskræl giver indsatsen tilbage, uanset
+        placeringen. Tre forskellige giver Miv. Bananskræl og bananblad er fyldmotiver.
       </p>
       <ul>
         <li
@@ -230,7 +236,7 @@ const resetLabel = computed(() =>
                 :key="index"
               >
                 <img
-                  :src="`/games/bananditten/${symbol}.webp`"
+                  :src="slotSymbolImage(symbol)"
                   :alt="SLOT_SYMBOLS.find((item) => item.id === symbol)?.name ?? ''"
                   loading="lazy"
                 />

@@ -123,3 +123,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Dismissed badge/level popups are cached per account in localStorage by useUser. Identity refreshes union local and server seen keys; unsaved dismissals retry on the next refresh/reload in batches of at most 300, so stale reads and failed POSTs cannot resurrect a dismissed tier.
 
 - Bananditten sound: useSlotSound lazily unlocks Web Audio on a tap, remembers stenbygaard-slot-sound, and creates local ratchet/stop/result effects via app/utils/slotAudio.ts. Sounds follow SLOT_STOP_MS, skip reel sounds for reduced motion, never replay on GET/restore, stop on account change/error and dispose on unmount. A footer button toggles sound. No external audio assets or dependencies.
+
+- Bananditten motifs updated 2026-11-05: strawberry pays 2x (9%), limoncello pays 5x (3.8%). RTP remains 94%. The original lemon symbol ID stays for persisted spins; slotSymbolImage maps it to limoncello.webp in reels, rules and casino card. Transparent original and built-in image_gen prompt are in docs/designs/bananditten-symbols/.

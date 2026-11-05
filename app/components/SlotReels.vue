@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SLOT_SYMBOLS } from '../../shared/utils/slots'
+import { SLOT_SYMBOLS, slotSymbolImage } from '../../shared/utils/slots'
 import { SLOT_STOP_MS } from '../composables/useSlotPresentation'
 defineProps<{ positions: number[]; rolling: boolean }>()
 const strip = Array.from({ length: 63 }, (_, i) => SLOT_SYMBOLS[i % SLOT_SYMBOLS.length]!)
@@ -27,7 +27,7 @@ const strip = Array.from({ length: 63 }, (_, i) => SLOT_SYMBOLS[i % SLOT_SYMBOLS
           class="symbol"
         >
           <img
-            :src="`/games/bananditten/${symbol.id}.webp`"
+            :src="slotSymbolImage(symbol.id)"
             alt=""
             draggable="false"
           />

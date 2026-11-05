@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NuxtLink } from '#components'
-import { SLOT_RTP } from '../../../shared/utils/slots'
+import { SLOT_RTP, slotSymbolImage } from '../../../shared/utils/slots'
 useHead({ title: 'Casino · Stenbygaard Stickers' })
 const { state } = useEconomy()
 const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
@@ -50,7 +50,7 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         <img
           v-for="id in ['lemon', 'faxe-kondi', 'crowned-banana']"
           :key="id"
-          :src="`/games/bananditten/${id}.webp`"
+          :src="slotSymbolImage(id)"
           alt=""
         />
       </div>

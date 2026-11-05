@@ -6,8 +6,8 @@ Optimerede transparente 384 × 384 WebP-filer ligger i `public/games/bananditten
 
 | Fil | Motiv | Foreslået rolle |
 |---|---|---|
-| lemon | Citron | 2× |
-| strawberry | Jordbær | 5× |
+| limoncello | Limoncello-flaske (internt ID `lemon`) | 5× |
+| strawberry | Jordbær | 2× |
 | mix-max | Balconi Mix Max | 10× |
 | faxe-kondi | Faxe Kondi-dåse | 25× |
 | crowned-banana | Guldbanan med lilla/guld-krone | Jackpot 100× |
@@ -17,5 +17,7 @@ Optimerede transparente 384 × 384 WebP-filer ligger i `public/games/bananditten
 [index.html](index.html) viser motiverne enkeltvis og følger systemets farvetema. [oversigt.png](oversigt.png) og [oversigt-lys.png](oversigt-lys.png) viser alle syv samlet. Gevinstmærkaterne er designoplæg; spil, odds og badgefunktioner er ikke implementeret i denne designændring.
 
 De tidligere PNG-originaler `peeled-banana.png` og `banana-bunch.png` er bevaret som designarkiv. De to tilhørende WebP-filer er erstattet af motiverne ovenfor.
+
+5. november 2026: Citronen er erstattet af en limoncello-flaske, genereret med den indbyggede image_gen og transparent baggrund. Original: `limoncello.png`, prompt: `prompt-limoncello.json`. Sharp er brugt til trimning, skalering og WebP-komprimering. Jordbær og limoncello giver nu henholdsvis 2× og 5×; odds pr. multiplikator og RTP på 94 % er uændrede. Det interne ID `lemon` bevares for eksisterende gemte spins, mens alle aktive billeder bruger `limoncello.webp`. De gamle citronfiler og oversigtsbilleder bevares som designarkiv.
 
 Visuel emballagereference: [Balconi Mix Max Classic](https://www.cerinicoffee.com/products/balconi-mix-max-classic) og [Faxe Kondi 33 cl](https://fsgfoods.dk/produkter/faxe-kondi-33cl-dase). Motiverne er genererede 3D-fortolkninger, ikke genbrugte produktfotos.

@@ -47,8 +47,8 @@ test('persisted reel symbols agree with payouts, net stats and ledger including 
   for (const [ticket, multiplier, symbol] of [
     [0, 0, null],
     [6500, 1, null],
-    [8500, 2, 'lemon'],
-    [9400, 5, 'strawberry'],
+    [8500, 2, 'strawberry'],
+    [9400, 5, 'lemon'],
     [9780, 10, 'mix-max'],
     [9950, 25, 'faxe-kondi'],
     [9990, 100, 'crowned-banana'],
