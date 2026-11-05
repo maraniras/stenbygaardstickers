@@ -11,10 +11,9 @@ export const CHANGELOG: Release[] = [
   {
     version: '2.3',
     notes: [
-      'Spil Bananditten i casinoet med fem nye badges og banangevinster',
-      'Bananditten har lyde til spin, hjulstop og gevinster – med mulighed for at slå lyden fra',
+      'Bananjack er åbent i casinoet med otte badges og banangevinster',
+      'Bananditten vises som Kommer snart i casinoet',
       'Bananjack har fået kortlyde, der følger uddelingen, og en lydknap',
-      'Nyt limoncello-motiv i Bananditten: jordbær giver 2× og limoncello 5×',
       'Få en mobilnotifikation, når en ny version af appen udgives',
       'Vælg Appopdateringer til eller fra under Notifikationer',
       'Badge-push springes over på enheder, hvor appen er åben',

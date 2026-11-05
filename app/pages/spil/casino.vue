@@ -34,44 +34,6 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
     <GameSectionNav section="casino" />
 
     <component
-      :is="banandittenEnabled ? NuxtLink : 'article'"
-      :to="banandittenEnabled ? '/spil/bananditten' : undefined"
-      class="slots-card"
-      aria-labelledby="slots-title"
-    >
-      <div class="card-top">
-        <span class="table-label">BANANDITTEN</span
-        ><span class="status">{{ banandittenEnabled ? 'Spil nu →' : 'På vej' }}</span>
-      </div>
-      <div
-        class="mini-reels"
-        aria-hidden="true"
-      >
-        <img
-          v-for="id in ['lemon', 'faxe-kondi', 'crowned-banana']"
-          :key="id"
-          :src="slotSymbolImage(id)"
-          alt=""
-        />
-      </div>
-      <div class="game-copy">
-        <h2 id="slots-title">Banan<span>ditten</span></h2>
-        <div class="game-details">
-          <span>5–25 🍌 pr. spin</span><span>{{ SLOT_RTP }} % RTP</span>
-        </div>
-      </div>
-      <div
-        v-if="!banandittenEnabled"
-        class="coming-soon"
-      >
-        <div>
-          <span class="soon-label">Bananditten</span><strong>Kommer snart</strong
-          ><span>Vi gør hjulene klar.</span>
-        </div>
-      </div>
-    </component>
-
-    <component
       :is="bananjackEnabled ? NuxtLink : 'article'"
       :to="bananjackEnabled ? '/spil/bananjack' : undefined"
       class="bananjack-card"
@@ -142,6 +104,44 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         <div>
           <span class="soon-label">Bananjack</span><strong>Kommer snart</strong
           ><span>Vi gør bordet klar.</span>
+        </div>
+      </div>
+    </component>
+
+    <component
+      :is="banandittenEnabled ? NuxtLink : 'article'"
+      :to="banandittenEnabled ? '/spil/bananditten' : undefined"
+      class="slots-card"
+      aria-labelledby="slots-title"
+    >
+      <div class="card-top">
+        <span class="table-label">BANANDITTEN</span
+        ><span class="status">{{ banandittenEnabled ? 'Spil nu →' : 'På vej' }}</span>
+      </div>
+      <div
+        class="mini-reels"
+        aria-hidden="true"
+      >
+        <img
+          v-for="id in ['lemon', 'faxe-kondi', 'crowned-banana']"
+          :key="id"
+          :src="slotSymbolImage(id)"
+          alt=""
+        />
+      </div>
+      <div class="game-copy">
+        <h2 id="slots-title">Banan<span>ditten</span></h2>
+        <div class="game-details">
+          <span>5–25 🍌 pr. spin</span><span>{{ SLOT_RTP }} % RTP</span>
+        </div>
+      </div>
+      <div
+        v-if="!banandittenEnabled"
+        class="coming-soon"
+      >
+        <div>
+          <span class="soon-label">Bananditten</span><strong>Kommer snart</strong
+          ><span>Vi gør hjulene klar.</span>
         </div>
       </div>
     </component>
