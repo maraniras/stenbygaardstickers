@@ -221,6 +221,7 @@ h1 > span {
 }
 .bananjack-card {
   position: relative;
+  margin-bottom: 18px;
   overflow: hidden;
   border: 1px solid #cda75f55;
   border-radius: 26px;
