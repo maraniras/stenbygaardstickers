@@ -9,7 +9,7 @@ export const SLOT_SYMBOLS: { id: SlotSymbol; name: string }[] = [
   { id: 'faxe-kondi', name: 'Faxe Kondi' },
   { id: 'crowned-banana', name: 'Guldbanan' },
   { id: 'banana-peel', name: 'Bananskræl' },
-  { id: 'banana-leaf', name: 'Bananblad' },
+  { id: 'banana-leaf', name: 'Heineken 0.0' },
 ]
 export const SLOT_PRIZES = [
   { multiplier: 0, weight: 6500, name: 'Miv', symbol: null },
@@ -23,7 +23,9 @@ export const SLOT_PRIZES = [
 export const SLOT_RTP =
   SLOT_PRIZES.reduce((sum, prize) => sum + prize.weight * prize.multiplier, 0) / 100
 export function slotSymbolImage(id: string) {
-  return `/games/bananditten/${id === 'lemon' ? 'limoncello' : id}.webp`
+  // Legacy IDs remain valid for saved spins; artwork can change independently.
+  const asset = id === 'lemon' ? 'limoncello' : id === 'banana-leaf' ? 'heineken-00' : id
+  return `/games/bananditten/${asset}.webp`
 }
 export function slotPrizeFor(ticket: number) {
   if (!Number.isInteger(ticket) || ticket < 0 || ticket >= 10000) throw Error('Ugyldigt spinlod')

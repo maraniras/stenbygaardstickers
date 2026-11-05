@@ -217,8 +217,8 @@ const resetLabel = computed(() =>
       <p>
         Den midterste række er gevinstlinjen. Tre ens jordbær giver 2×, limoncello-flasker 5×, Mix
         Max 10×, Faxe Kondi 25× og guldbananer 100×. To ens limoncello-flasker, jordbær, Mix Max
-        eller Faxe Kondi sammen med et bananblad eller en bananskræl giver indsatsen tilbage, uanset
-        placeringen. Tre forskellige giver Miv. Bananskræl og bananblad er fyldmotiver.
+        eller Faxe Kondi sammen med en Heineken 0.0 eller en bananskræl giver indsatsen tilbage,
+        uanset placeringen. Tre forskellige giver Miv. Bananskræl og Heineken 0.0 er fyldmotiver.
       </p>
       <ul>
         <li
@@ -247,7 +247,7 @@ const resetLabel = computed(() =>
           <small v-if="prize.multiplier <= 1">
             {{
               prize.multiplier === 1
-                ? 'Eksempel: to ens + blad eller skræl, i vilkårlig rækkefølge'
+                ? 'Eksempel: to ens + Heineken 0.0 eller skræl, i vilkårlig rækkefølge'
                 : 'Eksempel: tre forskellige'
             }}
           </small>

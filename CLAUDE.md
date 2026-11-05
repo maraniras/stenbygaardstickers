@@ -131,3 +131,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Release 2.3 (2026-11-05): Bananjack opens in production; Bananditten stays coming soon. Release.push optionally customises the one-time mobile broadcast; 2.3 says 'Bananjack er landet!' and opens /spil/casino. announceRelease still applies updates preferences, endpoint deduplication and the shared version claim. Push starts on the first production request, never in Preview/local.
 
 - Map mobile gestures: app.vue applies map-view only on route /. The shell and UI descendants use touch-action: pan-x pan-y (scrolling allowed, browser pinch/double-tap zoom excluded); Leaflet container and descendants use none so Leaflet retains custom map drag/pinch. Other routes restore ordinary browser zoom, including after keepalive navigation. No global viewport zoom restriction.
+
+- Bananditten filler updated: Heineken 0.0 replaces banana leaf visually, with legacy banana-leaf ID preserved and mapped by slotSymbolImage to heineken-00.webp. Same filler/refund role and unchanged 94% RTP. Transparent source/prompt in docs/designs/bananditten-symbols/.
