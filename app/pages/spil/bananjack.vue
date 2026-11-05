@@ -32,6 +32,8 @@ const {
   dealerValue,
   resultText,
   labels,
+  soundEnabled,
+  toggleSound,
   refresh,
   play,
 } = useBananjack()
@@ -53,12 +55,22 @@ const {
     </header>
     <div class="title-row">
       <h1>Banan<span>jack</span></h1>
-      <button
-        class="rules-button"
-        @click="rules?.showModal()"
-      >
-        Regler
-      </button>
+      <div class="table-tools">
+        <button
+          class="rules-button"
+          :aria-pressed="soundEnabled"
+          aria-label="Spillyd"
+          @click="toggleSound"
+        >
+          Lyd {{ soundEnabled ? 'til' : 'fra' }}
+        </button>
+        <button
+          class="rules-button"
+          @click="rules?.showModal()"
+        >
+          Regler
+        </button>
+      </div>
     </div>
     <div
       v-if="ready && !name"
@@ -353,6 +365,11 @@ button {
   color: var(--muted);
   font-size: 12px;
   text-decoration: underline;
+}
+.table-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .table {
   margin-top: 12px;

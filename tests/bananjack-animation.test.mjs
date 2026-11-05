@@ -27,6 +27,7 @@ function round(overrides = {}) {
 }
 function animator(reduced = false) {
   const timers = [],
+    sounds = [],
     unmount = [],
     exports = {}
   vm.runInNewContext(transpile('app/composables/useJackPresentation.ts'), {
@@ -45,7 +46,12 @@ function animator(reduced = false) {
       if (t) t.cancelled = true
     },
   })
-  return { ...exports.useJackPresentation(), timers, unmount: () => unmount.forEach((f) => f()) }
+  return {
+    ...exports.useJackPresentation(() => sounds.push('card')),
+    sounds,
+    timers,
+    unmount: () => unmount.forEach((f) => f()),
+  }
 }
 test('opening deal alternates player/dealer/player/dealer, without early scores or result', () => {
   const next = round(),
@@ -146,9 +152,11 @@ test('reduced motion and restored hands display instantly; cancellation never re
   await reduced.present(round(), true)
   assert.equal(reduced.timers.length, 0)
   assert.equal(reduced.animating.value, false)
+  assert.equal(reduced.sounds.length, 1)
   const a = animator()
   await a.present(round(), false)
   assert.equal(a.timers.length, 0)
+  assert.equal(a.sounds.length, 0)
   const running = a.present(round({ sequence: 2, id: 'round-b' }), true)
   assert.equal(a.animating.value, true)
   a.reset()
@@ -175,6 +183,47 @@ test('animation stays locked through final dealer card and settles once timers f
   assert.equal(await running, true)
   assert.equal(a.animating.value, false)
   assert.equal(a.shown.value.status, 'finished')
+  assert.equal(a.sounds.length, 5)
+})
+
+test('card sounds follow opening deals and hits, without replaying restored cards or split moves', async () => {
+  const a = animator()
+  const deal = a.present(round(), true)
+  while (a.timers.length) {
+    a.timers.shift().fn()
+    await new Promise(setImmediate)
+  }
+  await deal
+  assert.equal(a.sounds.length, 4)
+  const hit = round({
+    revision: 1,
+    hands: [{ cards: [0, 9, 2], bet: 10, fromSplit: false, status: 'playing' }],
+  })
+  const hitting = a.present(hit, true)
+  while (a.timers.length) {
+    a.timers.shift().fn()
+    await new Promise(setImmediate)
+  }
+  await hitting
+  assert.equal(a.sounds.length, 5)
+  await a.present(hit, false)
+  assert.equal(a.sounds.length, 5)
+  const splitFrames = planner.jackFrames(
+    round({ hands: [{ cards: [7, 59], bet: 10, fromSplit: false, status: 'playing' }] }),
+    round({
+      revision: 1,
+      hands: [
+        { cards: [7, 2], bet: 10, fromSplit: true, status: 'playing' },
+        { cards: [59, 5], bet: 10, fromSplit: true, status: 'playing' },
+      ],
+    }),
+  )
+  assert.equal(splitFrames.filter((frame) => frame.card).length, 2)
+  const pending = a.present(round({ sequence: 2, id: 'new' }), true)
+  const count = a.sounds.length
+  a.unmount()
+  await pending
+  assert.equal(a.sounds.length, count)
 })
 
 test('page holds payout balance and confetti until animation finishes, never replaying a restored result', async () => {
@@ -193,6 +242,7 @@ test('page holds payout balance and confetti until animation finishes, never rep
     onBeforeUnmount: () => {},
     useUser: () => ({ name: ref('Test'), ready: ref(false) }),
     useEconomy: () => ({}),
+    useJackSound: () => ({ enabled: ref(true), toggle() {}, unlock() {}, card() {}, stop() {} }),
     useJackPresentation: () => ({
       shown,
       animating: ref(false),

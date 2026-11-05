@@ -34,7 +34,8 @@ export function useBananjack() {
       : '',
   )
   let limitTimer: ReturnType<typeof setTimeout> | undefined
-  const { shown: game, animating, caption, present, reset } = useJackPresentation()
+  const sound = useJackSound()
+  const { shown: game, animating, caption, present, reset } = useJackPresentation(sound.card)
   const locked = computed(() => busy.value || loading.value || animating.value)
   const playing = computed(() => game.value?.status === 'playing')
   const completed = computed(
@@ -131,6 +132,7 @@ export function useBananjack() {
       action === 'deal'
         ? { action, id: crypto.randomUUID(), previous: authoritative?.id ?? null, bet: bet.value }
         : { action, id: authoritative!.id, revision: authoritative!.revision }
+    sound.unlock()
     try {
       const response = await $fetch<JackResponse>('/api/games/bananjack', {
         method: 'POST',
@@ -169,6 +171,7 @@ export function useBananjack() {
   watch(
     [name, ready],
     () => {
+      sound.stop()
       reset()
       data.value = null
       shownBalance.value = null
@@ -212,6 +215,8 @@ export function useBananjack() {
     dealerValue,
     resultText,
     labels,
+    soundEnabled: sound.enabled,
+    toggleSound: sound.toggle,
     refresh,
     play,
     accept,

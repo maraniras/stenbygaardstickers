@@ -1,7 +1,7 @@
 import type { JackPublic } from '../../shared/types/bananjack'
 import { jackFrames } from '../utils/jackFrames'
 
-export function useJackPresentation() {
+export function useJackPresentation(onCard: () => void = () => {}) {
   const shown = ref<JackPublic | null>(null),
     caption = ref('')
   const animating = useState('bananjack-animation', () => false)
@@ -26,6 +26,8 @@ export function useJackPresentation() {
     const current = generation
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!animate || !next || reduced) {
+      if (animate && next && reduced && jackFrames(shown.value, next).some((frame) => frame.card))
+        onCard()
       shown.value = next
       return true
     }
@@ -35,6 +37,7 @@ export function useJackPresentation() {
       if (current !== generation || disposed) return false
       shown.value = frame.game
       caption.value = frame.label
+      if (frame.card) onCard()
       if (frame.delay)
         await new Promise<void>((resolve) => {
           release = resolve
