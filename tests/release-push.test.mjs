@@ -15,7 +15,7 @@ function load(path, context) {
   return exports
 }
 const sub = (endpoint) => ({ endpoint, keys: { auth: 'auth', p256dh: 'key' } })
-function setup({ env = 'production', version = '2.3', date = '2026-01-01', db, now } = {}) {
+function setup({ env = 'production', version = '2.3', date = '2026-01-01', db, now, push } = {}) {
   db ??= { rank: 2002000 }
   const sent = [],
     users = [],
@@ -34,7 +34,7 @@ function setup({ env = 'production', version = '2.3', date = '2026-01-01', db, n
       : Date,
     process: { env: { VERCEL_ENV: env } },
     redisEnabled: true,
-    require: () => ({ CHANGELOG: [{ version, date }] }),
+    require: () => ({ CHANGELOG: [{ version, date, push }] }),
     wants: (p, t) => p?.[t] !== false,
     listUsers: async () => users,
     publicPushPrefs: async () => prefs,
@@ -93,6 +93,22 @@ test('release dates follow Danish midnight rather than UTC midnight', async () =
   const h = setup({ date: '2026-11-01', now: '2026-10-31T23:30:00Z' })
   await h.api.announceRelease()
   assert.equal(h.sent.length, 1)
+})
+
+test('a release can supply its own mobile notification and destination, without sending it twice', async () => {
+  const push = {
+    title: '🎉 Bananjack er landet!',
+    body: 'Casinoet er åbent! Prøv Bananjack, vind bananer og optjen nye badges.',
+    url: '/spil/casino',
+  }
+  const h = setup({ push })
+  await h.api.announceRelease()
+  await h.api.announceRelease()
+  assert.equal(h.sent.length, 1)
+  assert.equal(h.sent[0].message.title, push.title)
+  assert.equal(h.sent[0].message.body, push.body)
+  assert.equal(h.sent[0].message.url, '/spil/casino')
+  assert.equal(h.sent[0].message.tag, 'app-release-2.3')
 })
 
 test('broadcast deduplicates public and account devices and respects both preference scopes', async () => {

@@ -49,9 +49,9 @@ export async function announceRelease() {
   )
   if (!claimed) return
   const gone = await sendPush([...subs.values()], {
-    title: `🆕 Ny opdatering · Version ${release.version}`,
-    body: 'Se hvad der er nyt i appen.',
-    url: '/nyheder',
+    title: release.push?.title ?? `🆕 Ny opdatering · Version ${release.version}`,
+    body: release.push?.body ?? 'Se hvad der er nyt i appen.',
+    url: release.push?.url ?? '/nyheder',
     tag: `app-release-${release.version}`,
   })
   for (const endpoint of gone) await removeSub('all', endpoint)

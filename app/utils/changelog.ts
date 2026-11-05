@@ -4,12 +4,20 @@ export interface Release {
   version: string
   /** YYYY-MM-DD – mangler den, vises "Ny" */
   date?: string
+  /** Optional mobile push for this release. */
+  push?: { title: string; body: string; url: string }
   notes: string[]
 }
 
 export const CHANGELOG: Release[] = [
   {
     version: '2.3',
+    date: '2026-11-05',
+    push: {
+      title: '🎉 Bananjack er landet!',
+      body: 'Casinoet er åbent! Prøv Bananjack, vind bananer og optjen nye badges.',
+      url: '/spil/casino',
+    },
     notes: [
       'Bananjack er åbent i casinoet med otte badges og banangevinster',
       'Bananditten vises som Kommer snart i casinoet',
