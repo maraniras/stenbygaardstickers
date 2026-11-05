@@ -133,3 +133,5 @@ Kort over stickers (med Stenbygaard-hovedet) sat op rundt om i verden. Talk to t
 - Map mobile gestures: app.vue applies map-view only on route /. The shell and UI descendants use touch-action: pan-x pan-y (scrolling allowed, browser pinch/double-tap zoom excluded); Leaflet container and descendants use none so Leaflet retains custom map drag/pinch. Other routes restore ordinary browser zoom, including after keepalive navigation. No global viewport zoom restriction.
 
 - Bananditten filler updated: Heineken 0.0 replaces banana leaf visually, with legacy banana-leaf ID preserved and mapped by slotSymbolImage to heineken-00.webp. Same filler/refund role and unchanged 94% RTP. Transparent source/prompt in docs/designs/bananditten-symbols/.
+
+- Bananditten Faxe Kondi artwork is now a green 500 ml bottle to distinguish it from the Heineken 0.0 can. slotSymbolImage maps the retained faxe-kondi ID to faxe-kondi-bottle.webp; payout remains 25x. Source and built-in image_gen prompt in docs/designs/bananditten-symbols/.

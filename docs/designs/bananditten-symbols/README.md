@@ -9,7 +9,7 @@ Optimerede transparente 384 × 384 WebP-filer ligger i `public/games/bananditten
 | limoncello | Limoncello-flaske (internt ID `lemon`) | 5× |
 | strawberry | Jordbær | 2× |
 | mix-max | Balconi Mix Max | 10× |
-| faxe-kondi | Faxe Kondi-dåse | 25× |
+| faxe-kondi-bottle | Faxe Kondi-flaske (internt ID `faxe-kondi`) | 25× |
 | crowned-banana | Guldbanan med lilla/guld-krone | Jackpot 100× |
 | banana-peel | Tom bananskræl | Fyldmotiv |
 | heineken-00 | Heineken 0.0-dåse (internt ID `banana-leaf`) | Fyldmotiv |
@@ -23,3 +23,5 @@ De tidligere PNG-originaler `peeled-banana.png` og `banana-bunch.png` er bevaret
 Visuel emballagereference: [Balconi Mix Max Classic](https://www.cerinicoffee.com/products/balconi-mix-max-classic) og [Faxe Kondi 33 cl](https://fsgfoods.dk/produkter/faxe-kondi-33cl-dase). Motiverne er genererede 3D-fortolkninger, ikke genbrugte produktfotos.
 
 5. november 2026: Bananbladet er erstattet af en Heineken 0.0-dåse, tydeligt markeret alkoholfri. Genereret med indbygget image_gen med transparent baggrund; original heineken-00.png og prompt-heineken-00.json er gemt her. 384x384 WebP er trimmet og skaleret med sharp. Det interne ID banana-leaf bevares for eksisterende spins og mappes til heineken-00.webp. Det er stadig et fyldmotiv og kan indgå sammen med et par for at give indsatsen tilbage. Odds og RTP ændres ikke. Gamle bananblad-filer bevares som designarkiv.
+
+5. november 2026: Faxe Kondi-dåsen er erstattet af en grøn 500 ml-flaske med smal hals og skruelåg, så silhuetten er tydeligt forskellig fra Heineken 0.0-dåsen. Genereret med indbygget image_gen og transparent baggrund; original faxe-kondi-bottle.png og prompt-faxe-kondi-bottle.json er gemt her. Optimeret WebP er 384x384 med alpha. Internt ID faxe-kondi og gevinst på 25x bevares. Gamle dåsefiler bevares som designarkiv.

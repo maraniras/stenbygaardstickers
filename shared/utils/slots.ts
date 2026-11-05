@@ -24,7 +24,14 @@ export const SLOT_RTP =
   SLOT_PRIZES.reduce((sum, prize) => sum + prize.weight * prize.multiplier, 0) / 100
 export function slotSymbolImage(id: string) {
   // Legacy IDs remain valid for saved spins; artwork can change independently.
-  const asset = id === 'lemon' ? 'limoncello' : id === 'banana-leaf' ? 'heineken-00' : id
+  const asset =
+    id === 'lemon'
+      ? 'limoncello'
+      : id === 'banana-leaf'
+        ? 'heineken-00'
+        : id === 'faxe-kondi'
+          ? 'faxe-kondi-bottle'
+          : id
   return `/games/bananditten/${asset}.webp`
 }
 export function slotPrizeFor(ticket: number) {
