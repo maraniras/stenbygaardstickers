@@ -12,6 +12,41 @@ const viewport = ref<HTMLElement>()
 const scene = ref<HTMLElement>()
 const transform = ref('none')
 const origin = ref('50% 50%')
+const backgroundImage = ref<HTMLImageElement>()
+const surfaces = ref<Record<number, { x: number; y: number; width: number }>>({})
+const artwork = ref({ width: 0, height: 0, x: 0, y: 0 })
+let resizeObserver: ResizeObserver | undefined
+function measureSurfaces() {
+  const element = scene.value,
+    image = backgroundImage.value
+  if (!element || !image?.naturalWidth || !image.naturalHeight) return
+  const width = element.clientWidth,
+    height = element.clientHeight
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight)
+  const imageWidth = image.naturalWidth * scale,
+    imageHeight = image.naturalHeight * scale
+  artwork.value = {
+    width: imageWidth,
+    height: imageHeight,
+    x: (width - imageWidth) / 2,
+    y: (height - imageHeight) / 2,
+  }
+  surfaces.value = Object.fromEntries(
+    [...element.querySelectorAll<HTMLElement>('[data-day]')].map((door) => [
+      Number(door.dataset.day),
+      { x: door.offsetLeft, y: door.offsetTop, width: door.offsetWidth },
+    ]),
+  )
+}
+function surfaceStyle(day: number, side: string) {
+  const cutout = surfaces.value[day]
+  if (!cutout) return { backgroundImage: `url('${background}')` }
+  return {
+    backgroundImage: `url('${background}')`,
+    backgroundSize: `${artwork.value.width}px ${artwork.value.height}px`,
+    backgroundPosition: `${artwork.value.x - cutout.x - (side === 'right' ? cutout.width / 2 : 0)}px ${artwork.value.y - cutout.y}px`,
+  }
+}
 const currentDate = ref(new Date())
 const today = computed(() => {
   const parts = new Intl.DateTimeFormat('en-GB', {
@@ -73,7 +108,6 @@ async function reveal(day: number, run = generation) {
   const scale = Math.min(3.3, frame.width / (door.width * 1.35), frame.height / (door.height * 1.7))
   origin.value = `${x}px ${y}px`
   selected.value = day
-  phase.value = 'zooming'
   transform.value = `translate(${frame.width / 2 - x}px, ${frame.height / 2 - y}px) scale(${scale})`
   if (!(await pause(reducedMotion() ? 0 : 850)) || run !== generation) return false
   phase.value = 'opening'
@@ -109,12 +143,16 @@ async function playAll() {
   autoplay.value = false
 }
 onMounted(() => {
+  resizeObserver = new ResizeObserver(measureSurfaces)
+  if (scene.value) resizeObserver.observe(scene.value)
+  measureSurfaces()
   clock = setInterval(() => {
     currentDate.value = new Date()
   }, 60000)
 })
 onBeforeUnmount(() => {
   cancel()
+  resizeObserver?.disconnect()
   clearInterval(clock)
 })
 </script>
@@ -137,14 +175,18 @@ onBeforeUnmount(() => {
       <div
         ref="scene"
         class="calendar-scene"
-        :style="{ backgroundImage: `url('${background}')`, transform, transformOrigin: origin }"
+        :style="{ transform, transformOrigin: origin }"
       >
-        <div
-          class="calendar-heading"
-          aria-hidden="true"
-        >
+        <img
+          ref="backgroundImage"
+          class="calendar-background"
+          :src="background"
+          alt=""
+          @load="measureSurfaces"
+        />
+        <div class="calendar-heading">
           <span>DECEMBER {{ currentDate.getFullYear() }}</span
-          ><b>Lidt magi.<br />Hver dag.</b><i>✦</i>
+          ><b>Glædelig jul</b><span class="calendar-subtitle">Og godt Stenbygaard</span>
         </div>
         <div
           class="doors"
@@ -159,7 +201,7 @@ onBeforeUnmount(() => {
             :class="{
               opened: opened.includes(day),
               selected: selected === day,
-              golden: day === 24,
+              double: day === 24,
               today: day === today,
             }"
             :disabled="busy || autoplay"
@@ -183,10 +225,15 @@ onBeforeUnmount(() => {
               ><span>En lille<br />overraskelse</span></span
             >
             <span
+              v-for="side in day === 24 ? ['left', 'right'] : ['left']"
+              :key="side"
               class="door-hinge"
+              :class="side"
               aria-hidden="true"
-              ><span class="door-face"
-                ><span class="door-ornament">✦</span><b>{{ day }}</b
+              ><span
+                class="door-face"
+                :style="surfaceStyle(day, side)"
+                ><b>{{ day === 24 ? (side === 'left' ? '2' : '4') : day }}</b
                 ><span class="door-handle" /></span
               ><span class="door-back"
             /></span>
@@ -285,18 +332,25 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   padding: 18px 18px 45px;
-  background-size: cover;
-  background-position: center;
   transition: transform 800ms cubic-bezier(0.22, 0.75, 0.2, 1);
   will-change: transform;
+}
+.calendar-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 .calendar-heading {
   position: relative;
   display: flex;
   flex-direction: column;
   color: #fff0cb;
-  margin-bottom: 14px;
-  text-shadow: 0 2px 12px #102e2b;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 10px #102e2b;
+  pointer-events: none;
 }
 .calendar-heading > span {
   font-size: 8px;
@@ -304,24 +358,23 @@ onBeforeUnmount(() => {
   letter-spacing: 0.22em;
 }
 .calendar-heading b {
-  margin-top: 6px;
+  margin-top: 5px;
   font-family: Georgia, serif;
-  font-size: clamp(23px, 6vw, 32px);
+  font-size: clamp(27px, 7vw, 36px);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.1;
 }
-.calendar-heading i {
-  position: absolute;
-  right: 8px;
-  top: 5px;
-  color: #e7c978;
-  font-size: 44px;
-  font-style: normal;
+.calendar-heading .calendar-subtitle {
+  margin-top: 5px;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.025em;
 }
 .doors {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(7, minmax(0, 1fr));
   gap: 9px;
   flex: 1;
   min-height: 0;
@@ -329,14 +382,25 @@ onBeforeUnmount(() => {
 .door {
   position: relative;
   min-width: 0;
-  min-height: 36px;
+  min-height: 0;
   padding: 0;
   border: 0;
   border-radius: 5px;
-  background: #20322d;
+  background: transparent;
   perspective: 500px;
   cursor: pointer;
   transition: opacity 500ms;
+}
+.door.double {
+  grid-column: 2 / span 2;
+  grid-row: 5 / span 2;
+}
+.door.double .door-hinge {
+  width: 50%;
+}
+.door.double .door-hinge.right {
+  left: 50%;
+  transform-origin: right center;
 }
 .door-hinge {
   position: absolute;
@@ -357,59 +421,57 @@ onBeforeUnmount(() => {
 .door-face {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  border: 1px solid #d6bd7b9c;
-  border-radius: 5px;
-  background: linear-gradient(135deg, #974942ec, #602c2ce8);
-  box-shadow:
-    inset 0 0 0 3px #762e2a,
-    inset 0 0 0 4px #c2a5635c,
-    0 3px 7px #071d2850;
+  display: flex;
+  align-items: flex-end;
+  padding: 5px 6px;
+  border: 1px dashed #fff0cb66;
+  border-radius: 3px;
   backface-visibility: hidden;
-}
-.door:nth-child(3n) .door-face {
-  background: linear-gradient(135deg, #335a4eee, #204439e8);
-  box-shadow:
-    inset 0 0 0 3px #2a4a3d,
-    inset 0 0 0 4px #c2a5635c,
-    0 3px 7px #071d2850;
-}
-.door.golden .door-face {
-  background: linear-gradient(135deg, #f1d48b, #b7843e);
-  box-shadow:
-    inset 0 0 0 3px #d2ac62,
-    inset 0 0 0 4px #fff2be80,
-    0 3px 7px #071d2850;
+  background-repeat: no-repeat;
+  background-origin: border-box;
 }
 .door-face b {
-  color: #f6e6bc;
+  color: #fff6df;
   font-family: Georgia, serif;
-  font-size: clamp(21px, 6vw, 30px);
+  font-size: clamp(19px, 5vw, 25px);
   font-weight: 400;
   line-height: 1;
-  text-shadow: 0 1px 2px #33221a55;
+  text-shadow:
+    0 1px 3px #102e2b,
+    0 0 7px #102e2bcc;
 }
-.golden .door-face b,
-.golden .door-ornament {
-  color: #543c22;
+.double .left .door-face {
+  justify-content: flex-end;
+  padding-right: 1px;
+  border-right: 1px solid #fff0cb44;
+  border-radius: 3px 0 0 3px;
 }
-.door-ornament {
-  position: absolute;
-  top: 3px;
-  left: 6px;
-  color: #e2c17b;
-  font-size: 7px;
+.double .right .door-face {
+  padding-left: 1px;
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+}
+.double .door-face {
+  align-items: center;
+}
+.double .door-handle {
+  top: 65%;
+}
+.double .door-face b {
+  font-size: 36px;
 }
 .door-handle {
   position: absolute;
   top: 50%;
-  right: 5px;
-  width: 3px;
+  right: 4px;
+  width: 2px;
   height: 6px;
   border-radius: 4px;
-  background: #e6c583;
-  box-shadow: 0 1px 2px #0004;
+  background: #fff5da66;
+}
+.double .right .door-handle {
+  right: auto;
+  left: 4px;
 }
 .door-inside {
   position: absolute;
@@ -421,6 +483,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
   border-radius: 4px;
   background: radial-gradient(ellipse at top, #fff7db, #d2b887);
+  opacity: 0;
   box-shadow: inset 2px 3px 10px #48341444;
 }
 .door-inside svg {
@@ -433,6 +496,12 @@ onBeforeUnmount(() => {
   font-size: 6px;
   line-height: 1.2;
   margin-top: 2px;
+}
+.door.opened .door-inside {
+  opacity: 1;
+}
+.door.opened.double .door-hinge.right {
+  transform: rotateY(112deg);
 }
 .door.opened .door-hinge {
   transform: rotateY(-112deg);
@@ -559,10 +628,10 @@ button:disabled {
     margin-bottom: 9px;
   }
   .calendar-heading b {
-    font-size: 23px;
+    font-size: 27px;
   }
   .doors {
-    gap: 7px;
+    gap: 6px;
   }
   .calendar-controls {
     padding-top: 8px;

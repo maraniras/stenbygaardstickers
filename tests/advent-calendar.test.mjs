@@ -34,7 +34,7 @@ function calendar(reduced = false) {
   })
   vm.runInContext(
     code +
-      '\nglobalThis.api={days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay};',
+      '\nglobalThis.api={days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay,backgroundImage,surfaces,artwork,measureSurfaces,surfaceStyle};',
     context,
   )
   const a = context.api
@@ -64,6 +64,27 @@ test('24 unique doors; daily preview follows the Danish December date', () => {
   assert.equal(a.today.value, 7)
   a.currentDate.value = new Date('2026-12-31T12:00:00Z')
   assert.equal(a.today.value, 24)
+})
+
+test('single and double door cutouts keep the same image scale and crop as the full scene', () => {
+  const a = calendar()
+  a.backgroundImage.value = { naturalWidth: 900, naturalHeight: 1400 }
+  a.scene.value = {
+    clientWidth: 360,
+    clientHeight: 560,
+    querySelectorAll: () => [
+      { dataset: { day: '24' }, offsetLeft: 80, offsetTop: 200, offsetWidth: 160 },
+    ],
+  }
+  a.measureSurfaces()
+  assert.equal(a.surfaceStyle(24, 'left').backgroundSize, '360px 560px')
+  assert.equal(a.surfaceStyle(24, 'left').backgroundPosition, '-80px -200px')
+  assert.equal(a.surfaceStyle(24, 'right').backgroundPosition, '-160px -200px')
+  a.scene.value.clientWidth = 420
+  a.measureSurfaces()
+  assert.equal(a.artwork.value.width, 420)
+  assert.ok(Math.abs(a.artwork.value.height - 653.3333333333) < 0.001)
+  assert.ok(Math.abs(a.artwork.value.y + 46.6666666667) < 0.001)
 })
 
 test('door opens after camera zoom, and reset returns to the full calendar', async () => {

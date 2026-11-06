@@ -202,12 +202,9 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   place-items: center;
   width: 59px;
   height: 72px;
-  border: 1px solid #e7cb8c;
+  border: 1px dashed #e7cb8c80;
   border-radius: 6px;
-  background: #8b3b36ed;
-  box-shadow:
-    inset 0 0 0 4px #743632,
-    inset 0 0 0 5px #d0ad6d66;
+  background: #ffffff08;
   font-family: Georgia, serif;
   font-size: 32px;
   transform: rotate(8deg);
