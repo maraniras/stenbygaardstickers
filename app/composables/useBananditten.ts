@@ -1,4 +1,5 @@
 import type { SlotResponse } from '../../shared/types/slots'
+import type { CasinoDailyLimit } from '../../shared/types/casino'
 import { registerRefresh } from '../utils/refresh'
 import { useSlotPresentation } from './useSlotPresentation'
 export function useBananditten() {
@@ -6,6 +7,8 @@ export function useBananditten() {
   const economy = useEconomy()
   const data = ref<SlotResponse | null>(null),
     shownBalance = ref<number | null>(null)
+  // Keep financial summaries on the revealed spin, not the response driving the animation.
+  const dailyLimit = ref<CasinoDailyLimit | null>(null)
   const busy = ref(false),
     error = ref(''),
     bet = ref(5)
@@ -35,6 +38,7 @@ export function useBananditten() {
     const shown = await presentation.present(response.spin, animate)
     if (!shown) return
     shownBalance.value = response.balance
+    dailyLimit.value = response.dailyLimit
     if (animate && response.spin && response.spin.payout > response.spin.bet)
       void shootConfetti(response.spin.multiplier === 100 ? 'normal' : 'small')
   }
@@ -121,6 +125,7 @@ export function useBananditten() {
       presentation.reset()
       data.value = null
       shownBalance.value = null
+      dailyLimit.value = null
       error.value = ''
       clearTimeout(resetTimer)
       void refresh()
@@ -143,6 +148,7 @@ export function useBananditten() {
     ready,
     data,
     shownBalance,
+    dailyLimit,
     busy,
     locked,
     error,

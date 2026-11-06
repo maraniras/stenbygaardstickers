@@ -1,5 +1,6 @@
 import { registerRefresh } from '../utils/refresh'
 import type { JackResponse, JackAction } from '../../shared/types/bananjack'
+import type { CasinoDailyLimit } from '../../shared/types/casino'
 import { JACK_BETS, jackScore } from '../../shared/utils/bananjack'
 
 export function useBananjack() {
@@ -12,7 +13,8 @@ export function useBananjack() {
     error = ref(''),
     bet = ref(10)
   const rules = ref<HTMLDialogElement>()
-  const dailyLimit = computed(() => data.value?.dailyLimit)
+  // Reveal the budget alongside the hand; the authoritative response can arrive much earlier.
+  const dailyLimit = ref<CasinoDailyLimit | null>()
   const limitReached = computed(() =>
     Boolean(dailyLimit.value && dailyLimit.value.remaining < JACK_BETS[0]),
   )
@@ -88,13 +90,19 @@ export function useBananjack() {
         },
         Math.max(250, Date.parse(response.dailyLimit.nextResetAt) - Date.now() + 100),
       )
-    if (!animate || !changed) shownBalance.value = response.balance
+    if (!animate || !changed) {
+      shownBalance.value = response.balance
+      dailyLimit.value = response.dailyLimit
+    }
     if (!changed && game.value) {
       game.value = next
       return
     }
     const finished = await present(next, animate)
-    if (finished) shownBalance.value = response.balance
+    if (finished) {
+      shownBalance.value = response.balance
+      dailyLimit.value = response.dailyLimit
+    }
     if (finished && animate && next?.status === 'finished' && next.payout > next.staked)
       void shootConfetti(next.hands[0]?.result === 'blackjack' ? 'normal' : 'small')
   }
@@ -175,6 +183,7 @@ export function useBananjack() {
       reset()
       data.value = null
       shownBalance.value = null
+      dailyLimit.value = undefined
       error.value = ''
       void refresh()
     },

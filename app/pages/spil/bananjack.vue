@@ -254,7 +254,7 @@ const {
       >
         {{ game ? 'Spil næste hånd' : 'Giv kort' }} · {{ bet }} 🍌</button
       ><NuxtLink
-        v-if="data && data.balance < 10"
+        v-if="!locked && data && data.balance < 10"
         class="note"
         to="/spil"
         >Flere bananer? Tag dagens gratis spil →</NuxtLink

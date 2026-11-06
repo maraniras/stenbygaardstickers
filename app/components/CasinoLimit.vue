@@ -15,7 +15,9 @@ defineProps<{ limit?: CasinoDailyLimit | null }>()
         class="profit"
         >Overskud +{{ (-limit.netLoss).toLocaleString('da-DK') }} 🍌</span
       >
-      <span v-else
+      <span
+        v-else
+        :class="{ warning: limit.netLoss > 200 }"
         >Nettotab {{ limit.netLoss.toLocaleString('da-DK') }} / {{ limit.amount }} 🍌</span
       >
     </div>
@@ -51,6 +53,9 @@ defineProps<{ limit?: CasinoDailyLimit | null }>()
 }
 .profit {
   color: light-dark(#287343, #95d7ac);
+}
+.warning {
+  color: light-dark(#b33b4c, #f19ca7);
 }
 small {
   font-size: 10px;

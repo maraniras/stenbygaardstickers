@@ -19,6 +19,7 @@ const {
   ready,
   data,
   shownBalance,
+  dailyLimit: budget,
   busy,
   locked,
   error,
@@ -46,7 +47,6 @@ const outcome = computed(() => SLOT_PRIZES.find((p) => p.multiplier === result.v
 const resultNames = computed(() =>
   result.value?.reels.map((id) => SLOT_SYMBOLS.find((s) => s.id === id)?.name).join(' · '),
 )
-const budget = computed(() => data.value?.dailyLimit)
 const resetLabel = computed(() =>
   budget.value
     ? new Date(budget.value.nextResetAt).toLocaleString('da-DK', {
@@ -172,7 +172,7 @@ const resetLabel = computed(() =>
         Ikke plads til et spin i dagens fælles tabsgrænse. Grænsen nulstilles {{ resetLabel }}.
       </p>
       <p
-        v-else-if="data && data.balance < bet"
+        v-else-if="!locked && data && data.balance < bet"
         class="hint"
       >
         Du har ikke nok bananer til denne indsats.

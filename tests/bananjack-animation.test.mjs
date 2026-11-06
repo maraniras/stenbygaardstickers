@@ -226,7 +226,7 @@ test('card sounds follow opening deals and hits, without replaying restored card
   assert.equal(a.sounds.length, count)
 })
 
-test('page holds payout balance and confetti until animation finishes, never replaying a restored result', async () => {
+test('page holds balance, casino budget and confetti until animation finishes, never replaying a restored result', async () => {
   const shown = ref(null),
     shots = [],
     pending = []
@@ -234,6 +234,7 @@ test('page holds payout balance and confetti until animation finishes, never rep
     exports: {},
     require: () => ({}),
     clearTimeout: () => {},
+    setTimeout: () => 0,
     ref,
     computed,
     watch: () => {},
@@ -261,22 +262,39 @@ test('page holds payout balance and confetti until animation finishes, never rep
   }).outputText
   vm.runInContext(code + '\nglobalThis.api=exports.useBananjack();', context)
   const a = context.api
-  await a.accept({ game: round(), balance: 90 }, false)
+  const limit = (netLoss) => ({
+    amount: 300,
+    netLoss,
+    remaining: 300 - netLoss,
+    reserved: 0,
+    spent: Math.max(0, netLoss),
+    nextResetAt: '2026-11-07T03:00:00.000Z',
+  })
+  await a.accept({ game: round(), balance: 90, dailyLimit: limit(210) }, false)
   const won = round({ revision: 1, status: 'finished', payout: 25 })
-  const animation = a.accept({ game: won, balance: 115 }, true)
+  const animation = a.accept({ game: won, balance: 115, dailyLimit: limit(195) }, true)
   assert.equal(a.shownBalance.value, 90)
+  assert.equal(a.data.value.dailyLimit.netLoss, 195)
+  assert.equal(a.dailyLimit.value.netLoss, 210)
+  assert.equal(a.dailyLimit.value.remaining, 90)
   assert.equal(shots.length, 0)
   shown.value = pending[0].next
   pending[0].resolve(true)
   await animation
   assert.equal(a.shownBalance.value, 115)
+  assert.equal(a.dailyLimit.value.netLoss, 195)
+  assert.equal(a.dailyLimit.value.remaining, 105)
   assert.equal(shots.length, 1)
-  await a.accept({ game: won, balance: 115 }, true)
-  await a.accept({ game: won, balance: 115 }, false)
+  await a.accept({ game: won, balance: 115, dailyLimit: limit(195) }, true)
+  await a.accept({ game: won, balance: 115, dailyLimit: limit(195) }, false)
   assert.equal(shots.length, 1)
-  const cancelled = a.accept({ game: { ...won, id: 'round-b', sequence: 2 }, balance: 140 }, true)
+  const cancelled = a.accept(
+    { game: { ...won, id: 'round-b', sequence: 2 }, balance: 140, dailyLimit: limit(180) },
+    true,
+  )
   pending[1].resolve(false)
   await cancelled
   assert.equal(a.shownBalance.value, 115)
+  assert.equal(a.dailyLimit.value.netLoss, 195)
   assert.equal(shots.length, 1)
 })
