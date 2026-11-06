@@ -144,12 +144,13 @@ const {
           <div class="hand-label">
             <b>{{ game.hands.length > 1 ? `Hånd ${index + 1}` : 'Din hånd' }}</b>
             <div class="hand-value">
+              <small v-if="hand.result">{{ labels[hand.result] }}</small>
+              <small v-if="hand.cards.length && jackScore(hand.cards).soft">soft</small>
               <span
                 class="score"
                 :class="{ bust: jackScore(hand.cards).total > 21 }"
                 >{{ hand.cards.length ? jackScore(hand.cards).total : '—' }}</span
-              ><small v-if="hand.cards.length && jackScore(hand.cards).soft">soft</small
-              ><small v-if="hand.result">{{ labels[hand.result] }}</small>
+              >
             </div>
           </div>
           <TransitionGroup
