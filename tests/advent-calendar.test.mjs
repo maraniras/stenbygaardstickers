@@ -14,7 +14,29 @@ function calendar(reduced = false) {
   const code = ts.transpileModule(source, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
   }).outputText
+  const dayExports = {}
+  vm.runInNewContext(
+    ts.transpileModule(readFileSync('shared/utils/game-day.ts', 'utf8'), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS },
+    }).outputText,
+    { exports: dayExports },
+  )
   const context = vm.createContext({
+    exports: {},
+    require: () => dayExports,
+    watch() {},
+    useAdventRewards: () => ({
+      state: ref(null),
+      name: ref('Test'),
+      loading: ref(false),
+      claiming: ref(false),
+      error: ref(''),
+      testMode: ref(true),
+      previewAllowed: ref(true),
+      refresh() {},
+      claim: async () => false,
+      refreshBalance() {},
+    }),
     ref,
     computed,
     nextTick,
@@ -61,6 +83,8 @@ test('24 unique doors; daily preview follows the Danish December date', () => {
   a.currentDate.value = new Date('2026-11-06T12:00:00Z')
   assert.equal(a.today.value, 1)
   a.currentDate.value = new Date('2026-12-06T23:30:00Z')
+  assert.equal(a.today.value, 6)
+  a.currentDate.value = new Date('2026-12-07T03:00:00Z')
   assert.equal(a.today.value, 7)
   a.currentDate.value = new Date('2026-12-31T12:00:00Z')
   assert.equal(a.today.value, 24)

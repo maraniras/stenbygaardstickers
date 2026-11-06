@@ -175,7 +175,7 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   border-radius: 22px;
   background:
     linear-gradient(90deg, #163d37ee, #163d3733),
-    url('/images/christmas-calendar-placeholder.svg') center 40% / cover;
+    url('/images/christmas-calendar-mix-max-faxe-v1.webp') center 40% / cover;
   color: #fff0cb;
   text-decoration: none;
 }

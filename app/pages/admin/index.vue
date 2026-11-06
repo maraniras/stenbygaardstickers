@@ -172,6 +172,11 @@ function submitted(s: StoredSticker) {
       </NuxtLink>
 
       <AdminPush />
+      <NuxtLink
+        class="chip"
+        to="/admin/julekalender"
+        >Julekalender · præmier og åbninger →</NuxtLink
+      >
       <AdminUsers />
       <AdminBackups />
     </template>

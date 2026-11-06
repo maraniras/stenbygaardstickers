@@ -39,6 +39,7 @@ export interface WheelRun {
   jackpotAmount?: number
 }
 export interface EconomyRecord extends EconomyPublic {
+  advent?: Record<string, Record<string, import('./advent').AdventOpening>>
   slotGame?: import('./slots').SlotRecord
   jackDailyWagers?: { day: string; amount: number }
   casinoDaily?: { day: string; netLoss: number }

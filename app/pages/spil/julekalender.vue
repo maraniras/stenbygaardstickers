@@ -1,8 +1,53 @@
 <script setup lang="ts">
+import { gameDay } from '../../../shared/utils/game-day'
+const rewards = useAdventRewards()
+const { state: calendar, name, loading, claiming, error, testMode, previewAllowed } = rewards
+const claimInFlight = ref(false)
+function canOpen(day: number) {
+  if (testMode.value) return true
+  const door = calendar.value?.doors.find((item) => item.day === day)
+  return Boolean(door?.opening || (name.value && door?.available && door.configured))
+}
+function savedOpening(day: number) {
+  return testMode.value ? null : calendar.value?.doors.find((item) => item.day === day)?.opening
+}
+function prizeTitle(day: number) {
+  const opening = savedOpening(day)
+  if (!opening) return 'En lille overraskelse'
+  if (opening.prize.kind === 'bananas')
+    return `${opening.amount < 0 ? '−' : '+'}${Math.abs(opening.amount).toLocaleString('da-DK')} 🍌`
+  return opening.prize.title
+}
+function prizeDescription(day: number) {
+  const prize = savedOpening(day)?.prize
+  if (!prize) return ''
+  return prize.kind === 'physical'
+    ? `${prize.description} ${prize.instructions}`
+    : prize.description
+}
+function restoreSaved() {
+  if (testMode.value || claimInFlight.value || phase.value !== 'overview') return
+  opened.value = calendar.value?.doors.filter((door) => door.opening).map((door) => door.day) ?? []
+  torn.value = [...opened.value]
+}
+watch([testMode, name], async () => {
+  if (await reset()) restoreSaved()
+})
+watch(calendar, restoreSaved)
+const helper = computed(() => {
+  if (error.value) return error.value
+  if (loading.value && !calendar.value) return 'Henter kalenderen…'
+  if (testMode.value) return 'Testvisning · ingen præmier eller ændringer i saldoen'
+  if (!calendar.value?.availableDay) return 'Første låge åbner 1. december kl. 04.00 dansk tid'
+  if (!name.value) return 'Vælg dit navn for at åbne og gemme dine låger'
+  if (!calendar.value.doors.find((door) => door.day === today.value)?.configured)
+    return 'Præmierne er stadig kladder · tidligere låger kan åbnes senere'
+  return 'Nye låger kl. 04.00 · du kan også åbne låger, du har misset'
+})
 useHead({ title: 'Julekalender · Stenbygaard Stickers' })
 
 // Replace this image when the final calendar background is supplied.
-const background = '/images/christmas-calendar-placeholder.svg'
+const background = '/images/christmas-calendar-mix-max-faxe-v1.webp'
 const days = [7, 19, 3, 12, 22, 1, 15, 9, 5, 24, 17, 2, 14, 8, 21, 11, 4, 18, 6, 23, 16, 10, 20, 13]
 const opened = ref<number[]>([])
 const torn = ref<number[]>([])
@@ -52,14 +97,9 @@ function surfaceStyle(day: number, side: string) {
 }
 const currentDate = ref(new Date())
 const today = computed(() => {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Copenhagen',
-    month: 'numeric',
-    day: 'numeric',
-  }).formatToParts(currentDate.value)
-  const month = Number(parts.find((p) => p.type === 'month')?.value)
-  const day = Number(parts.find((p) => p.type === 'day')?.value)
-  return month === 12 ? Math.min(day, 24) : 1
+  if (!testMode.value && calendar.value) return Math.max(1, calendar.value.availableDay)
+  const date = gameDay(currentDate.value)
+  return date.slice(5, 7) === '12' ? Math.min(Number(date.slice(-2)), 24) : 1
 })
 const busy = computed(() => phase.value !== 'overview' && phase.value !== 'revealed')
 let generation = 0
@@ -125,9 +165,22 @@ async function reveal(day: number, run = generation) {
   phase.value = 'revealed'
   return true
 }
-function openDay(day: number) {
-  if (busy.value || autoplay.value) return
-  void reveal(day)
+async function openDay(day: number) {
+  if (busy.value || autoplay.value || claimInFlight.value || loading.value || !canOpen(day)) return
+  if (testMode.value) {
+    await reveal(day)
+    return
+  }
+  const owner = name.value,
+    token = userToken()
+  claimInFlight.value = true
+  try {
+    if (!savedOpening(day) && !(await rewards.claim(day))) return
+    if (owner !== name.value || token !== userToken() || testMode.value) return
+    if (await reveal(day)) rewards.refreshBalance()
+  } finally {
+    claimInFlight.value = false
+  }
 }
 async function reset() {
   cancel()
@@ -141,7 +194,7 @@ async function playAll() {
     void overview()
     return
   }
-  if (busy.value) return
+  if (busy.value || !testMode.value || !previewAllowed.value) return
   if (!(await reset())) return
   autoplay.value = true
   const run = generation
@@ -174,7 +227,22 @@ onBeforeUnmount(() => {
       back-to="/spil"
       compact
     >
-      <template #actions><span class="preview-tag">Designprøve</span></template>
+      <template #actions
+        ><button
+          v-if="previewAllowed"
+          class="preview-tag"
+          type="button"
+          :aria-pressed="testMode"
+          :disabled="busy || claiming || claimInFlight"
+          @click="testMode = !testMode"
+        >
+          {{ testMode ? 'Testvisning' : 'Datolås' }}</button
+        ><span
+          v-else
+          class="preview-tag"
+          >1.–24. december</span
+        ></template
+      >
     </PageHeader>
     <div
       ref="viewport"
@@ -195,7 +263,7 @@ onBeforeUnmount(() => {
           @load="measureSurfaces"
         />
         <div class="calendar-heading">
-          <span>DECEMBER {{ currentDate.getFullYear() }}</span
+          <span>DECEMBER {{ calendar?.year || currentDate.getFullYear() }}</span
           ><b>Glædelig jul</b><span class="calendar-subtitle">Og godt Stenbygaard</span>
         </div>
         <div
@@ -214,8 +282,9 @@ onBeforeUnmount(() => {
               selected: selected === day,
               double: day === 24,
               today: day === today,
+              locked: !testMode && !calendar?.doors.find((door) => door.day === day)?.available,
             }"
-            :disabled="busy || autoplay"
+            :disabled="busy || autoplay || claiming || claimInFlight || !canOpen(day)"
             :aria-label="`${opened.includes(day) ? 'Se' : 'Åbn'} låge ${day}`"
             :aria-pressed="opened.includes(day)"
             @click="openDay(day)"
@@ -233,7 +302,7 @@ onBeforeUnmount(() => {
                   fill="#fff"
                   opacity=".3"
                 /></svg
-              ><span>En lille<br />overraskelse</span></span
+              ><span>{{ prizeTitle(day) }}</span></span
             >
             <template v-if="!torn.includes(day)"
               ><span
@@ -251,7 +320,6 @@ onBeforeUnmount(() => {
             ></template>
           </button>
         </div>
-        <span class="placeholder-label">Midlertidig baggrund</span>
       </div>
       <div
         v-if="selected !== null"
@@ -260,8 +328,16 @@ onBeforeUnmount(() => {
       >
         <span>LÅGE {{ selected }}</span
         ><b>{{
-          phase === 'revealed' ? 'Her venter snart en overraskelse' : 'Lidt julemagi på vej…'
+          phase === 'revealed'
+            ? savedOpening(selected)?.prize.title || 'Her venter snart en overraskelse'
+            : 'Lidt julemagi på vej…'
         }}</b>
+        <small v-if="phase === 'revealed' && savedOpening(selected)">{{
+          prizeDescription(selected)
+        }}</small>
+        <small v-if="phase === 'revealed' && savedOpening(selected)?.prize.kind === 'physical'"
+          >Din præmie er gemt og afventer udlevering.</small
+        >
       </div>
       <span
         v-else
@@ -273,7 +349,14 @@ onBeforeUnmount(() => {
       <button
         class="open-today"
         type="button"
-        :disabled="busy || autoplay"
+        :disabled="
+          busy ||
+          autoplay ||
+          claiming ||
+          claimInFlight ||
+          loading ||
+          (phase !== 'revealed' && !canOpen(today))
+        "
         @click="phase === 'revealed' ? overview() : openDay(today)"
       >
         <span>{{
@@ -285,7 +368,10 @@ onBeforeUnmount(() => {
         }}</span
         ><span aria-hidden="true">{{ phase === 'revealed' ? '↗' : '✦' }}</span>
       </button>
-      <div class="test-controls">
+      <div
+        v-if="testMode && previewAllowed"
+        class="test-controls"
+      >
         <button
           type="button"
           :disabled="busy && !autoplay"
@@ -300,11 +386,18 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <p role="status">
-        {{
-          autoplay
-            ? `Viser låge ${selected || Math.min(opened.length + 1, 24)} af 24`
-            : 'Prøv lågerne frit · indhold og præmier kommer senere'
-        }}
+        {{ autoplay ? `Viser låge ${selected || Math.min(opened.length + 1, 24)} af 24` : helper }}
+        <NuxtLink
+          v-if="!testMode && !name"
+          to="/mig"
+          >Vælg navn</NuxtLink
+        ><button
+          v-if="error"
+          class="retry"
+          @click="rewards.refresh()"
+        >
+          Prøv igen
+        </button>
       </p>
     </footer>
   </div>
@@ -321,6 +414,12 @@ onBeforeUnmount(() => {
   flex-direction: column;
 }
 .preview-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  background: transparent;
+  cursor: pointer;
   padding: 5px 8px;
   border: 1px solid var(--hairline);
   border-radius: 8px;
@@ -558,12 +657,28 @@ onBeforeUnmount(() => {
 .door.selected {
   z-index: 2;
 }
+.door.locked .door-face {
+  border-color: #fff0cb33;
+}
+.door.locked .door-face b {
+  opacity: 0.5;
+}
+.door-caption small {
+  display: block;
+  margin: 6px auto 0;
+  max-width: 30em;
+  font-size: 11px;
+}
+.retry {
+  border: 0;
+  padding: 3px 6px;
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+}
 .focused .door:not(.selected),
 .focused .calendar-heading,
-.focused .placeholder-label {
-  opacity: 0.2;
-}
-.door:focus-visible {
+.focused .door:focus-visible {
   outline: 3px solid #ffe4a0;
   outline-offset: 3px;
   z-index: 3;

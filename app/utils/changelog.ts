@@ -12,7 +12,10 @@ export interface Release {
 export const CHANGELOG: Release[] = [
   {
     version: '2.4',
-    notes: ['Et første kig på julekalenderen med 24 låger og animationer'],
+    notes: [
+      'Julekalender med 24 animerede låger – nye låger åbner kl. 04.00 dansk tid',
+      'Missede låger kan åbnes senere, og dine åbninger gemmes på din bruger',
+    ],
   },
   {
     version: '2.3.1',
