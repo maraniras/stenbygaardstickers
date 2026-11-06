@@ -11,6 +11,10 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.4',
+    notes: ['Et første kig på julekalenderen med 24 låger og animationer'],
+  },
+  {
     version: '2.3.1',
     push: {
       title: '🎰 Bananditten er landet!',

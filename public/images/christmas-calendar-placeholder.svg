@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1400" viewBox="0 0 900 1400" fill="none">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1400" gradientUnits="userSpaceOnUse"><stop stop-color="#162f32"/><stop offset=".58" stop-color="#547370"/><stop offset="1" stop-color="#cbd4c2"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#f9dc9b" stop-opacity=".5"/><stop offset="1" stop-color="#f9dc9b" stop-opacity="0"/></radialGradient>
+    <linearGradient id="snow" x2="0" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#e6e6d3"/><stop offset="1" stop-color="#a3b6ad"/></linearGradient>
+    <pattern id="flakes" width="151" height="183" patternUnits="userSpaceOnUse"><circle cx="12" cy="27" r="2" fill="#f9f0d8" opacity=".6"/><circle cx="99" cy="130" r="3" fill="#f9f0d8" opacity=".35"/><circle cx="144" cy="66" r="1.5" fill="#f9f0d8" opacity=".8"/></pattern>
+    <g id="tree"><path d="M0-250-75-120h35l-65 110h52l-78 130h262L53-10h52L40-120h35L0-250Z" fill="currentColor"/><path d="m0-250-75 130h35l-26 45L0-94l52 14-26-40h49L0-250Z" fill="#c4d1c0" opacity=".2"/></g>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h900v1400H0z"/>
+  <ellipse cx="600" cy="470" rx="510" ry="620" fill="url(#glow)"/>
+  <circle cx="700" cy="180" r="47" fill="#efe4ba"/>
+  <circle cx="682" cy="168" r="43" fill="#304749"/>
+  <path d="M0 860q240-190 460-95t440-22v657H0Z" fill="#45625d"/>
+  <g color="#385b52" opacity=".8"><use href="#tree" transform="translate(100 850) scale(1.15)"/><use href="#tree" transform="translate(730 850)"/><use href="#tree" transform="translate(470 860) scale(.7)"/></g>
+  <path d="M0 1090q220-160 450-50t450-35v395H0Z" fill="url(#snow)"/>
+  <g transform="translate(365 1040)"><path d="M-115 22V-106L0-190l115 84V22Z" fill="#85483c"/><path d="m-150-105 150-116 150 116-14 21L0-186-136-84Z" fill="#e4e4d1"/><path d="M-35 22v-79h70v79" fill="#362e29"/><path d="M-87-79h35v40h-35zm139 0h35v40H52Z" fill="#f6d28c"/><path d="M-70-79v40m139-40v40M-87-59h35m104 0h35" stroke="#935443" stroke-width="4"/><path d="M65-171v-52h23v69" fill="#6a3c36"/><path d="M-131 26h262" stroke="#eff0dc" stroke-width="15" stroke-linecap="round"/></g>
+  <g color="#1d4038"><use href="#tree" transform="translate(40 1230) scale(1.3)"/><use href="#tree" transform="translate(820 1250) scale(1.6)"/></g>
+  <path d="M340 1070q110 60 10 170t190 160" stroke="#f3eed9" stroke-width="55" opacity=".55"/>
+  <path fill="url(#flakes)" d="M0 0h900v1400H0z"/>
+</svg>

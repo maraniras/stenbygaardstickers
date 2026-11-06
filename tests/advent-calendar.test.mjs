@@ -1,0 +1,140 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import vm from 'node:vm'
+import { readFileSync } from 'node:fs'
+import ts from 'typescript'
+import { ref, computed, nextTick } from 'vue'
+
+function calendar(reduced = false) {
+  const timers = [],
+    unmount = []
+  const source = readFileSync('app/pages/spil/julekalender.vue', 'utf8').match(
+    /<script setup lang="ts">([\s\S]*?)<\/script>/,
+  )[1]
+  const code = ts.transpileModule(source, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
+  }).outputText
+  const context = vm.createContext({
+    ref,
+    computed,
+    nextTick,
+    useHead() {},
+    onMounted() {},
+    onBeforeUnmount: (fn) => unmount.push(fn),
+    window: { matchMedia: () => ({ matches: reduced }) },
+    setTimeout(fn, ms) {
+      const t = { fn, ms, cancelled: false }
+      timers.push(t)
+      return t
+    },
+    clearTimeout(t) {
+      if (t) t.cancelled = true
+    },
+    clearInterval() {},
+  })
+  vm.runInContext(
+    code +
+      '\nglobalThis.api={days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay};',
+    context,
+  )
+  const a = context.api
+  a.viewport.value = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 360, height: 560 }) }
+  a.scene.value = {
+    querySelector: () => ({
+      getBoundingClientRect: () => ({ left: 60, top: 120, width: 60, height: 60 }),
+    }),
+  }
+  const tick = async () => {
+    const t = timers.shift()
+    if (t && !t.cancelled) t.fn()
+    await new Promise(setImmediate)
+  }
+  return { ...a, timers, tick, unmount: () => unmount.forEach((fn) => fn()) }
+}
+
+test('24 unique doors; daily preview follows the Danish December date', () => {
+  const a = calendar()
+  assert.deepEqual(
+    Array.from(a.days).sort((a, b) => a - b),
+    Array.from({ length: 24 }, (_, i) => i + 1),
+  )
+  a.currentDate.value = new Date('2026-11-06T12:00:00Z')
+  assert.equal(a.today.value, 1)
+  a.currentDate.value = new Date('2026-12-06T23:30:00Z')
+  assert.equal(a.today.value, 7)
+  a.currentDate.value = new Date('2026-12-31T12:00:00Z')
+  assert.equal(a.today.value, 24)
+})
+
+test('door opens after camera zoom, and reset returns to the full calendar', async () => {
+  const a = calendar(),
+    pending = a.reveal(7)
+  await new Promise(setImmediate)
+  assert.equal(a.phase.value, 'zooming')
+  assert.equal(a.opened.value.length, 0)
+  assert.match(a.transform.value, /scale\(3\.3\)/)
+  await a.tick()
+  assert.equal(a.phase.value, 'opening')
+  assert.deepEqual(Array.from(a.opened.value), [7])
+  await a.tick()
+  assert.equal(await pending, true)
+  assert.equal(a.phase.value, 'revealed')
+  const reset = a.reset()
+  await a.tick()
+  await reset
+  assert.equal(a.phase.value, 'overview')
+  assert.equal(a.selected.value, null)
+  assert.equal(a.opened.value.length, 0)
+})
+
+test('automatic preview opens all doors in date order, including reduced motion', async () => {
+  for (const reduced of [false, true]) {
+    const a = calendar(reduced),
+      running = a.playAll()
+    for (let i = 0; i < 150 && a.timers.length; i++) await a.tick()
+    await running
+    assert.deepEqual(
+      Array.from(a.opened.value),
+      Array.from({ length: 24 }, (_, i) => i + 1),
+    )
+    assert.equal(a.autoplay.value, false)
+    assert.equal(a.phase.value, 'overview')
+    assert.equal(a.selected.value, null)
+  }
+})
+
+test('stopping preview or leaving the page cancels pending openings', async () => {
+  for (const leaving of [false, true]) {
+    const a = calendar(),
+      running = a.playAll()
+    await a.tick()
+    assert.equal(a.phase.value, 'zooming')
+    if (leaving) a.unmount()
+    else await a.playAll()
+    await new Promise(setImmediate)
+    while (a.timers.length) await a.tick()
+    await running
+    assert.equal(a.autoplay.value, false)
+    assert.equal(a.opened.value.length, 0)
+    if (!leaving) assert.equal(a.phase.value, 'overview')
+  }
+})
+
+test('rapid taps cannot start overlapping zooms and reset cancels a pending camera measurement', async () => {
+  const a = calendar()
+  a.openDay(1)
+  a.openDay(2)
+  await new Promise(setImmediate)
+  assert.equal(a.selected.value, 1)
+  const reset = a.reset()
+  while (a.timers.length) await a.tick()
+  await reset
+  assert.equal(a.selected.value, null)
+  a.openDay(3)
+  const immediateReset = a.reset()
+  while (a.timers.length) await a.tick()
+  await immediateReset
+  assert.equal(a.phase.value, 'overview')
+  assert.equal(a.selected.value, null)
+  assert.equal(a.opened.value.length, 0)
+})

@@ -22,6 +22,22 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
       >
     </PageHeader>
     <GameSectionNav section="daily" />
+    <NuxtLink
+      class="advent-link"
+      to="/spil/julekalender"
+    >
+      <div>
+        <span>ET KIG PÅ DECEMBER</span>
+        <h2>Julekalender</h2>
+        <p>24 låger. Lidt magi hver dag.</p>
+      </div>
+      <span
+        class="advent-link-day"
+        aria-hidden="true"
+        >24</span
+      >
+      <span class="advent-link-cta">Prøv kalenderen <span aria-hidden="true">→</span></span>
+    </NuxtLink>
     <div class="daily-reset">
       <svg
         viewBox="0 0 24 24"
@@ -148,6 +164,61 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   </div>
 </template>
 <style scoped>
+.advent-link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid #c8ae775c;
+  border-radius: 22px;
+  background:
+    linear-gradient(90deg, #163d37ee, #163d3733),
+    url('/images/christmas-calendar-placeholder.svg') center 40% / cover;
+  color: #fff0cb;
+  text-decoration: none;
+}
+.advent-link div > span {
+  font-size: 8px;
+  letter-spacing: 0.17em;
+  font-weight: 700;
+}
+.advent-link h2 {
+  margin-top: 5px;
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.advent-link p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: #eee4c9;
+}
+.advent-link-day {
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 59px;
+  height: 72px;
+  border: 1px solid #e7cb8c;
+  border-radius: 6px;
+  background: #8b3b36ed;
+  box-shadow:
+    inset 0 0 0 4px #743632,
+    inset 0 0 0 5px #d0ad6d66;
+  font-family: Georgia, serif;
+  font-size: 32px;
+  transform: rotate(8deg);
+}
+.advent-link-cta {
+  grid-column: 1/-1;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+}
 .daily-page {
   max-width: 480px;
   margin: 0 auto;
