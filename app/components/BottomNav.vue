@@ -5,6 +5,7 @@ const { readyCount } = useDailyAvailability()
 const tab = computed(() => {
   if (route.path === '/') return 'map'
   if (route.path === '/spil' || route.path.startsWith('/spil/')) return 'games'
+  if (route.path === '/shop' || route.path.startsWith('/shop/')) return 'shop'
   if (route.path === '/mig' || (name.value && route.path === personUrl(name.value))) return 'me'
   if (route.path === '/rangliste' || route.path.startsWith('/person/')) return 'users'
   return 'list'
@@ -88,6 +89,20 @@ const tab = computed(() => {
       <span class="nav-label">Spil</span>
     </NuxtLink>
     <NuxtLink
+      to="/shop"
+      :class="{ on: tab === 'shop' }"
+      :aria-current="tab === 'shop' ? 'page' : undefined"
+      aria-label="Shop"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M6 7h12l1 14H5L6 7ZM9 7V5a3 3 0 0 1 6 0v2" />
+      </svg>
+      <span class="nav-label">Shop</span>
+    </NuxtLink>
+    <NuxtLink
       to="/rangliste"
       :class="{ on: tab === 'users' }"
       :aria-current="tab === 'users' ? 'page' : undefined"
@@ -141,10 +156,10 @@ const tab = computed(() => {
   bottom: calc(14px + var(--safe-b));
   z-index: 1000;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  width: min(360px, calc(100% - 28px));
-  gap: 4px;
-  padding: 5px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  width: min(420px, calc(100% - 24px));
+  gap: 3px;
+  padding: 4px;
   border-radius: 999px;
   transform: translateX(-50%);
 }
@@ -205,7 +220,7 @@ a:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 2px;
 }
-@media (max-width: 359px) {
+@media (max-width: 389px) {
   .nav-label {
     display: none;
   }

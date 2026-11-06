@@ -22,6 +22,7 @@ export const CHANGELOG: Release[] = [
       'Fem nye Bananditten-badges samt lyd på spin og gevinster',
       'Fælles daglig tabsgrænse på 300 bananer netto i casinoet – gevinster giver plads igen',
       'Brugere & rangliste har fået sin egen fane i bundmenuen',
+      'Ny Shop-fane – her kan du snart bruge dine optjente bananer',
       'Se de nye funktioner i Hvad er nyt, første gang du åbner en ny version',
       'Små fejlrettelser og forbedringer i appen',
     ],
