@@ -15,7 +15,7 @@ export const CHANGELOG: Release[] = [
     notes: [
       'Casinoet har en fælles daglig grænse på 300 bananer i nettotab',
       'Se opdateringens nye funktioner i Hvad er nyt, første gang du åbner den nye version',
-      'Find Brugere & rangliste direkte fra stickerlisten',
+      'Find Brugere & rangliste i bundmenuen – med kun ikoner på smalle skærme',
       'Kortet zoomes med to fingre uden at forstørre knapper og bundmenu',
       'Mere luft mellem spillene i casino-menuen',
     ],

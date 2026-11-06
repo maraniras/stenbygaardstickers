@@ -4,9 +4,9 @@ const { name } = useUser()
 const { readyCount } = useDailyAvailability()
 const tab = computed(() => {
   if (route.path === '/') return 'map'
-  if (route.path === '/spil' || route.path.startsWith('/spil/') || route.path === '/rangliste')
-    return 'games'
+  if (route.path === '/spil' || route.path.startsWith('/spil/')) return 'games'
   if (route.path === '/mig' || (name.value && route.path === personUrl(name.value))) return 'me'
+  if (route.path === '/rangliste' || route.path.startsWith('/person/')) return 'users'
   return 'list'
 })
 </script>
@@ -20,6 +20,7 @@ const tab = computed(() => {
       to="/"
       :class="{ on: tab === 'map' }"
       :aria-current="tab === 'map' ? 'page' : undefined"
+      aria-label="Kort"
     >
       <svg
         viewBox="0 0 24 24"
@@ -27,12 +28,13 @@ const tab = computed(() => {
       >
         <path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4Zm0 0v13.5m6-11V20" />
       </svg>
-      Kort
+      <span class="nav-label">Kort</span>
     </NuxtLink>
     <NuxtLink
       to="/liste"
       :class="{ on: tab === 'list' }"
       :aria-current="tab === 'list' ? 'page' : undefined"
+      aria-label="Stickers"
     >
       <svg
         viewBox="0 0 24 24"
@@ -53,7 +55,7 @@ const tab = computed(() => {
           rx="2"
         />
       </svg>
-      Stickers
+      <span class="nav-label">Stickers</span>
     </NuxtLink>
     <NuxtLink
       to="/spil"
@@ -83,12 +85,32 @@ const tab = computed(() => {
           r=".8"
         />
       </svg>
-      Spil
+      <span class="nav-label">Spil</span>
+    </NuxtLink>
+    <NuxtLink
+      to="/rangliste"
+      :class="{ on: tab === 'users' }"
+      :aria-current="tab === 'users' ? 'page' : undefined"
+      aria-label="Brugere & rangliste"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle
+          cx="9"
+          cy="8"
+          r="3"
+        />
+        <path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2" />
+      </svg>
+      <span class="nav-label">Brugere</span>
     </NuxtLink>
     <NuxtLink
       :to="name ? personUrl(name) : '/mig'"
       :class="{ on: tab === 'me' }"
       :aria-current="tab === 'me' ? 'page' : undefined"
+      aria-label="Mig"
     >
       <UserAvatar
         v-if="name"
@@ -107,7 +129,7 @@ const tab = computed(() => {
         />
         <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
       </svg>
-      Mig
+      <span class="nav-label">Mig</span>
     </NuxtLink>
   </nav>
 </template>
@@ -119,7 +141,7 @@ const tab = computed(() => {
   bottom: calc(14px + var(--safe-b));
   z-index: 1000;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   width: min(360px, calc(100% - 28px));
   gap: 4px;
   padding: 5px;
@@ -182,5 +204,10 @@ svg {
 a:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 2px;
+}
+@media (max-width: 359px) {
+  .nav-label {
+    display: none;
+  }
 }
 </style>
