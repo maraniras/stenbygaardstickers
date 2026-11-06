@@ -5,8 +5,11 @@ useHead({ title: 'Julekalender · Stenbygaard Stickers' })
 const background = '/images/christmas-calendar-placeholder.svg'
 const days = [7, 19, 3, 12, 22, 1, 15, 9, 5, 24, 17, 2, 14, 8, 21, 11, 4, 18, 6, 23, 16, 10, 20, 13]
 const opened = ref<number[]>([])
+const torn = ref<number[]>([])
 const selected = ref<number | null>(null)
-const phase = ref<'overview' | 'zooming' | 'opening' | 'revealed' | 'returning'>('overview')
+const phase = ref<'overview' | 'zooming' | 'opening' | 'revealed' | 'tearing' | 'returning'>(
+  'overview',
+)
 const autoplay = ref(false)
 const viewport = ref<HTMLElement>()
 const scene = ref<HTMLElement>()
@@ -82,6 +85,12 @@ function cancel() {
   autoplay.value = false
 }
 async function overview(run = generation) {
+  const day = selected.value
+  if (day !== null && opened.value.includes(day) && !torn.value.includes(day)) {
+    phase.value = 'tearing'
+    if (!(await pause(reducedMotion() ? 0 : 550)) || run !== generation) return false
+    torn.value = [...torn.value, day]
+  }
   phase.value = 'returning'
   transform.value = 'none'
   if (!(await pause(reducedMotion() ? 0 : 850)) || run !== generation) return false
@@ -123,6 +132,7 @@ function openDay(day: number) {
 async function reset() {
   cancel()
   opened.value = []
+  torn.value = []
   return overview()
 }
 async function playAll() {
@@ -200,6 +210,7 @@ onBeforeUnmount(() => {
             class="door"
             :class="{
               opened: opened.includes(day),
+              tearing: selected === day && phase === 'tearing',
               selected: selected === day,
               double: day === 24,
               today: day === today,
@@ -224,19 +235,20 @@ onBeforeUnmount(() => {
                 /></svg
               ><span>En lille<br />overraskelse</span></span
             >
-            <span
-              v-for="side in day === 24 ? ['left', 'right'] : ['left']"
-              :key="side"
-              class="door-hinge"
-              :class="side"
-              aria-hidden="true"
+            <template v-if="!torn.includes(day)"
               ><span
-                class="door-face"
-                :style="surfaceStyle(day, side)"
-                ><b>{{ day === 24 ? (side === 'left' ? '2' : '4') : day }}</b
-                ><span class="door-handle" /></span
-              ><span class="door-back"
-            /></span>
+                v-for="side in day === 24 ? ['left', 'right'] : ['left']"
+                :key="side"
+                class="door-hinge"
+                :class="side"
+                aria-hidden="true"
+                ><span
+                  class="door-face"
+                  :style="surfaceStyle(day, side)"
+                  ><b>{{ day === 24 ? (side === 'left' ? '2' : '4') : day }}</b
+                  ><span class="door-handle" /></span
+                ><span class="door-back" /></span
+            ></template>
           </button>
         </div>
         <span class="placeholder-label">Midlertidig baggrund</span>
@@ -506,6 +518,40 @@ onBeforeUnmount(() => {
 .door.opened .door-hinge {
   transform: rotateY(-112deg);
 }
+.door.tearing .door-hinge {
+  animation: tear-left 550ms cubic-bezier(0.3, 0.1, 0.65, 1) both;
+}
+.door.tearing .door-hinge.right {
+  animation-name: tear-right;
+}
+@keyframes tear-left {
+  0% {
+    transform: rotateY(-112deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translate3d(-5px, -8px, 8px) rotateY(-100deg) rotateZ(-8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-65px, 150px, 40px) rotateY(-55deg) rotateZ(-32deg);
+    opacity: 0;
+  }
+}
+@keyframes tear-right {
+  0% {
+    transform: rotateY(112deg);
+    opacity: 1;
+  }
+  25% {
+    transform: translate3d(5px, -8px, 8px) rotateY(100deg) rotateZ(8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(65px, 150px, 40px) rotateY(55deg) rotateZ(32deg);
+    opacity: 0;
+  }
+}
 .door.opened {
   z-index: 1;
 }
@@ -638,6 +684,9 @@ button:disabled {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .door.tearing .door-hinge {
+    animation: none;
+  }
   .calendar-scene,
   .door-hinge,
   .door {

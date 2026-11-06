@@ -34,7 +34,7 @@ function calendar(reduced = false) {
   })
   vm.runInContext(
     code +
-      '\nglobalThis.api={days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay,backgroundImage,surfaces,artwork,measureSurfaces,surfaceStyle};',
+      '\nglobalThis.api={days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay,backgroundImage,surfaces,artwork,measureSurfaces,surfaceStyle,overview,torn};',
     context,
   )
   const a = context.api
@@ -121,6 +121,41 @@ test('automatic preview opens all doors in date order, including reduced motion'
     assert.equal(a.autoplay.value, false)
     assert.equal(a.phase.value, 'overview')
     assert.equal(a.selected.value, null)
+    assert.equal(a.torn.value.length, 24)
+  }
+})
+
+test('returning tears off both door types before zooming out and keeps removed leaves gone on revisit', async () => {
+  for (const day of [7, 24]) {
+    const a = calendar(),
+      opening = a.reveal(day)
+    await new Promise(setImmediate)
+    await a.tick()
+    await a.tick()
+    await opening
+    const returning = a.overview()
+    assert.equal(a.phase.value, 'tearing')
+    assert.equal(a.torn.value.length, 0)
+    await a.tick()
+    assert.equal(a.phase.value, 'returning')
+    assert.deepEqual(Array.from(a.torn.value), [day])
+    await a.tick()
+    await returning
+    assert.equal(a.phase.value, 'overview')
+    assert.deepEqual(Array.from(a.opened.value), [day])
+    const revisit = a.reveal(day)
+    await new Promise(setImmediate)
+    while (a.timers.length) await a.tick()
+    await revisit
+    const secondReturn = a.overview()
+    assert.equal(a.phase.value, 'returning')
+    await a.tick()
+    await secondReturn
+    assert.deepEqual(Array.from(a.torn.value), [day])
+    const reset = a.reset()
+    await a.tick()
+    await reset
+    assert.equal(a.torn.value.length, 0)
   }
 })
 
