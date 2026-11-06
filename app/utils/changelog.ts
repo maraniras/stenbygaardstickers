@@ -22,9 +22,8 @@ export const CHANGELOG: Release[] = [
       'Fem nye Bananditten-badges samt lyd på spin og gevinster',
       'Fælles daglig tabsgrænse på 300 bananer netto i casinoet – gevinster giver plads igen',
       'Brugere & rangliste har fået sin egen fane i bundmenuen',
-      'Zoom på kortet uden at forstørre knapper og bundmenu',
       'Se de nye funktioner i Hvad er nyt, første gang du åbner en ny version',
-      'Mere luft mellem spillene i casino-menuen',
+      'Små fejlrettelser og forbedringer i appen',
     ],
   },
   {
