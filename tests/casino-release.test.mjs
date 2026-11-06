@@ -16,8 +16,8 @@ const code = ts.transpileModule(source, {
 for (const [label, env, slotsEnabled] of [
   ['local development', { NODE_ENV: 'development' }, true],
   ['Vercel Preview', { NODE_ENV: 'production', VERCEL_ENV: 'preview' }, true],
-  ['Vercel production', { NODE_ENV: 'production', VERCEL_ENV: 'production' }, false],
-  ['standalone production', { NODE_ENV: 'production' }, false],
+  ['Vercel production', { NODE_ENV: 'production', VERCEL_ENV: 'production' }, true],
+  ['standalone production', { NODE_ENV: 'production' }, true],
 ]) {
   test(`casino release defaults in ${label}: Bananjack open, slots ${slotsEnabled ? 'open' : 'coming soon'}`, () => {
     const exports = {}

@@ -12,11 +12,18 @@ export interface Release {
 export const CHANGELOG: Release[] = [
   {
     version: '2.3.1',
+    push: {
+      title: '🎰 Bananditten er landet!',
+      body: 'Prøv casinoets nye spilleautomat, og optjen fem nye badges.',
+      url: '/spil/bananditten',
+    },
     notes: [
-      'Casinoet har en fælles daglig grænse på 300 bananer i nettotab',
-      'Se opdateringens nye funktioner i Hvad er nyt, første gang du åbner den nye version',
-      'Find Brugere & rangliste i bundmenuen – med kun ikoner på smalle skærme',
-      'Kortet zoomes med to fingre uden at forstørre knapper og bundmenu',
+      'Bananditten er åben! Spin for 5–25 bananer, og jagt jackpotten på 100×',
+      'Fem nye Bananditten-badges samt lyd på spin og gevinster',
+      'Fælles daglig tabsgrænse på 300 bananer netto i casinoet – gevinster giver plads igen',
+      'Brugere & rangliste har fået sin egen fane i bundmenuen',
+      'Zoom på kortet uden at forstørre knapper og bundmenu',
+      'Se de nye funktioner i Hvad er nyt, første gang du åbner en ny version',
       'Mere luft mellem spillene i casino-menuen',
     ],
   },
