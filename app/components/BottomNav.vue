@@ -98,7 +98,7 @@ const tab = computed(() => {
         viewBox="0 0 24 24"
         aria-hidden="true"
       >
-        <path d="M6 7h12l1 14H5L6 7ZM9 7V5a3 3 0 0 1 6 0v2" />
+        <path d="m8 3-4 7m12-7 4 7M2 10h20l-3 11H5L2 10Zm7 4v3m6-3v3" />
       </svg>
       <span class="nav-label">Shop</span>
     </NuxtLink>
