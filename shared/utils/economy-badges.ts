@@ -102,6 +102,9 @@ export function economyBadges(economy?: EconomyPublic): Badge[] {
       'Ram jackpot på lykkehjulet',
     ),
     make('city-last', '😅', ['I sidste øjeblik'], [1], s.cityLastWins, 'Gæt byen på femte forsøg'),
-    make('wheel-nits', '🙃', ['Nitteekspert'], [3], s.bestNitStreak, 'Nitter i tre spins i træk'),
+    {
+      ...make('wheel-nits', '🙃', ['Miv-ekspert'], [3], s.bestNitStreak, '3 miv i træk'),
+      desc: '3 miv i træk',
+    },
   ]
 }

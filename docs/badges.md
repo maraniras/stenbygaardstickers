@@ -97,7 +97,7 @@ Reglerne og navnene står i `shared/utils/badges.ts` (id i parentes). Ikoner væ
 | x72 | Fast inventar → Møder altid op (`wheel-streak`) | 3/7/14/30/100 spildøgn med spin i træk | 10/25/50/100/250 |
 | x73 | Hjulets udvalgte (`wheel-jackpot`) | Ram dagens jackpot (400–1.000) på hjulet | 250 |
 | x74 | I sidste øjeblik (`city-last`) | Rigtigt svar på femte gæt | 25 |
-| x75 | Nitteekspert (`wheel-nits`) | Tre nitter i på hinanden følgende spins | 25 |
+| x75 | Miv-ekspert (`wheel-nits`) | 3 miv i træk | 25 |
 
 Hvert trin udbetales én gang. Formuebadge giver ingen levelpoint; spiltrin giver 1/2/3/4/5 point, og x73–75 giver 2/1/1 point. Gamle badges giver 20 bananer pr. point pr. trin, Pioner 60 pr. land, og Årets Dengse 200 efter årets udgang. Midlertidige rekorder giver ingen bananer.
 

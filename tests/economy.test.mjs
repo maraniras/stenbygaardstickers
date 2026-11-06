@@ -384,6 +384,7 @@ test('renamed badge rewards retain their IDs, amounts and stored history', async
   const { api: a } = setup()
   const record = a.freshEconomy()
   const names = [
+    ['wheel-nits', 'Nitteekspert', 'Miv-ekspert'],
     ['continent-europa:2', 'Euro-Emil', 'Europafarer'],
     ['continent-asien:3', 'Østens Emil', 'Østens eventyrer'],
     ['continent-sydamerika:2', 'Samba-Emil', 'Sambakonge'],

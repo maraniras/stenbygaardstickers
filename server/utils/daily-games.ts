@@ -5,6 +5,7 @@ import { casinoDailyLimit } from './casino-limit'
 
 // Keep previously credited rewards readable under the current badge names.
 const renamedBadgeLabels: Record<string, string> = {
+  'badge:wheel-nits': 'Miv-ekspert',
   'badge:jack-dealer-bust': 'Dealeren gik over',
   'badge:continent-europa:2': 'Europafarer',
   'badge:continent-asien:3': 'Østens eventyrer',
