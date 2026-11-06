@@ -86,15 +86,6 @@ function newCode() {
 onBeforeUnmount(() => clearInterval(timer))
 
 const router = useRouter()
-function toProfile() {
-  if (
-    window.history.state?.back &&
-    name.value &&
-    window.history.state.back === personUrl(name.value)
-  )
-    router.back()
-  else if (name.value) router.push(personUrl(name.value))
-}
 
 // Lige logget ind: videre til profilen
 watch(name, (n, old) => {
@@ -126,13 +117,11 @@ function selectMode(value: 'name' | 'code') {
 
     <!-- Logget ind -->
     <template v-else-if="name">
-      <button
-        class="back"
-        aria-label="Tilbage til profilen"
-        @click="toProfile"
-      >
-        <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-      </button>
+      <PageHeader
+        title="Indstillinger"
+        :back-to="personUrl(name)"
+        back-label="Tilbage til profilen"
+      />
       <header>
         <button
           class="avatar-btn"
@@ -180,7 +169,7 @@ function selectMode(value: 'name' | 'code') {
           </button>
         </div>
         <p class="eyebrow">Du er logget ind som</p>
-        <h1>{{ name }}</h1>
+        <h2 class="account-name">{{ name }}</h2>
       </header>
 
       <NuxtLink
@@ -263,18 +252,10 @@ function selectMode(value: 'name' | 'code') {
 
     <!-- Ikke logget ind -->
     <template v-else>
-      <header>
-        <img
-          class="logo"
-          src="/marker.png"
-          alt=""
-        />
-        <h1>Hvem er du?</h1>
-        <p class="sub">
-          Vælg dit navn, så kan appen kende dig. Det er helt frivilligt – og der er ingen
-          adgangskode.
-        </p>
-      </header>
+      <PageHeader
+        title="Hvem er du?"
+        description="Vælg dit navn, så kan appen kende dig. Det er helt frivilligt – og der er ingen adgangskode."
+      />
 
       <div
         class="tabs"
@@ -397,31 +378,9 @@ function selectMode(value: 'name' | 'code') {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 480px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: calc(28px + var(--safe-t)) 16px var(--nav-space);
-}
-.back {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin: -12px 0 -32px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-}
-.back svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
 }
 header {
   display: flex;
@@ -492,21 +451,11 @@ header {
   font-weight: 800;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
-.logo {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
-}
-h1 {
+.account-name {
   font-size: 30px;
 }
 header .eyebrow {
   margin: 0 0 2px;
-}
-.sub {
-  margin: 6px 0 0;
-  color: var(--muted);
 }
 .card {
   display: flex;

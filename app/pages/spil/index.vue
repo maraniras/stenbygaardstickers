@@ -7,29 +7,20 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
 </script>
 <template>
   <div class="daily-page">
-    <header>
-      <div class="brand">
-        <img
-          src="/marker.png"
-          alt=""
-        /><span>Stenbygaard Stickers</span
+    <PageHeader
+      title="Spil"
+      description="En lille pause. Måske flere bananer."
+    >
+      <template #actions
         ><NuxtLink
           v-if="state"
-          class="balance"
+          class="page-balance"
           to="/spil/bananer"
+          aria-label="Åbn dit bananlager"
           >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        >
-      </div>
-      <div class="heading-line">
-        <h1>Spil<span>.</span></h1>
-        <NuxtLink
-          class="ranking-link"
-          to="/rangliste"
-          >Brugere &amp; rangliste ↗</NuxtLink
-        >
-      </div>
-      <p class="lead">En lille pause. Måske flere bananer.</p>
-    </header>
+        ></template
+      >
+    </PageHeader>
     <GameSectionNav section="daily" />
     <div class="daily-reset">
       <svg
@@ -160,57 +151,7 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
 .daily-page {
   max-width: 480px;
   margin: 0 auto;
-  padding: calc(22px + var(--safe-t)) 18px calc(var(--nav-space) + 18px);
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-}
-.brand img {
-  width: 24px;
-  height: 28px;
-  object-fit: contain;
-}
-.balance {
-  margin-left: auto;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  padding: 5px 9px;
-  border-radius: 9px;
-  background: var(--accent-soft);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-.heading-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-}
-h1 {
-  font-size: 36px;
-  letter-spacing: -0.045em;
-}
-h1 > span {
-  color: var(--accent);
-}
-.ranking-link {
-  flex: none;
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-  text-decoration: none;
+  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
 }
 .lead {
   margin: 10px 0 0;
@@ -400,13 +341,6 @@ button:focus-visible {
   outline-offset: 3px;
 }
 @media (max-width: 350px) {
-  .daily-page {
-    padding-right: 14px;
-    padding-left: 14px;
-  }
-  h1 {
-    font-size: 32px;
-  }
   .visual-title,
   .wheel-copy h2 {
     font-size: 24px;

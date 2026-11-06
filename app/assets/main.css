@@ -484,6 +484,55 @@ button.chip {
   pointer-events: none;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
 }
+.game-title-accent {
+  color: var(--accent);
+}
+.page-icon-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.page-icon-button svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.page-icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.page-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 5px 9px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.page-balance img {
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+}
 /* Luftfoto beholder sine farver */
 :root .satellite .leaflet-tile-pane {
   filter: none;

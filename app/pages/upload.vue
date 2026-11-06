@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // Gemt side (link nederst i listen). Indsendte stickers venter på godkendelse i /admin.
-const router = useRouter()
 const { people } = useStickers()
 
 const { name: me } = useUser()
@@ -54,10 +53,6 @@ function again() {
   sent.value = false
 }
 
-function back() {
-  if (window.history.state?.back) router.back()
-  else router.push('/liste')
-}
 function discardDraft() {
   draft.value = newDraft()
   clearDraft()
@@ -67,13 +62,13 @@ function discardDraft() {
 
 <template>
   <div class="page">
-    <button
-      class="back"
-      aria-label="Tilbage"
-      @click="back"
-    >
-      <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-    </button>
+    <PageHeader
+      :title="sent ? 'Sticker indsendt' : 'Ny sticker'"
+      back-to="/liste"
+      :description="
+        sent ? undefined : 'Har du sat Emil op et nyt sted? Den bliver vist, når den er godkendt.'
+      "
+    />
 
     <div
       v-if="sent"
@@ -83,7 +78,7 @@ function discardDraft() {
         src="/marker.png"
         alt=""
       />
-      <h1>Tak!</h1>
+      <h2>Tak!</h2>
       <p>Stickeren kommer på kortet, så snart den er godkendt.</p>
       <button
         class="btn"
@@ -99,11 +94,6 @@ function discardDraft() {
     </div>
 
     <template v-else>
-      <header>
-        <h1>Ny sticker</h1>
-        <p class="sub">Har du sat Emil op et nyt sted? Den bliver vist, når den er godkendt.</p>
-      </header>
-
       <p
         v-if="restored"
         class="draft-note"
@@ -168,38 +158,10 @@ function discardDraft() {
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(12px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
 }
-.back {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-left: -8px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  cursor: pointer;
-}
-.back svg {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-header {
-  margin: 8px 0 22px;
-}
-h1 {
-  font-size: 34px;
-}
-.sub {
-  margin: 6px 0 0;
-  color: var(--muted);
+.done h2 {
+  font-size: 28px;
 }
 .submit {
   display: flex;

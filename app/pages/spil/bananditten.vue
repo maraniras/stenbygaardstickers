@@ -61,24 +61,23 @@ const resetLabel = computed(() =>
 </script>
 <template>
   <div class="slots-page">
-    <header>
-      <NuxtLink
-        to="/spil/casino"
-        class="back"
-        aria-label="Tilbage til casino"
-        >←</NuxtLink
+    <PageHeader
+      back-to="/spil/casino"
+      compact
+    >
+      <template #title>Banan<span class="game-title-accent">ditten</span></template>
+      <template #actions
+        ><NuxtLink
+          v-if="shownBalance !== null"
+          class="page-balance"
+          to="/spil/bananer"
+          ><img
+            src="/badges/banana-baron.webp"
+            alt="Bananer"
+          />{{ shownBalance.toLocaleString('da-DK') }}</NuxtLink
+        ></template
       >
-      <h1>Banan<span>ditten</span></h1>
-      <NuxtLink
-        v-if="shownBalance !== null"
-        class="balance"
-        to="/spil/bananer"
-        ><img
-          src="/badges/banana-baron.webp"
-          alt="Bananer"
-        />{{ shownBalance.toLocaleString('da-DK') }}</NuxtLink
-      >
-    </header>
+    </PageHeader>
     <div
       v-if="ready && !name"
       class="login"
@@ -279,43 +278,6 @@ const resetLabel = computed(() =>
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-}
-h1 {
-  font-size: clamp(22px, 6vw, 29px);
-  letter-spacing: -0.055em;
-}
-h1 span {
-  color: light-dark(#987023, #efcc7f);
-}
-.back {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  min-height: 44px;
-  font-size: 23px;
-  color: var(--muted);
-  text-decoration: none;
-}
-.balance {
-  margin-left: auto;
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--text);
-  text-decoration: none;
-  font-variant-numeric: tabular-nums;
-}
-.balance img {
-  width: 23px;
-  height: 23px;
 }
 .machine {
   border-radius: 25px;

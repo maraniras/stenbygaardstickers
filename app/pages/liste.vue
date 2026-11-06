@@ -49,18 +49,17 @@ const groups = computed(() => {
 
 <template>
   <div class="page">
-    <header>
-      <div class="title">
-        <h1>Stickers</h1>
-        <div class="title-actions">
+    <section aria-label="Stickeroversigt">
+      <PageHeader title="Stickers">
+        <template #actions>
           <NuxtLink
             class="add-sticker"
             to="/upload"
             >＋ Tilføj</NuxtLink
           >
           <NotifyButton />
-        </div>
-      </div>
+        </template>
+      </PageHeader>
       <div class="grid">
         <div class="stat">
           <b>{{ stats.count }}</b
@@ -153,7 +152,7 @@ const groups = computed(() => {
           Bedst bedømt
         </button>
       </div>
-    </header>
+    </section>
 
     <p
       v-if="!stickers.length"
@@ -245,18 +244,6 @@ const groups = computed(() => {
   max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 80px);
-}
-.title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.title-actions {
-  display: flex;
-  gap: 8px;
-}
-h1 {
-  font-size: 34px;
 }
 .grid {
   margin-top: 10px;

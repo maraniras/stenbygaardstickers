@@ -41,20 +41,21 @@ const {
 
 <template>
   <div class="jack-page">
-    <header>
-      <NuxtLink
-        class="back-link"
-        to="/spil/casino"
-        >← Casino</NuxtLink
-      ><NuxtLink
-        v-if="shownBalance !== null"
-        class="balance"
-        to="/spil/bananer"
-        >🍌 {{ shownBalance.toLocaleString('da-DK') }}</NuxtLink
+    <PageHeader
+      back-to="/spil/casino"
+      compact
+    >
+      <template #title>Banan<span class="game-title-accent">jack</span></template>
+      <template #actions
+        ><NuxtLink
+          v-if="shownBalance !== null"
+          class="page-balance"
+          to="/spil/bananer"
+          >🍌 {{ shownBalance.toLocaleString('da-DK') }}</NuxtLink
+        ></template
       >
-    </header>
+    </PageHeader>
     <div class="title-row">
-      <h1>Banan<span>jack</span></h1>
       <div class="table-tools">
         <button
           class="rules-button"
@@ -321,32 +322,11 @@ const {
   margin: auto;
   padding: calc(14px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
 }
-header,
 .title-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
-}
-.back-link,
-.balance {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text);
-  font-size: 13px;
-}
-.balance {
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
-}
-h1 {
-  font-size: 34px;
-  letter-spacing: -0.06em;
-}
-h1 span {
-  color: var(--accent);
 }
 button {
   cursor: pointer;

@@ -26,18 +26,11 @@ const time = (at: string) =>
 </script>
 <template>
   <div class="bank-page">
-    <NuxtLink
-      class="back"
-      :to="name ? personUrl(name) : '/spil'"
-      >{{ name ? '← Min profil' : '← Dagens spil' }}</NuxtLink
-    >
-    <header>
-      <img
-        src="/badges/banana-baron.webp"
-        alt=""
-      /><span class="eyebrow">Optjen. Gem. Gør Emil misundelig.</span>
-      <h1>Dit bananlager</h1>
-    </header>
+    <PageHeader
+      title="Dit bananlager"
+      :back-to="name ? personUrl(name) : '/spil'"
+      :back-label="name ? 'Tilbage til min profil' : 'Tilbage til spil'"
+    />
     <div
       v-if="ready && !name"
       class="empty"
@@ -138,37 +131,9 @@ const time = (at: string) =>
 </template>
 <style scoped>
 .bank-page {
-  max-width: 520px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 18px calc(var(--nav-space) + 20px);
-}
-.back {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--muted);
-  font-size: 13px;
-  text-decoration: none;
-}
-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin: 10px 0 24px;
-}
-header img {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-}
-header .eyebrow {
-  margin-top: 10px;
-  font-size: 10px;
-}
-h1 {
-  margin-top: 8px;
-  font-size: 31px;
+  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 20px);
 }
 h2 {
   font-size: 18px;

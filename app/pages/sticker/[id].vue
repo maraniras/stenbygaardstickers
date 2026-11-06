@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute()
-const router = useRouter()
 const { getSticker } = useStickers()
 const sticker = computed(() => getSticker(String(route.params.id)))
 const index = ref(0)
@@ -17,11 +16,6 @@ function onScroll() {
 
 function goTo(i: number) {
   track.value?.scrollTo({ left: i * track.value.clientWidth, behavior: 'smooth' })
-}
-
-function back() {
-  if (window.history.state?.back) router.back()
-  else router.push('/')
 }
 
 // Telefonens egen del-menu – ellers kopieres linket
@@ -58,6 +52,24 @@ watch(index, (i) => {
     v-if="sticker"
     class="page"
   >
+    <PageHeader
+      :title="sticker.title"
+      back-to="/liste"
+    >
+      <template #actions>
+        <button
+          class="page-icon-button"
+          aria-label="Del sticker"
+          title="Del sticker"
+          @click="share"
+        >
+          <svg viewBox="0 0 24 24">
+            <path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5" />
+            <path d="M7 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1" />
+          </svg>
+        </button>
+      </template>
+    </PageHeader>
     <div
       class="hero"
       :class="{ empty: !sticker.media.length }"
@@ -100,24 +112,6 @@ watch(index, (i) => {
         alt=""
       />
 
-      <button
-        class="back glass"
-        aria-label="Tilbage"
-        @click="back"
-      >
-        <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-      </button>
-      <button
-        class="back share glass"
-        aria-label="Del sticker"
-        title="Del sticker"
-        @click="share"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5" />
-          <path d="M7 10H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1" />
-        </svg>
-      </button>
       <Transition name="fade">
         <span
           v-if="copied"
@@ -144,7 +138,6 @@ watch(index, (i) => {
       <div class="place">
         <CountryFlag :code="sticker.countryCode" /> {{ sticker.city }}, {{ sticker.country }}
       </div>
-      <h1>{{ sticker.title }}</h1>
       <p class="date">{{ formatDate(sticker.date) }}</p>
 
       <div class="facts">
@@ -237,18 +230,23 @@ watch(index, (i) => {
 
   <div
     v-else
-    class="missing"
+    class="page"
   >
-    <img
-      src="/marker.png"
-      alt=""
+    <PageHeader
+      title="Sticker ikke fundet"
+      back-to="/liste"
     />
-    <h1>Sticker ikke fundet</h1>
-    <NuxtLink
-      class="btn"
-      to="/"
-      >Til kortet</NuxtLink
-    >
+    <div class="missing">
+      <img
+        src="/marker.png"
+        alt=""
+      />
+      <NuxtLink
+        class="btn"
+        to="/"
+        >Til kortet</NuxtLink
+      >
+    </div>
   </div>
 </template>
 
@@ -256,16 +254,18 @@ watch(index, (i) => {
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding-bottom: var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
 }
 .hero {
   position: relative;
+  overflow: hidden;
+  border-radius: 20px;
   background: #0d0d0f;
 }
 .hero.empty {
   display: grid;
   place-items: center;
-  height: calc(220px + var(--safe-t));
+  height: 220px;
   background: linear-gradient(160deg, var(--accent-light), var(--accent));
 }
 .placeholder {
@@ -299,37 +299,6 @@ watch(index, (i) => {
 }
 .slide video {
   object-fit: contain;
-}
-.back {
-  position: absolute;
-  top: calc(12px + var(--safe-t));
-  left: 12px;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  cursor: pointer;
-}
-.back svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.share {
-  left: auto;
-  right: 12px;
-}
-.share svg {
-  width: 20px;
-  height: 20px;
-  stroke-width: 2.1;
 }
 .copied {
   position: absolute;
@@ -382,23 +351,13 @@ watch(index, (i) => {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-top: -26px;
-  padding: 24px 16px 0;
-  border-radius: 28px 28px 0 0;
-  background: var(--bg);
-}
-.hero.empty + .body {
-  margin-top: -26px;
+  margin-top: 20px;
+  padding: 0;
 }
 .place {
   font-size: 14px;
   font-weight: 600;
   color: var(--muted);
-}
-h1 {
-  margin-top: -8px;
-  font-size: 32px;
-  overflow-wrap: anywhere;
 }
 .date {
   margin: -10px 0 0;

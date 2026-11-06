@@ -68,24 +68,19 @@ function reject() {
 
 <template>
   <div class="page">
-    <NuxtLink
-      class="back"
-      to="/admin"
-      aria-label="Tilbage"
+    <PageHeader
+      :title="original?.title || 'Redigér sticker'"
+      back-to="/admin"
     >
-      <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-    </NuxtLink>
+      <span
+        v-if="original"
+        class="status"
+        :class="original.status"
+        >{{ original.status === 'pending' ? 'Venter på godkendelse' : 'Godkendt' }}</span
+      >
+    </PageHeader>
 
     <template v-if="draft && original">
-      <header>
-        <span
-          class="status"
-          :class="original.status"
-          >{{ original.status === 'pending' ? 'Venter på godkendelse' : 'Godkendt' }}</span
-        >
-        <h1>{{ original.title }}</h1>
-      </header>
-
       <StickerForm
         v-model="draft"
         v-model:busy="busy"
@@ -180,30 +175,7 @@ function reject() {
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(12px + var(--safe-t)) 16px var(--nav-space);
-}
-.back {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-left: -8px;
-}
-.back svg {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-header {
-  margin: 8px 0 22px;
-}
-h1 {
-  font-size: 30px;
-  overflow-wrap: anywhere;
+  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
 }
 .status {
   display: inline-block;

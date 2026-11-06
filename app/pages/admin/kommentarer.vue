@@ -55,12 +55,10 @@ async function remove(c: AdminComment) {
 
 <template>
   <div class="page">
-    <NuxtLink
-      class="back-link"
-      to="/admin"
-      >‹ Admin</NuxtLink
-    >
-    <h1>Kommentarer</h1>
+    <PageHeader
+      title="Kommentarer"
+      back-to="/admin"
+    />
 
     <p
       v-if="admin === false"
@@ -160,16 +158,6 @@ async function remove(c: AdminComment) {
   max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
-}
-.back-link {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--muted);
-  text-decoration: none;
-}
-h1 {
-  font-size: 30px;
-  margin: 6px 0 14px;
 }
 .search {
   width: 100%;

@@ -4,10 +4,10 @@ useHead({ title: 'Shop · Stenbygaard Stickers' })
 
 <template>
   <div class="shop-page">
-    <header>
-      <span class="eyebrow">Brug dine bananer</span>
-      <h1>Shop<span>.</span></h1>
-    </header>
+    <PageHeader
+      title="Shop"
+      description="Brug dine bananer"
+    />
     <section
       class="coming-soon"
       aria-labelledby="shop-coming-soon"
@@ -29,25 +29,12 @@ useHead({ title: 'Shop · Stenbygaard Stickers' })
 
 <style scoped>
 .shop-page {
-  max-width: 480px;
-  min-height: calc(100dvh - var(--nav-space));
+  max-width: 640px;
+  min-height: 100dvh;
   margin: 0 auto;
-  padding: calc(24px + var(--safe-t)) 20px 32px;
+  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
   display: flex;
   flex-direction: column;
-}
-.eyebrow {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-}
-h1 {
-  margin-top: 8px;
-  font-size: 36px;
-  letter-spacing: -0.045em;
-}
-h1 span {
-  color: var(--accent);
 }
 .coming-soon {
   margin: auto 0;

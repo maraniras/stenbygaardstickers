@@ -86,41 +86,14 @@ function unit(n: number | null) {
   if (n === 1 && metric.value === 'badges') return 'badge'
   return selected.value.unit
 }
-const router = useRouter()
-function back() {
-  if (window.history.state?.back) router.back()
-  else router.push('/spil')
-}
 </script>
 
 <template>
   <div class="rank-page">
-    <header>
-      <button
-        class="back"
-        aria-label="Tilbage"
-        @click="back"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path d="m14 6-6 6 6 6" />
-        </svg>
-      </button>
-      <div class="heading-row">
-        <div>
-          <span class="eyebrow">Hele fællesskabet</span>
-          <h1>Brugere &amp; rangliste</h1>
-        </div>
-        <img
-          class="world"
-          src="/badges/world.webp"
-          alt=""
-        />
-      </div>
-      <p class="intro">Find en bruger, eller sammenlign badges, level, stickers og bananer.</p>
-    </header>
+    <PageHeader
+      title="Brugere"
+      description="Find en bruger, eller sammenlign badges, level, stickers og bananer."
+    />
 
     <div
       v-if="mine && !usersFailed"
@@ -321,55 +294,9 @@ function back() {
   font-size: 11px;
 }
 .rank-page {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
-}
-.back {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-}
-.back svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.heading-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 18px;
-}
-.heading-row .eyebrow {
-  font-size: 10px;
-}
-h1 {
-  margin-top: 4px;
-  font-size: 34px;
-}
-.world {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-}
-.intro {
-  margin: 8px 0 20px;
-  font-size: 14px;
-  color: var(--muted);
 }
 .your-rank {
   display: flex;
@@ -616,10 +543,6 @@ select:focus-visible {
   }
   .score b {
     font-size: 19px;
-  }
-  .rank-page {
-    padding-left: 12px;
-    padding-right: 12px;
   }
 }
 </style>

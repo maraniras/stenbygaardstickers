@@ -8,29 +8,20 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 
 <template>
   <div class="casino-page">
-    <header>
-      <div class="brand">
-        <img
-          src="/badges/banana-baron.webp"
-          alt=""
-        /><span>Stenbygaard Stickers</span
+    <PageHeader
+      title="Spil"
+      description="Lidt held. Lidt taktik. En håndfuld bananer."
+    >
+      <template #actions
         ><NuxtLink
           v-if="state"
-          class="balance"
+          class="page-balance"
           to="/spil/bananer"
+          aria-label="Åbn dit bananlager"
           >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        >
-      </div>
-      <div class="heading-line">
-        <h1>Spil<span>.</span></h1>
-        <NuxtLink
-          class="ranking-link"
-          to="/rangliste"
-          >Brugere &amp; rangliste ↗</NuxtLink
-        >
-      </div>
-      <p class="lead">Lidt held. Lidt taktik. En håndfuld bananer.</p>
-    </header>
+        ></template
+      >
+    </PageHeader>
     <GameSectionNav section="casino" />
     <CasinoLimit
       class="casino-budget"
@@ -167,59 +158,10 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 .casino-page {
   max-width: 480px;
   margin: 0 auto;
-  padding: calc(22px + var(--safe-t)) 18px calc(var(--nav-space) + 18px);
+  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
 }
 .casino-budget {
   margin-bottom: 18px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-}
-.brand > img {
-  width: 24px;
-  height: 28px;
-  object-fit: contain;
-}
-.balance {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-  min-height: 36px;
-  padding: 5px 9px;
-  border-radius: 9px;
-  background: var(--accent-soft);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-.heading-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-}
-h1 {
-  font-size: 36px;
-  letter-spacing: -0.045em;
-}
-h1 > span {
-  color: var(--accent);
-}
-.ranking-link {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-  text-decoration: none;
 }
 .lead {
   margin: 10px 0 0;
@@ -497,13 +439,6 @@ a:focus-visible {
   outline-offset: 3px;
 }
 @media (max-width: 350px) {
-  .casino-page {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-  h1 {
-    font-size: 32px;
-  }
   .table-art {
     height: 185px;
   }

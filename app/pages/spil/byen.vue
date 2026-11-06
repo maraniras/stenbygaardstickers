@@ -71,21 +71,20 @@ async function choose(id: string) {
 </script>
 <template>
   <div class="city-page">
-    <div class="top">
-      <NuxtLink
-        class="game-back"
-        to="/spil"
-        aria-label="Dagens spil"
-        >←</NuxtLink
+    <PageHeader
+      title="Emil er faret vild"
+      back-to="/spil"
+      compact
+    >
+      <template #actions
+        ><NuxtLink
+          v-if="state"
+          class="page-balance"
+          to="/spil/bananer"
+          >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
+        ></template
       >
-      <h1>Emil er faret vild</h1>
-      <NuxtLink
-        v-if="state"
-        class="balance"
-        to="/spil/bananer"
-        >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-      >
-    </div>
+    </PageHeader>
     <div
       v-if="ready && !name"
       class="login"
@@ -312,37 +311,6 @@ async function choose(id: string) {
   min-height: 400px;
   margin: 0 auto;
   padding: calc(6px + var(--safe-t)) 14px 6px;
-}
-.top {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-}
-.top a {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 12px;
-}
-.top .game-back {
-  justify-content: center;
-  flex: none;
-  width: 38px;
-  font-size: 22px;
-}
-.top h1 {
-  flex: 1;
-  margin: 0;
-  font-size: clamp(16px, 4.8vw, 21px);
-  letter-spacing: -0.04em;
-}
-.top .balance {
-  flex: none;
-  font-weight: 700;
 }
 .aerial {
   position: relative;
@@ -626,9 +594,6 @@ a:focus-visible {
     gap: 4px;
     padding-top: 3px;
     padding-bottom: 3px;
-  }
-  .top h1 {
-    font-size: 16px;
   }
   .options button {
     padding: 6px 9px;

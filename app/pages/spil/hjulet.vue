@@ -78,24 +78,23 @@ async function play(direction: 1 | -1 = 1) {
 </script>
 <template>
   <div class="wheel-page">
-    <div class="top">
-      <NuxtLink
-        class="game-back"
-        to="/spil"
-        aria-label="Dagens spil"
-        >←</NuxtLink
+    <PageHeader
+      title="Dagens lykkehjul"
+      back-to="/spil"
+      compact
+    >
+      <template #actions
+        ><NuxtLink
+          v-if="state"
+          class="page-balance"
+          to="/spil/bananer"
+          ><img
+            src="/badges/banana-baron.webp"
+            alt="Bananer"
+          />{{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
+        ></template
       >
-      <h1>Dagens lykkehjul</h1>
-      <NuxtLink
-        v-if="state"
-        class="balance"
-        to="/spil/bananer"
-        ><img
-          src="/badges/banana-baron.webp"
-          alt="Bananer"
-        />{{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-      >
-    </div>
+    </PageHeader>
 
     <section
       class="arcade"
@@ -300,51 +299,6 @@ async function play(direction: 1 | -1 = 1) {
   max-width: 480px;
   margin: auto;
   padding: calc(12px + var(--safe-t)) 18px calc(var(--nav-space) + 24px);
-}
-.top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.top a {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--muted);
-  font-size: 12px;
-  text-decoration: none;
-}
-.top .balance {
-  gap: 5px;
-  color: var(--text);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-.balance img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-header {
-  margin: 19px 0 24px;
-}
-header .eyebrow {
-  font-size: 9px;
-  letter-spacing: 0.16em;
-}
-h1 {
-  margin-top: 7px;
-  font-size: 30px;
-  letter-spacing: -0.055em;
-}
-h1 > span {
-  color: var(--accent);
-}
-header p {
-  margin: 9px 0 0;
-  font-size: 12px;
-  color: var(--muted);
 }
 .arcade {
   --wheel-glow: #b794dc38;
@@ -661,9 +615,6 @@ summary:focus-visible {
     padding-left: 12px;
     padding-right: 12px;
   }
-  h1 {
-    font-size: 27px;
-  }
   .arcade {
     padding-left: 9px;
     padding-right: 9px;
@@ -693,32 +644,6 @@ summary:focus-visible {
   height: calc(100dvh - var(--nav-space));
   min-height: 400px;
   padding: calc(6px + var(--safe-t)) 14px 6px;
-}
-.top {
-  flex: none;
-  gap: 8px;
-  min-height: 44px;
-}
-.top h1 {
-  flex: 1;
-  margin: 0;
-  font-size: clamp(16px, 4.8vw, 21px);
-  letter-spacing: -0.04em;
-}
-.top .game-back {
-  justify-content: center;
-  flex: none;
-  width: 38px;
-  min-height: 44px;
-  font-size: 22px;
-}
-.top .balance {
-  flex: none;
-  font-size: 12px;
-}
-.balance img {
-  width: 21px;
-  height: 21px;
 }
 .arcade {
   display: flex;

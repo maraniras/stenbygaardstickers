@@ -3,7 +3,6 @@
 // og en liste over landene. Kortdata (world-atlas, ~100 kB) hentes først her.
 import type { GeoJSON as LGeoJSON, Map as LMap } from 'leaflet'
 
-const router = useRouter()
 const { stickers } = useStickers()
 const el = ref<HTMLElement>()
 const loading = ref(true)
@@ -106,32 +105,21 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => map?.remove())
-
-function back() {
-  if (window.history.state?.back) router.back()
-  else router.push('/liste')
-}
 </script>
 
 <template>
   <div class="page">
-    <button
-      class="back"
-      aria-label="Tilbage"
-      @click="back"
+    <PageHeader
+      title="Lande"
+      back-to="/liste"
     >
-      <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-    </button>
-
-    <header>
-      <h1>Lande</h1>
-      <p class="sub">
+      <template #description>
         <b>{{ countries.length }}</b> af 195 lande i verden
-      </p>
+      </template>
       <div class="progress">
         <span :style="{ width: `${Math.max(2, (countries.length / 195) * 100)}%` }" />
       </div>
-    </header>
+    </PageHeader>
 
     <div class="world">
       <div
@@ -173,41 +161,8 @@ function back() {
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
 }
-.back {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-}
-.back svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-header {
-  margin: 14px 0 16px;
-}
-h1 {
-  font-size: 34px;
-}
-.sub {
-  margin: 4px 0 10px;
-  color: var(--muted);
-}
-.sub b {
-  color: var(--text);
-}
 .progress {
+  margin-top: 12px;
   height: 6px;
   border-radius: 999px;
   background: var(--surface-2);

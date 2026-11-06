@@ -46,16 +46,20 @@ function submitted(s: StoredSticker) {
 
 <template>
   <div class="page">
-    <header>
-      <h1>Admin</h1>
-      <button
-        v-if="admin"
-        class="chip"
-        @click="logout"
-      >
-        Log ud
-      </button>
-    </header>
+    <PageHeader
+      title="Admin"
+      back-to="/liste"
+    >
+      <template #actions>
+        <button
+          v-if="admin"
+          class="chip"
+          @click="logout"
+        >
+          Log ud
+        </button>
+      </template>
+    </PageHeader>
 
     <form
       v-if="admin === false"
@@ -186,15 +190,6 @@ function submitted(s: StoredSticker) {
   max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
-}
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-h1 {
-  font-size: 34px;
 }
 .login {
   max-width: 360px;

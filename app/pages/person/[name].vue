@@ -83,56 +83,47 @@ watch(
   },
   { immediate: true },
 )
-
-function back() {
-  if (window.history.state?.back) router.back()
-  else router.push('/liste')
-}
 </script>
 
 <template>
   <div class="page">
-    <div class="topbar">
-      <button
-        class="back"
-        aria-label="Tilbage"
-        @click="back"
+    <PageHeader
+      :title="displayName"
+      :back-to="isMe(displayName) ? undefined : '/rangliste'"
+    >
+      <template #leading
+        ><UserAvatar
+          class="profile-avatar"
+          :name="displayName"
+      /></template>
+      <template #actions>
+        <NuxtLink
+          v-if="isMe(displayName)"
+          class="page-icon-button"
+          to="/mig"
+          aria-label="Indstillinger"
+          title="Indstillinger"
+        >
+          <svg viewBox="0 0 24 24">
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            />
+            <path
+              d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"
+            />
+          </svg> </NuxtLink
+      ></template>
+      <template #description
+        >{{ earnedCount(badges) }} af {{ badges.length }} badges
+        <span
+          v-if="isMe(displayName)"
+          class="chip you"
+          >Det er dig</span
+        ></template
       >
-        <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg>
-      </button>
-      <NuxtLink
-        v-if="isMe(displayName)"
-        class="back"
-        to="/mig"
-        aria-label="Indstillinger"
-        title="Indstillinger"
-      >
-        <svg viewBox="0 0 24 24">
-          <circle
-            cx="12"
-            cy="12"
-            r="3"
-          />
-          <path
-            d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"
-          />
-        </svg>
-      </NuxtLink>
-    </div>
-
-    <header>
-      <UserAvatar
-        class="avatar"
-        :name="displayName"
-      />
-      <h1>{{ displayName }}</h1>
-      <p class="sub">{{ earnedCount(badges) }} af {{ badges.length }} badges</p>
-      <span
-        v-if="isMe(displayName)"
-        class="chip you"
-        >Det er dig</span
-      >
-    </header>
+    </PageHeader>
 
     <AppTabs
       id="profile"
@@ -317,25 +308,6 @@ function back() {
 </template>
 
 <style scoped>
-header .avatar {
-  grid-row: 1/4;
-  width: 60px;
-  height: 60px;
-  font-size: 28px;
-}
-header h1 {
-  margin: 0;
-  font-size: 26px;
-}
-header .sub {
-  margin-top: 2px;
-  font-size: 12px;
-}
-header .you {
-  justify-self: start;
-  margin-top: 5px;
-  font-size: 10px;
-}
 [role='tabpanel']:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -359,60 +331,17 @@ header .you {
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
 }
-.topbar {
-  display: flex;
-  justify-content: space-between;
-}
-.back {
+.profile-avatar {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-}
-.back svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-header {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  column-gap: 14px;
-  text-align: left;
-  margin: 12px 0 0;
-  flex-direction: column;
-  align-items: center;
-}
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 84px;
-  height: 84px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(160deg, var(--accent-light), var(--accent));
   color: var(--on-accent);
-  font-size: 36px;
+  font-size: 22px;
   font-weight: 800;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-}
-h1 {
-  margin-top: 14px;
-  font-size: 30px;
-}
-.sub {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-weight: 600;
 }
 .you {
   margin-top: 10px;
