@@ -19,6 +19,7 @@ export const CHANGELOG: Release[] = [
   },
   {
     version: '2.3.1',
+    date: '2026-11-07',
     push: {
       title: '🎰 Bananditten er landet!',
       body: 'Prøv casinoets nye spilleautomat, og optjen fem nye badges.',
