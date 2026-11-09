@@ -243,7 +243,7 @@ const groups = computed(() => {
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 80px);
+  padding: calc(20px + var(--safe-t)) 16px 80px;
 }
 .grid {
   margin-top: 10px;

@@ -36,7 +36,7 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       :aria-describedby="!bananjackEnabled ? 'bananjack-coming-soon' : undefined"
     >
       <div class="card-top">
-        <span class="table-label">CASINOBORDET</span
+        <span class="table-label">BANANJACK</span
         ><span class="status">{{ bananjackEnabled ? 'Spil nu →' : 'På vej' }}</span>
       </div>
       <div
@@ -87,7 +87,6 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         />
       </div>
       <div class="game-copy">
-        <span class="eyebrow">Første spil i casinoet</span>
         <h2 id="bananjack-title">Banan<span>jack</span></h2>
         <div class="game-details"><span>Én spiller</span><span>10–50 🍌 pr. hånd</span></div>
       </div>
@@ -127,7 +126,7 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       <div class="game-copy">
         <h2 id="slots-title">Banan<span>ditten</span></h2>
         <div class="game-details">
-          <span>5–25 🍌 pr. spin</span><span>{{ SLOT_RTP }} % RTP</span>
+          <span>Én spiller</span><span>5–25 🍌 pr. spin</span><span>{{ SLOT_RTP }} % RTP</span>
         </div>
       </div>
       <div
@@ -140,6 +139,30 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         </div>
       </div>
     </component>
+    <article
+      class="roulette-card"
+      aria-labelledby="roulette-title"
+      aria-describedby="roulette-soon"
+    >
+      <div class="card-top">
+        <span class="table-label">ROULETTE</span
+        ><span
+          class="status"
+          id="roulette-soon"
+          >Kommer snart</span
+        >
+      </div>
+      <div
+        class="roulette-art"
+        aria-hidden="true"
+      >
+        <div class="roulette-wheel"><span class="roulette-ball" /></div>
+      </div>
+      <div class="game-copy">
+        <h2 id="roulette-title">Roulette</h2>
+        <div class="game-details"><span>Fælles bord</span><span>Vi gør hjulet klar.</span></div>
+      </div>
+    </article>
     <NuxtLink
       class="daily-link"
       to="/spil"
@@ -158,10 +181,80 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 .casino-page {
   max-width: 480px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
+  padding: calc(20px + var(--safe-t)) 16px 18px;
 }
 .casino-budget {
   margin-bottom: 18px;
+}
+.bananjack-card,
+.slots-card,
+.roulette-card {
+  display: grid;
+  grid-template-rows: auto 160px auto;
+  text-decoration: none;
+}
+.roulette-card {
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #cda75f55;
+  border-radius: 26px;
+  color: #fff8e8;
+  background: radial-gradient(ellipse at 50% 25%, #555245, #252d29 75%);
+  box-shadow: var(--shadow-sm);
+}
+.roulette-card .status {
+  color: #f5d69a;
+  border: 1px solid #e6c78460;
+  border-radius: 999px;
+  padding: 4px 9px;
+}
+.roulette-art {
+  display: grid;
+  place-items: center;
+}
+.roulette-wheel {
+  position: relative;
+  width: 146px;
+  height: 146px;
+  border: 7px solid #c49b54;
+  border-radius: 50%;
+  background:
+    conic-gradient(from -5deg, #32865a 0deg 9.73deg, transparent 9.73deg),
+    repeating-conic-gradient(from -5deg, #b94551 0deg 9.73deg, #26342c 9.73deg 19.46deg);
+  box-shadow:
+    0 8px 18px #0005,
+    inset 0 0 0 3px #f2d9a366;
+  transform: rotate(-12deg);
+}
+.roulette-wheel::before {
+  content: '';
+  position: absolute;
+  inset: 26px;
+  border: 4px solid #d8b46d;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #60734e, #18342b 75%);
+  box-shadow:
+    inset 0 3px 9px #0007,
+    0 0 0 2px #15291f88;
+}
+.roulette-wheel::after {
+  content: '';
+  position: absolute;
+  inset: 51px;
+  border: 2px solid #f5d99c;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, #fff0bf, #b98334 80%);
+  box-shadow: 0 3px 6px #0007;
+}
+.roulette-ball {
+  position: absolute;
+  top: 10px;
+  left: 47px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fffbed;
+  box-shadow: 0 2px 4px #0008;
 }
 .lead {
   margin: 10px 0 0;
@@ -179,7 +272,6 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
   box-shadow: 0 12px 30px #10251e20;
 }
 .slots-card {
-  display: block;
   position: relative;
   overflow: hidden;
   text-decoration: none;
@@ -199,6 +291,8 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
   border: 3px solid #d5ac65;
   border-radius: 16px;
   background: #7d5d87;
+  align-self: center;
+  margin-block: 0;
 }
 .mini-reels img {
   width: 100%;
@@ -268,6 +362,8 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 .table-art {
   position: relative;
   height: 207px;
+  transform: scale(0.75);
+  transform-origin: center top;
   isolation: isolate;
 }
 .table-ring {
@@ -373,11 +469,6 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 .game-copy {
   padding: 0 22px 22px;
 }
-.eyebrow {
-  color: #e2cf9a;
-  font-size: 10px;
-  font-weight: 700;
-}
 h2 {
   margin: 6px 0 8px;
   font-size: 42px;
@@ -390,15 +481,15 @@ h2 > span {
 .game-details {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin-top: 17px;
 }
 .game-details > span {
-  padding: 6px 9px;
+  padding: 6px 7px;
   border: 1px solid #f1d99b33;
   border-radius: 8px;
   color: #f3e4bd;
-  font-size: 11px;
+  font-size: 10px;
 }
 .daily-link {
   margin-top: 16px;
@@ -439,8 +530,23 @@ a:focus-visible {
   outline-offset: 3px;
 }
 @media (max-width: 350px) {
+  .bananjack-card,
+  .slots-card,
+  .roulette-card {
+    grid-template-rows: auto 140px auto;
+  }
+  .roulette-wheel {
+    width: 130px;
+    height: 130px;
+  }
+  .roulette-wheel::before {
+    inset: 22px;
+  }
+  .roulette-wheel::after {
+    inset: 43px;
+  }
   .table-art {
-    height: 185px;
+    transform: scale(0.65);
   }
   .playing-card {
     top: 20px;
@@ -458,11 +564,5 @@ a:focus-visible {
   h2 {
     font-size: 38px;
   }
-}
-</style>
-<style scoped>
-.bananjack-card {
-  display: block;
-  text-decoration: none;
 }
 </style>

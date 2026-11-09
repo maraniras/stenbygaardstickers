@@ -20,6 +20,7 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  boxesAchievements?: import('./boxes').BoxesAchievements
   slots?: import('./slots').SlotStats
   jack?: import('./jackStats').JackStatsPublic
   balance: number
@@ -47,13 +48,14 @@ export interface EconomyRecord extends EconomyPublic {
   version: 1
   claims: Record<string, true>
   history: BananaTransaction[]
-  days: Record<string, { city?: CityRun; wheel?: WheelRun }>
+  days: Record<string, { city?: CityRun; wheel?: WheelRun; boxes?: import('./boxes').BoxesRun }>
 }
 export interface DailyCityState extends CityRun {
   options: { id: string; name: string }[]
   answer?: { id: string; name: string; country: string; countryCode: string }
 }
 export interface DailyResponse {
+  boxesActive: boolean
   casinoLimit?: import('./casino').CasinoDailyLimit
   day: string
   nextResetAt: string
@@ -61,5 +63,6 @@ export interface DailyResponse {
   history: BananaTransaction[]
   city: DailyCityState
   wheel: WheelRun | null
+  boxes: import('./boxes').BoxesRun | null
   wheelJackpot: number
 }

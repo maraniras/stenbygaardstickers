@@ -44,7 +44,7 @@ useHead({ title: 'Hvad er nyt · Stenbygaard Stickers' })
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
 }
 .release {
   margin-bottom: 12px;

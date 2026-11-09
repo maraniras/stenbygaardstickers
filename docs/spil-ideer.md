@@ -1,3 +1,7 @@
+# Release 2.4 · nyeste status
+
+Dagens bokse er implementeret med fire julebadges og sæson20november04 til midnat efter31december, dansk tid. Roulette ses som Kommer snart, men er ikke spilbart. Kalender/gaver er udskudt og indgår ikke her. Se docs/designs/boxes-badges for motiver/prompts.
+
 # Spil og valuta — brainstorm
 
 Opdateret 29. oktober 2026. Valuta og de to daglige spil er nu bestilt og implementeret på dev. Casino og børs er fortsat idéer til senere.

@@ -298,7 +298,7 @@ async function play(direction: 1 | -1 = 1) {
 .wheel-page {
   max-width: 480px;
   margin: auto;
-  padding: calc(12px + var(--safe-t)) 18px calc(var(--nav-space) + 24px);
+  padding: calc(12px + var(--safe-t)) 18px 24px;
 }
 .arcade {
   --wheel-glow: #b794dc38;
@@ -641,7 +641,7 @@ summary:focus-visible {
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  height: calc(100dvh - var(--nav-space));
+  height: var(--content-height);
   min-height: 400px;
   padding: calc(6px + var(--safe-t)) 14px 6px;
 }

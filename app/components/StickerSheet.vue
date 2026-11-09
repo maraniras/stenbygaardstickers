@@ -82,7 +82,7 @@ watch(
   position: absolute;
   left: 12px;
   right: 12px;
-  bottom: var(--nav-space);
+  bottom: 12px;
   z-index: 600;
   display: flex;
   gap: 14px;

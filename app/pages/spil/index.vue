@@ -4,6 +4,7 @@ const { name, ready } = useUser()
 const { state, error, loading, reload } = useEconomy()
 const cityDone = computed(() => Boolean(state.value?.city.finished))
 const wheelDone = computed(() => Boolean(state.value?.wheel))
+const boxesDone = computed(() => Boolean(state.value?.boxes))
 </script>
 <template>
   <div class="daily-page">
@@ -22,6 +23,46 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
       >
     </PageHeader>
     <GameSectionNav section="daily" />
+    <NuxtLink
+      class="boxes-card game-card"
+      to="/spil/bokse"
+      aria-label="Dagens bokse"
+    >
+      <div class="boxes-card-copy">
+        <span class="boxes-kicker">12 BOKSE · 3 VALG</span>
+        <h2>Dagens bokse</h2>
+        <p>
+          {{
+            !state?.boxesActive
+              ? 'Et dagligt julespil fra 20. november til 31. december.'
+              : boxesDone
+                ? `Dagens resultat: ${state!.boxes!.amount > 0 ? '+' : state!.boxes!.amount < 0 ? '−' : ''}${Math.abs(state!.boxes!.amount)} 🍌`
+                : 'Vælg tre. Find bananer, drillenisser eller Miv.'
+          }}
+        </p>
+        <span class="game-link"
+          >{{
+            !state?.boxesActive
+              ? 'Åbner 20. november'
+              : boxesDone
+                ? 'Se resultat'
+                : 'Vælg dine bokse'
+          }}
+          <span aria-hidden="true">→</span></span
+        >
+      </div>
+      <div
+        class="mini-boxes"
+        aria-hidden="true"
+      >
+        <i
+          v-for="n in 12"
+          :key="n"
+          :class="{ picked: [2, 6, 10].includes(n) }"
+          >{{ [2, 6, 10].includes(n) ? '✦' : '?' }}</i
+        >
+      </div>
+    </NuxtLink>
     <div class="daily-reset">
       <svg
         viewBox="0 0 24 24"
@@ -35,7 +76,11 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
         <path d="M12 7v5l3 2" />
       </svg>
       <div>
-        <b>{{ cityDone && wheelDone ? 'Du er med igen i morgen' : 'En ny chance hver dag' }}</b
+        <b>{{
+          cityDone && wheelDone && (!state?.boxesActive || boxesDone)
+            ? 'Du er med igen i morgen'
+            : 'En ny chance hver dag'
+        }}</b
         ><span>Nye spil kl. 04.00 dansk tid</span>
       </div>
     </div>
@@ -148,10 +193,66 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   </div>
 </template>
 <style scoped>
+.game-card {
+  margin-bottom: 16px;
+}
+.game-card.boxes-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: linear-gradient(125deg, var(--surface), var(--surface-2));
+}
+.boxes-card-copy {
+  min-width: 0;
+  flex: 1;
+}
+.boxes-kicker {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  font-weight: 800;
+  color: var(--muted);
+}
+.boxes-card h2 {
+  margin-top: 7px;
+  font-size: 23px;
+}
+.boxes-card p {
+  margin: 8px 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.mini-boxes {
+  flex: none;
+  width: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  transform: rotate(7deg);
+}
+.mini-boxes i {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid #9aaf9a55;
+  border-radius: 7px;
+  background: #304b3f;
+  color: #eee2bd66;
+  font-style: normal;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+.mini-boxes .picked {
+  color: #49371c;
+  background: #dfc180;
+  border-color: #edda9e;
+  box-shadow: 0 2px 8px #9d7e3422;
+}
 .daily-page {
   max-width: 480px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
+  padding: calc(20px + var(--safe-t)) 16px 18px;
 }
 .lead {
   margin: 10px 0 0;
@@ -261,7 +362,6 @@ h2 {
 .wheel-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-top: 16px;
   background: light-dark(#f7f2fd, #282032);
 }
 .wheel-copy {

@@ -78,7 +78,9 @@ useNuxtApp().hook('page:finish', () => {
 <style scoped>
 .shell {
   position: relative;
-  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100dvh;
 }
 /* On the map, pinch belongs to Leaflet rather than the browser viewport.
    Allow ordinary scrolling in sheets and filters; other pages keep browser zoom. */
@@ -91,7 +93,8 @@ useNuxtApp().hook('page:finish', () => {
   touch-action: none;
 }
 .content {
-  height: 100%;
+  min-height: 0;
+  min-width: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

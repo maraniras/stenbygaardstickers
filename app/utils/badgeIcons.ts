@@ -4,6 +4,10 @@
 const SHARED: Record<string, string> = { jubilee: 'jubilee', year: 'year' }
 
 const CUSTOM = new Set([
+  'boxes-hattrick',
+  'boxes-elves',
+  'boxes-miv',
+  'boxes-golden',
   'slot-spins',
   'slot-wins',
   'slot-big-wins',

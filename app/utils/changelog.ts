@@ -11,6 +11,21 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.4',
+    push: {
+      title: '🎁 Et nyt julespil er på vej!',
+      body: 'Se Dagens bokse under Spil. Det åbner 20. november kl. 04.00. Roulette er også på vej.',
+      url: '/spil',
+    },
+    notes: [
+      'Dagens bokse kan ses under Spil allerede nu – spillet åbner 20. november kl. 04.00',
+      'Fire nye julebadges: Hattrick, Nisseinvasion, Triple Miv og Den gyldne trio',
+      'Roulette er på vej – se det kommende fælles bord i casino-menuen',
+      'Bundmenuen har fået sin egen faste plads og dækker ikke længere sidens indhold',
+      'Mindre fejlrettelser og forbedringer i appens layout',
+    ],
+  },
+  {
     version: '2.3.1',
     date: '2026-11-07',
     push: {
