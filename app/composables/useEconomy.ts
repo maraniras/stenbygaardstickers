@@ -16,7 +16,11 @@ export function useEconomy() {
     state.value = response
     if (name.value)
       people.value = { ...people.value, [name.value.toLocaleLowerCase('da')]: response.wallet }
-    availability.value = { city: !response.city.finished, wheel: !response.wheel }
+    availability.value = {
+      city: !response.city.finished,
+      wheel: !response.wheel,
+      boxes: response.boxesActive && !response.boxes,
+    }
     clearTimeout(resetTimer)
     const delay = Math.max(500, Date.parse(response.nextResetAt) - Date.now() + 250)
     resetTimer = setTimeout(
@@ -69,7 +73,7 @@ export function useEconomy() {
       /* Preserve known public balances; never invent zero for unknown accounts. */
     }
   }
-  async function act(path: string, body: Record<string, string>) {
+  async function act(path: string, body: Record<string, unknown>) {
     const owner = name.value,
       token = userToken()
     if (!owner) throw new Error('Vælg dit navn for at spille')
@@ -113,5 +117,7 @@ export function useEconomy() {
     guess: (choice: string) =>
       act('/api/games/city/guess', { day: state.value?.day ?? '', choice }),
     spin: () => act('/api/games/wheel', { day: state.value?.day ?? '' }),
+    openBoxes: (choices: number[]) =>
+      act('/api/games/boxes', { day: state.value?.day ?? '', choices }),
   }
 }

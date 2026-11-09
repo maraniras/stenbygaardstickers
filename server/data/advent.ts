@@ -5,9 +5,10 @@ export interface AdventPrizeConfig {
   day: number
   published: boolean
   prize: AdventPrize | null
+  extras?: AdventPrize[]
 }
-// All rewards remain private drafts until the user supplies and approves them.
-// Physical rewards are per opener; limited stock/drawings require separate rules.
+// Unpublished fallback before the eligibility cutoff.
+// Private personal plans and stock-limited awards live in advent-draw.ts.
 export const ADVENT_PRIZES: AdventPrizeConfig[] = Array.from({ length: 24 }, (_, index) => ({
   day: index + 1,
   published: false,

@@ -30,9 +30,9 @@ useHead({ title: 'Shop · Stenbygaard Stickers' })
 <style scoped>
 .shop-page {
   max-width: 640px;
-  min-height: 100dvh;
+  min-height: var(--content-height);
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
   display: flex;
   flex-direction: column;
 }

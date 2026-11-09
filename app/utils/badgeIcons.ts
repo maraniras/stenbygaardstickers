@@ -4,6 +4,10 @@
 const SHARED: Record<string, string> = { jubilee: 'jubilee', year: 'year' }
 
 const CUSTOM = new Set([
+  'boxes-hattrick',
+  'boxes-elves',
+  'boxes-miv',
+  'boxes-golden',
   'slot-spins',
   'slot-wins',
   'slot-big-wins',
@@ -91,6 +95,16 @@ const CUSTOM = new Set([
 ])
 
 export function badgeIcon(id: string) {
+  const advent: Record<string, string> = {
+    'advent-doors': 'gift-self-christmas-v1',
+    'advent-giver': 'gift-friend-christmas-v1',
+    'advent-receiver': 'gift-friend-christmas-v1',
+    'advent-self': 'gift-self-christmas-v1',
+    'advent-elf': 'mischief-elf',
+    'advent-santa': 'santa-christmas-v1',
+    'advent-physical': 'mix-max-christmas-v2',
+  }
+  if (advent[id]) return `/games/advent/${advent[id]}.webp`
   const prefix = id.split('-')[0]!
   const asset = SHARED[prefix] ?? id
   return `/badges/${CUSTOM.has(asset) ? 'custom/' : ''}${asset}.webp`

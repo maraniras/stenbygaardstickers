@@ -20,6 +20,7 @@ export interface Backup {
   /** Saldi, udbetalingsnøgler, spilstatus og historik – ikke blot de viste tal. */
   economy?: Awaited<ReturnType<typeof allEconomyRecords>>
   games?: Awaited<ReturnType<typeof gameBackup>>
+  adventDraw?: Awaited<ReturnType<typeof readAdventDraw>>
 }
 
 async function allRatings(): Promise<Backup['ratings']> {
@@ -47,6 +48,7 @@ export async function createBackup(): Promise<Backup> {
     users: await listUsers(),
     economy: await allEconomyRecords(),
     games: await gameBackup(),
+    adventDraw: await readAdventDraw(),
   }
 }
 

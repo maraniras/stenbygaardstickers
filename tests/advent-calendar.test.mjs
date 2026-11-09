@@ -11,7 +11,7 @@ function calendar(reduced = false) {
   const source = readFileSync('app/pages/spil/julekalender.vue', 'utf8').match(
     /<script setup lang="ts">([\s\S]*?)<\/script>/,
   )[1]
-  const code = ts.transpileModule(source, {
+  const code = ts.transpileModule(source.replaceAll('import.meta.dev', 'true'), {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
   }).outputText
   const dayExports = {}
@@ -21,9 +21,16 @@ function calendar(reduced = false) {
     }).outputText,
     { exports: dayExports },
   )
+  const rewardExports = {}
+  vm.runInNewContext(
+    ts.transpileModule(readFileSync('shared/utils/advent-rewards.ts', 'utf8'), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS },
+    }).outputText,
+    { exports: rewardExports },
+  )
   const context = vm.createContext({
     exports: {},
-    require: () => dayExports,
+    require: (id) => (id.includes('advent-rewards') ? rewardExports : dayExports),
     watch() {},
     useAdventRewards: () => ({
       state: ref(null),
@@ -40,6 +47,7 @@ function calendar(reduced = false) {
     ref,
     computed,
     nextTick,
+    definePageMeta() {},
     useHead() {},
     onMounted() {},
     onBeforeUnmount: (fn) => unmount.push(fn),
@@ -56,7 +64,7 @@ function calendar(reduced = false) {
   })
   vm.runInContext(
     code +
-      '\nglobalThis.api={days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay,backgroundImage,surfaces,artwork,measureSurfaces,surfaceStyle,overview,torn};',
+      '\nglobalThis.api={celebration,days,opened,selected,phase,autoplay,today,currentDate,viewport,scene,transform,reveal,reset,playAll,openDay,backgroundImage,surfaces,artwork,measureSurfaces,surfaceStyle,overview,torn,pendingGifts,giftDay,giftOpening,givePreviewGift,calendar,testMode,restoreSaved};',
     context,
   )
   const a = context.api
@@ -90,7 +98,43 @@ test('24 unique doors; daily preview follows the Danish December date', () => {
   assert.equal(a.today.value, 24)
 })
 
-test('single and double door cutouts keep the same image scale and crop as the full scene', () => {
+test('ungiven preview gifts remain available in the overview, independently of the selected door', () => {
+  const a = calendar()
+  a.opened.value = [8, 15]
+  assert.equal(a.selected.value, null)
+  assert.equal(a.pendingGifts.value.length, 2)
+  a.giftDay.value = 8
+  a.givePreviewGift('Nicole')
+  assert.equal(a.giftOpening.value.gift.to, 'Nicole')
+  assert.equal(a.pendingGifts.value.length, 1)
+  assert.equal(a.pendingGifts.value[0].day, 15)
+  a.giftDay.value = 15
+  a.givePreviewGift('Mathias')
+  assert.equal(a.pendingGifts.value.length, 0)
+})
+
+test('restored actual calendar exposes only opened, undelivered friend gifts', () => {
+  const a = calendar()
+  a.testMode.value = false
+  const prize = { kind: 'friend-gift', amount: 100 }
+  a.calendar.value = {
+    doors: [
+      { day: 1, opening: null },
+      { day: 2, opening: { day: 2, prize } },
+      { day: 3, opening: { day: 3, prize, gift: { to: 'Nicole' } } },
+      { day: 4, opening: { day: 4, prize, gift: { to: 'Nicole', deliveredAt: '2026-12-04' } } },
+    ],
+  }
+  a.restoreSaved()
+  assert.deepEqual(
+    Array.from(a.pendingGifts.value, (opening) => opening.day),
+    [2, 3],
+  )
+  a.giftDay.value = 3
+  assert.equal(a.giftOpening.value.gift.to, 'Nicole')
+})
+
+test('single and double door cutouts show the full image without cropping when resized', () => {
   const a = calendar()
   a.backgroundImage.value = { naturalWidth: 900, naturalHeight: 1400 }
   a.scene.value = {
@@ -106,9 +150,17 @@ test('single and double door cutouts keep the same image scale and crop as the f
   assert.equal(a.surfaceStyle(24, 'right').backgroundPosition, '-160px -200px')
   a.scene.value.clientWidth = 420
   a.measureSurfaces()
-  assert.equal(a.artwork.value.width, 420)
-  assert.ok(Math.abs(a.artwork.value.height - 653.3333333333) < 0.001)
-  assert.ok(Math.abs(a.artwork.value.y + 46.6666666667) < 0.001)
+  assert.equal(a.artwork.value.width, 360)
+  assert.equal(a.artwork.value.height, 560)
+  assert.equal(a.artwork.value.x, 30)
+  assert.equal(a.artwork.value.y, 0)
+  assert.equal(a.surfaceStyle(24, 'left').backgroundPosition, '-50px -200px')
+  a.scene.value.clientWidth = 270
+  a.measureSurfaces()
+  assert.equal(a.artwork.value.width, 270)
+  assert.equal(a.artwork.value.height, 420)
+  assert.equal(a.artwork.value.x, 0)
+  assert.equal(a.artwork.value.y, 70)
 })
 
 test('door opens after camera zoom, and reset returns to the full calendar', async () => {
@@ -124,12 +176,14 @@ test('door opens after camera zoom, and reset returns to the full calendar', asy
   await a.tick()
   assert.equal(await pending, true)
   assert.equal(a.phase.value, 'revealed')
+  assert.equal(a.celebration.value, 7)
   const reset = a.reset()
   await a.tick()
   await reset
   assert.equal(a.phase.value, 'overview')
   assert.equal(a.selected.value, null)
   assert.equal(a.opened.value.length, 0)
+  assert.equal(a.celebration.value, null)
 })
 
 test('automatic preview opens all doors in date order, including reduced motion', async () => {
@@ -147,6 +201,34 @@ test('automatic preview opens all doors in date order, including reduced motion'
     assert.equal(a.selected.value, null)
     assert.equal(a.torn.value.length, 24)
   }
+})
+
+test('tapping the revealed door returns to the calendar without reopening or claiming again', async () => {
+  for (const preview of [true, false])
+    for (const day of [7, 24]) {
+      const a = calendar()
+      if (!preview) {
+        a.testMode.value = false
+        a.calendar.value = {
+          doors: [{ day, opening: { day, prize: { kind: 'bananas', amount: 25 } } }],
+        }
+      }
+      const opening = a.reveal(day)
+      await new Promise(setImmediate)
+      while (a.timers.length) await a.tick()
+      await opening
+      const closing = a.openDay(day)
+      assert.equal(a.phase.value, 'tearing')
+      assert.equal(a.celebration.value, null)
+      await a.openDay(day) // another tap during the return must not start anything
+      while (a.timers.length) await a.tick()
+      await closing
+      assert.equal(a.phase.value, 'overview')
+      assert.equal(a.selected.value, null)
+      assert.equal(a.transform.value, 'none')
+      assert.deepEqual(Array.from(a.opened.value), [day])
+      assert.deepEqual(Array.from(a.torn.value), [day])
+    }
 })
 
 test('returning tears off both door types before zooming out and keeps removed leaves gone on revisit', async () => {

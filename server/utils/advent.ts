@@ -3,8 +3,13 @@ import type { AdventOpening, AdventResponse } from '../../shared/types/advent'
 import { adventAvailableDay, adventUnlockAt } from '../../shared/utils/advent'
 import { nextGameReset } from '../../shared/utils/game-day'
 import { ADVENT_PRIZES, ADVENT_YEAR, type AdventPrizeConfig } from '../data/advent'
+import { adventPrizeAmount } from '../../shared/utils/advent-rewards'
 
-export function adventResponse(record?: EconomyRecord, now = new Date()): AdventResponse {
+export function adventResponse(
+  record?: EconomyRecord,
+  now = new Date(),
+  configs = ADVENT_PRIZES,
+): AdventResponse {
   const availableDay = adventAvailableDay(ADVENT_YEAR, now)
   return {
     year: ADVENT_YEAR,
@@ -14,7 +19,7 @@ export function adventResponse(record?: EconomyRecord, now = new Date()): Advent
       process.env.VERCEL_ENV !== 'production' &&
       (process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'preview'),
     availableDay,
-    doors: ADVENT_PRIZES.map((config) => ({
+    doors: configs.map((config) => ({
       day: config.day,
       unlocksAt: adventUnlockAt(ADVENT_YEAR, config.day),
       available: config.day <= availableDay,
@@ -49,18 +54,27 @@ export function openAdventDoor(
       statusMessage: 'Præmien til denne låge er ikke klar endnu.',
     })
   const prize = structuredClone(config.prize)
+  const extras = structuredClone(config.extras ?? [])
   if (
-    prize.kind === 'bananas' &&
-    (!Number.isSafeInteger(prize.amount) || !Number.isSafeInteger(record.balance + prize.amount))
+    (prize.kind === 'bananas' || prize.kind === 'friend-gift') &&
+    (!Number.isSafeInteger(prize.amount) ||
+      (prize.kind === 'friend-gift' && prize.amount <= 0) ||
+      !Number.isSafeInteger(record.balance + prize.amount))
   )
     throw createError({ statusCode: 500, statusMessage: 'Lågens præmie er ikke sat korrekt op.' })
-  const amount = prize.kind === 'bananas' ? Math.max(-record.balance, prize.amount) || 0 : 0
+  const reward = [prize, ...extras].reduce((sum, p) => sum + adventPrizeAmount(p), 0)
+  if (!Number.isSafeInteger(reward) || !Number.isSafeInteger(record.balance + reward))
+    throw createError({ statusCode: 500, statusMessage: 'Lågens beløb er ugyldigt.' })
+  const amount = Math.max(-record.balance, reward) || 0
   const opening: AdventOpening = {
     day: Number(day),
     openedAt: now.toISOString(),
     prize,
     amount,
-    ...(prize.kind === 'physical' ? { fulfilment: 'pending' as const } : {}),
+    ...(extras.length ? { extras } : {}),
+    ...([prize, ...extras].some((p) => p.kind === 'physical')
+      ? { fulfilment: 'pending' as const }
+      : {}),
   }
   const claim = `advent:${year}:${day}`
   record.balance += amount

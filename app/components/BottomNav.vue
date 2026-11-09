@@ -14,7 +14,7 @@ const tab = computed(() => {
 
 <template>
   <nav
-    class="nav glass"
+    class="nav"
     aria-label="Hovedmenu"
   >
     <NuxtLink
@@ -151,17 +151,17 @@ const tab = computed(() => {
 
 <style scoped>
 .nav {
-  position: fixed;
-  left: 50%;
-  bottom: calc(14px + var(--safe-b));
+  position: relative;
   z-index: 1000;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  width: min(420px, calc(100% - 24px));
+  width: 100%;
+  min-height: var(--nav-height);
   gap: 3px;
-  padding: 4px;
-  border-radius: 999px;
-  transform: translateX(-50%);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px), calc((100% - 720px) / 2))
+    calc(6px + var(--safe-b)) max(8px, env(safe-area-inset-left, 0px), calc((100% - 720px) / 2));
+  border-top: 1px solid var(--hairline);
+  background: var(--surface);
 }
 a {
   position: relative;
@@ -170,9 +170,9 @@ a {
   justify-content: center;
   align-items: center;
   gap: 3px;
-  height: 54px;
+  height: 52px;
   padding: 4px;
-  border-radius: 999px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 12px;
   text-decoration: none;

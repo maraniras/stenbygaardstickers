@@ -197,7 +197,7 @@ function toggleType(type: NotifyType) {
   gap: 14px;
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
 }
 .card {
   display: flex;

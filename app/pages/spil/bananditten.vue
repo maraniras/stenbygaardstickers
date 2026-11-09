@@ -274,7 +274,7 @@ const resetLabel = computed(() =>
   max-width: 480px;
   margin: auto;
   padding: calc(8px + var(--safe-t)) 14px 12px;
-  min-height: calc(100dvh - var(--nav-space));
+  min-height: var(--content-height);
   display: flex;
   flex-direction: column;
   gap: 12px;

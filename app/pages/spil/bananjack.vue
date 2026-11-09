@@ -55,24 +55,6 @@ const {
         ></template
       >
     </PageHeader>
-    <div class="title-row">
-      <div class="table-tools">
-        <button
-          class="rules-button"
-          :aria-pressed="soundEnabled"
-          aria-label="Spillyd"
-          @click="toggleSound"
-        >
-          Lyd {{ soundEnabled ? 'til' : 'fra' }}
-        </button>
-        <button
-          class="rules-button"
-          @click="rules?.showModal()"
-        >
-          Regler
-        </button>
-      </div>
-    </div>
     <div
       v-if="ready && !name"
       class="login"
@@ -261,7 +243,26 @@ const {
         >Flere bananer? Tag dagens gratis spil →</NuxtLink
       >
     </div>
-    <CasinoLimit :limit="dailyLimit" />
+    <CasinoLimit
+      class="casino-budget"
+      :limit="dailyLimit"
+    />
+    <div class="table-tools">
+      <button
+        class="rules-button"
+        :aria-pressed="soundEnabled"
+        aria-label="Spillyd"
+        @click="toggleSound"
+      >
+        Lyd {{ soundEnabled ? 'til' : 'fra' }}
+      </button>
+      <button
+        class="rules-button"
+        @click="rules?.showModal()"
+      >
+        Regler
+      </button>
+    </div>
     <dialog
       ref="rules"
       class="rules"
@@ -321,13 +322,10 @@ const {
 .jack-page {
   max-width: 480px;
   margin: auto;
-  padding: calc(14px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
+  padding: calc(14px + var(--safe-t)) 16px 18px;
 }
-.title-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
+.casino-budget {
+  margin-top: 18px;
 }
 button {
   cursor: pointer;
@@ -344,7 +342,9 @@ button {
 .table-tools {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 12px;
+  margin-top: 8px;
 }
 .table {
   margin-top: 12px;

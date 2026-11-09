@@ -13,6 +13,10 @@ vm.runInNewContext(
   { exports },
 )
 const ids = [
+  'boxes-hattrick',
+  'boxes-elves',
+  'boxes-miv',
+  'boxes-golden',
   'slot-spins',
   'slot-wins',
   'slot-big-wins',
@@ -98,7 +102,7 @@ const ids = [
   'jack-five-card',
   'jack-dealer-bust',
 ]
-test('all 84 custom badge motifs exist, fit retina medals and have real transparency', async () => {
+test('all 88 custom badge motifs exist, fit retina medals and have real transparency', async () => {
   for (const id of ids) {
     const file = exports.badgeIcon(id)
     assert.equal(file, `/badges/custom/${id}.webp`)
@@ -124,15 +128,15 @@ test('currency banana stays separate and shared badge families resolve to custom
 test('every badge in the fixed numbered catalogue has a custom asset, including aliases', () => {
   const catalogue = readFileSync('docs/badges.md', 'utf8')
     .split(/\r?\n/)
-    .filter((row) => /^\| x\d+ \|/.test(row))
+    .filter((row) => /^\| x\d+\s+\|/.test(row))
     .map((row) => row.match(/`([^`]+)`/))
-  assert.equal(catalogue.length, 88)
+  assert.equal(catalogue.length, 99)
   const files = new Set()
   for (const [, id] of catalogue) {
     const icon = exports.badgeIcon(id.replace('<år>', '2026'))
-    assert.ok(icon.startsWith('/badges/custom/'), id)
+    assert.ok(icon.startsWith('/badges/custom/') || icon.startsWith('/games/advent/'), id)
     assert.ok(readFileSync('public' + icon).length > 0, id)
     files.add(icon)
   }
-  assert.equal(files.size, 84)
+  assert.equal(files.size, 93)
 })

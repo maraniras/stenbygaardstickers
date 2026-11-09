@@ -10,8 +10,10 @@ export type NotifyType =
   | 'replies'
   | 'comments'
   | 'likes'
+  | 'gifts'
 
 export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; desc: string }[] = [
+  { type: 'gifts', emoji: '🎁', label: 'Gaver', desc: 'Når en anden bruger giver dig julebananer' },
   { type: 'stickers', emoji: '📍', label: 'Nye stickers', desc: 'Når Emil lander et nyt sted' },
   {
     type: 'updates',

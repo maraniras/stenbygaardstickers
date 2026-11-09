@@ -307,7 +307,7 @@ async function choose(id: string) {
   gap: 6px;
   width: 100%;
   max-width: 560px;
-  height: calc(100dvh - var(--nav-space));
+  height: var(--content-height);
   min-height: 400px;
   margin: 0 auto;
   padding: calc(6px + var(--safe-t)) 14px 6px;

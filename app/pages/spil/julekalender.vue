@@ -1,26 +1,42 @@
 <script setup lang="ts">
 import { gameDay } from '../../../shared/utils/game-day'
+import { adventPresentation } from '../../../shared/utils/advent'
+import { previewAdventOpening, adventPrizeIcon } from '../../../shared/utils/advent-rewards'
+definePageMeta({
+  middleware: () => {
+    if (!import.meta.dev && !adventPresentation().open) return navigateTo('/spil')
+  },
+})
 const rewards = useAdventRewards()
 const { state: calendar, name, loading, claiming, error, testMode, previewAllowed } = rewards
 const claimInFlight = ref(false)
+const previewGifts = ref<Record<number, string>>({})
+const giftDay = ref<number | null>(null)
 function canOpen(day: number) {
   if (testMode.value) return true
   const door = calendar.value?.doors.find((item) => item.day === day)
   return Boolean(door?.opening || (name.value && door?.available && door.configured))
 }
 function savedOpening(day: number) {
-  return testMode.value ? null : calendar.value?.doors.find((item) => item.day === day)?.opening
+  if (!testMode.value) return calendar.value?.doors.find((item) => item.day === day)?.opening
+  const opening = previewAdventOpening(day)
+  const to = previewGifts.value[day]
+  return to ? { ...opening, gift: { to, deliveredAt: opening.openedAt } } : opening
+}
+function givePreviewGift(to: string) {
+  if (testMode.value && giftDay.value !== null) previewGifts.value[giftDay.value] = to
 }
 function prizeTitle(day: number) {
   const opening = savedOpening(day)
   if (!opening) return 'En lille overraskelse'
-  if (opening.prize.kind === 'bananas')
+  if (opening.prize.kind === 'bananas' || opening.amount !== 0)
     return `${opening.amount < 0 ? '−' : '+'}${Math.abs(opening.amount).toLocaleString('da-DK')} 🍌`
   return opening.prize.title
 }
 function prizeDescription(day: number) {
   const prize = savedOpening(day)?.prize
   if (!prize) return ''
+  if (testMode.value) return prize.description
   return prize.kind === 'physical'
     ? `${prize.description} ${prize.instructions}`
     : prize.description
@@ -41,17 +57,41 @@ const helper = computed(() => {
   if (!calendar.value?.availableDay) return 'Første låge åbner 1. december kl. 04.00 dansk tid'
   if (!name.value) return 'Vælg dit navn for at åbne og gemme dine låger'
   if (!calendar.value.doors.find((door) => door.day === today.value)?.configured)
-    return 'Præmierne er stadig kladder · tidligere låger kan åbnes senere'
+    return 'Din kalender bliver klar 1. december · tidligere låger kan åbnes senere'
   return 'Nye låger kl. 04.00 · du kan også åbne låger, du har misset'
 })
 useHead({ title: 'Julekalender · Stenbygaard Stickers' })
 
 // Replace this image when the final calendar background is supplied.
-const background = '/images/christmas-calendar-mix-max-faxe-v1.webp'
-const days = [7, 19, 3, 12, 22, 1, 15, 9, 5, 24, 17, 2, 14, 8, 21, 11, 4, 18, 6, 23, 16, 10, 20, 13]
+const background = '/images/christmas-calendar-final-v3.webp'
+// Early openings stay on scenery, gifts and sleigh; faces are in the later doors.
+const days = [8, 15, 3, 21, 17, 23, 11, 19, 22, 16, 2, 7, 20, 18, 13, 4, 24, 10, 14, 6, 12, 1, 9, 5]
 const opened = ref<number[]>([])
 const torn = ref<number[]>([])
+const showFinds = ref(false)
+const showPoster = ref(false)
+const foundOpenings = computed(() =>
+  [...opened.value]
+    .sort((a, b) => a - b)
+    .flatMap((day) => {
+      const opening = savedOpening(day)
+      return opening ? [opening] : []
+    }),
+)
+const giftOpenings = computed(() =>
+  foundOpenings.value.filter((opening) => opening.prize.kind === 'friend-gift'),
+)
+const pendingGifts = computed(() =>
+  giftOpenings.value.filter((opening) => !opening.gift?.deliveredAt),
+)
+const giftOpening = computed(() =>
+  giftOpenings.value.find((opening) => opening.day === giftDay.value),
+)
+watch([testMode, name], () => {
+  showFinds.value = false
+})
 const selected = ref<number | null>(null)
+const celebration = ref<number | null>(null)
 const phase = ref<'overview' | 'zooming' | 'opening' | 'revealed' | 'tearing' | 'returning'>(
   'overview',
 )
@@ -70,7 +110,7 @@ function measureSurfaces() {
   if (!element || !image?.naturalWidth || !image.naturalHeight) return
   const width = element.clientWidth,
     height = element.clientHeight
-  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight)
+  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight)
   const imageWidth = image.naturalWidth * scale,
     imageHeight = image.naturalHeight * scale
   artwork.value = {
@@ -118,6 +158,7 @@ function pause(ms: number) {
   })
 }
 function cancel() {
+  celebration.value = null
   generation++
   clearTimeout(timer)
   release?.(false)
@@ -125,6 +166,7 @@ function cancel() {
   autoplay.value = false
 }
 async function overview(run = generation) {
+  celebration.value = null
   const day = selected.value
   if (day !== null && opened.value.includes(day) && !torn.value.includes(day)) {
     phase.value = 'tearing'
@@ -139,6 +181,7 @@ async function overview(run = generation) {
   return true
 }
 async function reveal(day: number, run = generation) {
+  const alreadyOpened = opened.value.includes(day)
   if (phase.value !== 'overview' && !(await overview(run))) return false
   if (run !== generation) return false
   phase.value = 'zooming'
@@ -163,10 +206,15 @@ async function reveal(day: number, run = generation) {
   if (!opened.value.includes(day)) opened.value = [...opened.value, day]
   if (!(await pause(reducedMotion() ? 0 : 850)) || run !== generation) return false
   phase.value = 'revealed'
+  if (!alreadyOpened) celebration.value = day
   return true
 }
 async function openDay(day: number) {
   if (busy.value || autoplay.value || claimInFlight.value || loading.value || !canOpen(day)) return
+  if (phase.value === 'revealed' && selected.value === day) {
+    await overview()
+    return
+  }
   if (testMode.value) {
     await reveal(day)
     return
@@ -184,6 +232,8 @@ async function openDay(day: number) {
 }
 async function reset() {
   cancel()
+  giftDay.value = null
+  previewGifts.value = {}
   opened.value = []
   torn.value = []
   return overview()
@@ -244,108 +294,219 @@ onBeforeUnmount(() => {
         ></template
       >
     </PageHeader>
-    <div
-      ref="viewport"
-      class="calendar-viewport"
-      :class="{ focused: selected !== null }"
-      :aria-busy="busy"
-    >
+    <div class="calendar-space">
       <div
-        ref="scene"
-        class="calendar-scene"
-        :style="{ transform, transformOrigin: origin }"
+        ref="viewport"
+        class="calendar-viewport"
+        :class="{ focused: selected !== null }"
+        :aria-busy="busy"
       >
-        <img
-          ref="backgroundImage"
-          class="calendar-background"
-          :src="background"
-          alt=""
-          @load="measureSurfaces"
+        <AdventRewardReveal
+          v-if="celebration !== null && phase === 'revealed' && savedOpening(celebration)"
+          :key="`${testMode}:${celebration}`"
+          :opening="savedOpening(celebration)!"
+          @finished="celebration = null"
         />
-        <div class="calendar-heading">
-          <span>DECEMBER {{ calendar?.year || currentDate.getFullYear() }}</span
-          ><b>Glædelig jul</b><span class="calendar-subtitle">Og godt Stenbygaard</span>
-        </div>
         <div
-          class="doors"
-          aria-label="Julekalenderens 24 låger"
+          ref="scene"
+          class="calendar-scene"
+          :style="{ transform, transformOrigin: origin }"
         >
-          <button
-            v-for="day in days"
-            :key="day"
-            :data-day="day"
-            type="button"
-            class="door"
-            :class="{
-              opened: opened.includes(day),
-              tearing: selected === day && phase === 'tearing',
-              selected: selected === day,
-              double: day === 24,
-              today: day === today,
-              locked: !testMode && !calendar?.doors.find((door) => door.day === day)?.available,
-            }"
-            :disabled="busy || autoplay || claiming || claimInFlight || !canOpen(day)"
-            :aria-label="`${opened.includes(day) ? 'Se' : 'Åbn'} låge ${day}`"
-            :aria-pressed="opened.includes(day)"
-            @click="openDay(day)"
+          <img
+            ref="backgroundImage"
+            class="calendar-background"
+            :src="background"
+            alt=""
+            @load="measureSurfaces"
+          />
+          <div class="calendar-heading">
+            <span>DECEMBER {{ calendar?.year || currentDate.getFullYear() }}</span
+            ><b>Glædelig jul</b><span class="calendar-subtitle">Og godt Stenbygaard</span>
+          </div>
+          <div
+            class="doors"
+            aria-label="Julekalenderens 24 låger"
           >
-            <span
-              class="door-inside"
-              aria-hidden="true"
-              ><svg viewBox="0 0 80 80">
-                <path
-                  d="m40 8 9 21 23 2-18 16 5 23-19-12-19 12 5-23L8 31l23-2Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="m40 8 1 31 18 31-5-23 18-16-23-2Z"
-                  fill="#fff"
-                  opacity=".3"
-                /></svg
-              ><span>{{ prizeTitle(day) }}</span></span
+            <button
+              v-for="day in days"
+              :key="day"
+              :data-day="day"
+              type="button"
+              class="door"
+              :class="{
+                opened: opened.includes(day),
+                tearing: selected === day && phase === 'tearing',
+                selected: selected === day,
+                double: day === 24,
+                today: day === today,
+                locked: !testMode && !calendar?.doors.find((door) => door.day === day)?.available,
+              }"
+              :disabled="busy || autoplay || claiming || claimInFlight || !canOpen(day)"
+              :aria-label="
+                selected === day && phase === 'revealed'
+                  ? `Luk låge ${day} og gå tilbage til kalenderen`
+                  : `${opened.includes(day) ? 'Se' : 'Åbn'} låge ${day}`
+              "
+              :aria-pressed="opened.includes(day)"
+              @click="openDay(day)"
             >
-            <template v-if="!torn.includes(day)"
-              ><span
-                v-for="side in day === 24 ? ['left', 'right'] : ['left']"
-                :key="side"
-                class="door-hinge"
-                :class="side"
+              <span
+                class="door-inside"
                 aria-hidden="true"
                 ><span
-                  class="door-face"
-                  :style="surfaceStyle(day, side)"
-                  ><b>{{ day === 24 ? (side === 'left' ? '2' : '4') : day }}</b
-                  ><span class="door-handle" /></span
-                ><span class="door-back" /></span
-            ></template>
-          </button>
+                  class="door-memory"
+                  :style="surfaceStyle(day, 'left')"
+                /><img
+                  v-if="opened.includes(day)"
+                  class="reward-icon"
+                  :src="adventPrizeIcon(savedOpening(day)?.prize)"
+                  alt=""
+                /><span
+                  v-if="selected === day"
+                  class="door-prize"
+                  >{{ prizeTitle(day) }}</span
+                ></span
+              >
+              <template v-if="!torn.includes(day)"
+                ><span
+                  v-for="side in day === 24 ? ['left', 'right'] : ['left']"
+                  :key="side"
+                  class="door-hinge"
+                  :class="side"
+                  aria-hidden="true"
+                  ><span
+                    class="door-face"
+                    :style="surfaceStyle(day, side)"
+                    ><b>{{ day === 24 ? (side === 'left' ? '2' : '4') : day }}</b
+                    ><span class="door-handle" /></span
+                  ><span class="door-back" /></span
+              ></template>
+            </button>
+          </div>
         </div>
-      </div>
-      <div
-        v-if="selected !== null"
-        class="door-caption"
-        aria-live="polite"
-      >
-        <span>LÅGE {{ selected }}</span
-        ><b>{{
-          phase === 'revealed'
-            ? savedOpening(selected)?.prize.title || 'Her venter snart en overraskelse'
-            : 'Lidt julemagi på vej…'
-        }}</b>
-        <small v-if="phase === 'revealed' && savedOpening(selected)">{{
-          prizeDescription(selected)
-        }}</small>
-        <small v-if="phase === 'revealed' && savedOpening(selected)?.prize.kind === 'physical'"
-          >Din præmie er gemt og afventer udlevering.</small
+        <div
+          v-if="selected !== null"
+          class="door-caption"
+          aria-live="polite"
+        >
+          <span>LÅGE {{ selected }}</span
+          ><b>{{
+            phase === 'revealed'
+              ? savedOpening(selected)?.prize.title || 'Her venter snart en overraskelse'
+              : 'Lidt julemagi på vej…'
+          }}</b>
+          <small v-if="phase === 'revealed' && savedOpening(selected)">{{
+            prizeDescription(selected)
+          }}</small>
+          <small v-if="!testMode && phase === 'revealed' && savedOpening(selected)?.fulfilment">{{
+            savedOpening(selected)?.fulfilment === 'delivered'
+              ? 'Dine præmier fra denne låge er udleveret.'
+              : 'Din præmie er gemt og afventer udlevering.'
+          }}</small>
+          <div
+            v-if="phase === 'revealed' && savedOpening(selected)?.extras?.length"
+            class="extra-prizes"
+          >
+            <span
+              v-for="(extra, i) in savedOpening(selected)!.extras"
+              :key="i"
+            >
+              <img
+                :src="adventPrizeIcon(extra)"
+                alt=""
+              />{{ extra.title }}
+            </span>
+          </div>
+          <small v-if="testMode && phase === 'revealed'"
+            >Prøvefund · ingen bananer eller rigtige præmier uddeles</small
+          >
+        </div>
+        <span
+          v-else
+          class="calendar-progress"
+          >{{ opened.length }} <span>/ 24 låger åbnet</span></span
         >
       </div>
-      <span
-        v-else
-        class="calendar-progress"
-        >{{ opened.length }} <span>/ 24 låger åbnet</span></span
-      >
     </div>
+    <AdventFinds
+      v-if="showFinds"
+      :openings="foundOpenings"
+      :preview="testMode"
+      @close="showFinds = false"
+    />
+    <AdventPosterDialog
+      v-if="showPoster"
+      :src="background"
+      :year="calendar?.year ?? 2026"
+      @close="showPoster = false"
+    />
+    <AppDialog
+      v-if="giftOpening"
+      label="Gave til en ven"
+      @close="giftDay = null"
+    >
+      <section class="gift-dialog">
+        <h2>Gave til en ven</h2>
+        <label
+          v-if="giftOpenings.length > 1"
+          class="gift-choice"
+        >
+          Vælg gave
+          <select v-model="giftDay">
+            <option
+              v-for="opening in giftOpenings"
+              :key="opening.day"
+              :value="opening.day"
+            >
+              Låge {{ opening.day
+              }}{{ opening.gift?.deliveredAt ? ' · Givet' : ' · Ikke givet endnu' }}
+            </option>
+          </select>
+        </label>
+        <p
+          v-else
+          class="gift-door"
+        >
+          Låge {{ giftOpening.day }}
+        </p>
+        <AdventGiftPicker
+          :key="`${name}:${giftDay}:${testMode}`"
+          :year="calendar?.year ?? currentDate.getFullYear()"
+          :preview="testMode"
+          :opening="giftOpening"
+          @sent="rewards.refresh()"
+          @preview-sent="givePreviewGift"
+        />
+        <button
+          class="btn"
+          type="button"
+          @click="giftDay = null"
+        >
+          Tilbage til kalenderen
+        </button>
+      </section>
+    </AppDialog>
     <footer class="calendar-controls">
+      <div class="calendar-shortcuts">
+        <button
+          class="finds-button"
+          type="button"
+          :disabled="busy || autoplay || claimInFlight"
+          @click="showFinds = true"
+        >
+          Mine fund <span>{{ opened.length }}/24</span>
+        </button>
+        <button
+          v-if="pendingGifts.length"
+          class="finds-button"
+          type="button"
+          :disabled="busy || autoplay || claimInFlight"
+          @click="giftDay = pendingGifts[0]!.day"
+        >
+          {{ testMode ? 'Giv testgaven' : 'Giv en gave'
+          }}<span v-if="pendingGifts.length > 1">({{ pendingGifts.length }})</span>
+        </button>
+      </div>
       <button
         class="open-today"
         type="button"
@@ -399,14 +560,90 @@ onBeforeUnmount(() => {
           Prøv igen
         </button>
       </p>
+      <button
+        class="poster-link"
+        type="button"
+        :disabled="busy || autoplay || claimInFlight"
+        @click="showPoster = true"
+      >
+        Se julebilledet
+      </button>
     </footer>
   </div>
 </template>
 
 <style scoped>
+.poster-link {
+  display: block;
+  margin: 4px auto 0;
+  padding: 5px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.calendar-shortcuts {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.calendar-shortcuts .finds-button {
+  flex: 1;
+  width: auto;
+}
+.gift-dialog {
+  padding: 22px 20px calc(22px + var(--safe-b));
+}
+.gift-dialog h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.gift-door {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.gift-choice {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 13px;
+}
+.gift-choice select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.gift-dialog > button {
+  width: 100%;
+  margin-top: 8px;
+}
+.finds-button {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+}
+.finds-button span {
+  color: var(--muted);
+  font-weight: 500;
+}
 .advent-page {
   max-width: 540px;
-  height: calc(100dvh - var(--nav-space));
+  height: var(--content-height);
   min-height: 540px;
   margin: 0 auto;
   padding: calc(8px + var(--safe-t)) 14px 8px;
@@ -426,10 +663,17 @@ onBeforeUnmount(() => {
   color: var(--muted);
   font-size: 10px;
 }
-.calendar-viewport {
-  position: relative;
+.calendar-space {
   flex: 1;
   min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+.calendar-viewport {
+  position: relative;
+  width: min(100cqw, calc(100cqh * 942 / 1670));
+  aspect-ratio: 942 / 1670;
   overflow: hidden;
   isolation: isolate;
   border: 1px solid #d0b97d70;
@@ -451,44 +695,67 @@ onBeforeUnmount(() => {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   pointer-events: none;
 }
 .calendar-heading {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   color: #fff0cb;
   margin-bottom: 16px;
-  text-shadow: 0 2px 10px #102e2b;
+  -webkit-text-stroke: 1.5px #211628;
+  paint-order: stroke fill;
+  text-shadow:
+    0 2px 2px #171124,
+    0 0 6px #171124,
+    0 0 14px #171124;
   pointer-events: none;
+}
+.calendar-heading::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -10px 16% -10px -10px;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at left, #171124b3, #17112466 60%, transparent 85%);
+  filter: blur(5px);
 }
 .calendar-heading > span {
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.22em;
+  -webkit-text-stroke-width: 0.8px;
 }
 .calendar-heading b {
   margin-top: 5px;
   font-family: Georgia, serif;
   font-size: clamp(27px, 7vw, 36px);
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.1;
 }
 .calendar-heading .calendar-subtitle {
   margin-top: 5px;
   font-family: Georgia, serif;
-  font-size: 13px;
-  font-weight: 400;
+  font-size: clamp(16px, 4.4vw, 19px);
+  font-weight: 700;
   letter-spacing: 0.025em;
+  -webkit-text-stroke-width: 1.5px;
 }
 .doors {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: repeat(7, minmax(0, 1fr));
-  gap: 9px;
+  gap: 15px;
   flex: 1;
   min-height: 0;
+}
+.doors::before {
+  content: '';
+  grid-column: 4;
+  grid-row: 1;
+  pointer-events: none;
 }
 .door {
   position: relative;
@@ -542,14 +809,17 @@ onBeforeUnmount(() => {
   background-origin: border-box;
 }
 .door-face b {
-  color: #fff6df;
+  color: #fffdf7;
   font-family: Georgia, serif;
-  font-size: clamp(19px, 5vw, 25px);
-  font-weight: 400;
+  font-size: clamp(22px, 5.7vw, 27px);
+  font-weight: 700;
   line-height: 1;
+  -webkit-text-stroke: 2.5px #211628;
+  paint-order: stroke fill;
   text-shadow:
-    0 1px 3px #102e2b,
-    0 0 7px #102e2bcc;
+    0 2px 2px #171124,
+    0 0 5px #171124,
+    0 0 10px #171124;
 }
 .double .left .door-face {
   justify-content: flex-end;
@@ -586,24 +856,52 @@ onBeforeUnmount(() => {
 }
 .door-inside {
   position: absolute;
-  inset: 1px;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: 4px;
-  background: radial-gradient(ellipse at top, #fff7db, #d2b887);
+  background: #211b2b;
   opacity: 0;
-  box-shadow: inset 2px 3px 10px #48341444;
+  box-shadow: inset 0 0 0 1px #fff0cb33;
 }
-.door-inside svg {
-  width: 37%;
-  height: 44%;
-  color: #c79037;
+.door-memory {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  opacity: 0.34;
 }
-.door-inside > span {
-  color: #694b2a;
+.door-inside .reward-icon {
+  position: relative;
+  width: 88%;
+  height: 76%;
+  object-fit: contain;
+  color: #ffe0a0;
+  filter: drop-shadow(0 1px 2px #211b2b);
+}
+.extra-prizes {
+  display: grid;
+  gap: 3px;
+  font-size: 11px;
+}
+.extra-prizes > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.extra-prizes img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+.door-prize {
+  position: relative;
+  color: #fff6df;
+  text-shadow:
+    0 1px 3px #211b2b,
+    0 0 5px #211b2b;
   font-size: 6px;
   line-height: 1.2;
   margin-top: 2px;
@@ -792,7 +1090,7 @@ button:disabled {
     font-size: 27px;
   }
   .doors {
-    gap: 6px;
+    gap: 11px;
   }
   .calendar-controls {
     padding-top: 8px;

@@ -1,0 +1,28 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "transparentBackground": true,
+  "icons": [
+    {
+      "id": "santa-christmas-v1",
+      "prompt": "Use case: identity-preserve. Asset: square mobile Christmas advent-calendar reward icon. Premium detailed glossy 3D illustration, rich festive colors, warm golden edge lighting, matching the provided Christmas reward reference. The MAIN SUBJECT must be large, legible at 100px and fully inside the canvas. Behind it add an asymmetrical organic arrangement of dark green fir, small red/gold baubles, tiny warm fairy lights and a little snow on the tips. Free irregular silhouette with transparent gaps; genuinely transparent alpha everywhere outside the objects. No rectangular background, badge frame, opaque halo, floor, watermark, captions, numbers or added words. Input 1 is the exact Santa portrait to adapt; Input 2 provides decoration/style only. Preserve input 1's recognizable real man's face, shouting expression, right-facing profile, red Santa hat, white fur, holly, collar and golden outline. Do not replace him with a generic bearded Santa. Add festive fir/baubles/lights behind and around the existing cutout, leaving his face entirely unobstructed. Keep the image a decorated portrait cutout, not a full-body scene.",
+      "refs": [
+        "C:/Users/MARA/Downloads/SSJul/emil-santa.png",
+        "C:/Git/StenbygaardStickers/docs/designs/advent-rewards/mix-max-christmas-v2.png"
+      ]
+    },
+    {
+      "id": "gift-friend-christmas-v1",
+      "prompt": "Use case: stylized-concept. Asset: square mobile Christmas advent-calendar reward icon. Premium detailed glossy 3D illustration, rich festive colors, warm golden edge lighting, matching the provided Christmas reward reference. The MAIN SUBJECT must be large, legible at 100px and fully inside the canvas. Behind it add an asymmetrical organic arrangement of dark green fir, small red/gold baubles, tiny warm fairy lights and a little snow on the tips. Free irregular silhouette with transparent gaps; genuinely transparent alpha everywhere outside the objects. No rectangular background, badge frame, opaque halo, floor, watermark, captions, numbers or added words. Reference is style and Christmas decoration only. Subject: a beautiful CLOSED royal BLUE gift box with a broad shiny GOLD ribbon and elegant gold bow. The box is being gently passed from one red knitted mitten at lower left to a second cream knitted mitten reaching from lower right, clearly symbolizing a gift to ANOTHER person. Show only two mitten hands and short cuffs, no arms, people or faces. A small gold heart-shaped gift tag near the bow, with no text. Strong readable compact composition, gift box dominates, branches remain behind. This must be visually distinct from a purple open gift for oneself.",
+      "refs": [
+        "C:/Git/StenbygaardStickers/docs/designs/advent-rewards/mix-max-christmas-v2.png"
+      ]
+    },
+    {
+      "id": "gift-self-christmas-v1",
+      "prompt": "Use case: stylized-concept. Asset: square mobile Christmas advent-calendar reward icon. Premium detailed glossy 3D illustration, rich festive colors, warm golden edge lighting, matching the provided Christmas reward reference. The MAIN SUBJECT must be large, legible at 100px and fully inside the canvas. Behind it add an asymmetrical organic arrangement of dark green fir, small red/gold baubles, tiny warm fairy lights and a little snow on the tips. Free irregular silhouette with transparent gaps; genuinely transparent alpha everywhere outside the objects. No rectangular background, badge frame, opaque halo, floor, watermark, captions, numbers or added words. Reference is style and Christmas decoration only. Subject: a beautiful OPEN deep PURPLE gift box with a broad shiny GOLD ribbon, its lid leaning slightly behind the box with a gold bow on top. Inside are three clearly visible golden-yellow whole curved bananas and a warm golden glow contained inside the box. A small RED HEART-shaped gift tag hangs at the front, no text. No hands or people, this is a personal treat gift for yourself. Strong readable compact composition, open purple box and bananas dominate; branches remain behind. Clearly distinct from a closed blue box being passed between two mitten hands.",
+      "refs": [
+        "C:/Git/StenbygaardStickers/docs/designs/advent-rewards/mix-max-christmas-v2.png"
+      ]
+    }
+  ]
+}

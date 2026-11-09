@@ -1,5 +1,16 @@
 # Spil og valuta — brainstorm
 
+## Fremtidige features — gemt 7. november 2026
+
+Disse fire ønsker skal kunne findes igen, når brugeren spørger efter fremtidige idéer. De er ikke bestilt til implementering endnu.
+
+- **Aktiemarked**: investér bananer i fiktive aktier. Bevar de tidligere simuleringer og afklaringer nedenfor; modellen er ikke endeligt godkendt.
+- **Kviklån af bananer**: mulighed for at låne bananer. Beløbsgrænser, renter, tilbagebetaling og konsekvenser af manglende betaling er endnu ikke besluttet.
+- **Sportsbetting**: væddemål på sport med appens bananer. Datakilde, odds, sportsgrene, afregning og grænser er endnu ikke besluttet.
+- **Custom bets / væddemål mellem brugere**: brugere kan lave og deltage i egne væddemål. Oprettelse, accept, låsning af indsatser, afgørelse og håndtering af uenighed er endnu ikke besluttet.
+
+Casino-status pr. denne dato: Bananjack og Bananditten er live i version 2.3.1. Ældre afsnit nedenfor er historiske brainstormnoter, hvor nyere implementering og beslutninger har forrang.
+
 Opdateret 29. oktober 2026. Valuta og de to daglige spil er nu bestilt og implementeret på dev. Casino og børs er fortsat idéer til senere.
 
 ## Implementeret økonomi og daglige spil (gælder over tidligere forslag nedenfor)
@@ -43,6 +54,10 @@ Opdateret 29. oktober 2026. Valuta og de to daglige spil er nu bestilt og implem
 - Luftfoto-eksempel med Rom viste ca. 0,8 / 4 / 20 / 100 / 500 km på tværs.
 
 ## Pil en sticker
+
+**Tilføjet 9. november 2026:** fire badges (x96–99): Hattrick, Nisseinvasion, Triple Miv og Den gyldne trio. Hver giver 1 point og 20 bananer én gang. Gemte historiske kombinationer tæller også; badges bevares fra år til år. Spillet er kun åbent i julesæsonen: 20. november kl. 04.00 til midnat efter 31. december, dansk tid. Server og app håndhæver datoerne; klar-indikatoren tæller ikke spillet uden for sæsonen.
+
+**Nyeste aftale, implementeret på dev 8. november 2026:** idéen er nu Dagens bokse på `/spil/bokse`: 12 bokse, vælg tre og vend dem samtidig. Seks bananpræmier (5/10/15/25/50/100), tre drillenisser (−10/−25/−40) og tre Miv. Privat, fælles placering for alle brugere pr. spildøgn, ny kl. 04.00 dansk tid. Kontoens valg/resultat/udbetaling gemmes atomisk én gang pr. dag; saldo går ikke under nul. Ved saldo mindst 75 er forventet nettobelønning 32,5 bananer, med udfald fra −75 til +175. Der er tilføjet fire badges; streak er fortsat ikke implementeret. De oprindelige forslag nedenfor er historik, ikke de aktive regler.
 
 - Inspireret af brugerens tidligere Daily Jegg.
 - Tolv skjulte stickers på en lygtepæl; vælg tre og afslør præmier eller tab.

@@ -380,7 +380,7 @@ function selectMode(value: 'name' | 'code') {
   gap: 16px;
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
 }
 header {
   display: flex;

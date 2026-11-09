@@ -13,6 +13,8 @@ import type { EconomyPublic } from '../types/economy'
 import { economyBadges } from './economy-badges'
 import { jackBadges } from './jackBadges'
 import { slotBadges } from './slotBadges'
+import { adventBadges } from './advent-badges'
+import { boxesBadges } from './boxes-badges'
 
 export type BadgeKind = 'tier' | 'single' | 'record'
 
@@ -778,6 +780,8 @@ export function badgesFor(
   const badges = [
     ...compute(name, mine, all, ratings, now, cs),
     ...economyBadges(wallet),
+    ...adventBadges(wallet),
+    ...boxesBadges(wallet),
     ...jackBadges(wallet),
     ...slotBadges(wallet),
   ]
@@ -842,6 +846,7 @@ export function earnedCount(badges: Badge[]) {
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
+  'advent-doors': [1, 1, 1, 1, 1],
   'slot-spins': [1, 2, 3, 4, 5],
   'slot-wins': [1, 2, 3, 4, 5],
   'slot-big-wins': [1, 2, 3, 4, 5],
@@ -868,6 +873,16 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'boxes-hattrick': 1,
+  'boxes-elves': 1,
+  'boxes-miv': 1,
+  'boxes-golden': 1,
+  'advent-giver': 1,
+  'advent-receiver': 1,
+  'advent-self': 1,
+  'advent-elf': 1,
+  'advent-santa': 1,
+  'advent-physical': 1,
   'slot-jackpot': 5,
   'slot-streak': 2,
   'jack-split': 2,

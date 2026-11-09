@@ -90,6 +90,7 @@ test('POST authenticates first and ignores supplied dates, preview flags and pri
         return { year: 2026, day: 1, preview: true, now: '2026-12-25T12:00:00Z', amount: 100000 }
       },
       economyContext: async () => ({}),
+      adventConfigsFor: async () => undefined,
       settleEconomy() {},
       Date: class extends Date {
         constructor() {

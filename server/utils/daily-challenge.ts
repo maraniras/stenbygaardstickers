@@ -2,7 +2,7 @@ import { createHmac, randomBytes } from 'node:crypto'
 import cities from '../data/daily-cities.json'
 
 let secretPromise: Promise<string> | undefined
-async function gameSecret() {
+export async function gameSecret() {
   if (!secretPromise)
     secretPromise = (async () => {
       if (!redisEnabled) {

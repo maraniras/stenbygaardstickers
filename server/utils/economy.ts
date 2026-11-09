@@ -1,6 +1,7 @@
 import type { EconomyRecord } from '../../shared/types/economy'
 import { syncJackStats } from './jack-stats'
 import { prepareCasinoDay } from './casino-limit'
+import { boxesAchievements } from '../../shared/utils/boxes-badges'
 
 export async function economyContext() {
   const stickers = withDistance(
@@ -36,6 +37,8 @@ export function settleEconomy(
   context: EconomyContext,
   now = new Date(),
 ) {
+  const boxes = boxesAchievements(record)
+  if (boxes) record.boxesAchievements = boxes
   prepareCasinoDay(record, now)
   syncJackStats(record)
   creditBananas(record, 'welcome', STARTING_BANANAS, 'Velkommen · startsaldo', now)

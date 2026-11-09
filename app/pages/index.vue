@@ -412,7 +412,7 @@ function showOverview() {
   position: absolute;
   left: 12px;
   right: 12px;
-  bottom: var(--nav-space);
+  bottom: 12px;
   z-index: 600;
   display: flex;
   flex-direction: column;
@@ -481,7 +481,7 @@ function showOverview() {
 .map-tools {
   position: absolute;
   left: max(16px, env(safe-area-inset-left, 0px));
-  bottom: calc(var(--nav-space) + 8px);
+  bottom: 8px;
   z-index: 500;
   display: flex;
   align-items: center;

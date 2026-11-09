@@ -4,11 +4,12 @@ export default defineEventHandler(async (event) => {
   // This route never accepts client dates, rewards, amounts or a preview bypass.
   const context = await economyContext()
   const now = new Date()
+  const configs = await adventConfigsFor(user.name, now)
   const { record } = await mutateEconomy(user.name, (wallet) => {
     settleEconomy(wallet, user.name, context, now)
-    openAdventDoor(wallet, body?.year, body?.day, now)
+    openAdventDoor(wallet, body?.year, body?.day, now, configs)
     settleEconomy(wallet, user.name, context, now)
   })
   await syncBadgesLater(event, [user.name])
-  return adventResponse(record, now)
+  return adventResponse(record, now, configs)
 })

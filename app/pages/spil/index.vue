@@ -1,9 +1,22 @@
 <script setup lang="ts">
+import { adventPresentation } from '../../../shared/utils/advent'
+
 useHead({ title: 'Daglige spil · Stenbygaard Stickers' })
+const calendarLink = resolveComponent('NuxtLink')
+const calendarNow = ref(new Date())
+const calendarSeason = computed(() => adventPresentation(calendarNow.value))
+const calendarVisible = computed(() => import.meta.dev || calendarSeason.value.visible)
+const calendarOpen = computed(() => import.meta.dev || calendarSeason.value.open)
+let calendarClock: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  calendarClock = setInterval(() => (calendarNow.value = new Date()), 1000)
+})
+onBeforeUnmount(() => clearInterval(calendarClock))
 const { name, ready } = useUser()
 const { state, error, loading, reload } = useEconomy()
 const cityDone = computed(() => Boolean(state.value?.city.finished))
 const wheelDone = computed(() => Boolean(state.value?.wheel))
+const boxesDone = computed(() => Boolean(state.value?.boxes))
 </script>
 <template>
   <div class="daily-page">
@@ -22,9 +35,12 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
       >
     </PageHeader>
     <GameSectionNav section="daily" />
-    <NuxtLink
+    <component
+      :is="calendarOpen ? calendarLink : 'div'"
+      v-if="calendarVisible"
       class="advent-link"
-      to="/spil/julekalender"
+      :to="calendarOpen ? '/spil/julekalender' : undefined"
+      :aria-disabled="!calendarOpen || undefined"
     >
       <div>
         <span>ET KIG PÅ DECEMBER</span>
@@ -36,7 +52,54 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
         aria-hidden="true"
         >24</span
       >
-      <span class="advent-link-cta">Prøv kalenderen <span aria-hidden="true">→</span></span>
+      <span class="advent-link-cta"
+        >{{ calendarSeason.open ? 'Åbn kalenderen' : 'Åbner 1. december' }}
+        <span
+          v-if="calendarOpen"
+          aria-hidden="true"
+          >→</span
+        ></span
+      >
+    </component>
+    <NuxtLink
+      class="boxes-card game-card"
+      to="/spil/bokse"
+      aria-label="Dagens bokse"
+    >
+      <div class="boxes-card-copy">
+        <span class="boxes-kicker">12 BOKSE · 3 VALG</span>
+        <h2>Dagens bokse</h2>
+        <p>
+          {{
+            !state?.boxesActive
+              ? 'Et dagligt julespil fra 20. november til 31. december.'
+              : boxesDone
+                ? `Dagens resultat: ${state!.boxes!.amount > 0 ? '+' : state!.boxes!.amount < 0 ? '−' : ''}${Math.abs(state!.boxes!.amount)} 🍌`
+                : 'Vælg tre. Find bananer, drillenisser eller Miv.'
+          }}
+        </p>
+        <span class="game-link"
+          >{{
+            !state?.boxesActive
+              ? 'Åbner 20. november'
+              : boxesDone
+                ? 'Se resultat'
+                : 'Vælg dine bokse'
+          }}
+          <span aria-hidden="true">→</span></span
+        >
+      </div>
+      <div
+        class="mini-boxes"
+        aria-hidden="true"
+      >
+        <i
+          v-for="n in 12"
+          :key="n"
+          :class="{ picked: [2, 6, 10].includes(n) }"
+          >{{ [2, 6, 10].includes(n) ? '✦' : '?' }}</i
+        >
+      </div>
     </NuxtLink>
     <div class="daily-reset">
       <svg
@@ -51,7 +114,11 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
         <path d="M12 7v5l3 2" />
       </svg>
       <div>
-        <b>{{ cityDone && wheelDone ? 'Du er med igen i morgen' : 'En ny chance hver dag' }}</b
+        <b>{{
+          cityDone && wheelDone && (!state?.boxesActive || boxesDone)
+            ? 'Du er med igen i morgen'
+            : 'En ny chance hver dag'
+        }}</b
         ><span>Nye spil kl. 04.00 dansk tid</span>
       </div>
     </div>
@@ -164,20 +231,82 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   </div>
 </template>
 <style scoped>
+.advent-link,
+.game-card {
+  margin-bottom: 16px;
+}
+.game-card.boxes-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: linear-gradient(125deg, var(--surface), var(--surface-2));
+}
+.boxes-card-copy {
+  min-width: 0;
+  flex: 1;
+}
+.boxes-kicker {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  font-weight: 800;
+  color: var(--muted);
+}
+.boxes-card h2 {
+  margin-top: 7px;
+  font-size: 23px;
+}
+.boxes-card p {
+  margin: 8px 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.mini-boxes {
+  flex: none;
+  width: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  transform: rotate(7deg);
+}
+.mini-boxes i {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid #9aaf9a55;
+  border-radius: 7px;
+  background: #304b3f;
+  color: #eee2bd66;
+  font-style: normal;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+.mini-boxes .picked {
+  color: #49371c;
+  background: #dfc180;
+  border-color: #edda9e;
+  box-shadow: 0 2px 8px #9d7e3422;
+}
 .advent-link {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 16px;
   padding: 20px;
   overflow: hidden;
   border: 1px solid #c8ae775c;
   border-radius: 22px;
   background:
-    linear-gradient(90deg, #163d37ee, #163d3733),
-    url('/images/christmas-calendar-mix-max-faxe-v1.webp') center 40% / cover;
+    linear-gradient(90deg, #163d371a, #163d37ee),
+    url('/images/christmas-calendar-final-v3.webp') center 40% / cover;
   color: #fff0cb;
   text-decoration: none;
+}
+.advent-link > div {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: right;
 }
 .advent-link div > span {
   font-size: 8px;
@@ -187,7 +316,7 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
 .advent-link h2 {
   margin-top: 5px;
   font-family: Georgia, serif;
-  font-size: 28px;
+  font-size: clamp(24px, 7vw, 28px);
   font-weight: 400;
   letter-spacing: -0.02em;
 }
@@ -197,6 +326,8 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   color: #eee4c9;
 }
 .advent-link-day {
+  grid-column: 1;
+  grid-row: 1;
   align-self: center;
   display: grid;
   place-items: center;
@@ -210,16 +341,17 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
   transform: rotate(8deg);
 }
 .advent-link-cta {
-  grid-column: 1/-1;
+  grid-column: 2;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 8px;
   font-size: 11px;
   font-weight: 700;
 }
 .daily-page {
   max-width: 480px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
+  padding: calc(20px + var(--safe-t)) 16px 18px;
 }
 .lead {
   margin: 10px 0 0;
@@ -329,7 +461,6 @@ h2 {
 .wheel-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-top: 16px;
   background: light-dark(#f7f2fd, #282032);
 }
 .wheel-copy {

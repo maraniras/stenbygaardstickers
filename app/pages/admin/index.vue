@@ -173,7 +173,7 @@ function submitted(s: StoredSticker) {
 
       <AdminPush />
       <NuxtLink
-        class="chip"
+        class="chip advent-link"
         to="/admin/julekalender"
         >Julekalender · præmier og åbninger →</NuxtLink
       >
@@ -191,10 +191,13 @@ function submitted(s: StoredSticker) {
 </template>
 
 <style scoped>
+.advent-link {
+  margin-top: 24px;
+}
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
 }
 .login {
   max-width: 360px;

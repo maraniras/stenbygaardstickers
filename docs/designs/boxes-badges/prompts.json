@@ -1,0 +1,26 @@
+{
+  "tool": "built-in imagegen",
+  "date": "2026-11-09",
+  "assets": [
+    {
+      "id": "boxes-hattrick",
+      "ref": "public/games/advent/banana-pile-large-christmas-v2.webp",
+      "prompt": "Use case: stylized-concept. Asset type: ONE premium 3D mobile achievement icon, square composition, transparent background with real alpha, no rectangular backdrop, no badge rim or medal border, no lettering or numerals. Match the rich glossy, highly detailed, colorful Christmas 3D style of the reference. Compact clear silhouette legible at 64px; leave 8% transparent padding. Warm studio lighting, shiny materials, red/green/gold holiday palette, a small irregular arrangement of fir sprigs, holly and ornaments behind the subject; no full scene, no watermark. Create Hattrick: THREE distinct ripe yellow banana bunches emerging from THREE small open jewel-colored Christmas gift boxes, arranged as a triumphant compact triangular cluster. Make the three separate banana rewards immediately countable. Reference is style/material guidance only. No human faces, no cat, no crown."
+    },
+    {
+      "id": "boxes-elves",
+      "ref": "public/games/advent/mischief-elf.webp",
+      "prompt": "Use case: stylized-concept. Asset type: ONE premium 3D mobile achievement icon, square composition, transparent background with real alpha, no rectangular backdrop, no badge rim or medal border, no lettering or numerals. Match the rich glossy, highly detailed, colorful Christmas 3D style of the reference. Compact clear silhouette legible at 64px; leave 8% transparent padding. Warm studio lighting, shiny materials, red/green/gold holiday palette, a small irregular arrangement of fir sprigs, holly and ornaments behind the subject; no full scene, no watermark. Create Nisseinvasion: THREE mischievous Christmas elf busts in a compact triangular formation, all with the SAME man's recognizable facial identity as the provided elf reference. Preserve the reference man's face and its red/green jester elf hats and gold bells. One elf in front, two behind, all three faces clearly visible; cheeky stealing-prank expressions, not aggressive. Christmas fir silhouette behind them. No bananas, no other people, no text. This is a new achievement composition, not a plain duplication strip."
+    },
+    {
+      "id": "boxes-miv",
+      "ref": "public/badges/custom/wheel-nits.webp",
+      "prompt": "Use case: stylized-concept. Asset type: ONE premium 3D mobile achievement icon, square composition, transparent background with real alpha, no rectangular backdrop, no badge rim or medal border, no lettering or numerals. Match the rich glossy, highly detailed, colorful Christmas 3D style of the reference. Compact clear silhouette legible at 64px; leave 8% transparent padding. Warm studio lighting, shiny materials, red/green/gold holiday palette, a small irregular arrangement of fir sprigs, holly and ornaments behind the subject; no full scene, no watermark. Create Triple Miv: THREE adorable tearful grey-lilac 3D kittens clustered together, all three distinct sad faces clearly countable. Use the provided sad kitten as character/style reference. Add little red and green winter scarves and a tiny holly sprig. They are empty-pawed, disappointed after finding three empty boxes. NO bananas, NO fruit, NO wheel emblem, NO coins, NO person. Richly colored detailed fur, amber eyes, cute comedy rather than distress. Three tiny open EMPTY gift boxes can sit at the very bottom."
+    },
+    {
+      "id": "boxes-golden",
+      "ref": "public/games/advent/banana-pile-large-christmas-v2.webp",
+      "prompt": "Use case: stylized-concept. Asset type: ONE premium 3D mobile achievement icon, square composition, transparent background with real alpha, no rectangular backdrop, no badge rim or medal border, no lettering or numerals. Match the rich glossy, highly detailed, colorful Christmas 3D style of the reference. Compact clear silhouette legible at 64px; leave 8% transparent padding. Warm studio lighting, shiny materials, red/green/gold holiday palette, a small irregular arrangement of fir sprigs, holly and ornaments behind the subject; no full scene, no watermark. Create Den gyldne trio: THREE distinct gleaming golden banana bunch trophies, a larger central bunch and two smaller flanking bunches, arranged as a luxurious three-piece prize. Clearly show three separate bunches, NOT a large pile. Add one small ornate gold crown over the central bunch, tiny star glints and rich Christmas fir/holly accents behind the base. Golden yellow bananas should still look unmistakably like bananas, not solid metal bars. No faces, no cats, no numerical values, no writing."
+    }
+  ]
+}

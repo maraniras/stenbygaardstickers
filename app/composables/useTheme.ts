@@ -6,7 +6,9 @@ export function useTheme() {
     try {
       localStorage.removeItem('stenbygaard-theme')
     } catch {}
-    return themeForDate()
+    // Midlertidig lokal julevisning under arbejdet med kalenderen.
+    // Produktions- og Preview-builds følger fortsat de normale sæsondatoer.
+    return import.meta.dev ? 'jul' : themeForDate()
   })
   return { theme }
 }

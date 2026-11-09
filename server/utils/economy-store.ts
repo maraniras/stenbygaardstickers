@@ -1,6 +1,8 @@
 import type { EconomyRecord, EconomyPublic } from '../../shared/types/economy'
 import { emptyDailyStats } from '../../shared/utils/economy'
 import { publicJackStats } from './jack-stats'
+import { adventStats } from '../../shared/utils/advent-badges'
+import { boxesAchievements } from '../../shared/utils/boxes-badges'
 
 export const ECONOMY_CAS = `if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
 redis.call('HSET', KEYS[1], ARGV[1], ARGV[3]); return 1`
@@ -74,7 +76,11 @@ export async function mutateEconomy<T>(
   })
 }
 export function publicEconomy(record: EconomyRecord): EconomyPublic {
+  const advent = adventStats(record)
+  const boxes = boxesAchievements(record)
   return {
+    ...(advent ? { adventStats: advent } : {}),
+    ...(boxes ? { boxesAchievements: boxes } : {}),
     balance: record.balance,
     peakBalance: record.peakBalance,
     stats: record.stats,

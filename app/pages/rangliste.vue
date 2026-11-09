@@ -296,7 +296,7 @@ function unit(n: number | null) {
 .rank-page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 18px);
+  padding: calc(20px + var(--safe-t)) 16px 18px;
 }
 .your-rank {
   display: flex;

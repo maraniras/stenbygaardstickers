@@ -2,6 +2,7 @@ import { randomInt } from 'node:crypto'
 import type { EconomyRecord, DailyResponse, CityRun } from '../../shared/types/economy'
 import type { EconomyContext } from './economy'
 import { casinoDailyLimit } from './casino-limit'
+import { boxesSeason } from '../../shared/utils/boxes'
 
 // Keep previously credited rewards readable under the current badge names.
 const renamedBadgeLabels: Record<string, string> = {
@@ -19,7 +20,7 @@ const renamedBadgeLabels: Record<string, string> = {
 export function emptyCityRun(): CityRun {
   return { guesses: [], finished: false, won: false, reward: 0 }
 }
-function trimGameDays(record: EconomyRecord, day: string) {
+export function trimGameDays(record: EconomyRecord, day: string) {
   const cutoff = Date.parse(`${day}T12:00:00Z`) - 35 * 86400_000
   for (const key of Object.keys(record.days))
     if (Date.parse(`${key}T12:00:00Z`) < cutoff) delete record.days[key]
@@ -33,6 +34,8 @@ export async function dailyResponse(
   const wallet = publicEconomy(record)
   // Return current streaks without removing the permanent best streak.
   const previous = previousGameDay(day)
+  const season = boxesSeason()
+  const resetAt = nextGameReset()
   wallet.stats = {
     ...wallet.stats,
     cityStreak:
@@ -47,7 +50,8 @@ export async function dailyResponse(
   return {
     casinoLimit: casinoDailyLimit(record),
     day,
-    nextResetAt: nextGameReset(),
+    nextResetAt: season.active && season.endAt < resetAt ? season.endAt : resetAt,
+    boxesActive: season.active,
     wallet,
     history: record.history.map((entry) =>
       renamedBadgeLabels[entry.id]
@@ -72,6 +76,7 @@ export async function dailyResponse(
         : {}),
     },
     wheel: record.days[day]?.wheel ?? null,
+    boxes: record.days[day]?.boxes ?? null,
   }
 }
 export function applyCityGuess(

@@ -159,7 +159,7 @@ onBeforeUnmount(() => map?.remove())
 .page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px var(--nav-space);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
 }
 .progress {
   margin-top: 12px;

@@ -133,7 +133,7 @@ const time = (at: string) =>
 .bank-page {
   max-width: 640px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px calc(var(--nav-space) + 20px);
+  padding: calc(20px + var(--safe-t)) 16px 20px;
 }
 h2 {
   font-size: 18px;

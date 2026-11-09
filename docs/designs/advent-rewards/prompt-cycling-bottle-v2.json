@@ -1,0 +1,6 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "transparentBackground": true,
+  "reference": "cycling-bottle-christmas-v1.png",
+  "prompt": "Use case: precise-object-edit. Edit target: provided transparent Christmas cycling bottle reward icon. ONLY recolor the cycling bottle and its bottle cage: replace all green plastic cap, bottle accent stripes, bicycle pictogram and green cage surfaces with rich cobalt/royal BLUE; keep the bottle body pearl white and its pull-up nozzle red. Keep the gold screws and highlights. Preserve the precise bottle shape, waist/ribs, spout, composition, red/gold bow and entire fir decoration. Fir branches must remain naturally GREEN; preserve their red/gold baubles, fairy lights and snow exactly. Do not recolor the fir. No additional objects or text, no changes to layout. Maintain the free organic silhouette, transparent gaps between branches and genuinely transparent alpha outside the object, no rectangular background. The bottle should clearly read as a BLUE AND WHITE cycling bidon rather than another green object."
+}
