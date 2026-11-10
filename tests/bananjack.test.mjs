@@ -61,7 +61,7 @@ test('bust skips dealer drawing; duplicate hit and settlement never repeat', () 
   assert.equal(r.bananjack.dealer.length, 2)
   assert.equal(r.balance, 240)
 })
-test('double debits once, draws one card, settles and cannot exceed 50 per hand', () => {
+test('double debits once, draws one card and settles, including the maximum starting bet', () => {
   const a = harness(false),
     r = fresh(a)
   a.dealJack(r, 'round-a', null, 20, deck(4, 8, 5, 7, 9))
@@ -71,10 +71,24 @@ test('double debits once, draws one card, settles and cannot exceed 50 per hand'
   assert.equal(r.balance, 290)
   a.actJack(r, 'round-a', 0, 'double')
   assert.equal(r.balance, 290)
-  const expensive = fresh(a)
-  a.dealJack(expensive, 'round-b', null, 30, deck(4, 8, 5, 7))
-  assert.ok(!a.jackActions(expensive.bananjack, expensive.balance).includes('double'))
-  assert.throws(() => a.actJack(expensive, 'round-b', 0, 'double'))
+  for (const bet of [30, 40, 50]) {
+    const expensive = fresh(a)
+    a.dealJack(expensive, 'round-b', null, bet, deck(4, 8, 5, 7, 9))
+    assert.ok(a.jackActions(expensive.bananjack, expensive.balance).includes('double'))
+    a.actJack(expensive, 'round-b', 0, 'double')
+    assert.equal(expensive.bananjack.hands[0].bet, bet * 2)
+    assert.equal(expensive.bananjack.hands[0].cards.length, 3)
+    assert.equal(expensive.bananjack.status, 'finished')
+    assert.equal(expensive.balance, 250 + bet * 2)
+    const saved = JSON.stringify(expensive)
+    a.actJack(expensive, 'round-b', 0, 'double')
+    assert.equal(JSON.stringify(expensive), saved)
+  }
+  const poor = fresh(a)
+  poor.balance = 99
+  a.dealJack(poor, 'round-poor', null, 50, deck(4, 8, 5, 7, 9))
+  assert.ok(!a.jackActions(poor.bananjack, poor.balance).includes('double'))
+  assert.throws(() => a.actJack(poor, 'round-poor', 0, 'double'))
 })
 test('split costs another bet; split aces each get one card and 21 pays only 1:1', () => {
   const a = harness(false),

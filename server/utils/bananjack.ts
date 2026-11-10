@@ -1,13 +1,7 @@
 import { randomInt } from 'node:crypto'
 import type { EconomyRecord } from '../../shared/types/economy'
 import type { JackGame, JackHand, JackAction, JackPublic } from '../../shared/types/bananjack'
-import {
-  JACK_BETS,
-  JACK_MAX_BET,
-  jackRank,
-  jackValue,
-  jackScore,
-} from '../../shared/utils/bananjack'
+import { JACK_BETS, jackRank, jackValue, jackScore } from '../../shared/utils/bananjack'
 import { syncJackStats } from './jack-stats'
 import {
   casinoDailyLimit,
@@ -48,12 +42,7 @@ export function jackActions(game: JackGame, balance: number, remaining = Infinit
   if (game.status !== 'playing') return []
   const hand = game.hands[game.active]!
   const actions: JackAction[] = ['hit', 'stand']
-  if (
-    hand.cards.length === 2 &&
-    hand.bet * 2 <= JACK_MAX_BET &&
-    Math.min(balance, remaining) >= hand.bet
-  )
-    actions.push('double')
+  if (hand.cards.length === 2 && Math.min(balance, remaining) >= hand.bet) actions.push('double')
   if (
     hand.cards.length === 2 &&
     game.hands.length < 4 &&

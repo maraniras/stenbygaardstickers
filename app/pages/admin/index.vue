@@ -177,6 +177,11 @@ function submitted(s: StoredSticker) {
         to="/admin/julekalender"
         >Julekalender · præmier og åbninger →</NuxtLink
       >
+      <NuxtLink
+        class="chip advent-link"
+        to="/admin/pakkeleg"
+        >Pakkeleg · præmier og udlevering →</NuxtLink
+      >
       <AdminUsers />
       <AdminBackups />
     </template>
@@ -192,6 +197,7 @@ function submitted(s: StoredSticker) {
 
 <style scoped>
 .advent-link {
+  display: flex;
   margin-top: 24px;
 }
 .page {

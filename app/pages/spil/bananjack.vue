@@ -192,7 +192,7 @@ const {
       >
         {{ { hit: 'Træk kort', stand: 'Stå', double: 'Fordobl', split: 'Split' }[action] }}
       </button>
-      <p>Fordobl: ét kort og stå. Maks. 50 🍌 pr. hånd.</p>
+      <p>Fordobl: indsatsen fordobles, du får ét kort og står.</p>
     </div>
     <div
       v-else-if="name && limitReached && !busy"
@@ -289,8 +289,8 @@ const {
             1:1. Ved lige op får du indsatsen tilbage.
           </li>
           <li>
-            Vælg 10–50 bananer i trin på 10. Fordobl på de første to kort, hvis du har råd, og
-            hånden højst kommer på 50. Du får ét kort og står.
+            Vælg 10–50 bananer i trin på 10. Fordobl på de første to kort, hvis du har råd og plads
+            inden for dagens tabsgrænse. Også 50 kan fordobles til 100. Du får ét kort og står.
           </li>
           <li>
             Split to kort med samme værdi. Maks. fire hænder. Hver ekstra hånd koster samme indsats.

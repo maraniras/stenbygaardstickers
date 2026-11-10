@@ -88,7 +88,7 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       </div>
       <div class="game-copy">
         <h2 id="bananjack-title">Banan<span>jack</span></h2>
-        <div class="game-details"><span>Én spiller</span><span>10–50 🍌 pr. hånd</span></div>
+        <div class="game-details"><span>Én spiller</span><span>10–50 🍌 i startindsats</span></div>
       </div>
       <div
         v-if="!bananjackEnabled"

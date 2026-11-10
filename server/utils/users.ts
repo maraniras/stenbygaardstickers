@@ -18,6 +18,7 @@ interface UserDevice {
 }
 
 export interface UserRecord {
+  frame?: string
   name: string
   createdAt: string
   /** Sidst set bevares også, når den sidste enhed logger ud. */

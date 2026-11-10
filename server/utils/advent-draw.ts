@@ -103,6 +103,8 @@ export function createAdventDraw(
     'white-wine',
     'cycling-bottle',
     'cycling-bottle',
+    'faxe-kondi',
+    'faxe-kondi',
     'santa',
   ] as AdventReward[]) {
     const pool = eligible.filter((n) => reward !== 'cycling-bottle' || nameKey(n) !== 'emil')
@@ -113,6 +115,10 @@ export function createAdventDraw(
       day: reward === 'red-wine' || reward === 'white-wine' ? 23 + random(2) : 1 + random(24),
     })
   }
+  // One optional prize shared by Ida and Marc, never one per participant.
+  const cakePool = participants.filter((name) => ['ida', 'marc'].includes(nameKey(name)))
+  if (cakePool.length)
+    awards.push({ reward: 'cake', winner: cakePool[random(cakePool.length)]!, day: 10 + random(9) })
   const draw: AdventDraw = {
     year: ADVENT_YEAR,
     createdAt: now.toISOString(),

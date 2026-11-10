@@ -1,6 +1,22 @@
 import type { AdventOpening, AdventPrize, AdventReward } from '../types/advent'
 
 export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
+  cake: {
+    kind: 'physical',
+    reward: 'cake',
+    amount: 50,
+    title: 'Du har vundet træstammer!',
+    description: 'Rigtige træstammer og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
+  'faxe-kondi': {
+    kind: 'physical',
+    reward: 'faxe-kondi',
+    amount: 50,
+    title: 'Du har vundet en Faxe Kondi!',
+    description: 'En rigtig flaske Faxe Kondi og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
   'banana-single': {
     kind: 'bananas',
     reward: 'banana-single',
@@ -81,6 +97,8 @@ export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
   },
 }
 export const ADVENT_REWARD_ICONS: Record<AdventReward, string> = {
+  cake: 'traestammer-christmas-v1',
+  'faxe-kondi': 'faxe-kondi-christmas-v1',
   'banana-single': 'banana-single-christmas-v2',
   'banana-small': 'banana-pile-small-christmas-v2',
   'banana-large': 'banana-pile-large-christmas-v2',
@@ -102,7 +120,7 @@ export function adventPrizeAmount(prize: AdventPrize) {
 /** A stable, no-payout demonstration; wine is still only behind 23/24. */
 export function previewAdventOpening(day: number): AdventOpening {
   const rewards: AdventReward[] = [
-    'banana-single',
+    'faxe-kondi',
     'banana-small',
     'banana-large',
     'elf',
@@ -115,7 +133,7 @@ export function previewAdventOpening(day: number): AdventOpening {
     'banana-small',
     'elf',
     'banana-large',
-    'banana-single',
+    'cake',
     'friend-gift',
     'self-gift',
     'banana-small',

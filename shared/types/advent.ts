@@ -4,6 +4,8 @@ export type AdventReward =
   | 'banana-large'
   | 'elf'
   | 'mix-max'
+  | 'faxe-kondi'
+  | 'cake'
   | 'red-wine'
   | 'white-wine'
   | 'cycling-bottle'

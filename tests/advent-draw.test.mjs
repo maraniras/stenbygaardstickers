@@ -30,6 +30,7 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       ['red-wine', 1],
       ['white-wine', 1],
       ['cycling-bottle', 2],
+      ['faxe-kondi', 2],
       ['santa', 1],
     ])
       assert.equal(all.filter((p) => p.reward === reward).length, count)
@@ -59,14 +60,56 @@ test('all limited prizes may go to the same person and stack without removing gu
     'one-winner',
     now,
   )
-  assert.equal(draw.awards.length, 10)
+  assert.equal(draw.awards.length, 12)
   assert.ok(draw.awards.every((p) => p.winner === 'Norsk'))
   const forced = { ...draw, awards: draw.awards.map((p) => ({ ...p, day: 24 })) }
   const plan = a.buildAdventPlan('Norsk', forced)
   const awards = prizes([plan[23]]).filter((p) =>
-    ['mix-max', 'red-wine', 'white-wine', 'cycling-bottle', 'santa'].includes(p.reward),
+    ['mix-max', 'red-wine', 'white-wine', 'cycling-bottle', 'faxe-kondi', 'santa'].includes(
+      p.reward,
+    ),
   )
-  assert.equal(awards.length, 10)
+  assert.equal(awards.length, 12)
+})
+
+test('one optional cake prize belongs only to eligible Ida or Marc behind December10–18', () => {
+  const { api: a } = harness()
+  for (const candidates of [[], ['Ida'], ['Marc'], ['IDA', 'mArC']]) {
+    for (let seed = 0; seed < 100; seed++) {
+      const roster = [
+        ...users,
+        ...candidates.map((name) => ({ name, createdAt: '2026-11-20T00:00:00Z' })),
+      ]
+      const draw = a.createAdventDraw(roster, `cake-${seed}`, now)
+      const cakes = draw.awards.filter((award) => award.reward === 'cake')
+      assert.equal(cakes.length, candidates.length ? 1 : 0)
+      assert.equal(
+        Object.values(draw.plans)
+          .flatMap(prizes)
+          .filter((p) => p.reward === 'cake').length,
+        cakes.length,
+      )
+      if (!cakes.length) continue
+      const cake = cakes[0]
+      assert.ok(candidates.includes(cake.winner))
+      assert.ok(cake.day >= 10 && cake.day <= 18)
+      const found = prizes([draw.plans[cake.winner.toLocaleLowerCase('da')][cake.day - 1]]).find(
+        (p) => p.reward === 'cake',
+      )
+      assert.equal(found.kind, 'physical')
+      assert.equal(found.amount, 50)
+    }
+  }
+  const late = a.createAdventDraw(
+    [
+      ...users,
+      { name: 'Ida', createdAt: '2026-11-30T23:00:00Z' },
+      { name: 'Marc', createdAt: '2026-12-01T12:00:00Z' },
+    ],
+    'late-cake',
+    now,
+  )
+  assert.equal(late.awards.filter((award) => award.reward === 'cake').length, 0)
 })
 
 for (const redis of [false, true])

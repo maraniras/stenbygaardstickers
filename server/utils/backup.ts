@@ -21,6 +21,7 @@ export interface Backup {
   economy?: Awaited<ReturnType<typeof allEconomyRecords>>
   games?: Awaited<ReturnType<typeof gameBackup>>
   adventDraw?: Awaited<ReturnType<typeof readAdventDraw>>
+  parcelGames?: Awaited<ReturnType<typeof parcelBackup>>
 }
 
 async function allRatings(): Promise<Backup['ratings']> {
@@ -49,6 +50,7 @@ export async function createBackup(): Promise<Backup> {
     economy: await allEconomyRecords(),
     games: await gameBackup(),
     adventDraw: await readAdventDraw(),
+    parcelGames: await parcelBackup(),
   }
 }
 

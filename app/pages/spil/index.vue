@@ -1,12 +1,24 @@
 <script setup lang="ts">
 import { adventPresentation } from '../../../shared/utils/advent'
+import { parcelSchedule } from '../../../shared/utils/parcel-game'
 
 useHead({ title: 'Daglige spil · Stenbygaard Stickers' })
 const calendarLink = resolveComponent('NuxtLink')
 const calendarNow = ref(new Date())
 const calendarSeason = computed(() => adventPresentation(calendarNow.value))
-const calendarVisible = computed(() => import.meta.dev || calendarSeason.value.visible)
+const calendarVisible = computed(() => calendarSeason.value.visible)
 const calendarOpen = computed(() => import.meta.dev || calendarSeason.value.open)
+const parcelDates = computed(() =>
+  parcelSchedule(
+    Number(
+      calendarNow.value.toLocaleDateString('en', {
+        timeZone: 'Europe/Copenhagen',
+        year: 'numeric',
+      }),
+    ),
+    calendarNow.value,
+  ),
+)
 let calendarClock: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
   calendarClock = setInterval(() => (calendarNow.value = new Date()), 1000)
@@ -14,6 +26,13 @@ onMounted(() => {
 onBeforeUnmount(() => clearInterval(calendarClock))
 const { name, ready } = useUser()
 const { state, error, loading, reload } = useEconomy()
+const { state: parcelCampaign } = useParcelGame(30000)
+const parcelVisible = computed(
+  () =>
+    parcelCampaign.value?.phase !== 'archived' &&
+    (!parcelCampaign.value?.collectionUntil ||
+      calendarNow.value.getTime() < Date.parse(parcelCampaign.value.collectionUntil)),
+)
 const cityDone = computed(() => Boolean(state.value?.city.finished))
 const wheelDone = computed(() => Boolean(state.value?.wheel))
 const boxesDone = computed(() => Boolean(state.value?.boxes))
@@ -35,6 +54,32 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
       >
     </PageHeader>
     <GameSectionNav section="daily" />
+    <NuxtLink
+      v-if="parcelVisible"
+      class="parcel-teaser"
+      to="/spil/pakkeleg"
+      ><span aria-hidden="true">🎁 🎲</span>
+      <div>
+        <small>TO SLAG · ÉT FÆLLES BORD</small>
+        <h2>Pakkeleg</h2>
+        <p>
+          {{
+            calendarNow.getTime() < Date.parse(parcelDates.startsAt)
+              ? 'Tilmeld dig 20.–26. november for 100 bananer. Vi starter 27. november.'
+              : 'Slå en sekser. Snup en gave. Stol på ingen.'
+          }}
+        </p>
+        <b>{{
+          parcelCampaign?.phase === 'ended'
+            ? 'Åbn dine gaver →'
+            : parcelDates.registrationOpen
+              ? 'Tilmeld dig · 100 🍌 →'
+              : calendarNow.getTime() < Date.parse(parcelDates.registrationStartsAt)
+                ? 'Tilmelding åbner 20. november →'
+                : 'Se julebordet →'
+        }}</b>
+      </div></NuxtLink
+    >
     <component
       :is="calendarOpen ? calendarLink : 'div'"
       v-if="calendarVisible"
@@ -231,6 +276,37 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
   </div>
 </template>
 <style scoped>
+.parcel-teaser {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: linear-gradient(120deg, #254e40, #6a343e);
+  color: #fff0d5;
+  border: 1px solid #d2ad6255;
+  border-radius: 24px;
+  padding: 24px;
+  margin: 18px 0;
+  text-decoration: none;
+}
+.parcel-teaser > span {
+  font-size: 34px;
+}
+.parcel-teaser small {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+.parcel-teaser h2 {
+  margin: 7px 0;
+  font-size: 26px;
+}
+.parcel-teaser p {
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+.parcel-teaser b {
+  font-size: 12px;
+}
 .advent-link,
 .game-card {
   margin-bottom: 16px;

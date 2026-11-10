@@ -1,0 +1,6 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "Use case: precise-object-edit. Edit the reference Faxe Kondi bottle into a festive Christmas prize icon for a mobile game. Preserve the green plastic bottle, green cap, recognizable FAXE KONDI label and product silhouette. Add a compact decorative arrangement behind and around its bottom: lush fir sprigs, a small red and gold ribbon and a couple red berries. Match polished richly colored 3D emoji rendering, soft studio highlights, centered square composition readable at 160px. No extra bottle, no human, no medal border, no rectangular scene or backdrop. True transparent background with alpha. Leave generous clear space around the entire silhouette.",
+  "reference": "public/games/bananditten/faxe-kondi-bottle.webp",
+  "asset": "public/games/advent/faxe-kondi-christmas-v1.webp"
+}

@@ -77,7 +77,9 @@ async function setDelivered(entry: AdventPhysicalWinner) {
         class="hint"
       >
         Vinderne vises her, når lodtrækningen er foretaget efter 1. december kl. 00.00. Der uddeles
-        fem Mix Max, én rødvin, én hvidvin og to cykeldrikkedunke.
+        fem Mix Max, én rødvin, én hvidvin, to cykeldrikkedunke og to Faxe Kondi-flasker. Der er
+        også én træstammegave, hvis Ida eller Marc deltager; kun de to kan vinde den, i en låge fra
+        10. til 18. december.
       </p>
       <template v-else>
         <p class="hint">

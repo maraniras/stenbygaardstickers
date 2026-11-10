@@ -81,6 +81,7 @@ export function publicEconomy(record: EconomyRecord): EconomyPublic {
   return {
     ...(advent ? { adventStats: advent } : {}),
     ...(boxes ? { boxesAchievements: boxes } : {}),
+    ...(record.parcelAchievements ? { parcelAchievements: record.parcelAchievements } : {}),
     balance: record.balance,
     peakBalance: record.peakBalance,
     stats: record.stats,

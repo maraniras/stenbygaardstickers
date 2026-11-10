@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "assets": [
+    {
+      "id": "golden-gift",
+      "prompt": "Create one premium 3D Christmas game reward icon, a small open treasure gift box of polished warm gold holding three clearly curved yellow bananas, gold wrapping ribbon and tiny tasteful holly sprig, soft sparkling highlights. Detailed friendly Fluent 3D style, realistic smooth materials, front three-quarter view, centered isolated asset, no square backdrop, no text, no numbers, no people. Real transparent background, generous clear margin, readable at 100 pixels."
+    },
+    {
+      "id": "exclusive-frame",
+      "prompt": "Create one exclusive Christmas avatar frame game asset: a perfectly circular ornate polished gold ring bordered with small evergreen pine sprigs, a few deep burgundy ornaments, tiny golden stars, one small red ribbon centered at bottom. Premium detailed Fluent 3D style, front view straight-on, clean balanced silhouette, circular inner opening must be completely transparent to place a person's photo behind it. Outer background also truly transparent. No portrait, no fill in central hole, no text, no square background. Ring centered with generous clear margin, recognizable at small size."
+    },
+    {
+      "id": "rta-snowglobe",
+      "prompt": "Create one premium 3D Christmas game reward icon: a beautiful realistic snow globe with clear glass sphere, floating white snowflakes, tiny festive snowy evergreen and a miniature cozy red Scandinavian house inside, sturdy dark navy and warm gold circular pedestal. Small readable gold plaque on front of pedestal with EXACT uppercase letters 'RTA'. A few fir needles and tasteful red holly berries at the base, no rectangular background. Friendly detailed Fluent 3D game asset matching luxury Christmas icons, centered front three-quarter view, isolated with generous clear margin, true transparent background. No other text, no people."
+    }
+  ]
+}

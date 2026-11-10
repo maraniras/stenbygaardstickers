@@ -153,4 +153,15 @@ Højst 11 point og 220 bananer. Belønnes én gang, også på tværs af år. Ing
 
 Engangsbelønninger på tværs af år. Den gyldne trio giver også Hattrick, hvis den ikke er opnået tidligere. Badges bevares efter jul; selve spillet er kun åbent 20. november kl. 04.00 til midnat efter 31. december, dansk tid.
 
-Næste ledige nummer: **x100**
+## Pakkeleg
+
+| Nr.  | Badge (id)                      | Krav                                                        | Bananer | Point |
+| ---- | ------------------------------- | ----------------------------------------------------------- | ------- | ----- |
+| x100 | Røvrendt (`parcel-empty`)       | Slut uden gaver                                             | 20      | 1     |
+| x101 | Seksersekspert (`parcel-sixes`) | Slå seks seksere i samme pakkeleg, ikke nødvendigvis i træk | 20      | 1     |
+| x102 | Gavegrådig (`parcel-three`)     | Slut med mindst tre gaver                                   | 20      | 1     |
+| x103 | Pakkebaron (`parcel-five`)      | Slut med mindst fem gaver                                   | 20      | 1     |
+
+Kun tilmeldte deltagere i en gennemført pakkeleg kan få dem. Slutbadges beregnes ud fra det endelige ejerskab, før gaver åbnes; 5+ giver også 3+. Alle belønnes én gang på tværs af år og bevares efter jul. En aflyst pakkeleg giver ingen badges.
+
+Næste ledige nummer: **x104**

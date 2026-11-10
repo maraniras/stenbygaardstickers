@@ -1,5 +1,4 @@
 export const JACK_BETS = [10, 20, 30, 40, 50] as const
-export const JACK_MAX_BET = 50
 export function jackRank(card: number) {
   return card % 13
 }

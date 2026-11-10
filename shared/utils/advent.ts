@@ -9,7 +9,7 @@ export function adventPresentation(now = new Date()) {
       month: '2-digit',
     }).format(now) === '01'
   return {
-    visible: !decemberEnded && day >= '11-20',
+    visible: !decemberEnded && day >= '11-24',
     open: !decemberEnded && day >= '12-01',
   }
 }

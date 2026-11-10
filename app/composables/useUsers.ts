@@ -28,5 +28,6 @@ export function useUsers() {
     reload,
     isTaken: (name: string) => Boolean(find(name)),
     avatarFor: (name: string) => find(name)?.avatar,
+    frameFor: (name: string) => find(name)?.frame,
   }
 }

@@ -11,6 +11,24 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.5',
+    date: '2026-11-10',
+    push: {
+      title: '🎄 Julehyggen er på vej!',
+      body: 'Pakkeleg, fysiske præmier og nye badges! Tilmeldingen åbner 20. november. Se alle nyhederne i appen.',
+      url: '/nyheder',
+    },
+    notes: [
+      'Pakkelegen er på vej! Tilmeld dig 20.–26. november for 100 bananer. Vi starter 27. november kl. 04.00',
+      'To terningeslag om dagen – slå en sekser, tag en gave fra bordet, eller stjæl fra de andre',
+      'Kæmp om bananer, fysiske præmier og en eksklusiv juleprofilramme. Spillet slutter på et hemmeligt tidspunkt mellem jul og nytår, og du har derefter 14 dage til at åbne dine gaver',
+      'Fire nye pakkelegsbadges: Røvrendt, Seksersekspert, Gavegrådig og Pakkebaron',
+      'Julekalenderen dukker op under Spil 24. november kl. 04.00. Første låge åbner 1. december kl. 04.00',
+      'Flere fysiske julepræmier: blandt andet Mix Max, Faxe Kondi, drikkedunke og træstammer',
+      'Bananjack: Du kan nu også fordoble en startindsats på 50 bananer til 100',
+    ],
+  },
+  {
     version: '2.4',
     date: '2026-11-09',
     push: {

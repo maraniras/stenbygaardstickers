@@ -20,6 +20,7 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  parcelAchievements?: import('../utils/parcel-badges').ParcelAchievements
   boxesAchievements?: import('./boxes').BoxesAchievements
   adventStats?: import('./advent').AdventStats
   slots?: import('./slots').SlotStats
@@ -41,6 +42,16 @@ export interface WheelRun {
   jackpotAmount?: number
 }
 export interface EconomyRecord extends EconomyPublic {
+  parcelRewards?: Record<
+    string,
+    {
+      year: number
+      parcelId: string
+      reward: import('./parcel-game').ParcelReward
+      openedAt: string
+      deliveredAt?: string
+    }
+  >
   adventPlans?: Record<
     string,
     {
