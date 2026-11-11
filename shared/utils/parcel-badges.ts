@@ -5,6 +5,34 @@ import type { ParcelGame } from '../types/parcel-game'
 export type ParcelBadgeId = 'parcel-empty' | 'parcel-sixes' | 'parcel-three' | 'parcel-five'
 export type ParcelAchievements = Partial<Record<ParcelBadgeId, string>>
 
+/** Contents, not opening order, wallet balance or badge bonuses decide the champion. */
+export function parcelChampion(game: ParcelGame): string | undefined {
+  if (!game.ended || game.cancelled) return undefined
+  const ranked = game.players
+    .map((name, index) => {
+      const gifts = game.parcels.filter((p) => p.owner === name)
+      const reached = game.reachedCounts?.[`u:${name}`]?.[String(gifts.length)]
+      return {
+        name,
+        index,
+        count: gifts.length,
+        bananas: gifts.reduce((sum, p) => sum + (p.reward?.amount ?? p.amount), 0),
+        at: reached ? Date.parse(reached.at) : Infinity,
+        order: reached?.order ?? Infinity,
+      }
+    })
+    .filter((p) => p.count > 0)
+  ranked.sort(
+    (a, b) =>
+      b.count - a.count ||
+      b.bananas - a.bananas ||
+      a.at - b.at ||
+      a.order - b.order ||
+      a.index - b.index,
+  )
+  return ranked[0]?.name
+}
+
 /** Only server-confirmed rolls and frozen final ownership can award these badges. */
 export function parcelAwards(game: ParcelGame, name: string): ParcelAchievements {
   if (game.cancelled || !game.players.includes(name)) return {}
@@ -18,7 +46,8 @@ export function parcelAwards(game: ParcelGame, name: string): ParcelAchievements
     const gifts = game.parcels.filter((p) => p.owner === name).length
     if (gifts === 0) earned['parcel-empty'] = game.endsAt
     if (gifts >= 3) earned['parcel-three'] = game.endsAt
-    if (gifts >= 5) earned['parcel-five'] = game.endsAt
+    // Keep x103's stored id and icon; this is the winner of the 2026 campaign, not a 5+ threshold.
+    if (game.year === 2026 && parcelChampion(game) === name) earned['parcel-five'] = game.endsAt
   }
   return earned
 }
@@ -40,9 +69,10 @@ export function parcelBadges(economy?: EconomyPublic): Badge[] {
     },
     {
       id: 'parcel-five',
-      name: 'Pakkebaron',
+      name: 'Pakkelegs Champ 2026',
       emoji: '👑',
-      about: 'Slut pakkelegen med mindst fem gaver',
+      about:
+        'Vind pakkelegen 2026: flest gaver ved slutningen. Ved uafgjort vinder flest bananer i gaverne, derefter den, der først nåede sit endelige antal gaver',
     },
   ]
   return rules.map((rule): Badge => {

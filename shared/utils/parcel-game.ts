@@ -47,6 +47,11 @@ export function takeParcel(game: ParcelGame, name: string, id: string, now: Date
   if (!pending || !parcel) fail('Vælg en af de fremhævede pakker.')
   const event = { id: pending.id, from: parcel.owner, to: name, parcel: id, at: now.toISOString() }
   parcel.owner = name
+  const order = (game.collectionSequence ?? 0) + 1
+  game.collectionSequence = order
+  const count = game.parcels.filter((p) => p.owner === name).length
+  const reached = ((game.reachedCounts ??= {})[playerKey(name)] ??= {})
+  reached[String(count)] ??= { at: now.toISOString(), order }
   const turn = Object.values(game.turns[playerKey(name)] ?? {})
     .flat()
     .find((t) => t.id === pending.id)

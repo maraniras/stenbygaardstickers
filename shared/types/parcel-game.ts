@@ -56,6 +56,9 @@ export interface ParcelGame {
   prizesAssigned?: boolean
   cancelled?: boolean
   players: string[]
+  /** First time each player held a given gift count. Kept independently of the short event feed. */
+  reachedCounts?: Record<string, Record<string, { at: string; order: number }>>
+  collectionSequence?: number
   parcels: Parcel[]
   turns: Record<string, Record<string, ParcelTurn[]>>
   pending: Record<string, ParcelPending>

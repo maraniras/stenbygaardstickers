@@ -155,13 +155,13 @@ Engangsbelønninger på tværs af år. Den gyldne trio giver også Hattrick, hvi
 
 ## Pakkeleg
 
-| Nr.  | Badge (id)                      | Krav                                                        | Bananer | Point |
-| ---- | ------------------------------- | ----------------------------------------------------------- | ------- | ----- |
-| x100 | Røvrendt (`parcel-empty`)       | Slut uden gaver                                             | 20      | 1     |
-| x101 | Seksersekspert (`parcel-sixes`) | Slå seks seksere i samme pakkeleg, ikke nødvendigvis i træk | 20      | 1     |
-| x102 | Gavegrådig (`parcel-three`)     | Slut med mindst tre gaver                                   | 20      | 1     |
-| x103 | Pakkebaron (`parcel-five`)      | Slut med mindst fem gaver                                   | 20      | 1     |
+| Nr.  | Badge (id)                           | Krav                                                                                                         | Bananer | Point |
+| ---- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------- | ----- |
+| x100 | Røvrendt (`parcel-empty`)            | Slut uden gaver                                                                                              | 20      | 1     |
+| x101 | Seksersekspert (`parcel-sixes`)      | Slå seks seksere i samme pakkeleg, ikke nødvendigvis i træk                                                  | 20      | 1     |
+| x102 | Gavegrådig (`parcel-three`)          | Slut med mindst tre gaver                                                                                    | 20      | 1     |
+| x103 | Pakkelegs Champ 2026 (`parcel-five`) | Flest gaver ved slutningen; ved uafgjort flest bananer i gaverne, derefter først nået det endelige gaveantal | 20      | 1     |
 
-Kun tilmeldte deltagere i en gennemført pakkeleg kan få dem. Slutbadges beregnes ud fra det endelige ejerskab, før gaver åbnes; 5+ giver også 3+. Alle belønnes én gang på tværs af år og bevares efter jul. En aflyst pakkeleg giver ingen badges.
+Kun tilmeldte deltagere i en gennemført pakkeleg kan få dem. Slutbadges beregnes ud fra det endelige ejerskab, før gaver åbnes. Champ 2026 går til én vinder og kræver ikke fem gaver; Gavegrådig gives separat ved mindst tre. Bananer fra alle ejede gaver tæller, også uåbnede, mens badgebonus, saldo, tilmeldingspris og fysisk værdi ikke tæller. Første gang man når gaveantallet bevares, også hvis gaver senere bliver stjålet; serverrækkefølge afgør samtidige tidsstempler. Champ 2026 uddeles kun for 2026. De øvrige belønnes én gang på tværs af år; alle badges bevares efter jul. En aflyst pakkeleg eller et spil helt uden fordelte gaver giver ingen champion.
 
 Næste ledige nummer: **x104**

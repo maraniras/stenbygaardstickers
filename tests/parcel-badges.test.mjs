@@ -29,10 +29,10 @@ test('final badges use frozen ownership, not gifts during play or opened gifts',
   const { api: a } = harness()
   for (const [count, expected] of [
     [0, ['parcel-empty']],
-    [1, []],
-    [2, []],
-    [3, ['parcel-three']],
-    [4, ['parcel-three']],
+    [1, ['parcel-five']],
+    [2, ['parcel-five']],
+    [3, ['parcel-five', 'parcel-three']],
+    [4, ['parcel-five', 'parcel-three']],
     [5, ['parcel-five', 'parcel-three']],
     [8, ['parcel-five', 'parcel-three']],
   ]) {
@@ -44,6 +44,70 @@ test('final badges use frozen ownership, not gifts during play or opened gifts',
     game.cancelled = true
     assert.deepEqual(Object.keys(a.parcelAwards(game, 'Nicole')), [])
   }
+})
+
+test('one champion is chosen by gifts, then gift bananas, then first reaching that count', () => {
+  const { api: a } = harness()
+  const game = board(6)
+  game.players = ['Nicole', 'Mathias']
+  game.parcels.forEach((p, i) => {
+    p.owner = i < 3 ? 'Nicole' : 'Mathias'
+  })
+  game.reachedCounts = {
+    'u:Nicole': { 3: { at: '2026-12-01T12:00:00Z', order: 4 } },
+    'u:Mathias': { 3: { at: '2026-12-02T12:00:00Z', order: 6 } },
+  }
+  assert.equal(a.parcelChampion(game), undefined)
+  game.ended = true
+  assert.equal(a.parcelChampion(game), 'Nicole')
+  game.parcels[3].reward = { kind: 'golden', amount: 500, title: 'Guld' }
+  assert.equal(a.parcelChampion(game), 'Mathias')
+  game.parcels[3].openedAt = end
+  assert.equal(a.parcelChampion(game), 'Mathias')
+  // More gifts takes precedence even when their banana sum is smaller.
+  game.parcels[4].owner = 'Nicole'
+  assert.equal(a.parcelChampion(game), 'Nicole')
+  assert.ok(a.parcelAwards(game, 'Nicole')['parcel-five'])
+  assert.equal(a.parcelAwards(game, 'Mathias')['parcel-five'], undefined)
+  game.year = 2027
+  assert.equal(a.parcelAwards(game, 'Nicole')['parcel-five'], undefined)
+  game.year = 2026
+  game.cancelled = true
+  assert.equal(a.parcelChampion(game), undefined)
+  game.cancelled = false
+  game.parcels.forEach((p) => {
+    p.owner = null
+  })
+  assert.equal(a.parcelChampion(game), undefined)
+})
+
+test('first collection milestones survive thefts, feed pruning and identical timestamps', () => {
+  const { api: a } = harness()
+  const game = board(6),
+    stamp = new Date('2026-12-01T12:00:00Z')
+  // Registration/name order must not decide simultaneous timestamps.
+  game.players = ['Mathias', 'Nicole']
+  game.parcels.forEach((p) => {
+    p.owner = null
+  })
+  let sequence = 0
+  const take = (name, id, at = stamp) => {
+    game.pending[`u:${name}`] = { id: `pick-${++sequence}`, deadline: end, ticket: 0 }
+    a.takeParcel(game, name, id, at)
+  }
+  for (let i = 1; i <= 3; i++) take('Nicole', `p${i}`)
+  for (let i = 4; i <= 6; i++) take('Mathias', `p${i}`)
+  const first = JSON.stringify(game.reachedCounts['u:Nicole']['3'])
+  for (let i = 0; i < 110; i++)
+    take(i % 2 === 0 ? 'Nicole' : 'Mathias', 'p4', new Date(stamp.getTime() + 10000 + i * 1000))
+  assert.equal(game.events.length, 100)
+  assert.equal(game.collectionSequence, 116)
+  assert.equal(JSON.stringify(game.reachedCounts['u:Nicole']['3']), first)
+  game.ended = true
+  assert.equal(a.parcelChampion(game), 'Nicole')
+  assert.equal(game.reachedCounts['u:Nicole']['3'].order, 3)
+  assert.equal(game.reachedCounts['u:Mathias']['3'].order, 6)
+  assert.equal(a.parcelView(game, 'Nicole', new Date(end)).reachedCounts, undefined)
 })
 
 test('six sixes count across days of one campaign, without requiring consecutive rolls', () => {

@@ -11,6 +11,18 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.5.1',
+    date: '2026-11-11',
+    push: {
+      title: '👑 Pakkelegs Champ 2026',
+      body: 'Pakkelegen får én samlet vinder. Flest gaver afgør det – se de nye Champ-regler i Hvad er nyt.',
+      url: '/nyheder',
+    },
+    notes: [
+      'Pakkelegs Champ 2026 går til årets vinder: flest gaver, derefter flest bananer i gaverne og til sidst først nået det endelige gaveantal',
+    ],
+  },
+  {
     version: '2.5',
     date: '2026-11-10',
     push: {

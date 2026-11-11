@@ -17,6 +17,7 @@ Lokalt spil på `/spil/pakkeleg`. Isoleret simulation på `/spil/pakkeleg?previe
 - Efter slut har ejerne præcis 14 dage til at åbne egne gaver. Andre ser først indhold og beløb efter åbning. Personkort summerer kun åbnede bananer, fysiske præmier og profilramme. Efter fristen skjules kortet på Spil, og pakkelegsiden viser afsluttet status. Uåbnede gaver bliver ikke automatisk udbetalt.
 - Profilrammen gemmes som kosmetisk ejendel og sættes på vinderens avatar ved åbning.
 - Julekalenderens personlige gaver holdes adskilt.
+- x103 hedder Pakkelegs Champ 2026 og går til én samlet vinder: flest ejede gaver ved slut, derefter flest bananer i disse gaver (åbnede såvel som uåbnede), derefter først nået det endelige gaveantal. Fysisk værdi, startsaldo, gebyr og badgebonus tæller ikke. Første opnåelse gemmes varigt på bordet, uafhængigt af den korte aktivitetshistorik; ved identiske tidsstempler bruges serverens rækkefølge. Badgen kræver ikke fem gaver og giver fortsat 1 point/20 bananer én gang. Gavegrådig kræver fortsat tre gaver.
 
 ## Lagring og sikkerhed
 
