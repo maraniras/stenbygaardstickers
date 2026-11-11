@@ -274,7 +274,7 @@ onBeforeUnmount(() => {
   <div class="advent-page">
     <PageHeader
       title="Julekalender"
-      back-to="/spil"
+      back-to="/spil/jul"
       compact
     >
       <template #actions

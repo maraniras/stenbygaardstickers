@@ -30,7 +30,7 @@ const net = computed(() =>
   <div class="boxes-page">
     <PageHeader
       title="Dagens bokse"
-      back-to="/spil"
+      back-to="/spil/jul"
       compact
     >
       <template #actions

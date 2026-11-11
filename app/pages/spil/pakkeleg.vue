@@ -71,7 +71,7 @@ watch(
   <div class="parcel-page">
     <PageHeader
       title="Pakkeleg"
-      back-to="/spil"
+      back-to="/spil/jul"
       compact
     />
     <p

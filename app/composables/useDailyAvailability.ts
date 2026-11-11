@@ -13,5 +13,9 @@ export function useDailyAvailability() {
         Number(availability.value.boxes)
       : 0,
   )
-  return { availability, readyCount }
+  const dailyReadyCount = computed(
+    () => Number(availability.value?.city ?? false) + Number(availability.value?.wheel ?? false),
+  )
+  const christmasReadyCount = computed(() => Number(availability.value?.boxes ?? false))
+  return { availability, readyCount, dailyReadyCount, christmasReadyCount }
 }

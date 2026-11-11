@@ -11,6 +11,18 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.5.2',
+    date: '2026-11-11',
+    push: {
+      title: '🎄 Julespillene har fået deres egen fane',
+      body: 'Find Pakkeleg og Dagens bokse under Julespil. Julekalenderen dukker op 24. november.',
+      url: '/spil/jul',
+    },
+    notes: [
+      'Julespillene har fået deres egen fane under Spil – også når der kun er previews eller gaver, der venter på at blive åbnet',
+    ],
+  },
+  {
     version: '2.5.1',
     date: '2026-11-11',
     push: {

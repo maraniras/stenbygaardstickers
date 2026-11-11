@@ -3,6 +3,7 @@ import { NuxtLink } from '#components'
 import { SLOT_RTP, slotSymbolImage } from '../../../shared/utils/slots'
 useHead({ title: 'Casino · Stenbygaard Stickers' })
 const { state } = useEconomy()
+const { season: christmasSeason } = useChristmasGames()
 const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
 </script>
 
@@ -22,7 +23,10 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         ></template
       >
     </PageHeader>
-    <GameSectionNav section="casino" />
+    <GameSectionNav
+      section="casino"
+      :christmas-visible="christmasSeason.visible"
+    />
     <CasinoLimit
       class="casino-budget"
       :limit="state?.casinoLimit"
