@@ -12,10 +12,26 @@ export default defineEventHandler(async (event) => {
   // A failed image never consumes a guess; neither coordinates nor source URL are sent to the browser.
   const cache = useStorage('cache')
   const cacheKey = `daily-image:v1:${day}:${stage}`
-  const cached = await cache.getItem<string>(cacheKey)
-  setHeader(event, 'Content-Type', 'image/jpeg')
-  setHeader(event, 'Cache-Control', 'private, max-age=30')
-  if (cached) return Buffer.from(cached, 'base64')
+  setHeader(event, 'Cache-Control', 'no-store')
+  try {
+    const cached = await cache.getItem<string>(cacheKey)
+    if (typeof cached === 'string') {
+      const image = Buffer.from(cached, 'base64')
+      if (
+        image.length > 4 &&
+        image[0] === 0xff &&
+        image[1] === 0xd8 &&
+        image.at(-2) === 0xff &&
+        image.at(-1) === 0xd9
+      ) {
+        setHeader(event, 'Content-Type', 'image/jpeg')
+        setHeader(event, 'Cache-Control', 'private, max-age=30')
+        return image
+      }
+    }
+  } catch {
+    console.warn('[city-image] Image cache read failed; fetching aerial image directly.')
+  }
   const { answer } = await dailyChallenge(day)
   const lat = (answer.lat * Math.PI) / 180
   const x = (6378137 * answer.lng * Math.PI) / 180
@@ -29,18 +45,35 @@ export default defineEventHandler(async (event) => {
     format: 'jpg',
     f: 'image',
   })
-  try {
-    const bytes = await $fetch<ArrayBuffer>(
-      `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?${params}`,
-      { responseType: 'arrayBuffer', timeout: 15_000, retry: 1 },
-    )
-    const image = await sharp(Buffer.from(bytes)).resize(700, 490).jpeg({ quality: 82 }).toBuffer()
-    await cache.setItem(cacheKey, image.toString('base64'), { ttl: 36 * 3600 })
+  // Bound both attempts so the fallback can finish before the client's 25 s timeout.
+  for (const host of ['server.arcgisonline.com', 'services.arcgisonline.com']) {
+    let image: Buffer
+    try {
+      const bytes = await $fetch<ArrayBuffer>(
+        `https://${host}/ArcGIS/rest/services/World_Imagery/MapServer/export?${params}`,
+        { responseType: 'arrayBuffer', timeout: 8_000, retry: 0 },
+      )
+      image = await sharp(Buffer.from(bytes)).resize(700, 490).jpeg({ quality: 82 }).toBuffer()
+    } catch (error: any) {
+      console.warn('[city-image] Aerial image request failed.', {
+        host,
+        status: error?.response?.status || error?.statusCode || null,
+        name: error?.name || 'Error',
+        cause: error?.cause?.code || error?.cause?.cause?.code || null,
+      })
+      continue
+    }
+    try {
+      await cache.setItem(cacheKey, image.toString('base64'), { ttl: 36 * 3600 })
+    } catch {
+      console.warn('[city-image] Image cache write failed; returning uncached aerial image.')
+    }
+    setHeader(event, 'Content-Type', 'image/jpeg')
+    setHeader(event, 'Cache-Control', 'private, max-age=30')
     return image
-  } catch {
-    throw createError({
-      statusCode: 502,
-      statusMessage: 'Luftfotoet kunne ikke hentes. Prøv igen uden at bruge et gæt.',
-    })
   }
+  throw createError({
+    statusCode: 502,
+    statusMessage: 'Luftfotoet kunne ikke hentes. Prøv igen uden at bruge et gæt.',
+  })
 })

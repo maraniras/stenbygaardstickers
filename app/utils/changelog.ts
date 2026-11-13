@@ -11,6 +11,18 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.5.3',
+    date: '2026-11-13',
+    push: {
+      title: '🗺️ Opdatering til dagens byspil',
+      body: 'Vi har forbedret indlæsningen af luftfotoet i Emil er faret vild.',
+      url: '/spil/byen',
+    },
+    notes: [
+      'Mere stabil indlæsning af luftfotoet i Emil er faret vild – med en reserveadresse og bedre håndtering af billedcachen',
+    ],
+  },
+  {
     version: '2.5.2',
     date: '2026-11-11',
     push: {
