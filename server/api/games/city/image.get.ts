@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     try {
       const bytes = await $fetch<ArrayBuffer>(
         `https://${host}/ArcGIS/rest/services/World_Imagery/MapServer/export?${params}`,
-        { responseType: 'arrayBuffer', timeout: 8_000, retry: 0 },
+        { responseType: 'arrayBuffer', timeout: 5_000, retry: 0 },
       )
       image = await sharp(Buffer.from(bytes)).resize(700, 490).jpeg({ quality: 82 }).toBuffer()
     } catch (error: any) {
@@ -71,6 +71,20 @@ export default defineEventHandler(async (event) => {
     setHeader(event, 'Content-Type', 'image/jpeg')
     setHeader(event, 'Cache-Control', 'private, max-age=30')
     return image
+  }
+  // Cached tiles bypass the dynamic export renderer, which fails for some areas.
+  try {
+    const image = await cityAerialTiles({ x, y, half })
+    try {
+      await cache.setItem(cacheKey, image.toString('base64'), { ttl: 36 * 3600 })
+    } catch {
+      console.warn('[city-image] Image cache write failed; returning uncached aerial image.')
+    }
+    setHeader(event, 'Content-Type', 'image/jpeg')
+    setHeader(event, 'Cache-Control', 'private, max-age=30')
+    return image
+  } catch {
+    console.warn('[city-image] Aerial map tile fallback failed.')
   }
   throw createError({
     statusCode: 502,

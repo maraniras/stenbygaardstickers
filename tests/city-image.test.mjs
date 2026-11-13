@@ -18,13 +18,14 @@ function imageRoute({
   upstreamFails = false,
   primaryFails = false,
   primaryInvalid = false,
+  tilesSucceed = false,
   loggedIn = true,
   queryDay = day,
   guesses = [],
 } = {}) {
   const headers = {},
     logs = [],
-    calls = { upstream: 0, cacheWrite: 0, challenge: 0, requests: [] }
+    calls = { upstream: 0, tiles: 0, cacheWrite: 0, challenge: 0, requests: [] }
   const run = { guesses: [...guesses] }
   const context = vm.createContext({
     exports: {},
@@ -54,6 +55,11 @@ function imageRoute({
     dailyChallenge: async () => {
       calls.challenge++
       return { answer: { lat: 57, lng: 9.9 } }
+    },
+    cityAerialTiles: async () => {
+      calls.tiles++
+      if (!tilesSucceed) throw Error('tile service unavailable')
+      return jpeg
     },
     setHeader: (_event, key, value) => {
       headers[key] = value
@@ -123,12 +129,22 @@ for (const failure of ['primaryFails', 'primaryInvalid'])
     assert.equal(new URL(first.url).host, 'server.arcgisonline.com')
     assert.equal(new URL(second.url).host, 'services.arcgisonline.com')
     assert.equal(new URL(first.url).search, new URL(second.url).search)
-    assert.equal(first.options.timeout + second.options.timeout, 16_000)
+    assert.equal(first.options.timeout + second.options.timeout, 10_000)
     assert.equal(first.options.retry, 0)
     assert.equal(second.options.retry, 0)
     assert.equal(route.run.guesses.length, 0)
     assert.equal(route.calls.cacheWrite, 1)
   })
+
+test('cached tiles bypass failed exports without consuming a guess', async () => {
+  const route = imageRoute({ upstreamFails: true, tilesSucceed: true })
+  assert.deepEqual(await route.get(), jpeg)
+  assert.equal(route.calls.upstream, 2)
+  assert.equal(route.calls.tiles, 1)
+  assert.equal(route.calls.cacheWrite, 1)
+  assert.equal(route.headers['Content-Type'], 'image/jpeg')
+  assert.equal(route.run.guesses.length, 0)
+})
 
 test('city image still requires login and the current server game day', async () => {
   const anonymous = imageRoute({ loggedIn: false })
