@@ -1,0 +1,57 @@
+{
+  "name": "wall-free-v1",
+  "date": "2026-11-11",
+  "columns": 24,
+  "rows": 28,
+  "words": 61,
+  "files": [
+    {
+      "file": "server/data/crossword.ts",
+      "sha256": "d72426a15a3917c9eda545a0e34f8c58814f4eca1de3cbc519e523e638d93aa4"
+    },
+    {
+      "file": "app/components/CrosswordBoard.vue",
+      "sha256": "e3626fe8bf0108d7a1d708c70c969d60b0df596091efd59fda7851f12f7e7396"
+    },
+    {
+      "file": "app/pages/spil/krydsord.vue",
+      "sha256": "0ac2847070586da3030fecf011d25b09c805bbd257820f2cda15cbeb881bf4ad"
+    },
+    {
+      "file": "shared/types/crossword.ts",
+      "sha256": "4076d3ebdb960dfa7cfa41ce1276d7abaf8f0b74469243fef488de947493b7d8"
+    },
+    {
+      "file": "tests/crossword-grid.test.mjs",
+      "sha256": "f81d5464532dc5151c7cabdfb5d641e37c1e019ab96bd90720407193c62bcb91"
+    },
+    {
+      "file": "tests/crossword-preview.test.mjs",
+      "sha256": "f4731d1f5e37ce49f0fa3b058f3d24de8d11310f63b2a9778e469f9da64c6edb"
+    },
+    {
+      "file": "docs/designs/crossword/word-list.json",
+      "sha256": "2c25ebba9307e382759444bf5a91d6ae1b19969c9f60957b14d931b5b31a7d39"
+    },
+    {
+      "file": "public/games/crossword/cello.svg",
+      "sha256": "1082c8a42304ca1716e0b76dcf4cdaa051dea162bd436bbd54ae175c5a65d9c0"
+    },
+    {
+      "file": "public/games/crossword/penguin.svg",
+      "sha256": "1d806ea5d122fb1d047fe37ac54702a0664c8fbc189964a7838bc6641d19abe8"
+    },
+    {
+      "file": "public/games/crossword/picture-1.svg",
+      "sha256": "a56a940912f7b4808ea8bccf1fd655dd74501572d80ad40ab4161c980ba41c27"
+    },
+    {
+      "file": "public/games/crossword/picture-2.svg",
+      "sha256": "e72c27ab242dee7086a336b9824bc204e23ef57f0c7552c5ba1e0fe71c083e4c"
+    },
+    {
+      "file": "public/games/crossword/writing.svg",
+      "sha256": "1dd825075c6a7f2a73c5919802ba0229d286495cbcdb2c5546235345b6ee4b74"
+    }
+  ]
+}

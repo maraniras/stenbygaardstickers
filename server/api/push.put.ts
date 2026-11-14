@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   if (!(await hasSub('all', sub.endpoint)))
     throw createError({ statusCode: 400, statusMessage: 'Slå notifikationer til først.' })
   const changes: NotifyPrefs = {}
-  for (const type of ['stickers', 'updates'] as const)
+  for (const type of ['stickers', 'updates', 'crossword'] as const)
     if (typeof body.notify?.[type] === 'boolean') changes[type] = body.notify[type]
   return setPublicPushPrefs(sub.endpoint, changes)
 })

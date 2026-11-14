@@ -20,6 +20,7 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  crosswordWins?: Record<string, string>
   parcelAchievements?: import('../utils/parcel-badges').ParcelAchievements
   boxesAchievements?: import('./boxes').BoxesAchievements
   adventStats?: import('./advent').AdventStats

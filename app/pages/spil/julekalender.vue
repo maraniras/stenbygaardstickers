@@ -568,6 +568,12 @@ onBeforeUnmount(() => {
       >
         Se julebilledet
       </button>
+      <AdventPrizeShowcase
+        v-if="calendar"
+        :year="calendar.year"
+        :preview="testMode"
+        :disabled="busy || autoplay || claimInFlight || showFinds || showPoster || giftDay !== null"
+      />
     </footer>
   </div>
 </template>

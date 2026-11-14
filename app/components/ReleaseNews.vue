@@ -10,6 +10,7 @@ const dailyAnimation = useState('daily-game-animation', () => false)
 const jackAnimation = useState('bananjack-animation', () => false)
 const slotAnimation = useState('slot-animation', () => false)
 const giftOpen = useState('advent-gift-open', () => false)
+const prizesOpen = useState('advent-prizes-open', () => false)
 const settled = ref(false)
 let timer: ReturnType<typeof setTimeout> | undefined
 onMounted(() => {
@@ -30,6 +31,7 @@ watchEffect(() => {
     jackAnimation.value ||
     slotAnimation.value ||
     giftOpen.value ||
+    prizesOpen.value ||
     route.path === '/upload' ||
     route.path.startsWith('/admin')
   open.value = Boolean(pending.value && !blocked)

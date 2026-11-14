@@ -22,6 +22,7 @@ export interface Backup {
   games?: Awaited<ReturnType<typeof gameBackup>>
   adventDraw?: Awaited<ReturnType<typeof readAdventDraw>>
   parcelGames?: Awaited<ReturnType<typeof parcelBackup>>
+  crossword?: Awaited<ReturnType<typeof readCrossword>>
 }
 
 async function allRatings(): Promise<Backup['ratings']> {
@@ -51,6 +52,7 @@ export async function createBackup(): Promise<Backup> {
     games: await gameBackup(),
     adventDraw: await readAdventDraw(),
     parcelGames: await parcelBackup(),
+    crossword: await readCrossword(),
   }
 }
 

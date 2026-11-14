@@ -15,6 +15,7 @@ const displayName = computed(
 )
 const stats = computed(() => statsFor(list.value))
 const jackStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.jack)
+const slotStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.slots)
 const countryList = computed(() => {
   const map = new Map<string, { code: string; name: string; count: number }>()
   for (const s of list.value) {
@@ -150,6 +151,10 @@ watch(
       <JackProfileStats
         v-if="jackStats?.rounds"
         :stats="jackStats"
+      />
+      <SlotProfileStats
+        v-if="slotStats?.spins"
+        :stats="slotStats"
       />
       <NuxtLink
         class="ranking-link"

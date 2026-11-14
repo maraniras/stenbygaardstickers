@@ -11,6 +11,24 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.6',
+    date: '2026-11-14',
+    push: {
+      title: '🧩 Kryds & tværs er på vej!',
+      body: 'Find det nye ordspil under Øvrige. Første korrekte løsning vinder 500 bananer og en særlig badge, når spillet åbner.',
+      url: '/spil/oevrige',
+    },
+    notes: [
+      'Ny fane under Spil: Øvrige – her finder du Kryds & tværs #1 med 104 ord og billedledetråde',
+      'Krydsordet åbner på et fælles tidspunkt. De sidste 48 timer tæller menuen ned til start',
+      'Første korrekte løsning vinder 500 bananer og en særlig vinderbadge. Alle andre kan stadig løse krydsordet',
+      'Følg deltagernes fremgang på krydsordets rangliste. Efter åbningsdagen og én hel ekstra dag får du dagligt hjælp kl. 04 med grønne markeringer af korrekte bogstaver',
+      'Bananditten har fået et statistikpanel på profiler med spins, gevinster, jackpots, bedste gevinststime og nettoresultat',
+      'Julekalenderen får en illustreret præmieoversigt ved første besøg, som du også selv kan åbne igen',
+      'Mindre fejlrettelser og forbedringer af brugeroplevelsen',
+    ],
+  },
+  {
     version: '2.5.3',
     date: '2026-11-13',
     push: {

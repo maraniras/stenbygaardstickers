@@ -173,7 +173,7 @@ test('anonymous settings only accept public notification types on a subscribed d
     defineEventHandler: (fn) => fn,
     readBody: async () => ({
       ...sub('device'),
-      notify: { updates: false, stickers: true, likes: false },
+      notify: { updates: false, stickers: true, crossword: false, likes: false },
     }),
     cleanSub: (body) => body,
     hasSub: async () => subscribed,
@@ -183,6 +183,7 @@ test('anonymous settings only accept public notification types on a subscribed d
   await route({})
   assert.equal(saved[0].prefs.updates, false)
   assert.equal(saved[0].prefs.stickers, true)
+  assert.equal(saved[0].prefs.crossword, false)
   assert.equal(saved[0].prefs.likes, undefined)
   subscribed = false
   await assert.rejects(route({}), { statusCode: 400 })

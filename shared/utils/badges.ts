@@ -16,6 +16,7 @@ import { slotBadges } from './slotBadges'
 import { adventBadges } from './advent-badges'
 import { boxesBadges } from './boxes-badges'
 import { parcelBadges } from './parcel-badges'
+import { crosswordBadges } from './crossword-badges'
 
 export type BadgeKind = 'tier' | 'single' | 'record'
 
@@ -784,6 +785,7 @@ export function badgesFor(
     ...adventBadges(wallet),
     ...boxesBadges(wallet),
     ...parcelBadges(wallet),
+    ...crosswordBadges(wallet),
     ...jackBadges(wallet),
     ...slotBadges(wallet),
   ]
@@ -875,6 +877,7 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'crossword-1-winner': 1,
   'parcel-empty': 1,
   'parcel-sixes': 1,
   'parcel-three': 1,

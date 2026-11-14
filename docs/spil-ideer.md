@@ -73,6 +73,7 @@ Opdateret 29. oktober 2026. Valuta og de to daglige spil er nu bestilt og implem
   - Foreslået teknik: klienterne henter små statusopdateringer med få sekunders mellemrum og synkroniserer nedtællingen til servertid. Tidsbaserede runder og afregning ved serverkontakt kan undgå et job hvert minut; faktisk baggrundsafregning uden nogen serverkontakt kræver en særskilt mekanisme. Teknologien er ikke valgt endnu.
   - Socialt: vis deltagere (fx »Mathias, Nicole og 2 andre spiller med«), venners indsatser som jetoner med profilbilleder og seneste resultater. Alle funktionerne er ønskede; foreslået første version er fælles runder, deltagere og egne indsatser, derefter synlige jetoner for venner, med fokus på mobilbrug.
   - Roulettevariant, indsatsgrænser, udbetalinger og badges skal stadig fastlægges.
+  - Når Roulette bygges, skal profiler have et foldbart statistikpanel ligesom Bananjack og Bananditten. Genbrug `CasinoProfileStats.vue`, vis kun panelet efter deltagelse, og brug gemte, offentlige spilstatistikker (runder, gevinster og netto uden badgebonuser). De præcise Roulette-statistikker fastlægges med spillet.
 - Blackjack med Emil som dealer, vennerne som billedkort og eventuelt et særligt Emil-kort.
 - Fiktive væddemål om næste stickers land, kontinent eller hvem der sætter den op; kan afgøres ved godkendelse.
 - Kosmetik og spilbadges som mulige anvendelser af valuta og aktivitet.

@@ -97,6 +97,8 @@ export function wheelPrizeFor(ticket: number, jackpot = 500) {
 }
 /** Full reward per tier, never a second points-based reward for game badges. */
 export function bananaRewardFor(badge: Badge, level = badge.kind === 'tier' ? badge.level : 1) {
+  // The crossword winner's 500 bananas are settled with the competition receipt.
+  if (badge.id === 'crossword-1-winner') return 0
   const slots = SLOT_BADGE_REWARDS[badge.id]
   if (slots) return slots[level - 1] ?? 0
   const jack = JACK_BADGE_REWARDS[badge.id]

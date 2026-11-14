@@ -10,6 +10,7 @@ const dailyAnimation = useState('daily-game-animation', () => false)
 const jackAnimation = useState('bananjack-animation', () => false)
 const slotAnimation = useState('slot-animation', () => false)
 const open = useState('advent-gift-open', () => false)
+const prizesOpen = useState('advent-prizes-open', () => false)
 const settled = ref(false)
 let timer: ReturnType<typeof setTimeout> | undefined
 onMounted(() => {
@@ -30,6 +31,7 @@ watchEffect(() => {
     !pushPrompt.value &&
     !releaseNews.value &&
     !badgeSheet.value &&
+    !prizesOpen.value &&
     route.query.badge === undefined &&
     !dailyAnimation.value &&
     !jackAnimation.value &&

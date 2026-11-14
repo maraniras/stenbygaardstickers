@@ -1,5 +1,8 @@
 <script setup lang="ts">
-defineProps<{ section: 'daily' | 'casino' | 'christmas'; christmasVisible: boolean }>()
+defineProps<{
+  section: 'daily' | 'casino' | 'christmas' | 'other'
+  christmasVisible: boolean
+}>()
 const { dailyReadyCount, christmasReadyCount } = useDailyAvailability()
 </script>
 
@@ -99,13 +102,19 @@ const { dailyReadyCount, christmasReadyCount } = useDailyAvailability()
         >{{ christmasReadyCount }}</span
       ></NuxtLink
     >
+    <NuxtLink
+      to="/spil/oevrige"
+      :class="{ active: section === 'other' }"
+      :aria-current="section === 'other' ? 'page' : undefined"
+      >Øvrige</NuxtLink
+    >
   </nav>
 </template>
 
 <style scoped>
 .game-sections {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
   margin: 20px 0;
   padding: 5px;
@@ -114,7 +123,7 @@ const { dailyReadyCount, christmasReadyCount } = useDailyAvailability()
   background: var(--surface-2);
 }
 .has-christmas {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .has-christmas a {
   font-size: 12px;
@@ -134,6 +143,11 @@ a {
   color: var(--muted);
   font-size: 13px;
   font-weight: 750;
+}
+@media (max-width: 430px) {
+  .has-christmas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 a.active {
   background: var(--surface);

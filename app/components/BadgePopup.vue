@@ -14,6 +14,7 @@ const jackAnimation = useState('bananjack-animation', () => false)
 const slotAnimation = useState('slot-animation', () => false)
 const releaseNews = useState('release-news-pending', () => false)
 const giftPending = useState('advent-gift-pending', () => false)
+const prizesOpen = useState('advent-prizes-open', () => false)
 const route = useRoute()
 const router = useRouter()
 
@@ -66,6 +67,7 @@ const blocked = computed(
     slotAnimation.value ||
     releaseNews.value ||
     giftPending.value ||
+    prizesOpen.value ||
     economyLoading.value,
 )
 

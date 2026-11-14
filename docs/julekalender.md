@@ -64,3 +64,9 @@ Hele christmas-calendar-final-v3.webp vises uden beskæring. Numre er blandede; 
 ## Idéer, endnu ikke valgt
 
 Nisseværn, julepynt til profil, stickerpakke, snebold til en ven og tom gave med trøstepræmie.
+
+## Præmieoversigt ved første besøg
+
+`AdventPrizeShowcase.vue` viser et samlet julemotiv med alle kalenderens 13 fundtyper langs en granguirlande. Popupen åbner første gang kalenderen besøges pr. sæson/enhed, når andre introduktioner og animationer er afsluttet. Den kan altid åbnes igen med »Se kalenderens præmier« nederst. Det er en oversigt, der hverken åbner låger eller ændrer præmier, saldo eller adgangsdatoer. Introduktionen huskes som `stenbygaard-advent-prizes:<år>` i localStorage, med separat `:preview`-nøgle for testvisning og sessionshukommelse, hvis lagring er blokeret. Popupen koordineres med badge-, opdaterings- og gavepopup via `advent-prizes-open`.
+
+Billedet er `public/games/advent/prizes-showcase-v1.webp`; den genererede original er gemt i `docs/designs/advent-rewards/prizes-showcase-v1.png`. Motiver: enkelt banan, lille/stor bananbunke, drillenisse, Mix Max, Faxe Kondi, træstammer, rødvin, hvidvin, cykeldrikkedunk, julemand, vennegave og egen gave. Ingen beløb står i billedet, så satser kan ændres uafhængigt.

@@ -79,6 +79,7 @@ export function publicEconomy(record: EconomyRecord): EconomyPublic {
   const advent = adventStats(record)
   const boxes = boxesAchievements(record)
   return {
+    ...(record.crosswordWins ? { crosswordWins: record.crosswordWins } : {}),
     ...(advent ? { adventStats: advent } : {}),
     ...(boxes ? { boxesAchievements: boxes } : {}),
     ...(record.parcelAchievements ? { parcelAchievements: record.parcelAchievements } : {}),

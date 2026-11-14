@@ -164,4 +164,12 @@ Engangsbelønninger på tværs af år. Den gyldne trio giver også Hattrick, hvi
 
 Kun tilmeldte deltagere i en gennemført pakkeleg kan få dem. Slutbadges beregnes ud fra det endelige ejerskab, før gaver åbnes. Champ 2026 går til én vinder og kræver ikke fem gaver; Gavegrådig gives separat ved mindst tre. Bananer fra alle ejede gaver tæller, også uåbnede, mens badgebonus, saldo, tilmeldingspris og fysisk værdi ikke tæller. Første gang man når gaveantallet bevares, også hvis gaver senere bliver stjålet; serverrækkefølge afgør samtidige tidsstempler. Champ 2026 uddeles kun for 2026. De øvrige belønnes én gang på tværs af år; alle badges bevares efter jul. En aflyst pakkeleg eller et spil helt uden fordelte gaver giver ingen champion.
 
-Næste ledige nummer: **x104**
+## Kryds & tværs
+
+| Nr. | Badge (id) | Krav | Bananer | Point |
+| --- | --- | --- | --- | --- |
+| x104 | Kryds & tværs #1 · Vinder (`crossword-1-winner`) | Første servergodkendte, helt korrekte løsning på krydsord #1 | 500 som konkurrencepræmie, ingen ekstra badgebonus | 1 |
+
+Kun én vinder. Andre kan færdiggøre spillet uden bananer eller badge. Før åbningen vises kun menukortet; opgaven er serverlåst. Admin vælger dato/klokkeslæt i dansk tid på /admin/krydsord. Forhåndsvisning kræver admin og uddeler ingen præmie. Vinderen er permanent og kan ikke nulstilles fra admin.
+
+Næste ledige nummer: **x105**

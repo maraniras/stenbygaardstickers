@@ -4,6 +4,7 @@
 const SHARED: Record<string, string> = { jubilee: 'jubilee', year: 'year' }
 
 const CUSTOM = new Set([
+  'crossword-1-winner',
   'parcel-empty',
   'parcel-sixes',
   'parcel-three',

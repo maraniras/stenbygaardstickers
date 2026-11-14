@@ -75,7 +75,7 @@ export function usePush(list: List) {
     notify.value = r?.notify ?? {}
   }
 
-  async function setNotify(type: 'stickers' | 'updates', value: boolean) {
+  async function setNotify(type: 'stickers' | 'updates' | 'crossword', value: boolean) {
     const sub = await subscription()
     if (!sub || !on.value) throw new Error('Slå notifikationer til først.')
     notify.value = await $fetch<NotifyPrefs>('/api/push', {

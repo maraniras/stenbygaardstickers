@@ -1,5 +1,5 @@
 // Typer af notifikationer man kan slå til og fra (gemt på brugeren, standard: til).
-// "stickers" og "updates" virker også uden login – de andre kræver et navn.
+// "stickers", "updates" og "crossword" virker også uden login – de andre kræver et navn.
 export type NotifyType =
   | 'stickers'
   | 'updates'
@@ -12,8 +12,15 @@ export type NotifyType =
   | 'likes'
   | 'gifts'
   | 'parcels'
+  | 'crossword'
 
 export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; desc: string }[] = [
+  {
+    type: 'crossword',
+    emoji: '🧩',
+    label: 'Kryds & tværs',
+    desc: 'En time før et krydsord åbner, og når du kan begynde at spille',
+  },
   {
     type: 'parcels',
     emoji: '🎲',

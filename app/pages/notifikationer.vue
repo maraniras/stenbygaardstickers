@@ -24,7 +24,7 @@ const deviceOn = computed(() => all.on.value || (Boolean(name.value) && badgePus
 const types = computed(() =>
   name.value
     ? NOTIFY_TYPES
-    : NOTIFY_TYPES.filter((t) => t.type === 'stickers' || t.type === 'updates'),
+    : NOTIFY_TYPES.filter((t) => ['stickers', 'updates', 'crossword'].includes(t.type)),
 )
 const preferences = computed(() => (name.value ? notify.value : all.notify.value))
 
@@ -57,7 +57,8 @@ function toggleType(type: NotifyType) {
   return run(async () => {
     const value = !wants(preferences.value, type)
     if (name.value) await setNotify(type, value)
-    else if (type === 'stickers' || type === 'updates') await all.setNotify(type, value)
+    else if (type === 'stickers' || type === 'updates' || type === 'crossword')
+      await all.setNotify(type, value)
   })
 }
 </script>

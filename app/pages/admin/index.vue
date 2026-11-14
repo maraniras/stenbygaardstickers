@@ -183,6 +183,11 @@ function submitted(s: StoredSticker) {
         >Pakkeleg · præmier og udlevering →</NuxtLink
       >
       <AdminUsers />
+      <NuxtLink
+        class="chip advent-link"
+        to="/admin/krydsord"
+        >Krydsord · åbningstidspunkt og vinder →</NuxtLink
+      >
       <AdminBackups />
     </template>
 
