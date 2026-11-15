@@ -1,6 +1,6 @@
 import type { CrosswordState } from '../types/crossword'
 
-export const CROSSWORD_PRIZE = 500
+export const CROSSWORD_PRIZE = 1000
 export const CROSSWORD_WINNER_BADGE = 'crossword-1-winner'
 export function crosswordOpen(state: CrosswordState, now = new Date()) {
   return !!state.opensAt && Date.parse(state.opensAt) <= now.getTime()

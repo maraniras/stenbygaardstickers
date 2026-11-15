@@ -17,6 +17,7 @@ import { adventBadges } from './advent-badges'
 import { boxesBadges } from './boxes-badges'
 import { parcelBadges } from './parcel-badges'
 import { crosswordBadges } from './crossword-badges'
+import { rouletteBadges } from './roulette-badges'
 
 export type BadgeKind = 'tier' | 'single' | 'record'
 
@@ -786,6 +787,7 @@ export function badgesFor(
     ...boxesBadges(wallet),
     ...parcelBadges(wallet),
     ...crosswordBadges(wallet),
+    ...rouletteBadges(wallet),
     ...jackBadges(wallet),
     ...slotBadges(wallet),
   ]
@@ -850,6 +852,8 @@ export function earnedCount(badges: Badge[]) {
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
+  'roulette-rounds': [1, 2, 3, 4, 5],
+  'roulette-wins': [1, 2, 3, 4, 5],
   'advent-doors': [1, 1, 1, 1, 1],
   'slot-spins': [1, 2, 3, 4, 5],
   'slot-wins': [1, 2, 3, 4, 5],
@@ -877,6 +881,11 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  'roulette-straight': 1,
+  'roulette-zero': 2,
+  'roulette-big-win': 3,
+  'roulette-colour-five': 2,
+  'roulette-colour-ten': 4,
   'crossword-1-winner': 1,
   'parcel-empty': 1,
   'parcel-sixes': 1,

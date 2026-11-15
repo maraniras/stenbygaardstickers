@@ -2,6 +2,7 @@ import type { Badge } from './badges'
 import type { DailyStats } from '../types/economy'
 import { JACK_BADGE_REWARDS } from './jackBadges'
 import { SLOT_BADGE_REWARDS } from './slotBadges'
+import { ROULETTE_BADGE_REWARDS } from './roulette-badges'
 
 export const STARTING_BANANAS = 250
 export const CITY_REWARDS = [50, 40, 30, 20, 10]
@@ -40,6 +41,8 @@ export function dailyJackpotFor(ticket: number) {
   throw new Error('Jackpotfordelingen skal summere til 10000')
 }
 export const GAME_BADGE_REWARDS: Record<string, number[]> = {
+  'roulette-colour-five': [50],
+  'roulette-colour-ten': [150],
   'banana-baron': [50, 100, 200, 400, 800],
   'city-guide': [20, 40, 80, 160, 320],
   'city-gps': [20, 40, 80, 160, 320],
@@ -97,8 +100,10 @@ export function wheelPrizeFor(ticket: number, jackpot = 500) {
 }
 /** Full reward per tier, never a second points-based reward for game badges. */
 export function bananaRewardFor(badge: Badge, level = badge.kind === 'tier' ? badge.level : 1) {
-  // The crossword winner's 500 bananas are settled with the competition receipt.
+  // The crossword winner's prize is settled with the competition receipt.
   if (badge.id === 'crossword-1-winner') return 0
+  const roulette = ROULETTE_BADGE_REWARDS[badge.id]
+  if (roulette) return roulette[level - 1] ?? 0
   const slots = SLOT_BADGE_REWARDS[badge.id]
   if (slots) return slots[level - 1] ?? 0
   const jack = JACK_BADGE_REWARDS[badge.id]

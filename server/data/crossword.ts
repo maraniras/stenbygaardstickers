@@ -535,7 +535,7 @@ export const CROSSWORD_PREVIEW: CrosswordEntry[] = [
     down: true,
   },
   {
-    clue: 'Rød',
+    clue: 'Vin',
     answer: 'HVID',
     row: 18,
     col: 14,

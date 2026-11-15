@@ -67,7 +67,7 @@ const opening = computed(() =>
         <span>{{
           view?.winner
             ? 'Vundet af ' + view.winner.name
-            : '500 bananer + vinderbadge til den første'
+            : '1000 bananer + vinderbadge til den første'
         }}</span
         ><strong>{{
           view?.open ? 'Åbn krydsord →' : opening ? 'Åbner ' + opening : 'Tidspunkt følger'

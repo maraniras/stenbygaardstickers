@@ -9,6 +9,7 @@ const badgeSheet = useState('badge-sheet-open', () => false)
 const dailyAnimation = useState('daily-game-animation', () => false)
 const jackAnimation = useState('bananjack-animation', () => false)
 const slotAnimation = useState('slot-animation', () => false)
+const rouletteAnimation = useState('roulette-animation', () => false)
 const giftOpen = useState('advent-gift-open', () => false)
 const prizesOpen = useState('advent-prizes-open', () => false)
 const settled = ref(false)
@@ -30,6 +31,7 @@ watchEffect(() => {
     dailyAnimation.value ||
     jackAnimation.value ||
     slotAnimation.value ||
+    rouletteAnimation.value ||
     giftOpen.value ||
     prizesOpen.value ||
     route.path === '/upload' ||

@@ -105,6 +105,16 @@ export async function syncAllEconomies(names?: string[]) {
 export async function publicEconomies() {
   const records = await allEconomyRecords()
   return Object.fromEntries(
-    Object.entries(records).map(([name, record]) => [name, publicEconomy(record)]),
+    await Promise.all(
+      Object.entries(records).map(async ([name, original]) => {
+        let record = original
+        if (
+          record.rouletteGame?.pending &&
+          Date.now() >= roulettePendingRevealsAt(record.rouletteGame.pending)
+        )
+          record = (await mutateEconomy(name, () => {})).record
+        return [name, publicEconomy(record)]
+      }),
+    ),
   )
 }

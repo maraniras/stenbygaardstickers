@@ -20,6 +20,7 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  roulette?: import('./roulette').RouletteStats
   crosswordWins?: Record<string, string>
   parcelAchievements?: import('../utils/parcel-badges').ParcelAchievements
   boxesAchievements?: import('./boxes').BoxesAchievements
@@ -43,6 +44,7 @@ export interface WheelRun {
   jackpotAmount?: number
 }
 export interface EconomyRecord extends EconomyPublic {
+  rouletteGame?: import('./roulette').RouletteRecord
   parcelRewards?: Record<
     string,
     {

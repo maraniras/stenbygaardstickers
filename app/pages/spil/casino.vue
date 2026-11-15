@@ -143,18 +143,13 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
         </div>
       </div>
     </component>
-    <article
+    <NuxtLink
       class="roulette-card"
+      to="/spil/roulette"
       aria-labelledby="roulette-title"
-      aria-describedby="roulette-soon"
     >
       <div class="card-top">
-        <span class="table-label">ROULETTE</span
-        ><span
-          class="status"
-          id="roulette-soon"
-          >Kommer snart</span
-        >
+        <span class="table-label">ROULETTE</span><span class="status">Spil nu →</span>
       </div>
       <div
         class="roulette-art"
@@ -164,9 +159,11 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       </div>
       <div class="game-copy">
         <h2 id="roulette-title">Roulette</h2>
-        <div class="game-details"><span>Fælles bord</span><span>Vi gør hjulet klar.</span></div>
+        <div class="game-details">
+          <span>Fælles bord · 0 + 00</span><span>5–50 🍌 pr. runde</span>
+        </div>
       </div>
-    </article>
+    </NuxtLink>
     <NuxtLink
       class="daily-link"
       to="/spil"

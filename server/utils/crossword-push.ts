@@ -141,8 +141,8 @@ export async function deliverCrosswordPush(body: unknown, now = new Date()) {
       job.kind === 'reminder' ? '🧩 Kryds & tværs #1 åbner snart' : '🧩 Kryds & tværs #1 er åbent!',
     body:
       job.kind === 'reminder'
-        ? `Vi åbner ${opening}. Første korrekte løsning vinder 500 bananer og en særlig badge.`
-        : 'Nu kan du spille! Første korrekte løsning vinder 500 bananer og en særlig badge.',
+        ? `Vi åbner ${opening}. Første korrekte løsning vinder 1000 bananer og en særlig badge.`
+        : 'Nu kan du spille! Første korrekte løsning vinder 1000 bananer og en særlig badge.',
     url: job.kind === 'reminder' ? '/spil/oevrige' : '/spil/krydsord',
     tag: `crossword-1-${job.kind}-${Date.parse(job.opensAt)}`,
   })

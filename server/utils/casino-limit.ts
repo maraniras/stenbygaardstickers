@@ -3,8 +3,11 @@ import type { CasinoDailyLimit } from '../../shared/types/casino'
 import { CASINO_DAILY_LOSS_LIMIT } from '../../shared/utils/casino'
 import { gameDay, nextGameReset } from '../../shared/utils/game-day'
 
-function reservedStake(record: EconomyRecord) {
+function reservedJackStake(record: EconomyRecord) {
   return record.bananjack?.status === 'playing' ? record.bananjack.staked : 0
+}
+function reservedStake(record: EconomyRecord) {
+  return reservedJackStake(record) + (record.rouletteGame?.pending?.total ?? 0)
 }
 /** One-time migration: legacy gross counters are complete even if history was trimmed.
  * Only known casino payouts reduce them; unrelated credits never fund the limit. */
@@ -30,9 +33,9 @@ function legacyNetLoss(record: EconomyRecord, day: string) {
       : 0
     : stakes('slots:')
   const payouts = entries.reduce((sum, entry) => sum + Math.max(0, entry.amount), 0)
-  const pending = reservedStake(record)
+  const pending = reservedJackStake(record)
     ? record.jackDailyWagers?.day === day
-      ? Math.min(jack, reservedStake(record))
+      ? Math.min(jack, reservedJackStake(record))
       : stakes(`bananjack:${record.bananjack!.id}:`)
     : 0
   return jack + slots - payouts - pending

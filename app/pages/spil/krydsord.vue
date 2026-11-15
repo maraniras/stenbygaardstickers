@@ -41,13 +41,13 @@ const opening = computed(() =>
         }}</NuxtLink>
         vandt kryds &amp; tværs #1</strong
       >
-      <span>500 bananer og vinderbadgen er uddelt. Du kan stadig løse krydsordet.</span>
+      <span>1000 bananer og vinderbadgen er uddelt. Du kan stadig løse krydsordet.</span>
     </div>
     <p
       v-else
       class="competition-banner"
     >
-      Første korrekte løsning vinder 500 bananer og vinderbadgen.
+      Første korrekte løsning vinder 1000 bananer og vinderbadgen.
       <NuxtLink
         v-if="!name"
         to="/mig"
@@ -117,7 +117,7 @@ const opening = computed(() =>
           opening ? 'Åbner ' + opening + ' (dansk tid).' : 'Åbningstidspunktet annonceres senere.'
         }}
       </p>
-      <p>Den første korrekte løsning vinder 500 bananer og en særlig badge.</p>
+      <p>Den første korrekte løsning vinder 1000 bananer og en særlig badge.</p>
       <button
         v-if="error"
         type="button"

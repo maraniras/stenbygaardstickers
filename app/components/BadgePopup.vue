@@ -12,6 +12,7 @@ const { people: economy, loading: economyLoading } = useEconomy()
 const gameAnimation = useState('daily-game-animation', () => false)
 const jackAnimation = useState('bananjack-animation', () => false)
 const slotAnimation = useState('slot-animation', () => false)
+const rouletteAnimation = useState('roulette-animation', () => false)
 const releaseNews = useState('release-news-pending', () => false)
 const giftPending = useState('advent-gift-pending', () => false)
 const prizesOpen = useState('advent-prizes-open', () => false)
@@ -65,6 +66,7 @@ const blocked = computed(
     gameAnimation.value ||
     jackAnimation.value ||
     slotAnimation.value ||
+    rouletteAnimation.value ||
     releaseNews.value ||
     giftPending.value ||
     prizesOpen.value ||

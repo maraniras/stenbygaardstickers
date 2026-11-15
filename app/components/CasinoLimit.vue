@@ -26,7 +26,7 @@ defineProps<{ limit?: CasinoDailyLimit | null }>()
       {{ limit.amount }} 🍌</span
     >
     <small v-if="limit.reserved"
-      >{{ limit.reserved.toLocaleString('da-DK') }} 🍌 reserveret i din aktive hånd</small
+      >{{ limit.reserved.toLocaleString('da-DK') }} 🍌 reserveret i igangværende spil</small
     >
   </div>
 </template>

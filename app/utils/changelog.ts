@@ -11,6 +11,24 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.7',
+    date: '2026-11-15',
+    push: {
+      title: '🎡 Roulette er nu live!',
+      body: 'Spil ved det fælles roulettebord, gå efter syv nye badges, og se hvem der har lagt indsatser.',
+      url: '/spil/roulette',
+    },
+    notes: [
+      'Roulette er åbnet i casinoet: Alle spiller på samme hjul med en ny runde hvert halve minut',
+      'Du har 20 sekunder til indsatser. Vælg jetoner på 5, 10, 25 eller 50 bananer og spil på tal, farver, dusiner og kolonner – også grøn, der dækker både 0 og 00',
+      'Se spillernes profilbilleder på deres felter og de seneste ti resultater under hjulet. Roulette har også egne lydeffekter, som kan slås fra',
+      'Syv nye roulettebadges med egne 3D-ikoner, point og bananbelønninger. Din profil har også fået roulettestatistik',
+      'Den fælles casinogrænse gælder også roulette: højst 300 bananer i nettotab om dagen på tværs af spillene',
+      'Vinderpræmien i Kryds & tværs #1 er hævet til 1.000 bananer',
+      'Mindre fejlrettelser og forbedringer af brugeroplevelsen',
+    ],
+  },
+  {
     version: '2.6',
     date: '2026-11-14',
     push: {

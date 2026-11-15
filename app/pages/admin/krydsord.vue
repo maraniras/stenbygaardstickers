@@ -130,7 +130,7 @@ async function save() {
         Tidspunktet er gemt.
       </p>
       <div class="reward">
-        <strong>Én vinder · 500 bananer + vinderbadge</strong>
+        <strong>Én vinder · 1000 bananer + vinderbadge</strong>
         <p>
           Den første servergodkendte løsning vinder. Andre må gerne færdiggøre krydsordet uden
           præmie.

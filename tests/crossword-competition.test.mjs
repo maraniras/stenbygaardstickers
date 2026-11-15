@@ -78,7 +78,7 @@ test('only complete submissions are checked, with no per-cell hints and no rewar
 })
 
 for (const redis of [false, true])
-  test(`one winner and exactly 500 bananas under concurrent correct submissions and payout retries (${redis ? 'Redis CAS' : 'local queue'})`, async () => {
+  test(`one winner and exactly 1000 bananas under concurrent correct submissions and payout retries (${redis ? 'Redis CAS' : 'local queue'})`, async () => {
     const { api: a } = game(redis)
     await a.mutateCrossword((state) => {
       state.opensAt = '2026-11-20T11:00:00Z'
@@ -99,7 +99,7 @@ for (const redis of [false, true])
     const records = await a.allEconomyRecords()
     assert.equal(Object.keys(records).length, 1)
     const wallet = records[state.winner.name.toLocaleLowerCase('da')]
-    assert.equal(wallet.balance, 500)
+    assert.equal(wallet.balance, 1000)
     assert.equal(wallet.history.length, 1)
     assert.equal(wallet.crosswordWins['1'], state.winner.at)
     const badges = a.badgesFor(
@@ -111,13 +111,13 @@ for (const redis of [false, true])
     const badge = badges.find((b) => b.id === 'crossword-1-winner')
     assert.equal(badge.earned, true)
     assert.equal(badge.points, 1)
-    assert.equal(a.bananaRewardFor(badge), 0, 'No second badge payment above the 500 prize')
+    assert.equal(a.bananaRewardFor(badge), 0, 'No second badge payment above the 1000 prize')
     const loser = names.find((name) => name !== state.winner.name)
     assert.equal(a.crosswordView(state, loser, false, now).completed, true)
     assert.equal(a.crosswordView(state, loser, false, now).winner.name, state.winner.name)
     assert.equal(await a.readEconomy(loser), undefined)
     await a.mutateCrossword((s) => a.submitCrossword(s, state.winner.name, answers, now))
-    assert.equal((await a.readEconomy(state.winner.name)).balance, 500)
+    assert.equal((await a.readEconomy(state.winner.name)).balance, 1000)
   })
 
 function route(a, file) {
@@ -180,7 +180,7 @@ test('normal submission requires a user and ignores client-supplied winner ident
     body: { name: 'Mathias', answers: a.crosswordSolution() },
   })
   assert.equal(result.view.winner.name, 'Nicole')
-  assert.equal((await a.readEconomy('Nicole')).balance, 500)
+  assert.equal((await a.readEconomy('Nicole')).balance, 1000)
   assert.equal(await a.readEconomy('Mathias'), undefined)
 })
 

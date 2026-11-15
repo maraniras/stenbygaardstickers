@@ -1,0 +1,15 @@
+# Roulette
+
+Vi har valgt amerikansk roulette med 38 felter: 1–36, 0 og 00. De to nulfelter er forskellige. Tilladte indsatser er enkelttal (36×), rød/sort, lige/ulige og lav/høj (2×), dusiner og kolonner (3×) samt grøn, der dækker både 0 og 00 (18×). Bruttoudbetalinger inkluderer indsatsen. Alle tilladte felter har teoretisk RTP 36/38, cirka 94,74 %.
+
+Appens valgte indsatsgrænser er 5–50 bananer pr. felt i trin på 5 og højst 50 samlet pr. spiller pr. runde. En ny indsats erstatter hele spillerens bord; tomt bord annullerer og refunderer før lås. Dubletter og ugyldige felter afvises. Det er produktregler for dette spil.
+
+En fælles runde varer 30 sekunder: 20 sekunder til indsatser, 6 sekunders spin og 4 sekunders resultatfase. Hjulets nedbremsning ligger i resultatfasen; saldo og resultat holdes skjult indtil visuel landing. Serverens tid afgør fasen. Resultatet udledes deterministisk med HMAC-SHA256 og rejection sampling fra fælles hemmelighed og rundenummer. Aktuelt resultat offentliggøres først ved sekund 26; gamle resultater kan vises straks. Indsatser fra den tidligere minutkadence uden roundMs beholder deres oprindelige resultat og afsløring efter 55 sekunder.
+
+Wallet er source of truth. Reservation, saldo, nonce/fingerprint, revision, kvittering og statistik gemmes atomisk med walletens CAS. Genafsendelse med samme nonce og indhold debiterer ikke igen; ændret indhold eller forkert revision afvises. Redis kontrollerer commitfristen med TIME i Lua; lokal lagring kontrollerer tiden før persist. Deltagerindekset er en eventual mirror med revisionsbeskyttelse og må ikke bruges til afregning.
+
+Der er ingen cron. Overdue indsatser autoafregnes før walletmutationer; personlig roulettevisning og offentlig saldohentning sørger også for afregning. Resultatet gemmes én gang i wallet. Casinogrænsen er fælles med Bananjack og Bananditten: højst 300 i nettotab pr. dansk spilledag med skift kl. 04.00. Uafregnet roulette og aktive jackindsatser reserverer plads. Afregning tilhører rundens oprindelige afsløringsdag, også efter langt fravær; dagens nye spil starter med den nye dags grænse. Reduktion og annullering skal kunne refundere selv med opbrugt grænse.
+
+GET er offentligt og no-store, med egen walletdel kun for en genkendt bruger. POST kræver brugeridentitet. Den offentlige visning indeholder deltagernes navne og indsatser, men ingen saldo, noncer, fingerprints eller hemmelighed. Roulette-badges x105–x111 og deres belønninger er dokumenteret i docs/badges.md. Lyd følger brugerinteraktion, gemt lydvalg og synlig fane.
+
+Tests: `node --test tests/roulette*.test.mjs`. De bruger eksisterende economy-harness med hukommelseslagring og en isoleret VM-dato, så rigtige `.data`-wallets ikke berøres. De dækker alle 51 tilladte felter og RTP, validering, frister, HMAC, afregning, refundering, fælles casinoreservationer, dansk døgnskifte, badges, klientmaskering, lyd og samtidighed i lokal/Redis CAS samt VM-routetests. Redis-harnessen udfører ikke Lua; TIME/deadline-delen har derfor en kildeguard plus test af fjerde argument og fejlretur, ikke en integrationstest mod Redis.

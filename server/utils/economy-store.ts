@@ -4,7 +4,11 @@ import { publicJackStats } from './jack-stats'
 import { adventStats } from '../../shared/utils/advent-badges'
 import { boxesAchievements } from '../../shared/utils/boxes-badges'
 
-export const ECONOMY_CAS = `if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
+export const ECONOMY_CAS = `if ARGV[4] and ARGV[4] ~= '' then
+local clock = redis.call('TIME')
+if tonumber(clock[1]) * 1000 + math.floor(tonumber(clock[2]) / 1000) >= tonumber(ARGV[4]) then return -1 end
+end
+if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
 redis.call('HSET', KEYS[1], ARGV[1], ARGV[3]); return 1`
 const localQueues = new Map<string, Promise<void>>()
 export function freshEconomy(): EconomyRecord {
@@ -40,6 +44,7 @@ export async function readEconomy(name: string): Promise<EconomyRecord | undefin
 export async function mutateEconomy<T>(
   name: string,
   change: (record: EconomyRecord) => T,
+  options: { before?: number } = {},
 ): Promise<{ record: EconomyRecord; result: T }> {
   const key = nameKey(name)
   if (!redisEnabled) {
@@ -54,7 +59,13 @@ export async function mutateEconomy<T>(
     try {
       const raw = await economyRaw(key)
       const record: EconomyRecord = raw ? JSON.parse(raw) : freshEconomy()
+      if (record.rouletteGame?.pending) await settleRouletteRecord(record)
       const result = change(record)
+      if (options.before !== undefined && Date.now() >= options.before)
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'Indsatserne er låst. Vent på næste runde.',
+        })
       await useStorage('data').setItem(`economy:${encodeURIComponent(key)}`, JSON.stringify(record))
       return { record, result }
     } finally {
@@ -65,9 +76,24 @@ export async function mutateEconomy<T>(
   for (let attempt = 0; attempt < 16; attempt++) {
     const raw = await economyRaw(key)
     const record: EconomyRecord = raw ? JSON.parse(raw) : freshEconomy()
+    if (record.rouletteGame?.pending) await settleRouletteRecord(record)
     const result = change(record)
-    if ((await redisEval(ECONOMY_CAS, ['economy'], [key, raw, JSON.stringify(record)])) === 1)
-      return { record, result }
+    const committed = await redisEval(
+      ECONOMY_CAS,
+      ['economy'],
+      [
+        key,
+        raw,
+        JSON.stringify(record),
+        options.before === undefined ? '' : String(options.before),
+      ],
+    )
+    if (committed === -1)
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'Indsatserne er låst. Vent på næste runde.',
+      })
+    if (committed === 1) return { record, result }
     await new Promise((resolve) => setTimeout(resolve, 5 + attempt * 2))
   }
   throw createError({
@@ -89,6 +115,7 @@ export function publicEconomy(record: EconomyRecord): EconomyPublic {
     milestones: record.milestones,
     jack: publicJackStats(record),
     slots: record.slotGame?.stats,
+    roulette: record.rouletteGame?.stats,
   }
 }
 export async function allEconomyRecords(): Promise<Record<string, EconomyRecord>> {

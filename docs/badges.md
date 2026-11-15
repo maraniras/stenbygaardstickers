@@ -168,8 +168,24 @@ Kun tilmeldte deltagere i en gennemført pakkeleg kan få dem. Slutbadges beregn
 
 | Nr. | Badge (id) | Krav | Bananer | Point |
 | --- | --- | --- | --- | --- |
-| x104 | Kryds & tværs #1 · Vinder (`crossword-1-winner`) | Første servergodkendte, helt korrekte løsning på krydsord #1 | 500 som konkurrencepræmie, ingen ekstra badgebonus | 1 |
+| x104 | Kryds & tværs #1 · Vinder (`crossword-1-winner`) | Første servergodkendte, helt korrekte løsning på krydsord #1 | 1000 som konkurrencepræmie, ingen ekstra badgebonus | 1 |
 
 Kun én vinder. Andre kan færdiggøre spillet uden bananer eller badge. Før åbningen vises kun menukortet; opgaven er serverlåst. Admin vælger dato/klokkeslæt i dansk tid på /admin/krydsord. Forhåndsvisning kræver admin og uddeler ingen præmie. Vinderen er permanent og kan ikke nulstilles fra admin.
 
-Næste ledige nummer: **x105**
+## Roulette
+
+| Nr. | Badge (id) | Krav | Bananer | Point |
+| --- | --- | --- | --- | --- |
+| x105 | Farvesans (`roulette-colour-five`) | Vind på rød/sort i 5 spillede runder i træk med nettooverskud | 50 | 2 |
+| x106 | Farvemester (`roulette-colour-ten`) | Vind på rød/sort i 10 spillede runder i træk med nettooverskud | 150 | 4 |
+| x107 | Første rotation → Med i svinget → Fast ved hjulet → Hjulets stamgæst → Rouletteinventar (`roulette-rounds`) | Spil 1 / 10 / 50 / 100 / 250 afsluttede runder med indsats | 10 / 20 / 40 / 75 / 150 | 1 / 2 / 3 / 4 / 5 |
+| x108 | Første gevinst → Vinderkurs → Medvind → Hjulet makker ret → Banken bæver (`roulette-wins`) | Vind 1 / 10 / 25 / 50 / 100 runder med nettooverskud | 10 / 25 / 50 / 100 / 200 | 1 / 2 / 3 / 4 / 5 |
+| x109 | Lige på tallet (`roulette-straight`) | Vind på et enkelt tal | 25 | 1 |
+| x110 | Grøn bølge (`roulette-zero`) | Vind på en direkte indsats på 0 eller 00 | 50 | 2 |
+| x111 | Fuldtræffer (`roulette-big-win`) | Vind mindst 500 bananer netto i én runde | 100 | 3 |
+
+Man må skifte farve. Tab, lige op og spillede runder uden en vindende farveindsats afbryder rækken; runder uden indsats tæller ikke. Begge belønninger udbetales én gang. Tracking starter med denne funktion; gamle runder rekonstrueres ikke fra den begrænsede historik.
+
+Belønninger gives én gang pr. trin/badge. Trinbadges bruger samme motiv og forskellige kantfarver. Eksisterende rundestatistik tæller med; særskilt optælling af nulgevinster starter med denne funktion. Indsatsen tæller ikke med i nettooverskuddet.
+
+Næste ledige nummer: **x112**
