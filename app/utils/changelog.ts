@@ -11,6 +11,16 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.7.1',
+    date: '2026-11-15',
+    push: {
+      title: '🎡 Lille rouletteopdatering',
+      body: 'Roulettevisningen er blevet mere enkel og overskuelig.',
+      url: '/spil/roulette',
+    },
+    notes: ['En mere enkel roulettevisning uden hjælpeteksten under rundestatussen'],
+  },
+  {
     version: '2.7',
     date: '2026-11-15',
     push: {

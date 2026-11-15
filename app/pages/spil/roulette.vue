@@ -145,19 +145,6 @@ function label(spot: string) {
           >{{ seconds }}<small>sek.</small></span
         >
       </div>
-      <p class="phase-copy">
-        {{
-          landing
-            ? 'Et øjeblik… Resultat og saldo vises, når hjulet er landet.'
-            : phase === 'betting'
-              ? 'Læg dine chips, før bordet lukker.'
-              : phase === 'spinning'
-                ? 'Hjulet drejer. Alle indsatser er låst.'
-                : phase === 'result'
-                  ? 'Næste runde åbner om et øjeblik.'
-                  : 'Vi synkroniserer med bordet.'
-        }}
-      </p>
       <RouletteWheel
         :spinning="rolling"
         :result="wheelResult"
@@ -591,11 +578,6 @@ function label(spot: string) {
 .countdown small {
   font-size: 11px;
   font-weight: 500;
-}
-.phase-copy {
-  font-size: 12px;
-  color: #e2e7cf;
-  margin: 0 0 14px;
 }
 .result-strip {
   display: flex;
