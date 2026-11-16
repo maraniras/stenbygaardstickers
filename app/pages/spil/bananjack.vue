@@ -281,8 +281,14 @@ const {
           <li>Kom tættere på 21 end dealeren. Over 21 taber.</li>
           <li>Es er 1 eller 11. Billedkort er 10.</li>
           <li>
-            Seks kortspil blandes på ny til hver runde. Dealeren tjekker for blackjack og står på
-            alle 17, også soft 17.
+            <template v-if="game?.shuffleMode === 'per-round'"
+              >Seks kortspil blandes på ny til hver runde.</template
+            >
+            <template v-else
+              >Seks kortspil bruges på tværs af dine runder og blandes igen før næste hånd, når
+              mindst 75 % er brugt.</template
+            >
+            Dealeren tjekker for blackjack og står på alle 17, også soft 17.
           </li>
           <li>
             Bananjack er es + et 10-kort på de to første kort og giver 3:2. Almindelig sejr giver

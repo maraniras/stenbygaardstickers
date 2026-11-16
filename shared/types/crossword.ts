@@ -19,7 +19,11 @@ export interface CrosswordClue {
 export interface CrosswordState {
   opensAt: string | null
   pushSchedule?: { opensAt: string; status: 'scheduled' | 'failed' }
-  pushSent?: Record<string, Partial<Record<'reminder' | 'opened', string>>>
+  pushSent?: Record<
+    string,
+    Partial<Record<'announced' | 'day-before' | 'reminder' | 'opened', string>>
+  >
+  winnerPushSentAt?: string
   winner: { name: string; at: string } | null
   finished: Record<string, { name: string; at: string }>
   attempts: Record<string, number>

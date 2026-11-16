@@ -185,6 +185,7 @@ function selectMode(value: 'name' | 'code') {
       </NuxtLink>
 
       <AppearanceSettings />
+      <ProfileFrameSettings />
 
       <section class="card">
         <h2>Brug appen på en enhed mere</h2>

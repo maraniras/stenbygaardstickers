@@ -145,7 +145,7 @@ for (const redis of [false, true])
       .filter((b) => b.id.startsWith('parcel-') && b.earned)
     assert.equal(earned.length, 2)
     for (const badge of earned) {
-      assert.equal(badge.points, 1)
+      assert.equal(badge.points, badge.id === 'parcel-five' ? 4 : 1)
       assert.equal(a.bananaRewardFor(badge), 20)
     }
     assert.equal(a.publicEconomy(wallet).parcelRewards, undefined)

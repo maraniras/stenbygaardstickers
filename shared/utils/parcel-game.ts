@@ -4,7 +4,7 @@ import { gameDay } from './game-day'
 const playerKey = (name: string) => `u:${name}`
 export const PARCEL_DAILY_ROLLS = 2
 export const PARCEL_ENTRY_FEE = 100
-export const parcelCount = (participants: number) => participants * 2
+export const parcelCount = (participants: number) => Math.ceil(participants * 2.5)
 /** Distinct wrapping, including a hatbox, giant box, banana and bunch; unrelated to contents. */
 export function parcelWrappingStyle(index: number) {
   return [8, 9, 10, 11, 12, 0, 1, 2, 3, 13, 4, 5, 14, 6, 7, 15, 16, 17, 18, 19][index] ?? index % 8

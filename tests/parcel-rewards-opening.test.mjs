@@ -43,26 +43,49 @@ test('20 gifts contain the agreed unique prizes, three elves and the configured 
   const { api: a } = harness(),
     pool = a.parcelRewardPool(20)
   assert.equal(pool.length, 20)
-  for (const kind of ['mix-max', 'cake', 'faxe-kondi', 'frame', 'golden', 'snowglobe'])
+  for (const kind of [
+    'mix-max',
+    'cake',
+    'faxe-kondi',
+    'vampiri',
+    'juleskum',
+    'white-wine',
+    'frame',
+    'golden',
+    'snowglobe',
+  ])
     assert.equal(pool.filter((p) => p.kind === kind).length, 1)
   assert.equal(pool.filter((p) => p.kind === 'bottle').length, 2)
   assert.equal(pool.filter((p) => p.kind === 'elf').length, 3)
   assert.equal(
     pool.reduce((n, p) => n + p.amount, 0),
-    1703,
+    1553,
   )
   assert.equal(pool.filter((p) => p.amount === 500).length, 1)
   assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'cake')), true)
   assert.equal(pool.find((p) => p.kind === 'cake').amount, 50)
   assert.equal(pool.find((p) => p.kind === 'faxe-kondi').amount, 50)
   assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'faxe-kondi')), true)
-  for (let count = 8; count <= 100; count += 2) {
+  assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'vampiri')), true)
+  assert.equal(pool.find((p) => p.kind === 'vampiri').amount, 50)
+  assert.equal(
+    a.parcelRewardIcon(pool.find((p) => p.kind === 'vampiri')),
+    '/games/advent/vampiri-christmas-v1.webp',
+  )
+  for (let count = 10; count <= 100; count++) {
     const gifts = a.parcelRewardPool(count)
     assert.equal(gifts.length, count)
     assert.equal(gifts.filter((p) => p.kind === 'cake').length, 1)
     assert.equal(gifts.filter((p) => p.kind === 'faxe-kondi').length, 1)
+    assert.equal(gifts.filter((p) => p.kind === 'vampiri').length, 1)
+    for (const kind of ['juleskum', 'white-wine']) {
+      const physical = gifts.filter((p) => p.kind === kind)
+      assert.equal(physical.length, 1)
+      assert.equal(physical[0].amount, 50)
+      assert.equal(a.isParcelPhysical(physical[0]), true)
+    }
     const mixMax = gifts.filter((p) => p.kind === 'mix-max')
-    assert.equal(mixMax.length, count >= 24 ? 2 : 1)
+    assert.equal(mixMax.length, count >= 30 ? 2 : 1)
     assert.ok(mixMax.every((p) => p.amount === 50))
   }
   assert.throws(() => a.parcelRewardPool(6), /fire deltagere/)
@@ -74,9 +97,11 @@ test('20 gifts contain the agreed unique prizes, three elves and the configured 
     false,
   )
   assert.equal(
-    a.parcelRewardPool(12).filter((p) => p.kind === 'bottle' || p.kind === 'snowglobe').length,
+    a.parcelRewardPool(13).filter((p) => p.kind === 'bottle' || p.kind === 'snowglobe').length,
     3,
   )
+  assert.equal(a.parcelRewardPool(a.parcelCount(10)).filter((p) => p.kind === 'mix-max').length, 1)
+  assert.equal(a.parcelRewardPool(a.parcelCount(12)).filter((p) => p.kind === 'mix-max').length, 2)
 })
 test('unopened contents stay secret even to their owner after the game ends, reservations are private', () => {
   const { api: a } = harness(),
@@ -163,6 +188,26 @@ test('physical cake gift stays hidden until opening and pays 50 once', async () 
   assert.equal(a.isParcelPhysical(visible), true)
 })
 
+test('Vampiri stays hidden until opening and pays its 50 banana bonus exactly once', async () => {
+  const { api: a } = harness(),
+    b = board()
+  b.parcels[0].reward = { kind: 'vampiri', amount: 50, title: 'Haribo Vampiri' }
+  b.parcels[0].amount = 50
+  assert.equal(a.parcelView(b, 'Nicole', new Date(end)).parcels[0].reward, undefined)
+  a.reserveParcelOpening(b, 'Nicole', 'p1', new Date(end))
+  await a.mutateParcels(2026, [], (g) => Object.assign(g, b))
+  await a.settleParcelPrizes(b)
+  const wallet = await a.readEconomy('Nicole')
+  assert.equal(wallet.balance, 50)
+  assert.equal(wallet.parcelRewards['parcel-open:2026:p1'].reward.kind, 'vampiri')
+  await a.settleParcelPrizes(b)
+  assert.equal((await a.readEconomy('Nicole')).balance, 50)
+  const { game } = await a.mutateParcels(2026, [], () => {})
+  const found = a.parcelView(game, 'Mathias', new Date(end)).parcels[0].reward
+  assert.equal(found.kind, 'vampiri')
+  assert.equal(a.isParcelPhysical(found), true)
+})
+
 test('exclusive frame is granted and equipped only when its owner opens it', async () => {
   const { api: a } = harness(),
     b = board(),
@@ -177,6 +222,11 @@ test('exclusive frame is granted and equipped only when its owner opens it', asy
   await a.mutateParcels(2026, [], (g) => Object.assign(g, b))
   await a.settleParcelPrizes(b)
   assert.equal(user.frame, 'parcel-2026')
+  assert.deepEqual([...user.ownedFrames], ['parcel-2026'])
+  delete user.frame
+  await a.settleParcelPrizes(b)
+  assert.equal(user.frame, undefined)
+  assert.deepEqual([...user.ownedFrames], ['parcel-2026'])
   assert.equal(
     (await a.readEconomy('Nicole')).parcelRewards['parcel-open:2026:p1'].reward.kind,
     'frame',

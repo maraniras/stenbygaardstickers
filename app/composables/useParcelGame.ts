@@ -67,7 +67,7 @@ export function useParcelGame(pollMs = 5000) {
         pending: {},
         events: [],
         parcels: Array.from(
-          { length: registrationPreview ? parcelCount(players.length) : fullTable ? 24 : 8 },
+          { length: fullTable && !registrationPreview ? 24 : parcelCount(players.length) },
           (_, i) => ({
             id: `p${i + 1}`,
             style: i % 8,

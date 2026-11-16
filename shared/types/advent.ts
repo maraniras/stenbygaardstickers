@@ -6,6 +6,8 @@ export type AdventReward =
   | 'mix-max'
   | 'faxe-kondi'
   | 'cake'
+  | 'vampiri'
+  | 'juleskum'
   | 'red-wine'
   | 'white-wine'
   | 'cycling-bottle'

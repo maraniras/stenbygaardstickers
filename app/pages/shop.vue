@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { SHOP_PROFILE_FRAMES, type ProfileFrame } from '../../shared/utils/profile-frames'
 useHead({ title: 'Shop · Stenbygaard Stickers' })
+const { name } = useUser()
+const { inventory } = useProfileFrames()
+const selected = ref<ProfileFrame>()
+const preview = ref<HTMLDialogElement>()
+function show(frame: ProfileFrame) {
+  selected.value = frame
+  preview.value?.showModal()
+}
 </script>
 
 <template>
@@ -8,74 +17,206 @@ useHead({ title: 'Shop · Stenbygaard Stickers' })
       title="Shop"
       description="Brug dine bananer"
     />
-    <section
-      class="coming-soon"
-      aria-labelledby="shop-coming-soon"
-    >
-      <div
-        class="shop-icon"
-        aria-hidden="true"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="m8 3-4 7m12-7 4 7M2 10h20l-3 11H5L2 10Zm7 4v3m6-3v3" />
-        </svg>
+    <p class="preview-notice">
+      <span>Forhåndsvisning</span> Shoppen åbner snart. Du kan prøve rammerne her — køb er ikke
+      åbnet endnu.
+    </p>
+    <section aria-labelledby="profile-frames-title">
+      <div class="section-title">
+        <h2 id="profile-frames-title">Profilrammer</h2>
+        <span>8 rammer</span>
       </div>
-      <span class="soon-label">Noget at spare op til</span>
-      <h2 id="shop-coming-soon">Kommer snart</h2>
-      <p>Her kan du snart bruge dine optjente bananer.</p>
+      <div class="frames">
+        <button
+          v-for="frame in SHOP_PROFILE_FRAMES"
+          :key="frame.id"
+          class="frame-card"
+          type="button"
+          :aria-label="`Se ${frame.name} på dit profilbillede`"
+          @click="show(frame)"
+        >
+          <ProfileFramePreview
+            :frame="frame"
+            :name="name"
+          />
+          <h3>{{ frame.name }}</h3>
+          <span class="availability">{{
+            inventory.owned.includes(frame.id) ? 'Ejet' : 'Kommer snart'
+          }}</span>
+          <span class="try-label">Se ramme ↗</span>
+        </button>
+      </div>
     </section>
+    <dialog
+      ref="preview"
+      class="frame-dialog"
+      aria-labelledby="frame-preview-title"
+      @click="$event.target === preview && preview?.close()"
+    >
+      <template v-if="selected">
+        <button
+          class="close"
+          type="button"
+          aria-label="Luk forhåndsvisning"
+          @click="preview?.close()"
+        >
+          ×
+        </button>
+        <ProfileFramePreview
+          :frame="selected"
+          :name="name"
+        />
+        <h2 id="frame-preview-title">{{ selected.name }}</h2>
+        <p>{{ selected.description }}</p>
+        <NuxtLink
+          v-if="inventory.owned.includes(selected.id)"
+          class="btn"
+          to="/mig"
+          @click="preview?.close()"
+          >Vælg i indstillinger</NuxtLink
+        >
+        <button
+          v-else
+          class="btn"
+          type="button"
+          disabled
+        >
+          Køb åbner snart
+        </button>
+        <p class="small">
+          {{
+            inventory.owned.includes(selected.id)
+              ? 'Du ejer allerede denne ramme.'
+              : 'Pris kommer senere. Der trækkes ingen bananer.'
+          }}
+        </p>
+      </template>
+    </dialog>
   </div>
 </template>
 
 <style scoped>
 .shop-page {
-  max-width: 640px;
-  min-height: var(--content-height);
+  max-width: 680px;
   margin: 0 auto;
-  padding: calc(20px + var(--safe-t)) 16px 20px;
-  display: flex;
-  flex-direction: column;
+  padding: calc(20px + var(--safe-t)) 16px 24px;
 }
-.coming-soon {
-  margin: auto 0;
-  padding: 36px 0;
-  text-align: center;
-}
-.shop-icon {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 30px;
+.preview-notice {
+  padding: 16px;
+  border-radius: 18px;
   background: var(--accent-soft);
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+.preview-notice span {
+  display: block;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.section-title h2 {
+  font-size: 21px;
+}
+.section-title > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.frames {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.frame-card {
+  min-width: 0;
+  text-align: center;
+  padding: 14px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 22px;
+  background: var(--surface);
   color: var(--text);
   box-shadow: var(--shadow-sm);
-  transform: rotate(-7deg);
 }
-svg {
-  width: 48px;
-  height: 48px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.frame-card:hover {
+  background: var(--surface-2);
 }
-.soon-label {
+.frame-card h3 {
+  font-size: 16px;
+  margin-top: 8px;
+}
+.availability {
+  display: block;
+  margin-top: 7px;
   color: var(--muted);
   font-size: 11px;
+}
+.try-label {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 12px;
   font-weight: 700;
 }
-h2 {
-  margin-top: 8px;
-  font-size: 28px;
+.frame-dialog {
+  position: fixed;
+  margin: auto;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--hairline);
+  border-radius: 26px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
 }
-p {
-  max-width: 28ch;
-  margin: 14px auto 0;
+.frame-dialog::backdrop {
+  background: #080612a8;
+  backdrop-filter: blur(5px);
+}
+.frame-dialog .frame-preview {
+  width: min(240px, 100%);
+  margin: 12px auto;
+}
+.frame-dialog h2 {
+  font-size: 24px;
+}
+.frame-dialog p {
   color: var(--muted);
+  line-height: 1.6;
   font-size: 14px;
-  line-height: 1.7;
+  margin: 12px 0 20px;
+}
+.frame-dialog .small {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+.frame-dialog .btn {
+  width: 100%;
+}
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text);
+  background: var(--surface-2);
+  font-size: 26px;
+}
+@media (min-width: 560px) {
+  .frames {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 </style>

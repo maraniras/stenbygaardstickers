@@ -11,10 +11,12 @@ Implementeret lokalt på dev 7. november 2026. Endnu ikke udgivet på prod.
 | Stor bunke        |                250 | Mindst to pr. kalender |
 | Drillenisse       |                −75 | Saldo stopper ved nul  |
 | Mix Max           |                250 | En rigtig Mix Max      |
-| Rødvin / hvidvin  |                  0 | En rigtig flaske       |
-| Cykeldrikkedunk   |                  0 | En rigtig dunk         |
+| Rødvin / hvidvin  |                 50 | En rigtig flaske       |
+| Cykeldrikkedunk   |                 50 | En rigtig dunk         |
 | Faxe Kondi        |                 50 | En rigtig flaske       |
 | Træstammer        |                 50 | Fysisk kagepræmie      |
+| Haribo Vampiri    |                 50 | En rigtig pose        |
+| Juleskum          |                 50 | En rigtig pose        |
 | Julemand          |              2.500 | Én person i alt        |
 | Gave til en ven   | 100 til modtageren | Betales af kalenderen  |
 | Gave til sig selv |                150 |                        |
@@ -28,9 +30,11 @@ Julepyntede transparente ikoner: public/games/advent/. Originaler og tidligere u
 - 24 personlige låger. Almindelige bananfund vægtes 55/35/10 før garanterede fund placeres.
 - Alle får 1–5 drillenisser (15/40/30/10/5 procent); Norsk får præcis syv.
 - Alle får 1–3 vennegaver og 1–3 egne gaver, ligeligt fordelt mellem antal.
-- Globalt: fem Mix Max, én rødvin, én hvidvin, to drikkedunke, to Faxe Kondi-flasker og én julemand. Separat lodtrækning for hver præmie; samme person må vinde flere.
+- Globalt: fem Mix Max, én rødvin, én hvidvin, to drikkedunke, to Faxe Kondi-flasker, én pose juleskum og én julemand. Separat lodtrækning for hver præmie; samme person må vinde flere.
 - Én ekstra træstammegave + 50 bananer, kun hvis Ida eller Marc er på deltagerlisten. Kun disse to navne (uden forskel på store/små bogstaver) kan vinde den. Hvis begge er med, trækkes én af dem; hvis ingen er med, udelades gaven. Placering er tilfældig fra 10. til og med 18. december.
-- Mathias og Tobias Frost er udelukket fra fysiske præmier og julemanden. Emil desuden fra drikkedunke, men ikke vin eller Mix Max.
+- En separat træstammegave + 50 bananer er reserveret til Anna, hvis hun er på deltagerlisten før fristen. Den placeres også tilfældigt den 10.–18. december. Hvis Anna ikke er med, udelades denne gave; den flyttes ikke til andre. Der er dermed op til to træstammegaver i kalenderen.
+- To poser Haribo Vampiri med 50 bananer pr. pose: én til Anna på en tilfældig dag den 7.–16. december og én til Norsk den 18. december. Kun hvis de er på deltagerlisten før fristen; ellers udelades deres pose uden at flytte den til andre. Fysisk præmie, gemmes i fund og adminens udleveringsoversigt som de øvrige præmier.
+- Mathias er udelukket fra fysiske præmier og julemanden, bortset fra drikkedunkene, som han deltager i lodtrækningen om. Tobias Frost er fortsat udelukket fra alle fysiske præmier og julemanden. Emil er udelukket fra drikkedunke, men ikke vin eller Mix Max. Der er stadig kun to drikkedunke i kalenderen.
 - Deltagerlisten: oprettet før 1. december 2026 kl. 00.00 dansk tid. Fryses først efter fristen. Senere konti får almindelig kalender uden begrænsede præmier.
 - Vin kun i låge 23/24. Flere fund kan ligge i samme låge uden at fjerne garanterede nisser/gaver eller to store bunker.
 - Privat servergemt lodtrækning og planer medtages i backup. Genindlæsning, flere enheder og åbningsrækkefølge ændrer ikke udfald.

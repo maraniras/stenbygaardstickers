@@ -41,6 +41,7 @@ export function dailyJackpotFor(ticket: number) {
   throw new Error('Jackpotfordelingen skal summere til 10000')
 }
 export const GAME_BADGE_REWARDS: Record<string, number[]> = {
+  'parcel-five': [20],
   'roulette-colour-five': [50],
   'roulette-colour-ten': [150],
   'banana-baron': [50, 100, 200, 400, 800],

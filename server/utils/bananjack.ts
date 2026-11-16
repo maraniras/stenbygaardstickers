@@ -1,6 +1,12 @@
 import { randomInt } from 'node:crypto'
 import type { EconomyRecord } from '../../shared/types/economy'
-import type { JackGame, JackHand, JackAction, JackPublic } from '../../shared/types/bananjack'
+import type {
+  JackGame,
+  JackHand,
+  JackAction,
+  JackPublic,
+  JackShuffleMode,
+} from '../../shared/types/bananjack'
 import { JACK_BETS, jackRank, jackValue, jackScore } from '../../shared/utils/bananjack'
 import { syncJackStats } from './jack-stats'
 import {
@@ -60,6 +66,7 @@ export function jackPublic(record: EconomyRecord, now = new Date()): JackPublic 
     id: game.id,
     sequence: game.sequence,
     revision: game.revision,
+    shuffleMode: game.shuffleMode ?? 'per-round',
     hands: game.hands,
     active: game.active,
     status: game.status,
@@ -138,8 +145,9 @@ export function dealJack(
   id: string,
   previous: string | null,
   bet: number,
-  deck = jackDeck(),
+  deck: number[] | undefined = undefined,
   now = new Date(),
+  shuffleMode: JackShuffleMode = 'continuous',
 ) {
   const old = record.bananjack
   if (old?.id === id) return // Lost response: same request resumes its round, never another debit.
@@ -154,7 +162,15 @@ export function dealJack(
     id,
     sequence: (old?.sequence ?? 0) + 1,
     revision: 0,
-    deck: [...deck],
+    // The persisted finished round owns the remaining shoe. Clone it inside the
+    // wallet mutation so JSON reloads and CAS retries cannot reuse dealt cards.
+    deck: [
+      ...(deck ??
+        (shuffleMode === 'continuous' && old?.shuffleMode === 'continuous' && old.deck.length > 78
+          ? old.deck
+          : jackDeck())),
+    ],
+    shuffleMode,
     dealer: [],
     hands: [{ cards: [], bet, fromSplit: false, status: 'playing' }],
     active: 0,

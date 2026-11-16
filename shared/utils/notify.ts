@@ -19,7 +19,7 @@ export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; des
     type: 'crossword',
     emoji: '🧩',
     label: 'Kryds & tværs',
-    desc: 'En time før et krydsord åbner, og når du kan begynde at spille',
+    desc: 'Startdato, påmindelser 24 timer og én time før start, åbning og vinderen',
   },
   {
     type: 'parcels',

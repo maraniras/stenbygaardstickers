@@ -6,6 +6,76 @@ const harness = (remote) =>
 const deck = (...cards) => [...cards, ...Array(100).fill(9)]
 const fresh = (a) => ({ ...a.freshEconomy(), balance: 250, peakBalance: 250 })
 
+test('saved shoe survives reload and resumes without reusing dealt cards', () => {
+  const a = harness(false)
+  const r = fresh(a)
+  a.dealJack(r, 'first', null, 10, deck(9, 9, 7, 7, 4, 9, 5, 7))
+  a.actJack(r, 'first', 0, 'stand')
+  const saved = JSON.parse(JSON.stringify(r))
+  const remaining = [...saved.bananjack.deck]
+  a.dealJack(saved, 'second', 'first', 10)
+  assert.deepEqual([...saved.bananjack.hands[0].cards], [remaining[0], remaining[2]])
+  assert.deepEqual([...saved.bananjack.deck], remaining.slice(4))
+  const snapshot = JSON.stringify(saved)
+  a.dealJack(saved, 'second', 'first', 10)
+  assert.equal(JSON.stringify(saved), snapshot)
+})
+
+test('75 percent cut card triggers a fresh shoe only on the next deal', () => {
+  const a = harness(false)
+  const r = fresh(a)
+  a.dealJack(r, 'first', null, 10, [9, 9, 7, 7, ...Array(75).fill(2)])
+  assert.equal(r.bananjack.deck.length, 75)
+  a.actJack(r, 'first', 0, 'hit')
+  assert.equal(r.bananjack.hands[0].cards[2], 2)
+  assert.equal(r.bananjack.status, 'finished')
+  a.dealJack(r, 'second', 'first', 10)
+  assert.equal(r.bananjack.deck.length, 308)
+  const all = [...r.bananjack.deck, ...r.bananjack.dealer, ...r.bananjack.hands[0].cards]
+  assert.equal(new Set(all).size, 312)
+})
+
+test('switching modes or migrating a legacy hand starts a new shoe next round', () => {
+  for (const previousMode of ['continuous', 'per-round', undefined]) {
+    for (const nextMode of ['continuous', 'per-round']) {
+      if (previousMode === 'continuous' && nextMode === 'continuous') continue
+      const a = harness(false)
+      const r = fresh(a)
+      a.dealJack(r, 'first', null, 10, deck(9, 9, 7, 7))
+      a.actJack(r, 'first', 0, 'stand')
+      r.bananjack.shuffleMode = previousMode
+      a.dealJack(r, 'second', 'first', 10, undefined, new Date(), nextMode)
+      assert.equal(r.bananjack.shuffleMode, nextMode)
+      assert.equal(r.bananjack.deck.length, 308)
+      assert.equal(a.jackPublic(r).deck, undefined)
+    }
+  }
+})
+
+test('cut card boundary is 78 remaining cards, never 79', () => {
+  for (const remaining of [78, 79]) {
+    const a = harness(false)
+    const r = fresh(a)
+    a.dealJack(r, 'first', null, 10, [9, 9, 7, 7, ...Array(remaining).fill(9)])
+    a.actJack(r, 'first', 0, 'stand')
+    a.dealJack(r, 'second', 'first', 10)
+    assert.equal(r.bananjack.deck.length, remaining === 78 ? 308 : 75)
+  }
+})
+
+for (const remote of [false, true]) {
+  test(`admin shuffle setting persists and validates input (${remote ? 'Redis' : 'local'})`, async () => {
+    const a = setup(remote, ['server/utils/jack-settings.ts']).api
+    assert.equal(await a.readJackShuffleMode(), 'continuous')
+    await a.saveJackShuffleMode('per-round')
+    assert.equal(await a.readJackShuffleMode(), 'per-round')
+    await assert.rejects(a.saveJackShuffleMode('invalid'), { statusCode: 400 })
+    assert.equal(await a.readJackShuffleMode(), 'per-round')
+    await a.saveJackShuffleMode('continuous')
+    assert.equal(await a.readJackShuffleMode(), 'continuous')
+  })
+}
+
 test('ace valuation, soft hands and a complete six-deck shuffle', () => {
   const a = harness(false)
   for (const [cards, total, soft] of [
@@ -169,11 +239,18 @@ for (const remote of [false, true])
     r = await a.readEconomy('Test')
     assert.equal(r.balance, 260)
     assert.equal(r.history.length, 2)
-    await a.mutateEconomy('Test', (r) => a.dealJack(r, 'round-b', 'round-a', 10, deck(9, 8, 7, 7)))
+    const remaining = [...r.bananjack.deck]
+    await Promise.all(
+      Array.from({ length: 8 }, () =>
+        a.mutateEconomy('Test', (r) => a.dealJack(r, 'round-b', 'round-a', 10)),
+      ),
+    )
     await assert.rejects(
       a.mutateEconomy('Test', (r) => a.dealJack(r, 'round-a', null, 10, deck(0, 9, 9, 8))),
     )
     r = await a.readEconomy('Test')
     assert.equal(r.bananjack.id, 'round-b')
+    assert.deepEqual([...r.bananjack.hands[0].cards], [remaining[0], remaining[2]])
+    assert.deepEqual([...r.bananjack.deck], remaining.slice(4))
     assert.equal(r.balance, 250)
   })

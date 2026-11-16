@@ -139,6 +139,7 @@ function route(a, file) {
     return { user: { name: event.name } }
   }
   a.syncBadgesLater = async () => {}
+  a.notifyCrosswordWinnerLater = async () => {}
   vm.runInContext(`(function(exports){${code}\n})`, a)(exports)
   return exports.default
 }

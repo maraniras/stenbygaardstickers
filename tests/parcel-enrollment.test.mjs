@@ -6,15 +6,17 @@ const context = { stickers: [], ratings: {}, comments: {} }
 const harness = (redis = false) =>
   setup(redis, ['shared/utils/parcel-game.ts', 'server/utils/parcel-game.ts'])
 
-test('gift pool contains two gifts per participant', () => {
+test('gift pool contains 2.5 gifts per participant rounded upwards', () => {
   const { api: a } = harness()
   for (const [people, gifts] of [
     [0, 0],
-    [1, 2],
-    [2, 4],
-    [3, 6],
-    [7, 14],
-    [10, 20],
+    [1, 3],
+    [2, 5],
+    [3, 8],
+    [4, 10],
+    [7, 18],
+    [10, 25],
+    [12, 30],
   ])
     assert.equal(a.parcelCount(people), gifts)
 })
@@ -28,12 +30,26 @@ for (const redis of [false, true])
     const names = ['Nicole', 'Mathias', 'Norsk', 'A', 'B', 'C', 'D']
     const { game } = await a.mutateParcels(2026, names, () => {})
     assert.equal(game.players.length, 7)
-    assert.equal(game.parcels.length, 14)
+    assert.equal(game.parcels.length, 18)
     assert.equal(JSON.stringify(game.parcels[0]), original)
     const { game: repeated } = await a.mutateParcels(2026, names, () => {})
-    assert.equal(repeated.parcels.length, 14)
-    assert.equal(new Set(repeated.parcels.map((p) => p.id)).size, 14)
+    assert.equal(repeated.parcels.length, 18)
+    assert.equal(new Set(repeated.parcels.map((p) => p.id)).size, 18)
   })
+test('already assigned gifts remain unchanged when the gift ratio changes', async () => {
+  const { api: a } = harness()
+  const names = ['Nicole', 'Mathias', 'Norsk', 'Anna']
+  const { game: old } = await a.mutateParcels(2026, names, (game) => {
+    game.parcels = game.parcels.slice(0, 8)
+    game.prizesAssigned = true
+    game.parcels[0].owner = 'Nicole'
+  })
+  const snapshot = JSON.stringify(old.parcels)
+  const { game } = await a.mutateParcels(2026, names, () => {})
+  assert.equal(game.parcels.length, 8)
+  assert.equal(JSON.stringify(game.parcels), snapshot)
+})
+
 test('signup runs November20 at04 through November26 inclusive in Danish time; play starts November27 at04', () => {
   const { api: a } = harness()
   for (const [at, open] of [
@@ -103,10 +119,10 @@ for (const redis of [false, true])
     const view = await a.parcelRequest('Nicole')
     assert.equal(view.joined, true)
     assert.deepEqual(Array.from(view.players), ['Nicole'])
-    assert.equal(view.parcels.length, 2)
+    assert.equal(view.parcels.length, 3)
     const spectator = await a.parcelRequest('Mathias')
     assert.equal(spectator.joined, false)
-    assert.equal(spectator.parcels.length, 2)
+    assert.equal(spectator.parcels.length, 3)
     wallet = await a.readEconomy('Nicole')
     assert.equal(wallet.balance, 100)
   })

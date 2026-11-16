@@ -6,5 +6,6 @@ export default defineEventHandler(async (event) => {
   const state = await readCrossword()
   if (!preview && (await settleCrosswordWinner(state)) && state.winner)
     await syncBadgesLater(event, [state.winner.name])
+  if (!preview) await notifyCrosswordWinnerLater(event, state)
   return crosswordView(state, found?.user.name, preview)
 })

@@ -31,6 +31,8 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       ['white-wine', 1],
       ['cycling-bottle', 2],
       ['faxe-kondi', 2],
+      ['vampiri', 1],
+      ['juleskum', 1],
       ['santa', 1],
     ])
       assert.equal(all.filter((p) => p.reward === reward).length, count)
@@ -42,7 +44,14 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       assert.ok(count('friend-gift') >= 1 && count('friend-gift') <= 3)
       assert.ok(count('self-gift') >= 1 && count('self-gift') <= 3)
       assert.ok(count('banana-large') >= 2)
-      if (['mathias', 'tobias frost'].includes(owner))
+      if (owner === 'mathias')
+        assert.equal(
+          items.filter(
+            (p) => (p.kind === 'physical' && p.reward !== 'cycling-bottle') || p.reward === 'santa',
+          ).length,
+          0,
+        )
+      if (owner === 'tobias frost')
         assert.equal(items.filter((p) => p.kind === 'physical' || p.reward === 'santa').length, 0)
       if (owner === 'emil') assert.equal(count('cycling-bottle'), 0)
       for (const day of plan)
@@ -53,6 +62,35 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
   }
 })
 
+test('Mathias can win bottles but no other limited prizes; Emil and Tobias remain excluded from bottles', () => {
+  const { api: a } = harness()
+  for (const mathias of ['Mathias', 'MATHIAS', 'mAtHiAs']) {
+    const roster = [mathias, 'Emil', 'Tobias Frost'].map((name) => ({
+      name,
+      createdAt: '2026-11-01T00:00:00Z',
+    }))
+    const draw = a.createAdventDraw(roster, 'mathias-bottles', now)
+    const bottles = draw.awards.filter((a) => a.reward === 'cycling-bottle')
+    assert.equal(bottles.length, 2)
+    assert.ok(bottles.every((a) => a.winner === mathias))
+    assert.ok(
+      draw.awards.filter((a) => a.winner === mathias).every((a) => a.reward === 'cycling-bottle'),
+    )
+    assert.equal(
+      prizes(draw.plans[mathias.toLocaleLowerCase('da')]).filter(
+        (p) => p.reward === 'cycling-bottle',
+      ).length,
+      2,
+    )
+  }
+  const late = a.createAdventDraw(
+    [{ name: 'Mathias', createdAt: a.ADVENT_CUTOFF }],
+    'late-mathias',
+    now,
+  )
+  assert.equal(late.awards.filter((a) => a.reward === 'cycling-bottle').length, 0)
+})
+
 test('all limited prizes may go to the same person and stack without removing guaranteed gifts', () => {
   const { api: a } = harness()
   const draw = a.createAdventDraw(
@@ -60,16 +98,22 @@ test('all limited prizes may go to the same person and stack without removing gu
     'one-winner',
     now,
   )
-  assert.equal(draw.awards.length, 12)
+  assert.equal(draw.awards.length, 14)
   assert.ok(draw.awards.every((p) => p.winner === 'Norsk'))
   const forced = { ...draw, awards: draw.awards.map((p) => ({ ...p, day: 24 })) }
   const plan = a.buildAdventPlan('Norsk', forced)
   const awards = prizes([plan[23]]).filter((p) =>
-    ['mix-max', 'red-wine', 'white-wine', 'cycling-bottle', 'faxe-kondi', 'santa'].includes(
-      p.reward,
-    ),
+    [
+      'mix-max',
+      'red-wine',
+      'white-wine',
+      'cycling-bottle',
+      'faxe-kondi',
+      'juleskum',
+      'santa',
+    ].includes(p.reward),
   )
-  assert.equal(awards.length, 12)
+  assert.equal(awards.length, 13)
 })
 
 test('one optional cake prize belongs only to eligible Ida or Marc behind December10–18', () => {
@@ -112,6 +156,81 @@ test('one optional cake prize belongs only to eligible Ida or Marc behind Decemb
   assert.equal(late.awards.filter((award) => award.reward === 'cake').length, 0)
 })
 
+test('Anna has her own cake prize on December 10–18, separate from Ida/Marc and subject to cutoff', () => {
+  const { api: a } = harness()
+  for (const annaName of ['Anna', 'ANNA', 'aNnA']) {
+    for (let seed = 0; seed < 30; seed++) {
+      const roster = [
+        ...users,
+        ...['Ida', 'Marc', annaName].map((name) => ({ name, createdAt: '2026-11-20T00:00:00Z' })),
+      ]
+      const draw = a.createAdventDraw(roster, `anna-cake-${seed}`, now)
+      const cakes = draw.awards.filter((award) => award.reward === 'cake')
+      assert.equal(cakes.length, 2)
+      assert.equal(cakes.filter((c) => ['Ida', 'Marc'].includes(c.winner)).length, 1)
+      const anna = cakes.filter((c) => c.winner === annaName)
+      assert.equal(anna.length, 1)
+      assert.ok(anna[0].day >= 10 && anna[0].day <= 18)
+      const gifts = prizes(draw.plans[annaName.toLocaleLowerCase('da')]).filter(
+        (p) => p.reward === 'cake',
+      )
+      assert.equal(gifts.length, 1)
+      assert.equal(gifts[0].amount, 50)
+      assert.equal(gifts[0].kind, 'physical')
+    }
+  }
+  const onlyAnna = a.createAdventDraw(
+    [...users, { name: 'Anna', createdAt: '2026-11-20T00:00:00Z' }],
+    'only-anna',
+    now,
+  )
+  assert.equal(onlyAnna.awards.filter((a) => a.reward === 'cake').length, 1)
+  const late = a.createAdventDraw(
+    [...users, { name: 'Anna', createdAt: a.ADVENT_CUTOFF }],
+    'late-anna',
+    now,
+  )
+  assert.equal(late.awards.filter((a) => a.reward === 'cake').length, 0)
+})
+
+test('Vampiri is reserved for Anna on 7–16 and Norsk on 18, never substitutes another winner', () => {
+  const { api: a } = harness()
+  for (let seed = 0; seed < 50; seed++) {
+    const roster = ['ANNA', 'nOrSk', 'Nicole'].map((name) => ({
+      name,
+      createdAt: '2026-11-01T00:00:00Z',
+    }))
+    const draw = a.createAdventDraw(roster, `vampiri-${seed}`, now)
+    const awards = draw.awards.filter((award) => award.reward === 'vampiri')
+    assert.equal(awards.length, 2)
+    const anna = awards.find((a) => a.winner === 'ANNA')
+    const norsk = awards.find((a) => a.winner === 'nOrSk')
+    assert.ok(anna.day >= 7 && anna.day <= 16)
+    assert.equal(norsk.day, 18)
+    for (const award of awards) {
+      const items = prizes([draw.plans[award.winner.toLocaleLowerCase('da')][award.day - 1]])
+      const found = items.filter((item) => item.reward === 'vampiri')
+      assert.equal(found.length, 1)
+      assert.equal(found[0].kind, 'physical')
+      assert.equal(found[0].amount, 50)
+      assert.equal(a.adventPrizeIcon(found[0]), '/games/advent/vampiri-christmas-v1.webp')
+    }
+    assert.equal(prizes(draw.plans.nicole).filter((p) => p.reward === 'vampiri').length, 0)
+    assert.equal(
+      JSON.stringify(a.createAdventDraw(roster, `vampiri-${seed}`, now)),
+      JSON.stringify(draw),
+    )
+  }
+  for (const roster of [
+    [],
+    [{ name: 'Anna', createdAt: a.ADVENT_CUTOFF }],
+    [{ name: 'Norsk', createdAt: a.ADVENT_CUTOFF }],
+  ]) {
+    const draw = a.createAdventDraw(roster, 'no-vampiri', now)
+    assert.equal(draw.awards.filter((a) => a.reward === 'vampiri').length, 0)
+  }
+})
+
 for (const redis of [false, true])
   test(`cutoff, frozen participants and concurrent initialization (${redis ? 'Redis' : 'local'})`, async () => {
     const { api: a, storage, hashes } = harness(redis)
@@ -135,6 +254,28 @@ for (const redis of [false, true])
     assert.ok(!JSON.stringify(dto).includes(results[0].seed))
     void hashes
   })
+
+test('every real calendar prize pays 50 bananas except Mix Max at 250, exactly once per door', () => {
+  const { api: a } = harness()
+  const draw = a.createAdventDraw(users, 'physical-bonuses', now)
+  const entries = Object.entries(draw.catalog).filter(([, prize]) => prize.kind === 'physical')
+  assert.equal(entries.length, 8)
+  const plan = entries.map(([reward, prize], i) => {
+    assert.equal(prize.amount, reward === 'mix-max' ? 250 : 50)
+    return { day: i + 1, published: true, prize }
+  })
+  const wallet = a.freshEconomy()
+  const ready = new Date('2026-12-24T03:00:00Z')
+  for (const entry of plan) {
+    a.openAdventDoor(wallet, 2026, entry.day, ready, plan)
+    assert.equal(wallet.advent[2026][entry.day].amount, entry.prize.amount)
+    assert.equal(wallet.advent[2026][entry.day].prize.kind, 'physical')
+  }
+  assert.equal(wallet.balance, 600)
+  const saved = JSON.stringify(wallet)
+  for (const entry of plan) a.openAdventDoor(wallet, 2026, entry.day, ready, plan)
+  assert.equal(JSON.stringify(wallet), saved)
+})
 
 test('limited-stock bonuses, negative floors and calendar badges settle exactly once', async () => {
   const { api: a } = harness()

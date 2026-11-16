@@ -86,16 +86,19 @@ function setup({ env = 'production', token = 'fixture-token' } = {}) {
   }
 }
 
-test('two server-side jobs target exactly one hour before opening and the opening instant', async () => {
+test('three server-side jobs target 24 hours, one hour before opening and the opening instant', async () => {
   const h = setup()
-  assert.equal(await h.api.scheduleCrosswordPushes(h.state, new Date(time - 2 * hour)), 'scheduled')
+  assert.equal(
+    await h.api.scheduleCrosswordPushes(h.state, new Date(time - 48 * hour)),
+    'scheduled',
+  )
   assert.deepEqual(
     h.jobs.map((j) => Number(j.headers['Upstash-Not-Before'])),
-    [(time - hour) / 1000, time / 1000],
+    [(time - 24 * hour) / 1000, (time - hour) / 1000, time / 1000],
   )
   assert.deepEqual(
     h.jobs.map((j) => j.body.kind),
-    ['reminder', 'opened'],
+    ['day-before', 'reminder', 'opened'],
   )
   assert.equal(h.api.crosswordPushStatus(h.state), 'scheduled')
   for (const job of h.jobs) {
@@ -124,12 +127,12 @@ test('Hobby-compatible relays keep every delay under seven days without sending 
   const result = await h.api.deliverCrosswordPush(h.jobs[0].body, early)
   assert.equal(result.relayed, true)
   assert.equal(h.jobs.length, count + 1)
-  assert.equal(h.pushes.length, 0)
-  assert.equal(h.state.pushSent, undefined)
+  assert.equal(h.pushes.length, 1, 'only the immediate start-date announcement was sent')
+  assert.ok(h.state.pushSent[opening].announced)
 })
 
-test('local/preview environments, missing credentials and unscheduled games never publish', async () => {
-  for (const options of [{ env: '' }, { env: 'preview' }, { token: '' }]) {
+test('local/preview environments and unscheduled games never publish; missing QStash still allows immediate announcements', async () => {
+  for (const options of [{ env: '' }, { env: 'preview' }]) {
     const h = setup(options)
     await h.api.scheduleCrosswordPushes(h.state, new Date(time - 2 * hour))
     await h.api.deliverCrosswordPush({ opensAt: opening, kind: 'opened' }, new Date(time))
@@ -141,12 +144,21 @@ test('local/preview environments, missing credentials and unscheduled games neve
   h.state.opensAt = null
   assert.equal(await h.api.scheduleCrosswordPushes(h.state), 'unscheduled')
   assert.equal(h.jobs.length, 0)
+  const noQueue = setup({ token: '' })
+  assert.equal(
+    await noQueue.api.scheduleCrosswordPushes(noQueue.state, new Date(time - 2 * hour)),
+    'not-configured',
+  )
+  assert.equal(noQueue.jobs.length, 0)
+  assert.equal(noQueue.pushes.length, 1)
+  assert.equal(noQueue.api.crosswordPushAuthorized('anything'), false)
 })
 
 test('each stage broadcasts once under concurrent callbacks, with separate destinations', async () => {
   const h = setup()
   h.publicSubs.push(sub('anonymous'))
   for (const [kind, now] of [
+    ['day-before', time - 24 * hour],
     ['reminder', time - hour],
     ['opened', time],
   ]) {
@@ -156,9 +168,10 @@ test('each stage broadcasts once under concurrent callbacks, with separate desti
       ),
     )
   }
-  assert.equal(h.pushes.length, 2)
+  assert.equal(h.pushes.length, 3)
   assert.equal(h.pushes[0].message.url, '/spil/oevrige')
-  assert.equal(h.pushes[1].message.url, '/spil/krydsord')
+  assert.equal(h.pushes[1].message.url, '/spil/oevrige')
+  assert.equal(h.pushes[2].message.url, '/spil/krydsord')
   assert.notEqual(h.pushes[0].message.tag, h.pushes[1].message.tag)
 })
 
@@ -267,4 +280,103 @@ test('invalid callbacks and excessively late opening messages never create jobs 
   assert.equal(h.pushes.length, 0)
   assert.equal(h.jobs.length, 0)
   assert.equal(h.state.pushSent, undefined)
+})
+
+test('start announcements show Danish weekday/date/time, deduplicate saves and allow a new future date', async () => {
+  const h = setup()
+  h.publicSubs.push(sub('subscriber'))
+  const before = new Date(time - 48 * hour)
+  await Promise.all(
+    Array.from({ length: 12 }, () =>
+      h.api.announceCrosswordOpening(structuredClone(h.state), before),
+    ),
+  )
+  assert.equal(h.pushes.length, 1)
+  assert.match(h.pushes[0].message.body, /tirsdag.*1\. december 2026 kl\. 20:00/)
+  assert.match(h.pushes[0].message.body, /1\.000 bananer/)
+  assert.equal(h.pushes[0].message.url, '/spil/oevrige')
+  assert.match(h.api.crosswordOpeningLabel('2027-07-01T18:00:00.000Z'), /kl\. 20:00$/)
+  const original = h.pushes[0].message.tag
+  h.state.opensAt = new Date(time + 24 * hour).toISOString()
+  await h.api.announceCrosswordOpening(h.state, before)
+  assert.equal(h.pushes.length, 2)
+  assert.notEqual(h.pushes[1].message.tag, original)
+  assert.match(h.pushes[1].message.body, /onsdag.*2\. december/)
+  await h.api.announceCrosswordOpening(h.state, new Date(time + 48 * hour))
+  assert.equal(h.pushes.length, 2)
+})
+
+test('announcements cannot send a superseded or cancelled date after recipient lookup', async () => {
+  for (const next of [null, new Date(time + hour).toISOString()]) {
+    const h = setup()
+    const candidate = structuredClone(h.state)
+    h.duringLookup(() => {
+      h.state.opensAt = next
+    })
+    await h.api.announceCrosswordOpening(candidate, new Date(time - 48 * hour))
+    assert.equal(h.pushes.length, 0)
+    assert.equal(h.state.pushSent, undefined)
+  }
+})
+
+test('24-hour reminders expire after an hour, skip short notice and stop after a winner', async () => {
+  const h = setup()
+  await h.api.deliverCrosswordPush(
+    { opensAt: opening, kind: 'day-before' },
+    new Date(time - 23 * hour + 1),
+  )
+  assert.equal(h.pushes.length, 0)
+  await h.api.scheduleCrosswordPushes(h.state, new Date(time - 2 * hour))
+  assert.deepEqual(
+    h.jobs.map((j) => j.body.kind),
+    ['reminder', 'opened'],
+  )
+  const count = h.pushes.length
+  h.state.winner = { name: 'Nicole', at: opening }
+  for (const [kind, stamp] of [
+    ['day-before', time - 24 * hour],
+    ['reminder', time - hour],
+    ['opened', time],
+  ])
+    await h.api.deliverCrosswordPush({ opensAt: opening, kind }, new Date(stamp))
+  assert.equal(h.pushes.length, count)
+})
+
+test('winner announcement is once globally, respects preferences and works without QStash', async () => {
+  const h = setup({ token: '' })
+  h.state.winner = { name: 'Nicole', at: opening }
+  h.publicSubs.push(sub('member'), sub('muted'), sub('guest'))
+  h.users.push({ name: 'Nicole', devices: { a: { push: sub('member') } } })
+  h.prefs.muted = { crossword: false }
+  await Promise.all(
+    Array.from({ length: 12 }, () =>
+      h.api.announceCrosswordWinner(structuredClone(h.state), new Date(time)),
+    ),
+  )
+  assert.equal(h.pushes.length, 1)
+  assert.deepEqual(Array.from(h.pushes[0].subs, (s) => s.endpoint).sort(), ['guest', 'member'])
+  assert.match(h.pushes[0].message.body, /Nicole.*1\.000 bananer/)
+  assert.match(h.pushes[0].message.body, /stadig løse/)
+  assert.equal(h.pushes[0].message.url, '/spil/krydsord')
+  assert.equal(h.state.winnerPushSentAt, opening)
+  for (const env of ['', 'preview']) {
+    const local = setup({ env })
+    local.state.winner = h.state.winner
+    await local.api.announceCrosswordWinner(local.state, new Date(time))
+    assert.equal(local.pushes.length, 0)
+  }
+})
+
+test('failed winner lookup is retryable and cannot fail a successful solution response', async () => {
+  const h = setup()
+  h.state.winner = { name: 'Nicole', at: opening }
+  h.failLookup(true)
+  await h.api.notifyCrosswordWinnerLater({}, h.state)
+  assert.equal(h.state.winnerPushSentAt, undefined)
+  h.failLookup(false)
+  const jobs = []
+  await h.api.notifyCrosswordWinnerLater({ waitUntil: (job) => jobs.push(job) }, h.state)
+  await Promise.all(jobs)
+  assert.equal(h.pushes.length, 1)
+  assert.ok(h.state.winnerPushSentAt)
 })

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { profileFrame } from '../../shared/utils/profile-frames'
 // Profilbillede eller forbogstav. Størrelse, form og farve kommer fra forælderens
 // klasse (fx class="avatar"), så den passer ind, hvor forbogstavet sad før.
 const props = defineProps<{ name: string }>()
 const { avatarFor, frameFor } = useUsers()
 const src = computed(() => avatarFor(props.name))
+const frame = computed(() => profileFrame(frameFor(props.name)))
 const failed = ref(false)
 watch(src, () => {
   failed.value = false
@@ -13,7 +15,7 @@ watch(src, () => {
 <template>
   <span
     class="user-avatar"
-    :class="{ photo: src && !failed, framed: !!frameFor(name) }"
+    :class="{ photo: src && !failed, framed: !!frame }"
   >
     <img
       v-if="src && !failed"
@@ -24,10 +26,10 @@ watch(src, () => {
     />
     <template v-else>{{ name[0] }}</template>
     <img
-      v-if="frameFor(name)"
+      v-if="frame"
       class="avatar-frame"
-      src="/games/parcels/exclusive-frame.webp"
-      alt="Eksklusiv juleprofilramme"
+      :src="frame.image"
+      :alt="frame.name"
     />
   </span>
 </template>

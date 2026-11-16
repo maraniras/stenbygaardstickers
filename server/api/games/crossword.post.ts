@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
     submitCrossword(state, user.name, body?.answers),
   )
   await settleCrosswordWinner(state)
+  await notifyCrosswordWinnerLater(event, state)
   if (correct && state.winner?.name === user.name) await syncBadgesLater(event, [user.name])
   return { correct, view: crosswordView(state, user.name) }
 })

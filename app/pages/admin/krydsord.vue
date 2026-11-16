@@ -8,10 +8,10 @@ const pushMessage = computed(() => {
   const messages: Record<CrosswordPushStatus, string> = {
     development: 'Planlagte pushbeskeder sendes kun fra drift, ikke fra lokal test eller dev.',
     'not-configured':
-      'Push er ikke sat op endnu: tilføj QSTASH_TOKEN i Vercel og gem tidspunktet igen.',
+      'Påmindelser mangler opsætning: tilføj QSTASH_TOKEN i Vercel og gem tidspunktet igen. Startdato og vinder kan stadig annonceres.',
     unscheduled: 'Vælg et tidspunkt for at planlægge pushbeskeder.',
     scheduled:
-      'Push er planlagt: én time før start og ved åbning. Hvis der var under en time til start, sendes kun åbningsbeskeden.',
+      'Startdatoen annonceres ved gemning. Påmindelser er planlagt 24 timer og én time før start samt ved åbning. Tidspunkter, der allerede er passeret, springes over. Vinderen annonceres, når krydsordet løses.',
     failed: 'Tidspunktet er gemt, men push kunne ikke planlægges. Prøv at gemme tidspunktet igen.',
     pending: 'Push er ikke planlagt for dette tidspunkt endnu. Gem tidspunktet igen.',
   }

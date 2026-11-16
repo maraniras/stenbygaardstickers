@@ -105,9 +105,13 @@ export function createAdventDraw(
     'cycling-bottle',
     'faxe-kondi',
     'faxe-kondi',
+    'juleskum',
     'santa',
   ] as AdventReward[]) {
-    const pool = eligible.filter((n) => reward !== 'cycling-bottle' || nameKey(n) !== 'emil')
+    const pool =
+      reward === 'cycling-bottle'
+        ? participants.filter((n) => !['tobias frost', 'emil'].includes(nameKey(n)))
+        : eligible
     if (!pool.length) continue
     awards.push({
       reward,
@@ -119,6 +123,13 @@ export function createAdventDraw(
   const cakePool = participants.filter((name) => ['ida', 'marc'].includes(nameKey(name)))
   if (cakePool.length)
     awards.push({ reward: 'cake', winner: cakePool[random(cakePool.length)]!, day: 10 + random(9) })
+  // A separate cake prize reserved for Anna; never changes the Ida/Marc draw.
+  const anna = participants.find((name) => nameKey(name) === 'anna')
+  if (anna) awards.push({ reward: 'cake', winner: anna, day: 10 + random(9) })
+  // Named Vampiri prizes still require an account created before the roster cutoff.
+  if (anna) awards.push({ reward: 'vampiri', winner: anna, day: 7 + random(10) })
+  const norsk = participants.find((name) => nameKey(name) === 'norsk')
+  if (norsk) awards.push({ reward: 'vampiri', winner: norsk, day: 18 })
   const draw: AdventDraw = {
     year: ADVENT_YEAR,
     createdAt: now.toISOString(),

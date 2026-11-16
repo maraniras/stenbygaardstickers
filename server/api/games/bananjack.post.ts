@@ -21,9 +21,11 @@ export default defineEventHandler(async (event) => {
   )
     throw createError({ statusCode: 400, statusMessage: 'Ugyldigt træk.' })
   const context = await economyContext()
+  const shuffleMode = body.action === 'deal' ? await readJackShuffleMode() : undefined
   const { record } = await mutateEconomy(user.name, (r) => {
     settleEconomy(r, user.name, context)
-    if (body.action === 'deal') dealJack(r, body.id, body.previous, body.bet)
+    if (body.action === 'deal')
+      dealJack(r, body.id, body.previous, body.bet, undefined, new Date(), shuffleMode)
     else actJack(r, body.id, body.revision, body.action as JackAction)
     settleEconomy(r, user.name, context)
   })

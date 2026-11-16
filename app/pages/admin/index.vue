@@ -172,6 +172,7 @@ function submitted(s: StoredSticker) {
       </NuxtLink>
 
       <AdminPush />
+      <AdminJackSettings />
       <NuxtLink
         class="chip advent-link"
         to="/admin/julekalender"

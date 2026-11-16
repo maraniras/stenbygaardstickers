@@ -108,7 +108,7 @@ export async function mutateParcels<T>(
           if (!game.players.includes(name)) {
             game.players.push(name)
           }
-        while (game.parcels.length < parcelCount(game.players.length)) {
+        while (!game.prizesAssigned && game.parcels.length < parcelCount(game.players.length)) {
           game.parcels.push({
             id: `p${game.parcels.length + 1}`,
             style: game.parcels.length % 8,
@@ -201,7 +201,13 @@ export async function settleParcelPrizes(game: ParcelGame) {
     })
     if (reward.kind === 'frame')
       await updateUser(nameKey(owner), (u) => {
-        u.frame = `parcel-${game.year}`
+        const id = `parcel-${game.year}`
+        const owned = new Set([...(u.ownedFrames ?? []), ...(u.frame ? [u.frame] : [])])
+        if (!owned.has(id)) {
+          owned.add(id)
+          if (!u.frame) u.frame = id
+        }
+        u.ownedFrames = [...owned]
       })
     const committed = await mutateParcels(game.year, [], (board) => {
       const p = board.parcels.find((p) => p.id === parcel.id)

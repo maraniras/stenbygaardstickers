@@ -8,6 +8,9 @@ export type ParcelRewardKind =
   | 'golden'
   | 'cake'
   | 'faxe-kondi'
+  | 'vampiri'
+  | 'juleskum'
+  | 'white-wine'
 export interface ParcelReward {
   kind: ParcelRewardKind
   amount: number

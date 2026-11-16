@@ -1,6 +1,22 @@
 import type { AdventOpening, AdventPrize, AdventReward } from '../types/advent'
 
 export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
+  juleskum: {
+    kind: 'physical',
+    reward: 'juleskum',
+    amount: 50,
+    title: 'Du har vundet juleskum!',
+    description: 'En rigtig pose juleskum og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
+  vampiri: {
+    kind: 'physical',
+    reward: 'vampiri',
+    amount: 50,
+    title: 'Du har vundet Haribo Vampiri!',
+    description: 'En rigtig pose Haribo Vampiri og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
   cake: {
     kind: 'physical',
     reward: 'cake',
@@ -56,22 +72,25 @@ export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
   'red-wine': {
     kind: 'physical',
     reward: 'red-wine',
+    amount: 50,
     title: 'Du har vundet rødvin!',
-    description: 'En rigtig flaske rødvin venter på dig.',
+    description: 'En rigtig flaske rødvin og 50 bananer.',
     instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
   },
   'white-wine': {
     kind: 'physical',
     reward: 'white-wine',
+    amount: 50,
     title: 'Du har vundet hvidvin!',
-    description: 'En rigtig flaske hvidvin venter på dig.',
+    description: 'En rigtig flaske hvidvin og 50 bananer.',
     instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
   },
   'cycling-bottle': {
     kind: 'physical',
     reward: 'cycling-bottle',
+    amount: 50,
     title: 'En cykeldrikkedunk!',
-    description: 'En rigtig drikkedunk til din næste cykeltur.',
+    description: 'En rigtig drikkedunk til din næste cykeltur og 50 bananer.',
     instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
   },
   santa: {
@@ -97,6 +116,8 @@ export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
   },
 }
 export const ADVENT_REWARD_ICONS: Record<AdventReward, string> = {
+  juleskum: 'juleskum-christmas-v1',
+  vampiri: 'vampiri-christmas-v1',
   cake: 'traestammer-christmas-v1',
   'faxe-kondi': 'faxe-kondi-christmas-v1',
   'banana-single': 'banana-single-christmas-v2',
@@ -130,9 +151,9 @@ export function previewAdventOpening(day: number): AdventOpening {
     'friend-gift',
     'self-gift',
     'banana-single',
-    'banana-small',
+    'vampiri',
     'elf',
-    'banana-large',
+    'juleskum',
     'cake',
     'friend-gift',
     'self-gift',

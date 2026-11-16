@@ -890,7 +890,7 @@ const SINGLE_POINTS: Record<string, number> = {
   'parcel-empty': 1,
   'parcel-sixes': 1,
   'parcel-three': 1,
-  'parcel-five': 1,
+  'parcel-five': 4,
   'boxes-hattrick': 1,
   'boxes-elves': 1,
   'boxes-miv': 1,

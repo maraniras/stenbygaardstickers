@@ -3,11 +3,14 @@ import type { ParcelReward } from '../types/parcel-game'
 /** Counts are public; the random mapping from contents to wrapping stays server-only. */
 export function parcelRewardPool(count: number): ParcelReward[] {
   if (!count) return []
-  if (count < 8) throw new Error('Der skal være mindst fire deltagere.')
+  if (count < 10) throw new Error('Der skal være mindst fire deltagere.')
   const pool: ParcelReward[] = [
     { kind: 'mix-max', amount: 50, title: 'Mix Max' },
     { kind: 'cake', amount: 50, title: 'Træstammer' },
     { kind: 'faxe-kondi', amount: 50, title: 'Faxe Kondi' },
+    { kind: 'vampiri', amount: 50, title: 'Haribo Vampiri' },
+    { kind: 'juleskum', amount: 50, title: 'Juleskum' },
+    { kind: 'white-wine', amount: 50, title: 'Hvidvin' },
     { kind: 'frame', amount: 0, title: 'Eksklusiv juleprofilramme' },
     { kind: 'golden', amount: 500, title: 'Den gyldne gave' },
     ...Array.from({ length: Math.max(2, Math.ceil(count * 0.15)) }, () => ({
@@ -16,14 +19,14 @@ export function parcelRewardPool(count: number): ParcelReward[] {
       title: 'Drillenissens gave',
     })),
   ]
-  if (count >= 12)
+  if (count >= 13)
     pool.push(
       { kind: 'bottle', amount: 50, title: 'Drikkedunk' },
       { kind: 'bottle', amount: 50, title: 'Drikkedunk' },
       { kind: 'snowglobe', amount: 50, title: 'RTA-snekugle' },
     )
-  // Two gifts per person: 24 gifts means at least twelve participants.
-  if (count >= 24) pool.push({ kind: 'mix-max', amount: 50, title: 'Mix Max' })
+  // 2.5 gifts per person: 30 gifts means at least twelve participants.
+  if (count >= 30) pool.push({ kind: 'mix-max', amount: 50, title: 'Mix Max' })
   const left = count - pool.length
   const amounts = [25, 50, 100, 150, 250],
     weights = [3, 3, 2, 2, 2]
@@ -50,8 +53,20 @@ export function parcelRewardPool(count: number): ParcelReward[] {
   return pool
 }
 export const isParcelPhysical = (reward: ParcelReward) =>
-  ['mix-max', 'bottle', 'snowglobe', 'cake', 'faxe-kondi'].includes(reward.kind)
+  [
+    'mix-max',
+    'bottle',
+    'snowglobe',
+    'cake',
+    'faxe-kondi',
+    'vampiri',
+    'juleskum',
+    'white-wine',
+  ].includes(reward.kind)
 export function parcelRewardIcon(reward: ParcelReward) {
+  if (reward.kind === 'juleskum') return '/games/advent/juleskum-christmas-v1.webp'
+  if (reward.kind === 'white-wine') return '/games/advent/white-wine-christmas-v2.webp'
+  if (reward.kind === 'vampiri') return '/games/advent/vampiri-christmas-v1.webp'
   if (reward.kind === 'faxe-kondi') return '/games/advent/faxe-kondi-christmas-v1.webp'
   if (reward.kind === 'cake') return '/games/parcels/traestammer.webp'
   if (reward.kind === 'golden') return '/games/parcels/golden-gift.webp'

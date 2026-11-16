@@ -1,4 +1,5 @@
 export type JackAction = 'hit' | 'stand' | 'double' | 'split'
+export type JackShuffleMode = 'continuous' | 'per-round'
 export interface JackHand {
   cards: number[]
   bet: number
@@ -13,6 +14,7 @@ export interface JackGame {
   sequence: number
   revision: number
   deck: number[]
+  shuffleMode?: JackShuffleMode
   dealer: number[]
   hands: JackHand[]
   active: number

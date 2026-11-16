@@ -6,7 +6,7 @@ defineProps<{ stats: RouletteStats }>()
   <CasinoProfileStats
     v-if="stats.rounds > 0"
     title="Roulette"
-    image="/badges/banana-baron.webp"
+    image="/badges/custom/roulette-rounds.webp"
     :summary="`${stats.rounds.toLocaleString('da-DK')} runder · ${stats.wins.toLocaleString('da-DK')} med overskud`"
     :rows="[
       { label: 'Runder', value: stats.rounds },

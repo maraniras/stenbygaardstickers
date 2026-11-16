@@ -11,6 +11,24 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.8',
+    date: '2026-11-16',
+    push: {
+      title: '🖼️ Profilrammer og nyt i shoppen',
+      body: 'Prøv otte profilrammer i shoppen, vælg dine egne i indstillingerne, og se nyhederne i Bananjack og pakkelegen.',
+      url: '/nyheder',
+    },
+    notes: [
+      'Profilrammer: Vælg mellem dine ejede rammer i indstillingerne, og giv dit profilbillede et personligt udtryk',
+      'Kig indenfor i shoppen: Forhåndsvis otte forskellige profilrammer på dit eget profilbillede. Køb åbner senere',
+      'Mere autentisk Bananjack: Efter utallige klager fra Hr. Norsk fortsætter kortbunken nu mellem dine runder og blandes igen, når mindst 75 % af kortene er brugt',
+      'Flere gaver i pakkelegen: Der er nu 2,5 gave pr. deltager, rundet op. Pakkelegs Champ 2026 giver desuden fire point',
+      'Flere beskeder om krydsordet: Få besked, når starten bliver annonceret, 24 timer og én time før åbning, ved åbning og når vinderen er fundet',
+      'Roulette-statistikken på profilen har fået sit eget rouletteikon',
+      'Mindre fejlrettelser og forbedringer af brugeroplevelsen',
+    ],
+  },
+  {
     version: '2.7.1',
     date: '2026-11-15',
     push: {

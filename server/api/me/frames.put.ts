@@ -1,0 +1,15 @@
+export default defineEventHandler(async (event) => {
+  setHeader(event, 'Cache-Control', 'no-store')
+  const found = await userForToken(readToken(event))
+  if (!found) throw createError({ statusCode: 401, statusMessage: 'Ikke logget ind' })
+  const body = await readBody(event)
+  if (!body || !(body.frame === null || typeof body.frame === 'string'))
+    throw createError({ statusCode: 400, statusMessage: 'Vælg en profilramme eller ingen ramme.' })
+  const user = await updateUser(found.key, (current) => {
+    if (!current.devices[found.hash])
+      throw createError({ statusCode: 401, statusMessage: 'Ikke logget ind' })
+    equipProfileFrame(current, body.frame)
+  })
+  if (!user) throw createError({ statusCode: 401, statusMessage: 'Brugeren findes ikke længere' })
+  return frameInventory(user)
+})
