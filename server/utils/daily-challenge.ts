@@ -24,7 +24,7 @@ export async function gameSecret() {
   return secretPromise
 }
 export async function gameBackup() {
-  return { secret: await gameSecret() }
+  return { secret: await gameSecret(), wordle: await readWordleHistory() }
 }
 /** One shared, persisted amount per 04:00 Danish game day. Independent of city choice. */
 export async function dailyWheelJackpot(day: string): Promise<number> {

@@ -1,7 +1,23 @@
 <script setup lang="ts">
-useHead({ title: 'Stickers · Stenbygaard Stickers' })
-const sort = ref<'date' | 'far' | 'stars'>('date')
-const { stickers, people, stats } = useStickers()
+definePageMeta({ keepalive: true })
+useHead({ title: 'Udforsk · Stenbygaard Stickers' })
+const route = useRoute()
+const router = useRouter()
+const sort = useState<'date' | 'far' | 'stars'>('explore-sort', () => 'date')
+const { stickers, stickersBy, people } = useStickers()
+const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
+const country = computed(() => (typeof route.query.country === 'string' ? route.query.country : ''))
+const visible = computed(() =>
+  (person.value ? stickersBy(person.value) : stickers.value).filter(
+    (s) => !country.value || s.countryCode === country.value,
+  ),
+)
+const stats = computed(() => statsFor(visible.value))
+const allPeople = ref(false)
+function filterPerson(name = '') {
+  const { by: _, ...query } = route.query
+  router.replace({ path: '/liste', query: name ? { ...query, by: name } : query })
+}
 const { ratings, enabled } = useRatings()
 const { commentStats } = useCommentStats()
 const { people: economy } = useEconomy()
@@ -20,22 +36,17 @@ const levels = computed(() =>
     ]),
   ),
 )
-const { show: showInstall } = useInstall()
-const standalone = ref(true)
-onMounted(() => {
-  standalone.value = isStandalone()
-})
 
 const groups = computed(() => {
   if (sort.value === 'far') {
-    return [{ label: '', items: [...stickers.value].sort((a, b) => b.distanceKm - a.distanceKm) }]
+    return [{ label: '', items: [...visible.value].sort((a, b) => b.distanceKm - a.distanceKm) }]
   }
   if (sort.value === 'stars') {
     const avg = (s: Sticker) => ratings.value[s.id]?.avg ?? 0
-    return [{ label: '', items: [...stickers.value].sort((a, b) => avg(b) - avg(a)) }]
+    return [{ label: '', items: [...visible.value].sort((a, b) => avg(b) - avg(a)) }]
   }
   const out: { label: string; items: Sticker[] }[] = []
-  for (const s of stickers.value) {
+  for (const s of visible.value) {
     const label = new Date(`${s.date}T12:00:00`).toLocaleDateString('da-DK', {
       month: 'long',
       year: 'numeric',
@@ -50,16 +61,20 @@ const groups = computed(() => {
 <template>
   <div class="page">
     <section aria-label="Stickeroversigt">
-      <PageHeader title="Stickers">
+      <PageHeader title="Udforsk">
         <template #actions>
-          <NuxtLink
-            class="add-sticker"
-            to="/upload"
-            >＋ Tilføj</NuxtLink
-          >
           <NotifyButton />
         </template>
       </PageHeader>
+      <ExploreToolbar view="list" />
+      <button
+        v-if="person"
+        class="chip selected-person"
+        @click="filterPerson()"
+      >
+        Sat op af {{ person }} <span aria-hidden="true">×</span
+        ><span class="sr-only">Fjern filter</span>
+      </button>
       <div class="grid">
         <div class="stat">
           <b>{{ stats.count }}</b
@@ -98,16 +113,13 @@ const groups = computed(() => {
         <summary>
           Sat op af {{ people.length }} {{ people.length === 1 ? 'person' : 'personer' }}
         </summary>
-        <div class="people-heading">
-          <span class="eyebrow">Sat op af</span
-          ><NuxtLink to="/rangliste">Alle profiler og rangliste ›</NuxtLink>
-        </div>
         <div class="row">
-          <NuxtLink
-            v-for="p in people.slice(0, 5)"
+          <button
+            v-for="p in allPeople ? people : people.slice(0, 5)"
             :key="p.name"
             class="chip person"
-            :to="personUrl(p.name)"
+            :aria-pressed="person === p.name"
+            @click="filterPerson(person === p.name ? '' : p.name)"
           >
             <UserAvatar
               class="avatar"
@@ -120,7 +132,15 @@ const groups = computed(() => {
               :size="24"
               :title="`Level ${levels[p.name]!.level} · ${levels[p.name]!.title}`"
             />
-          </NuxtLink>
+          </button>
+          <button
+            v-if="people.length > 5"
+            class="chip more-people"
+            :aria-expanded="allPeople"
+            @click="allPeople = !allPeople"
+          >
+            {{ allPeople ? 'Vis færre' : `Vis alle ${people.length}` }}
+          </button>
         </div>
       </details>
 
@@ -155,10 +175,10 @@ const groups = computed(() => {
     </section>
 
     <p
-      v-if="!stickers.length"
+      v-if="!visible.length"
       class="empty"
     >
-      Ingen stickers endnu.
+      {{ person || country ? 'Ingen stickers matcher filtrene.' : 'Ingen stickers endnu.' }}
     </p>
 
     <section
@@ -180,41 +200,30 @@ const groups = computed(() => {
         />
       </div>
     </section>
-
-    <div class="footer-links">
-      <NuxtLink
-        class="add-link"
-        to="/nyheder"
-        >Hvad er nyt</NuxtLink
-      >
-      <button
-        v-if="!standalone"
-        class="add-link"
-        @click="showInstall"
-      >
-        Installer appen
-      </button>
-      <NuxtLink
-        class="add-link"
-        to="/admin"
-        >Admin</NuxtLink
-      >
-    </div>
   </div>
 </template>
 
 <style scoped>
-.add-sticker {
-  display: inline-flex;
+.selected-person {
+  margin-top: 12px;
+  background: var(--ink);
+  color: #fff;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.person[aria-pressed='true'] {
+  outline: 2px solid var(--accent);
+}
+.more-people {
   min-height: 44px;
-  align-items: center;
-  padding: 0 12px;
-  border-radius: 14px;
-  background: var(--surface);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 700;
+  background: var(--surface-2);
 }
 .people summary {
   min-height: 44px;
@@ -224,22 +233,6 @@ const groups = computed(() => {
   font-size: 12px;
 }
 
-.people-heading {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-.people-heading a {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-  text-decoration: none;
-}
 .page {
   max-width: 640px;
   margin: 0 auto;
@@ -379,23 +372,5 @@ const groups = computed(() => {
   display: grid;
   gap: 14px;
   margin-top: 14px;
-}
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 32px 0 8px;
-}
-.add-link {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
 }
 </style>

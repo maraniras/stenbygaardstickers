@@ -3,8 +3,21 @@ useHead({ title: 'Daglige spil · Stenbygaard Stickers' })
 const { season: christmasSeason } = useChristmasGames()
 const { name, ready } = useUser()
 const { state, error, loading, reload } = useEconomy()
-const cityDone = computed(() => Boolean(state.value?.city.finished))
+const cityDone = computed(() =>
+  Boolean(
+    state.value?.city.finished ||
+    state.value?.city.won ||
+    (state.value?.city.guesses.length ?? 0) >= 5,
+  ),
+)
 const wheelDone = computed(() => Boolean(state.value?.wheel))
+const wordleDone = computed(() =>
+  Boolean(
+    state.value?.wordle?.finished ||
+    state.value?.wordle?.won ||
+    (state.value?.wordle?.guesses.length ?? 0) >= 6,
+  ),
+)
 </script>
 <template>
   <div class="daily-page">
@@ -13,14 +26,10 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
       description="En lille pause. Måske flere bananer."
     >
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="state"
-          class="page-balance"
-          to="/spil/bananer"
-          aria-label="Åbn dit bananlager"
-          >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="state.wallet.balance"
+      /></template>
     </PageHeader>
     <GameSectionNav
       section="daily"
@@ -39,7 +48,9 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
         <path d="M12 7v5l3 2" />
       </svg>
       <div>
-        <b>{{ cityDone && wheelDone ? 'Du er med igen i morgen' : 'En ny chance hver dag' }}</b
+        <b>{{
+          cityDone && wheelDone && wordleDone ? 'Du er med igen i morgen' : 'En ny chance hver dag'
+        }}</b
         ><span>Nye spil kl. 04.00 dansk tid</span>
       </div>
     </div>
@@ -73,7 +84,60 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
       Henter dine bananer og dagens spil…
     </p>
     <NuxtLink
+      class="wordle-card game-card"
+      :class="{ 'is-complete': wordleDone }"
+      to="/spil/wordle"
+      aria-label="Dagens Wordle"
+    >
+      <div
+        class="wordle-art"
+        aria-hidden="true"
+      >
+        <span
+          v-for="(letter, index) in ['O', 'R', 'D', 'E', 'T']"
+          :key="index"
+          :class="{ yellow: index === 1, grey: index === 3 }"
+          >{{ letter }}</span
+        >
+      </div>
+      <div class="card-body">
+        <h2>Wordle</h2>
+        <GameStatus
+          :done="wordleDone"
+          :started="!!state?.wordle?.guesses.length"
+          :loading="!ready || (!!name && !state)"
+        />
+        <p>
+          {{
+            wordleDone
+              ? state?.wordle?.won
+                ? `Dagens ord er løst · +${state.wordle.reward} 🍌`
+                : 'Seks forsøg brugt. Et nyt ord venter i morgen.'
+              : 'Et ord. Fem bogstaver. Måske en reference?'
+          }}
+        </p>
+        <div class="card-bottom">
+          <span class="game-meta">{{
+            state?.wordle?.guesses.length
+              ? `${state.wordle.guesses.length}/6 forsøg`
+              : 'Seks forsøg · Op til 50 🍌'
+          }}</span
+          ><span class="game-link"
+            >{{
+              wordleDone
+                ? 'Se resultat'
+                : state?.wordle?.guesses.length
+                  ? 'Fortsæt'
+                  : 'Gæt dagens ord'
+            }}
+            →</span
+          >
+        </div>
+      </div>
+    </NuxtLink>
+    <NuxtLink
       class="game-card city-card"
+      :class="{ 'is-complete': cityDone }"
       to="/spil/byen"
       aria-label="Emil er faret vild"
       ><div class="city-visual">
@@ -84,6 +148,11 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
       </div>
       <div class="card-body">
         <h2>Emil er faret vild</h2>
+        <GameStatus
+          :done="cityDone"
+          :started="!!state?.city.guesses.length"
+          :loading="!ready || (!!name && !state)"
+        />
         <p>
           {{
             cityDone
@@ -108,10 +177,15 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
     >
     <NuxtLink
       class="wheel-card game-card"
+      :class="{ 'is-complete': wheelDone }"
       to="/spil/hjulet"
       aria-label="Dagens lykkehjul"
       ><div class="wheel-copy">
         <span class="wheel-kicker">Lidt held skal man have</span>
+        <GameStatus
+          :done="wheelDone"
+          :loading="!ready || (!!name && !state)"
+        />
         <h2>Dagens<br />lykkehjul</h2>
         <p>
           {{
@@ -143,17 +217,54 @@ const wheelDone = computed(() => Boolean(state.value?.wheel))
         {{ state.wallet.stats.wheelStreak === 1 ? 'dags' : 'dages' }} hjulstime</span
       >
     </div>
-    <NuxtLink
-      v-if="name"
-      class="wallet-link"
-      to="/spil/bananer"
-      >Dit bananlager og dine belønninger <span aria-hidden="true">↗</span></NuxtLink
-    >
   </div>
 </template>
 <style scoped>
+.wordle-card {
+  display: block;
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+}
+.wordle-art {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface-2));
+}
+.wordle-art span {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  aspect-ratio: 1;
+  border-radius: 9px;
+  background: #387b57;
+  color: white;
+  font-size: 25px;
+  font-weight: 850;
+  transform: rotate(-4deg);
+  box-shadow: var(--shadow-sm);
+}
+.wordle-art .yellow {
+  background: #a27924;
+  transform: rotate(5deg);
+}
+.wordle-art .grey {
+  background: #646975;
+  transform: rotate(4deg);
+}
 .game-card {
   margin-bottom: 16px;
+}
+.is-complete {
+  opacity: 0.78;
+}
+.is-complete:hover,
+.is-complete:focus-visible {
+  opacity: 1;
 }
 .daily-page {
   max-width: 480px;
@@ -301,16 +412,6 @@ h2 {
   padding: 20px 0 0;
   color: var(--muted);
   font-size: 11px;
-}
-.wallet-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 48px;
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
 }
 .login-box {
   margin-bottom: 16px;

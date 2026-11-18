@@ -63,8 +63,9 @@ const time = (at: string) =>
       <section class="earn">
         <h2>Sådan fylder du lageret</h2>
         <p>
-          <b>250 🍌</b> for en sticker i Danmark. <b>500–5.000 🍌</b> i udlandet efter afstand fra
-          Aalborg.
+          <b>250 🍌</b> pr. sticker i Danmark. Din første sticker i hvert andet land giver
+          <b>500–5.000 🍌</b> efter afstanden fra Aalborg. Derefter får du <b>250 🍌</b> pr. sticker
+          plus forskellen, hvis den slår din hidtidige afstandsbelønning i landet.
         </p>
         <p>
           Spil de daglige spil, og optjen badges. Belønningerne tilføjes automatisk — også for dine

@@ -3,6 +3,7 @@ import type { DailyStats } from '../types/economy'
 import { JACK_BADGE_REWARDS } from './jackBadges'
 import { SLOT_BADGE_REWARDS } from './slotBadges'
 import { ROULETTE_BADGE_REWARDS } from './roulette-badges'
+import { WORDLE_BADGE_REWARDS } from './wordle-badges'
 
 export const STARTING_BANANAS = 250
 export const CITY_REWARDS = [50, 40, 30, 20, 10]
@@ -41,6 +42,7 @@ export function dailyJackpotFor(ticket: number) {
   throw new Error('Jackpotfordelingen skal summere til 10000')
 }
 export const GAME_BADGE_REWARDS: Record<string, number[]> = {
+  ...WORDLE_BADGE_REWARDS,
   'parcel-five': [20],
   'roulette-colour-five': [50],
   'roulette-colour-ten': [150],
@@ -88,6 +90,12 @@ export function stickerBananas(countryCode: string, km: number) {
       return Math.round((y1! + ((distance - x1!) / (x2! - x1!)) * (y2! - y1!)) / 50) * 50
   }
   return 5000
+}
+/** Personal country record: first full reward, then 250 plus any record improvement. */
+export function stickerCountryBananas(countryCode: string, km: number, previousMax?: number) {
+  const base = stickerBananas(countryCode, km)
+  if (countryCode.toUpperCase() === 'DK' || previousMax === undefined) return base
+  return 250 + Math.max(0, base - previousMax)
 }
 export function wheelPrizeFor(ticket: number, jackpot = 500) {
   if (!DAILY_JACKPOTS.some((p) => p.value === jackpot)) throw new Error('Ugyldig jackpot')

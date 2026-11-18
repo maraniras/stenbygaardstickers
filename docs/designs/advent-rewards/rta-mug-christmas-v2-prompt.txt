@@ -1,0 +1,4 @@
+Tool: built-in image_gen, transparent image edit
+References: rta-mugs-christmas-v1.webp (style), supplied single RTA mug photo (product)
+
+undefined

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 useHead({ title: 'Julespil · Stenbygaard Stickers' })
 const { state } = useEconomy()
+const { name, ready } = useUser()
 const { now: calendarNow, season, parcelDates, parcelCampaign } = useChristmasGames()
 const calendarLink = resolveComponent('NuxtLink')
 const calendarVisible = computed(() => season.value.calendar)
@@ -16,14 +17,10 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
       description="Julehygge, nisser og gaver, der skifter hænder."
     >
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="state"
-          class="page-balance"
-          to="/spil/bananer"
-          aria-label="Åbn dit bananlager"
-          >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="state.wallet.balance"
+      /></template>
     </PageHeader>
     <GameSectionNav
       section="christmas"
@@ -42,7 +39,7 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
         to="/spil/pakkeleg"
         ><span aria-hidden="true">🎁 🎲</span>
         <div>
-          <small>TO SLAG · ÉT FÆLLES BORD</small>
+          <small>3 SLAG → 2 SLAG · ÉT FÆLLES BORD</small>
           <h2>Pakkeleg</h2>
           <p>
             {{
@@ -97,6 +94,11 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
         <div class="boxes-card-copy">
           <span class="boxes-kicker">12 BOKSE · 3 VALG</span>
           <h2>Dagens bokse</h2>
+          <GameStatus
+            :done="boxesDone"
+            :loading="!ready || (!!name && !state)"
+            :locked="!season.boxesOpen ? 'Åbner 20. november' : undefined"
+          />
           <p>
             {{
               !season.boxesOpen
@@ -232,7 +234,7 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
   border-radius: 22px;
   background:
     linear-gradient(90deg, #163d371a, #163d37ee),
-    url('/images/christmas-calendar-final-v3.webp') center 40% / cover;
+    url('/images/christmas-calendar-mixmax-v5.webp') center 40% / cover;
   color: #fff0cb;
   text-decoration: none;
 }

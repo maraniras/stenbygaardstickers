@@ -34,13 +34,10 @@ const net = computed(() =>
       compact
     >
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="balance !== null"
-          class="page-balance"
-          to="/spil/bananer"
-          >🍌 {{ balance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="balance"
+      /></template>
     </PageHeader>
     <div class="box-intro">
       <span>12 BOKSE · 3 VALG</span>

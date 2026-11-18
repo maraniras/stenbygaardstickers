@@ -7,7 +7,8 @@ useHead({ title: 'Hvad er nyt · Stenbygaard Stickers' })
   <div class="page">
     <PageHeader
       title="Hvad er nyt"
-      back-to="/liste"
+      back-to="/mig"
+      back-label="Indstillinger"
     />
 
     <section

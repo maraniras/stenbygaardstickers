@@ -8,9 +8,9 @@ const options: { key: Metric; label: string; unit: string }[] = [
   { key: 'countries', label: 'Lande', unit: 'lande' },
   { key: 'bananas', label: 'Bananer', unit: 'bananer' },
 ]
-const metric = ref<Metric>('points')
-const query = ref('')
-const registeredOnly = ref(false)
+const metric = useState<Metric>('people-metric', () => 'points')
+const query = useState('people-search', () => '')
+const registeredOnly = useState('people-registered', () => false)
 const busy = ref(false)
 const { name: me } = useUser()
 const { people: economies, reloadPeople } = useEconomy()

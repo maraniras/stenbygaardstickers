@@ -47,13 +47,10 @@ const {
     >
       <template #title>Banan<span class="game-title-accent">jack</span></template>
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="shownBalance !== null"
-          class="page-balance"
-          to="/spil/bananer"
-          >🍌 {{ shownBalance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="shownBalance"
+      /></template>
     </PageHeader>
     <div
       v-if="ready && !name"

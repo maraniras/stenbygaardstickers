@@ -4,6 +4,7 @@ defineProps<{
   christmasVisible: boolean
 }>()
 const { dailyReadyCount, christmasReadyCount } = useDailyAvailability()
+const { hasNew: christmasNew } = useChristmasDiscovery()
 </script>
 
 <template>
@@ -35,7 +36,11 @@ const { dailyReadyCount, christmasReadyCount } = useDailyAvailability()
       v-if="christmasVisible"
       to="/spil/jul"
       class="christmas-tab"
-      :class="{ active: section === 'christmas' }"
+      :class="{
+        active: section === 'christmas',
+        'has-new': christmasNew || christmasReadyCount > 0,
+      }"
+      :aria-label="christmasNew || christmasReadyCount > 0 ? 'Julespil · Nyt at prøve' : 'Julespil'"
       :aria-current="section === 'christmas' ? 'page' : undefined"
       ><svg
         class="christmas-trim"
@@ -179,6 +184,30 @@ a.active {
 }
 .christmas-bulbs {
   filter: drop-shadow(0 0 2px #fbc66f99);
+}
+.has-christmas .christmas-tab.has-new {
+  box-shadow:
+    inset 0 0 0 1px #e6b555b3,
+    0 0 13px #e6b55555;
+  background: linear-gradient(145deg, #34815c28, #e9b95f38), var(--surface);
+}
+.has-new .christmas-bulbs {
+  filter: drop-shadow(0 0 4px #ffc94b);
+  animation: christmas-new-glow 2.5s ease-in-out infinite alternate;
+}
+@keyframes christmas-new-glow {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px #ffc94b);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .has-new .christmas-bulbs {
+    animation: none;
+  }
 }
 .ready {
   display: grid;

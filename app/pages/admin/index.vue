@@ -48,7 +48,8 @@ function submitted(s: StoredSticker) {
   <div class="page">
     <PageHeader
       title="Admin"
-      back-to="/liste"
+      back-to="/mig"
+      back-label="Tilbage til indstillinger"
     >
       <template #actions>
         <button
@@ -184,6 +185,11 @@ function submitted(s: StoredSticker) {
         >Pakkeleg · præmier og udlevering →</NuxtLink
       >
       <AdminUsers />
+      <NuxtLink
+        class="chip advent-link"
+        to="/admin/julebeskeder"
+        >Julebeskeder · tidspunkter og status →</NuxtLink
+      >
       <NuxtLink
         class="chip advent-link"
         to="/admin/krydsord"

@@ -79,9 +79,15 @@ const personUrl = (name: string) => `/person/${encodeURIComponent(name)}`
 
 /** Sender til alle enheder, hvor brugeren har slået notifikationer til – hvis brugeren
  *  vil have den type */
-export async function notifyUser(name: string, message: PushMessage, type: NotifyType) {
+export async function notifyUser(
+  name: string,
+  message: PushMessage,
+  type: NotifyType,
+  activity = true,
+) {
   try {
     const found = await findUser(name)
+    if (found && activity) await saveActivity(found.key, [{ type, message }])
     if (found && wants(found.user.notify, type))
       await pushToUser(found.key, found.user, [{ type, message }])
   } catch (err) {
@@ -221,12 +227,14 @@ export async function syncBadges(names?: string[]) {
         for (const [k, at] of Object.entries(u.notifiedAt))
           if (now - Date.parse(at) > RESEND_MS) delete u.notifiedAt[k]
       })
-      if (updated)
+      if (updated) {
+        await saveActivity(key, out)
         await pushToUser(
           key,
           updated,
           out.filter((o) => wants(updated.notify, o.type)),
         )
+      }
     }
   } catch (err) {
     console.error('Kunne ikke tjekke badges', err)

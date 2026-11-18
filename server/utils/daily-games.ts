@@ -3,6 +3,8 @@ import type { EconomyRecord, DailyResponse, CityRun } from '../../shared/types/e
 import type { EconomyContext } from './economy'
 import { casinoDailyLimit } from './casino-limit'
 import { boxesSeason } from '../../shared/utils/boxes'
+import { wordleView } from './wordle'
+import { dailyWordleAnswer } from './wordle-draw'
 
 // Keep previously credited rewards readable under the current badge names.
 const renamedBadgeLabels: Record<string, string> = {
@@ -29,7 +31,11 @@ export async function dailyResponse(
   record: EconomyRecord,
   day = gameDay(),
 ): Promise<DailyResponse> {
-  const [challenge, wheelJackpot] = await Promise.all([dailyChallenge(day), dailyWheelJackpot(day)])
+  const [challenge, wheelJackpot, wordleAnswer] = await Promise.all([
+    dailyChallenge(day),
+    dailyWheelJackpot(day),
+    dailyWordleAnswer(day),
+  ])
   const city = record.days[day]?.city ?? emptyCityRun()
   const wallet = publicEconomy(record)
   // Return current streaks without removing the permanent best streak.
@@ -48,6 +54,7 @@ export async function dailyResponse(
         : 0,
   }
   return {
+    wordle: wordleView(record, day, wordleAnswer),
     casinoLimit: casinoDailyLimit(record),
     day,
     nextResetAt: season.active && season.endAt < resetAt ? season.endAt : resetAt,

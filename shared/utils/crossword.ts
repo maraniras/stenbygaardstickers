@@ -1,6 +1,11 @@
 import type { CrosswordState } from '../types/crossword'
 
 export const CROSSWORD_PRIZE = 1000
+export const CROSSWORD_PHYSICAL_PRIZE = {
+  kind: 'rta-mug',
+  title: 'RTA-kop',
+  image: '/games/prizes/rta-mug-laurel-v2.webp',
+} as const
 export const CROSSWORD_WINNER_BADGE = 'crossword-1-winner'
 export function crosswordOpen(state: CrosswordState, now = new Date()) {
   return !!state.opensAt && Date.parse(state.opensAt) <= now.getTime()

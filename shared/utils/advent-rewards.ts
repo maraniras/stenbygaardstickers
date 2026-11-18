@@ -1,6 +1,14 @@
 import type { AdventOpening, AdventPrize, AdventReward } from '../types/advent'
 
 export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
+  'rta-mug': {
+    kind: 'physical',
+    reward: 'rta-mug',
+    amount: 50,
+    title: 'Du har vundet en RTA-kop!',
+    description: 'En hvid RTA-kop med sort hank og inderside samt 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
   juleskum: {
     kind: 'physical',
     reward: 'juleskum',
@@ -116,6 +124,7 @@ export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
   },
 }
 export const ADVENT_REWARD_ICONS: Record<AdventReward, string> = {
+  'rta-mug': 'rta-mug-christmas-v2',
   juleskum: 'juleskum-christmas-v1',
   vampiri: 'vampiri-christmas-v1',
   cake: 'traestammer-christmas-v1',
@@ -159,7 +168,7 @@ export function previewAdventOpening(day: number): AdventOpening {
     'self-gift',
     'banana-small',
     'elf',
-    'mix-max',
+    'rta-mug',
     'friend-gift',
     'self-gift',
     'banana-single',

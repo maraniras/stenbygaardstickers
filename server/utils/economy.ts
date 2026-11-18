@@ -1,7 +1,9 @@
 import type { EconomyRecord } from '../../shared/types/economy'
 import { syncJackStats } from './jack-stats'
+import { syncWordleStats } from './wordle-stats'
 import { prepareCasinoDay } from './casino-limit'
 import { boxesAchievements } from '../../shared/utils/boxes-badges'
+import { settleStickerRewards } from './sticker-rewards'
 
 export async function economyContext() {
   const stickers = withDistance(
@@ -41,17 +43,9 @@ export function settleEconomy(
   if (boxes) record.boxesAchievements = boxes
   prepareCasinoDay(record, now)
   syncJackStats(record)
+  syncWordleStats(record)
   creditBananas(record, 'welcome', STARTING_BANANAS, 'Velkommen · startsaldo', now)
-  for (const s of context.stickers) {
-    if (s.placedBy.some((n) => sameName(n, name)))
-      creditBananas(
-        record,
-        `sticker:${s.id}`,
-        stickerBananas(s.countryCode, s.distanceKm),
-        `Sticker · ${s.title}`,
-        now,
-      )
-  }
+  settleStickerRewards(record, name, context.stickers, now)
   const ordered = [...context.stickers].sort(
     (a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id),
   )
@@ -104,6 +98,14 @@ export async function syncAllEconomies(names?: string[]) {
 }
 export async function publicEconomies() {
   const records = await allEconomyRecords()
+  const legacy = Object.entries(records).filter(
+    ([, record]) =>
+      !record.stickerRewards && Object.keys(record.claims).some((id) => id.startsWith('sticker:')),
+  )
+  if (legacy.length) {
+    const context = await economyContext()
+    for (const [name] of legacy) records[name] = await syncEconomy(name, context)
+  }
   return Object.fromEntries(
     await Promise.all(
       Object.entries(records).map(async ([name, original]) => {

@@ -132,8 +132,8 @@ export async function deliverCrosswordPush(body: unknown, now = new Date()) {
             : '🧩 Kryds & tværs #1 er åbent!',
       body:
         job.kind !== 'opened'
-          ? `Vi starter ${opening}. Første korrekte løsning vinder 1.000 bananer og en særlig badge.`
-          : 'Nu kan du spille! Første korrekte løsning vinder 1.000 bananer og en særlig badge.',
+          ? `Vi starter ${opening}. Første korrekte løsning vinder en RTA-kop, 1.000 bananer og en særlig badge.`
+          : 'Nu kan du spille! Første korrekte løsning vinder en RTA-kop, 1.000 bananer og en særlig badge.',
       url: job.kind !== 'opened' ? '/spil/oevrige' : '/spil/krydsord',
       tag: `crossword-1-${job.kind}-${Date.parse(job.opensAt)}`,
     },
@@ -184,7 +184,7 @@ export async function announceCrosswordOpening(state: CrosswordState, now = new 
   return broadcastCrosswordPush(
     {
       title: '🧩 Kryds & tværs #1 har fået en startdato',
-      body: `Vi starter ${crosswordOpeningLabel(opensAt)}. Første korrekte løsning vinder 1.000 bananer og en særlig badge.`,
+      body: `Vi starter ${crosswordOpeningLabel(opensAt)}. Første korrekte løsning vinder en RTA-kop, 1.000 bananer og en særlig badge.`,
       url: '/spil/oevrige',
       tag: `crossword-1-announced-${Date.parse(opensAt)}`,
     },
@@ -212,7 +212,7 @@ export async function announceCrosswordWinner(state: CrosswordState, now = new D
   return broadcastCrosswordPush(
     {
       title: '🏆 Kryds & tværs #1 har fået en vinder!',
-      body: `${winner.name} løste krydsordet først og vandt 1.000 bananer og vinderbadgen. Du kan stadig løse det færdigt.`,
+      body: `${winner.name} løste krydsordet først og vandt en RTA-kop, 1.000 bananer og vinderbadgen. Du kan stadig løse det færdigt.`,
       url: '/spil/krydsord',
       tag: 'crossword-1-winner',
     },

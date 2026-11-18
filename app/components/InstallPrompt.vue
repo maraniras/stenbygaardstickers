@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Boks der foreslår at få appen på hjemmeskærmen. Vises af sig selv én gang for dem,
 // der ikke allerede har den (iPhone i Safari, eller Android når Chrome tilbyder det),
-// og ellers fra linket "Installer appen" nederst på listen.
+// og ellers fra "Installer appen" i indstillingerne.
 const ASKED = 'stenbygaard-install-asked'
 const { open, canPrompt, install } = useInstall()
 

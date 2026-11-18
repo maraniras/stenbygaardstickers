@@ -2,13 +2,29 @@
 const route = useRoute()
 const { name } = useUser()
 const { readyCount } = useDailyAvailability()
+const { entry } = useExplore()
 const tab = computed(() => {
-  if (route.path === '/') return 'map'
+  if (
+    route.path === '/' ||
+    route.path === '/liste' ||
+    route.path === '/lande' ||
+    route.path === '/upload' ||
+    route.path.startsWith('/sticker/')
+  )
+    return 'explore'
   if (route.path === '/spil' || route.path.startsWith('/spil/')) return 'games'
   if (route.path === '/shop' || route.path.startsWith('/shop/')) return 'shop'
-  if (route.path === '/mig' || (name.value && route.path === personUrl(name.value))) return 'me'
+  if (
+    route.path === '/mig' ||
+    route.path === '/notifikationer' ||
+    route.path === '/aktivitet' ||
+    route.path === '/nyheder' ||
+    route.path.startsWith('/admin') ||
+    (name.value && route.path === personUrl(name.value))
+  )
+    return 'me'
   if (route.path === '/rangliste' || route.path.startsWith('/person/')) return 'users'
-  return 'list'
+  return undefined
 })
 </script>
 
@@ -18,10 +34,10 @@ const tab = computed(() => {
     aria-label="Hovedmenu"
   >
     <NuxtLink
-      to="/"
-      :class="{ on: tab === 'map' }"
-      :aria-current="tab === 'map' ? 'page' : undefined"
-      aria-label="Kort"
+      :to="entry"
+      :class="{ on: tab === 'explore' }"
+      :aria-current="tab === 'explore' ? 'page' : undefined"
+      aria-label="Udforsk stickers"
     >
       <svg
         viewBox="0 0 24 24"
@@ -29,34 +45,7 @@ const tab = computed(() => {
       >
         <path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4Zm0 0v13.5m6-11V20" />
       </svg>
-      <span class="nav-label">Kort</span>
-    </NuxtLink>
-    <NuxtLink
-      to="/liste"
-      :class="{ on: tab === 'list' }"
-      :aria-current="tab === 'list' ? 'page' : undefined"
-      aria-label="Stickers"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <rect
-          x="4"
-          y="4"
-          width="16"
-          height="7"
-          rx="2"
-        />
-        <rect
-          x="4"
-          y="14"
-          width="16"
-          height="6"
-          rx="2"
-        />
-      </svg>
-      <span class="nav-label">Stickers</span>
+      <span class="nav-label">Udforsk</span>
     </NuxtLink>
     <NuxtLink
       to="/spil"
@@ -154,7 +143,7 @@ const tab = computed(() => {
   position: relative;
   z-index: 1000;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   width: 100%;
   min-height: var(--nav-height);
   gap: 3px;

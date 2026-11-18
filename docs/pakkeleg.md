@@ -5,19 +5,19 @@ Lokalt spil på `/spil/pakkeleg`. Isoleret simulation på `/spil/pakkeleg?previe
 ## Regler
 
 - Tilmelding 20. november kl. 04 til og med 26. november kl. 23.59 dansk tid. Pris 100 bananer pr. bruger. Ingen eftertilmelding.
-- Spillet starter 27. november kl. 04 dansk tid. To slag pr. tilmeldt bruger pr. spildøgn, nulstilling kl. 04; ingen opsparing.
+- Spillet starter 27. november kl. 04 dansk tid. Tre slag pr. tilmeldt bruger pr. spildøgn, mens der er pakker på midten; derefter to. Allerede brugte slag tæller med i den nye grænse samme dag, så ingen får ekstra slag ved skiftet. Nulstilling kl. 04; ingen opsparing.
 - Kun seksere giver pakkevalg. 60 sekunder, ellers automatisk valg. Serveren behandler udløbne valg inden næste handling, også efter offlineperioder.
 - Tag fra midten først. Når midten er tom, vælger man en anden brugers pakke. Egne pakker kan ikke vælges.
-- Kun betalende tilmeldte brugere er med. 2,5 gave pr. deltager, rundet op: 7 deltagere giver 18 gaver, 10 giver 25. Andre kan se bordet som tilskuere.
+- Kun betalende tilmeldte brugere er med. 3 gaver pr. deltager: 7 deltagere giver 21 gaver, 10 giver 30. Andre kan se bordet som tilskuere.
 - Fast udseende og nummer pr. pakke. Sluttidspunktet er hemmeligt til afslutningen. Indholdet er hemmeligt for alle, inklusive ejeren, indtil ejeren selv åbner pakken.
 - Slut trækkes kryptografisk én gang i intervallet 25. december kl. 00 til 31. december kl. 23.59.59, dansk tid. Når tiden er gået, låses ejerskab. Afslutningen beregnes ved næste serverforespørgsel. Ejerskab låses, men ingen uåbnede præmier udbetales automatisk.
-- Én Mix Max + 50 (to ved mindst 12 deltagere/30 gaver), én fysisk gave med træstammer + 50, én Faxe Kondi-flaske + 50, én Haribo Vampiri-pose + 50 bananer, én juleskumspose + 50 og én hvidvin + 50, én eksklusiv profilramme, én gylden gave med 500 og mindst to drillenisser med 1 banan hver (15 % rundet op). Ved 13+ gaver også to separate drikkedunksgaver med en drikkedunk + 50 bananer hver og én RTA-snekugle + 50. Resten er 25/50/100/150/250 fordelt efter vægt 3/3/2/2/2. Antallet tilpasses indtil præmierne er fordelt ved spilstart; allerede fordelte spil ændres ikke.
+- Én Mix Max + 50 (to ved mindst 12 deltagere), én fysisk gave med træstammer + 50, én Faxe Kondi-flaske + 50, én Haribo Vampiri-pose + 50, én juleskumspose + 50, én RTA-kop + 50, to separate drikkedunksgaver + 50 hver, én eksklusiv profilramme, én gylden gave med 500 og mindst to drillenisser med 1 banan hver (15 % rundet op). RTA-snekugle + 50 først ved 7+ deltagere, hvidvin + 50 først ved 9+ deltagere. Resten er 25/50/100/150/250 fordelt efter vægt 3/3/2/2/2. Koppen indgår i de 3 gaver pr. deltager. Antallet tilpasses indtil præmierne er fordelt ved spilstart; allerede fordelte spil ændres ikke.
 - Minimum fire deltagere for at kunne rumme de faste præmier; ellers aflyses og 100 bananer refunderes én gang til hver tilmeldt.
 - Gaverne fordeles tilfældigt på indpakningerne én gang ved spilstart efter tilmelding.
 - Efter slut har ejerne præcis 14 dage til at åbne egne gaver. Andre ser først indhold og beløb efter åbning. Personkort summerer kun åbnede bananer, fysiske præmier og profilramme. Efter fristen skjules kortet på Spil, og pakkelegsiden viser afsluttet status. Uåbnede gaver bliver ikke automatisk udbetalt.
 - Profilrammen gemmes som kosmetisk ejendel og sættes på vinderens avatar ved åbning.
 - Julekalenderens personlige gaver holdes adskilt.
-- x103 hedder Pakkelegs Champ 2026 og går til én samlet vinder: flest ejede gaver ved slut, derefter flest bananer i disse gaver (åbnede såvel som uåbnede), derefter først nået det endelige gaveantal. Fysisk værdi, startsaldo, gebyr og badgebonus tæller ikke. Første opnåelse gemmes varigt på bordet, uafhængigt af den korte aktivitetshistorik; ved identiske tidsstempler bruges serverens rækkefølge. Badgen kræver ikke fem gaver og giver fortsat 1 point/20 bananer én gang. Gavegrådig kræver fortsat tre gaver.
+- x103 hedder Pakkelegs Champ 2026 og går til én samlet vinder: flest ejede gaver ved slut, derefter flest bananer i disse gaver (åbnede såvel som uåbnede), derefter først nået det endelige gaveantal. Fysisk værdi, startsaldo, gebyr og badgebonus tæller ikke. Første opnåelse gemmes varigt på bordet, uafhængigt af den korte aktivitetshistorik; ved identiske tidsstempler bruges serverens rækkefølge. Badgen kræver ikke fem gaver og giver fortsat 1 point/20 bananer én gang. Gavegrådig (x102) kræver nu mindst fem gaver ved slut. ID og ikon bevares.
 
 ## Lagring og sikkerhed
 
@@ -35,8 +35,25 @@ Gaveåbning reserverer `openingAt` på pakken i global CAS. Wallet-CAS gemmer en
 
 ## Kontrol
 
-`tests/parcel-game.test.mjs` tester to slag, kl. 04, genafsendelser, selvtyveri, krav om at tømme midten, automatisk valg efter offlineperiode, skjult sluttid/indhold, afslutning, samtidige enheder i både Redis- og lokalt CAS samt enkelt udbetaling. Mobilvisningen er kontrolleret ved 390 px med simulationen.
+`tests/parcel-game.test.mjs` tester tre slag før tomt bord, to derefter, kl. 04, genafsendelser, selvtyveri, krav om at tømme midten, automatisk valg efter offlineperiode, skjult sluttid/indhold, afslutning, samtidige enheder i både Redis- og lokalt CAS samt enkelt udbetaling. Mobilvisningen er kontrolleret ved 390 px med simulationen.
 
 Slutvisning til lokal test: `/spil/pakkeleg?preview=1&finished=1`. Ti fiktive deltagere, 20 gaver; ingen saldoændringer eller rigtige præmier.
 
 Ikoner: `public/games/parcels/`, originale PNG og prompts i `docs/designs/parcel-rewards/`. Nye motiver lavet med built-in imagegen; øvrige juleikoner genbruges fra kalenderen. Alle er transparente WebP.
+
+RTA-kop (18. november 2026, lokalt): én hvid kop med sort hank, sort inderside og sort RTA-logo. Én i pakkeleg + 50 bananer og én tilfældigt fordelt i julekalenderen + 50 bananer (samme deltagerfrist og udelukkelser som øvrige almindelige fysiske kalenderpræmier). Juleikon: `/games/advent/rta-mug-christmas-v2.webp`. Vinderen af krydsord #1 får også én kop oven i de 1000 bananer og badgen; særskilt ikon uden julepynt. Udlevering registreres i admin for hver aktivitet.
+
+## Godkendte pushbeskeder 2026
+
+Alle tider er dansk tid. Tobias Frost undtages fra disse beskeder, og notifikationsvalg respekteres.
+
+| Tidspunkt | Modtagere | Besked | Link |
+| --- | --- | --- | --- |
+| 20/11 06.30 | Alle brugere | Nu begynder julen så småt i Stenbygaardland — Prøv dagens bokse og tilmeld dig pakkelegen. | `/spil/jul` |
+| 21/11 08.00 | Ikke tilmeldte | Husk at tilmelde dig pakkelegen — Tilmeld dig inden den 27. november. | `/spil/pakkeleg` |
+| 26/11 08.00 | Ikke tilmeldte | Sidste chance for at tilmelde sig pakkelegen i dag — Husk at tilmelde dig, hvis du vil være med. | `/spil/pakkeleg` |
+| 27/11 06.30 | Tilmeldte | Så er det tid til pakkeleg — Se om du kan få indsamlet nogle gaver. | `/spil/pakkeleg` |
+| 1/12 06.30 | Alle brugere | Så har julen for alvor ramt Stenbygaardland — Åbn første låge i julekalenderen nu. | `/spil/julekalender` |
+| Når midten er tømt | Alle brugere | Alle pakker er taget fra bordet — Nu er det tid til at stjæle. | `/spil/pakkeleg` |
+
+Planlægges automatisk på drift med QStash. Tilmelding afgøres ved afsendelsen. Status og opsætning ses under Admin → Julebeskeder. Lokal test og dev sender ingenting.

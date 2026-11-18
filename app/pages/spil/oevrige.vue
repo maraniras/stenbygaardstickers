@@ -2,6 +2,7 @@
 import { crosswordCountdown } from '../../utils/crosswordCountdown'
 useHead({ title: 'Øvrige spil · Stenbygaard Stickers' })
 const { season } = useChristmasGames()
+const { state } = useEconomy()
 const { view, now } = useCrossword()
 const countdown = computed(() =>
   crosswordCountdown(view.value?.open ? null : view.value?.opensAt, now.value),
@@ -25,7 +26,11 @@ const opening = computed(() =>
     <PageHeader
       title="Spil"
       description="En lille pause i dit eget tempo."
-    />
+      ><template #actions
+        ><BananaBalance
+          v-if="state"
+          :balance="state.wallet.balance" /></template
+    ></PageHeader>
     <GameSectionNav
       section="other"
       :christmas-visible="season.visible"
@@ -64,12 +69,9 @@ const opening = computed(() =>
         <span>Åbner om</span><strong>{{ countdown }}</strong>
       </div>
       <div class="card-bottom">
-        <span>{{
-          view?.winner
-            ? 'Vundet af ' + view.winner.name
-            : '1000 bananer + vinderbadge til den første'
-        }}</span
-        ><strong>{{
+        <span v-if="view?.winner">Vundet af {{ view.winner.name }}</span>
+        <CrosswordPrize v-else />
+        <strong>{{
           view?.open ? 'Åbn krydsord →' : opening ? 'Åbner ' + opening : 'Tidspunkt følger'
         }}</strong>
       </div>

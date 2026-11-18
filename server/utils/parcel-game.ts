@@ -13,6 +13,7 @@ import {
 } from '../../shared/utils/parcel-game'
 import type { EconomyRecord } from '../../shared/types/economy'
 import { parcelAwards } from '../../shared/utils/parcel-badges'
+import { notifyParcelTableEmpty } from './seasonal-push'
 
 const PARCEL_CAS = `if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
 redis.call('HSET', KEYS[1], ARGV[1], ARGV[3]); return 1`
@@ -325,6 +326,9 @@ export async function parcelRequest(
           'parcels',
         ),
       ),
+  )
+  await notifyParcelTableEmpty(game).catch((error) =>
+    console.error('Kunne ikke sende besked om tomt pakkebord', error),
   )
   const settled = await settleParcelPrizes(game)
   const awarded = await settleParcelAchievements(settled, wallets)

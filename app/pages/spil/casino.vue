@@ -14,14 +14,10 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       description="Lidt held. Lidt taktik. En håndfuld bananer."
     >
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="state"
-          class="page-balance"
-          to="/spil/bananer"
-          aria-label="Åbn dit bananlager"
-          >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="state.wallet.balance"
+      /></template>
     </PageHeader>
     <GameSectionNav
       section="casino"
@@ -169,11 +165,6 @@ const { bananjackEnabled, banandittenEnabled } = useRuntimeConfig().public
       to="/spil"
       ><span>Dagens ekstra chance</span
       ><b>Tag dagens gratis spil <span aria-hidden="true">→</span></b></NuxtLink
-    >
-    <NuxtLink
-      class="wallet-link"
-      to="/spil/bananer"
-      >Dit bananlager og dine belønninger <span aria-hidden="true">↗</span></NuxtLink
     >
   </div>
 </template>
@@ -515,16 +506,6 @@ h2 > span {
   justify-content: space-between;
   gap: 8px;
   font-size: 13px;
-}
-.wallet-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 48px;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 12px;
-  text-decoration: none;
 }
 a:focus-visible {
   outline: 2px solid var(--text);

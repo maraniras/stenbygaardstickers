@@ -112,13 +112,10 @@ function label(spot: string) {
       back-to="/spil/casino"
     >
       <template #actions>
-        <NuxtLink
+        <BananaBalance
           v-if="view?.me?.balance !== undefined"
-          class="page-balance"
-          to="/spil/bananer"
-          aria-label="Åbn dit bananlager"
-          >🍌 {{ view.me.balance.toLocaleString('da-DK') }}</NuxtLink
-        >
+          :balance="view.me.balance"
+        />
       </template>
     </PageHeader>
 

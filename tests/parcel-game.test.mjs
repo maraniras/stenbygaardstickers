@@ -24,17 +24,17 @@ function board() {
 const now = new Date('2026-12-01T12:00:00Z')
 const day = '2026-12-01'
 
-test('two daily rolls, replay safety and 04 reset are enforced by the engine', () => {
+test('three collection rolls, replay safety and 04 reset are enforced by the engine', () => {
   const { api: a } = harness(),
     b = board()
-  for (let i = 0; i < 2; i++) a.rollParcel(b, 'Nicole', day, `roll-${i}`, 2, 0, now)
+  for (let i = 0; i < 3; i++) a.rollParcel(b, 'Nicole', day, `roll-${i}`, 2, 0, now)
   a.rollParcel(b, 'Nicole', day, 'roll-0', 6, 0, now)
   assert.equal(a.parcelView(b, 'Nicole', now).remaining, 0)
-  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'third', 2, 0, now), /to slag/)
+  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'fourth', 2, 0, now), /dagens slag/)
   const before = new Date('2026-12-02T02:59:59Z'),
     after = new Date('2026-12-02T03:00:00Z')
   assert.equal(a.parcelView(b, 'Nicole', before).remaining, 0)
-  assert.equal(a.parcelView(b, 'Nicole', after).remaining, 2)
+  assert.equal(a.parcelView(b, 'Nicole', after).remaining, 3)
   assert.throws(() => a.rollParcel(b, 'Nicole', day, 'stale', 2, 0, after), /spildøgn/)
 })
 test('only six grants a choice; middle must be emptied before stealing; no own gifts', () => {
@@ -52,6 +52,26 @@ test('only six grants a choice; middle must be emptied before stealing; no own g
   a.takeParcel(b, 'Nicole', 'p2', next)
   assert.equal(b.parcels[1].owner, 'Nicole')
   assert.equal(b.events[0].from, 'Mathias')
+})
+
+test('taking the last middle gift changes the limit for everyone immediately, counting used rolls', () => {
+  const { api: a } = harness(),
+    b = board()
+  a.rollParcel(b, 'Mathias', day, 'm1', 1, 0, now)
+  a.rollParcel(b, 'Nicole', day, 'n1', 1, 0, now)
+  a.rollParcel(b, 'Nicole', day, 'n2', 1, 0, now)
+  a.rollParcel(b, 'Nicole', day, 'n3', 6, 0, now)
+  a.takeParcel(b, 'Nicole', 'p1', now)
+  assert.equal(a.parcelDailyRolls(b), 2)
+  assert.equal(a.parcelView(b, 'Nicole', now).remaining, 0)
+  assert.equal(a.parcelView(b, 'Mathias', now).remaining, 1)
+  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'n4', 1, 0, now), /dagens slag/)
+  a.rollParcel(b, 'Mathias', day, 'm2', 1, 0, now)
+  assert.throws(() => a.rollParcel(b, 'Mathias', day, 'm3', 1, 0, now), /dagens slag/)
+  assert.equal(a.parcelView(b, 'Nicole', new Date('2026-12-02T03:00:00Z')).remaining, 2)
+  // Retrying an old roll after the phase switch remains idempotent.
+  a.rollParcel(b, 'Nicole', day, 'n3', 6, 0, now)
+  assert.equal(b.turns['u:Nicole'][day].length, 3)
 })
 test('pending choice auto-resolves after 60 seconds, including after leaving overnight', () => {
   const { api: a } = harness(),
@@ -104,9 +124,9 @@ for (const redis of [false, true])
         ),
       ),
     )
-    assert.equal(results.filter((r) => r.status === 'fulfilled').length, 2)
+    assert.equal(results.filter((r) => r.status === 'fulfilled').length, 3)
     const { game } = await a.mutateParcels(2026, ['Nicole'], () => {})
-    assert.equal(game.turns['u:Nicole']['2026-11-09'].length, 2)
+    assert.equal(game.turns['u:Nicole']['2026-11-09'].length, 3)
   })
 test('final winnings are credited exactly once across retries', async () => {
   const { api: a } = harness(),

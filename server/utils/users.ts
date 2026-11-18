@@ -8,6 +8,7 @@
 // som tæller forkerte koder. Uden Redis bruges Nitros lokale storage i `.data/`.
 import { createHash, randomBytes, randomInt } from 'node:crypto'
 import type { PushSubscription } from 'web-push'
+import type { ActivityItem } from '../../shared/types/activity'
 import { normalizeName, validName } from '../../shared/utils/validation'
 
 interface UserDevice {
@@ -18,6 +19,7 @@ interface UserDevice {
 }
 
 export interface UserRecord {
+  activity?: ActivityItem[]
   frame?: string
   ownedFrames?: string[]
   name: string

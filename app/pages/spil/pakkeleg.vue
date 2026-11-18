@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ParcelView } from '../../../shared/types/parcel-game'
 import { isParcelPhysical } from '../../../shared/utils/parcel-rewards'
+import { parcelDailyRolls } from '../../../shared/utils/parcel-game'
 useHead({ title: 'Pakkeleg · Stenbygaard Stickers' })
 const { state, name, busy, loading, error, seconds, refresh, act, testMode, rollStage, rollDie } =
   useParcelGame()
@@ -90,7 +91,7 @@ watch(
     <div class="parcel-intro">
       <span>ÉT BORD · ALLE MOD ALLE</span>
       <h2>Hvem løber med gaverne?</h2>
-      <p>To slag om dagen. En sekser. En pakke, der skifter hænder.</p>
+      <p>Tre slag om dagen, indtil bordet er tømt. Derefter to. Kun seksere giver pakker.</p>
     </div>
     <p
       v-if="error"
@@ -128,7 +129,7 @@ watch(
         <p>
           {{
             state.joined
-              ? 'Dine 100 bananer er betalt. Dine første to slag er klar 27. november kl. 04.00.'
+              ? 'Dine 100 bananer er betalt. Dine første tre slag er klar 27. november kl. 04.00.'
               : 'Det koster 100 bananer at være med. Vi spiller fra 27. november kl. 04.00, og kun tilmeldte brugere kan tage og stjæle pakker.'
           }}
         </p>
@@ -347,7 +348,7 @@ watch(
             :size="66"
           />
           <div>
-            <b>{{ state.remaining }} af 2 slag tilbage</b
+            <b>{{ state.remaining }} af {{ parcelDailyRolls(state) }} slag tilbage</b
             ><span>{{
               state.turn
                 ? state.turn.die === 6
@@ -466,8 +467,9 @@ watch(
         Pakkelegen starter 27. november kl. 04.00.
       </p>
       <p>
-        Alle deler bordet, men spiller, når de har tid. Du har to slag pr. døgn. Kun seksere giver
-        en pakke. Tag først fra midten, og stjæl derefter fra de andre.
+        Alle deler bordet, men spiller, når de har tid. Du har tre slag pr. døgn, mens der er pakker
+        på midten, og derefter to. Allerede brugte slag tæller med, når grænsen skifter. Kun seksere
+        giver en pakke. Tag først fra midten, og stjæl derefter fra de andre.
       </p>
       <p>
         Du har 60 sekunder til at vælge. Vi vælger automatisk, hvis du går væk. Pakkerne beholder

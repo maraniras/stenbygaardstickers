@@ -42,6 +42,7 @@ defineProps<{
         </dd>
       </div>
     </dl>
+    <slot />
     <p>{{ note }}</p>
   </details>
 </template>

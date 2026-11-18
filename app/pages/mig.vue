@@ -172,6 +172,8 @@ function selectMode(value: 'name' | 'code') {
         <h2 class="account-name">{{ name }}</h2>
       </header>
 
+      <AppSettingsLinks />
+
       <NuxtLink
         class="card link-row"
         to="/notifikationer"
@@ -259,6 +261,15 @@ function selectMode(value: 'name' | 'code') {
       />
 
       <div
+        class="join-benefits"
+        aria-label="Fordele ved at vælge navn"
+      >
+        <b>Dit navn er nok</b>
+        <p>Gem dine spil, få dit eget bananlager og saml badges på din profil.</p>
+        <span>250 bananer i startsaldo · Ingen adgangskode</span>
+      </div>
+
+      <div
         class="tabs"
         role="group"
         aria-label="Vælg loginmetode"
@@ -278,8 +289,6 @@ function selectMode(value: 'name' | 'code') {
           Jeg har en kode
         </button>
       </div>
-
-      <AppearanceSettings />
 
       <form
         v-if="mode === 'name'"
@@ -370,11 +379,50 @@ function selectMode(value: 'name' | 'code') {
           {{ busy ? 'Tjekker…' : 'Log ind' }}
         </button>
       </form>
+      <AppearanceSettings />
     </template>
+    <AppSettingsLinks v-if="ready && !name" />
+    <NuxtLink
+      class="card link-row"
+      to="/admin"
+    >
+      <svg
+        class="admin-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7l8-4Z" />
+        <path d="m8 12 3 3 5-6" />
+      </svg>
+      <div>
+        <h2>Admin</h2>
+        <p class="hint">Administrér appen</p>
+      </div>
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="m9 5 7 7-7 7" />
+      </svg>
+    </NuxtLink>
   </div>
 </template>
 
 <style scoped>
+.join-benefits {
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--accent-soft);
+}
+.join-benefits p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+.join-benefits span {
+  font-size: 11px;
+  font-weight: 700;
+}
 .page {
   display: flex;
   flex-direction: column;
@@ -382,6 +430,14 @@ function selectMode(value: 'name' | 'code') {
   max-width: 640px;
   margin: 0 auto;
   padding: calc(20px + var(--safe-t)) 16px 20px;
+}
+.admin-icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
 }
 header {
   display: flex;

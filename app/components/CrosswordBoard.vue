@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CrosswordHelp, CrosswordView } from '../../shared/types/crossword'
+import { DANISH_KEY_ROWS } from '../../shared/utils/danish-keyboard'
 const props = defineProps<{
   puzzle: NonNullable<CrosswordView['puzzle']>
   puzzleId: string
@@ -552,7 +553,7 @@ function onKey(event: KeyboardEvent) {
       aria-label="Bogstavtastatur"
     >
       <div
-        v-for="row in ['QWERTYUIOP', 'ASDFGHJKLÆ', 'ZXCVBNMØÅ⌫']"
+        v-for="row in [DANISH_KEY_ROWS[0], DANISH_KEY_ROWS[1], DANISH_KEY_ROWS[2] + '⌫']"
         :key="row"
         class="keyboard-row"
       >
@@ -997,6 +998,9 @@ function onKey(event: KeyboardEvent) {
   font-size: 13px;
   font-weight: 750;
   touch-action: manipulation;
+}
+.keyboard-row:last-child {
+  padding-inline: 13.6%;
 }
 .result {
   flex: none;

@@ -33,6 +33,7 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       ['faxe-kondi', 2],
       ['vampiri', 1],
       ['juleskum', 1],
+      ['rta-mug', 1],
       ['santa', 1],
     ])
       assert.equal(all.filter((p) => p.reward === reward).length, count)
@@ -98,7 +99,7 @@ test('all limited prizes may go to the same person and stack without removing gu
     'one-winner',
     now,
   )
-  assert.equal(draw.awards.length, 14)
+  assert.equal(draw.awards.length, 15)
   assert.ok(draw.awards.every((p) => p.winner === 'Norsk'))
   const forced = { ...draw, awards: draw.awards.map((p) => ({ ...p, day: 24 })) }
   const plan = a.buildAdventPlan('Norsk', forced)
@@ -110,10 +111,11 @@ test('all limited prizes may go to the same person and stack without removing gu
       'cycling-bottle',
       'faxe-kondi',
       'juleskum',
+      'rta-mug',
       'santa',
     ].includes(p.reward),
   )
-  assert.equal(awards.length, 13)
+  assert.equal(awards.length, 14)
 })
 
 test('one optional cake prize belongs only to eligible Ida or Marc behind December10–18', () => {
@@ -259,7 +261,7 @@ test('every real calendar prize pays 50 bananas except Mix Max at 250, exactly o
   const { api: a } = harness()
   const draw = a.createAdventDraw(users, 'physical-bonuses', now)
   const entries = Object.entries(draw.catalog).filter(([, prize]) => prize.kind === 'physical')
-  assert.equal(entries.length, 8)
+  assert.equal(entries.length, 9)
   const plan = entries.map(([reward, prize], i) => {
     assert.equal(prize.amount, reward === 'mix-max' ? 250 : 50)
     return { day: i + 1, published: true, prize }
@@ -271,7 +273,7 @@ test('every real calendar prize pays 50 bananas except Mix Max at 250, exactly o
     assert.equal(wallet.advent[2026][entry.day].amount, entry.prize.amount)
     assert.equal(wallet.advent[2026][entry.day].prize.kind, 'physical')
   }
-  assert.equal(wallet.balance, 600)
+  assert.equal(wallet.balance, 650)
   const saved = JSON.stringify(wallet)
   for (const entry of plan) a.openAdventDoor(wallet, 2026, entry.day, ready, plan)
   assert.equal(JSON.stringify(wallet), saved)

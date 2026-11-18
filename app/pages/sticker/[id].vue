@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
+const { entry } = useExplore()
+const router = useRouter()
 const { getSticker } = useStickers()
 const sticker = computed(() => getSticker(String(route.params.id)))
 const index = ref(0)
@@ -54,7 +56,8 @@ watch(index, (i) => {
   >
     <PageHeader
       :title="sticker.title"
-      back-to="/liste"
+      :back-to="router.resolve(entry).fullPath"
+      back-label="Udforsk"
     >
       <template #actions>
         <button

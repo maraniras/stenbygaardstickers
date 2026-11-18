@@ -84,16 +84,10 @@ async function play(direction: 1 | -1 = 1) {
       compact
     >
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="state"
-          class="page-balance"
-          to="/spil/bananer"
-          ><img
-            src="/badges/banana-baron.webp"
-            alt="Bananer"
-          />{{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="state.wallet.balance"
+      /></template>
     </PageHeader>
 
     <section

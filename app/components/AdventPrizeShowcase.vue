@@ -111,7 +111,13 @@ onBeforeUnmount(close)
               width="64"
               height="64"
             />
-            <span>Du kan også finde Haribo Vampiri og juleskum.</span>
+            <img
+              src="/games/advent/rta-mug-christmas-v2.webp"
+              alt=""
+              width="64"
+              height="64"
+            />
+            <span>Du kan også finde Haribo Vampiri, juleskum og en RTA-kop.</span>
           </div>
           <p>
             Bananer, rigtige præmier og gaver til dig selv og vennerne. Men pas på drillenissen —

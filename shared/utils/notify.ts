@@ -13,8 +13,15 @@ export type NotifyType =
   | 'gifts'
   | 'parcels'
   | 'crossword'
+  | 'christmas'
 
 export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; desc: string }[] = [
+  {
+    type: 'christmas',
+    emoji: '🎄',
+    label: 'Julespil',
+    desc: 'Når julespillene starter, og julekalenderen åbner',
+  },
   {
     type: 'crossword',
     emoji: '🧩',
@@ -25,7 +32,7 @@ export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; des
     type: 'parcels',
     emoji: '🎲',
     label: 'Pakkeleg',
-    desc: 'Når nogen stjæler din pakke, og når dine præmier er klar',
+    desc: 'Tilmelding, påmindelser, spilstart, tomt bord, stjålne pakker og præmier',
   },
   { type: 'gifts', emoji: '🎁', label: 'Gaver', desc: 'Når en anden bruger giver dig julebananer' },
   { type: 'stickers', emoji: '📍', label: 'Nye stickers', desc: 'Når Emil lander et nyt sted' },

@@ -8,6 +8,7 @@ export type AdventReward =
   | 'cake'
   | 'vampiri'
   | 'juleskum'
+  | 'rta-mug'
   | 'red-wine'
   | 'white-wine'
   | 'cycling-bottle'

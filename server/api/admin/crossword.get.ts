@@ -6,5 +6,6 @@ export default defineEventHandler(async (event) => {
     ...crosswordView(state),
     completions: Object.keys(state.finished).length,
     pushStatus: crosswordPushStatus(state),
+    prizeDeliveredAt: state.prizeDeliveredAt ?? null,
   }
 })

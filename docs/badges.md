@@ -159,7 +159,7 @@ Engangsbelønninger på tværs af år. Den gyldne trio giver også Hattrick, hvi
 | ---- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------- | ----- |
 | x100 | Røvrendt (`parcel-empty`)            | Slut uden gaver                                                                                              | 20      | 1     |
 | x101 | Seksersekspert (`parcel-sixes`)      | Slå seks seksere i samme pakkeleg, ikke nødvendigvis i træk                                                  | 20      | 1     |
-| x102 | Gavegrådig (`parcel-three`)          | Slut med mindst tre gaver                                                                                    | 20      | 1     |
+| x102 | Gavegrådig (`parcel-three`)          | Slut med mindst fem gaver                                                                                    | 20      | 1     |
 | x103 | Pakkelegs Champ 2026 (`parcel-five`) | Flest gaver ved slutningen; ved uafgjort flest bananer i gaverne, derefter først nået det endelige gaveantal | 20      | 4     |
 
 Kun tilmeldte deltagere i en gennemført pakkeleg kan få dem. Slutbadges beregnes ud fra det endelige ejerskab, før gaver åbnes. Champ 2026 går til én vinder og kræver ikke fem gaver; Gavegrådig gives separat ved mindst tre. Bananer fra alle ejede gaver tæller, også uåbnede, mens badgebonus, saldo, tilmeldingspris og fysisk værdi ikke tæller. Første gang man når gaveantallet bevares, også hvis gaver senere bliver stjålet; serverrækkefølge afgør samtidige tidsstempler. Champ 2026 uddeles kun for 2026. De øvrige belønnes én gang på tværs af år; alle badges bevares efter jul. En aflyst pakkeleg eller et spil helt uden fordelte gaver giver ingen champion.
@@ -188,4 +188,16 @@ Man må skifte farve. Tab, lige op og spillede runder uden en vindende farveinds
 
 Belønninger gives én gang pr. trin/badge. Trinbadges bruger samme motiv og forskellige kantfarver. Eksisterende rundestatistik tæller med; særskilt optælling af nulgevinster starter med denne funktion. Indsatsen tæller ikke med i nettooverskuddet.
 
-Næste ledige nummer: **x112**
+## Wordle
+
+| Nr. | Badge (id) | Krav | Bananer | Point |
+| --- | --- | --- | --- | --- |
+| x112 | Ordkløver (`wordle-wins`) | Løs 1 / 10 / 25 / 50 / 100 dagsord | 10 / 25 / 50 / 100 / 200 | 1 / 2 / 3 / 4 / 5 |
+| x113 | Ordentlig stime (`wordle-streak`) | Løs ordet 3 / 7 / 14 / 30 / 60 spildøgn i træk | 15 / 30 / 60 / 125 / 250 | 1 / 2 / 3 / 4 / 5 |
+| x114 | Ren clairvoyance (`wordle-first`) | Løs ordet på første forsøg | 50 | 4 |
+| x115 | På falderebet (`wordle-last`) | Løs ordet på sjette forsøg | 20 | 1 |
+| x116 | Effektiv yapper (`wordle-efficient`) | Løs 10 dagsord på højst tre forsøg hver | 75 | 3 |
+
+Spildøgnet skifter kl. 04 dansk tid. Tabte/oversprungne døgn bryder den aktuelle stime; rekorden bevares. Point og bananer gives én gang pr. badge/trin. Alle fem har egne transparente 3D-ikoner. Trinbadges genbruger motivet med de eksisterende fem kantfarver. Statistik gemmes permanent; beholdte ældre dagsforsøg importeres én gang.
+
+Næste ledige nummer: **x117**

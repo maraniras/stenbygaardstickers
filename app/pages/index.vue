@@ -12,13 +12,21 @@ const { stickers, stickersBy, getSticker } = useStickers()
 const { basemap, toggle: toggleBasemap } = useBasemap()
 
 const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
-const visible = computed(() => (person.value ? stickersBy(person.value) : stickers.value))
+const country = computed(() => (typeof route.query.country === 'string' ? route.query.country : ''))
+const visible = computed(() =>
+  (person.value ? stickersBy(person.value) : stickers.value).filter(
+    (s) => !country.value || s.countryCode === country.value,
+  ),
+)
 const countries = computed(() => new Set(visible.value.map((s) => s.countryCode)).size)
 
 let map: LMap | undefined
+let disposed = false
 let cluster: MarkerClusterGroup | undefined
 const markers = new Map<string, Marker>()
 let buildMarkers: (() => void) | undefined
+let shownFilter = ''
+const filterKey = computed(() => `${person.value}:${country.value}`)
 
 function setActive(id: string | undefined) {
   for (const [key, m] of markers) m.getElement()?.classList.toggle('active', key === id)
@@ -53,6 +61,7 @@ function fitAll() {
 
 function showVisible(fit = true) {
   if (!cluster) return
+  shownFilter = filterKey.value
   cluster.clearLayers()
   cluster.addLayers(visible.value.map((s) => markers.get(s.id)!))
   if (selected.value && !visible.value.includes(selected.value)) select(undefined)
@@ -70,7 +79,8 @@ function openFromQuery() {
 }
 
 function clearPerson() {
-  router.replace({ query: {} })
+  const { by: _, ...query } = route.query
+  router.replace({ query })
 }
 
 // Emils rejse (app/utils/journey.ts). Mens den kører, er de almindelige nåle skjult.
@@ -132,8 +142,9 @@ function stopJourney(restore = true) {
   }
 }
 
-watch(person, () => {
-  stopJourney()
+watch(filterKey, () => {
+  if (route.path !== '/') return
+  if (journey.value) stopJourney()
   showVisible()
 })
 
@@ -142,6 +153,7 @@ onMounted(async () => {
   Lf = L
   ;(window as any).L = L
   await import('leaflet.markercluster')
+  if (disposed) return
 
   map = L.map(el.value!, { zoomControl: false, worldCopyJump: true, minZoom: 2 })
   attachBasemap(L, map, basemap)
@@ -195,16 +207,22 @@ watch(stickers, () => {
 
 onDeactivated(() => {
   toolsOpen.value = false
-  stopJourney()
+  if (journey.value) stopJourney()
 })
 
 onActivated(() => {
   map?.invalidateSize()
+  if (map && shownFilter !== filterKey.value) showVisible()
   openFromQuery()
 })
 
 onBeforeUnmount(() => {
-  map?.remove()
+  disposed = true
+  stopJourney(false)
+  const oldMap = map
+  map = undefined
+  oldMap?.stop()
+  oldMap?.remove()
 })
 function showOverview() {
   select(undefined)
@@ -233,6 +251,7 @@ function showOverview() {
           </p>
         </div>
       </div>
+      <ExploreToolbar view="map" />
       <div
         v-if="!journey && person"
         class="chips"
@@ -264,7 +283,6 @@ function showOverview() {
         </svg>
         Kortvalg
       </button>
-      <UploadButton />
     </template>
 
     <MapToolsSheet
@@ -339,7 +357,7 @@ function showOverview() {
       v-if="!visible.length"
       class="empty chip glass"
     >
-      {{ person ? `Ingen stickers fra ${person}` : 'Ingen stickers endnu' }}
+      {{ person || country ? 'Ingen stickers matcher filtrene' : 'Ingen stickers endnu' }}
     </div>
   </div>
 </template>
@@ -384,6 +402,10 @@ function showOverview() {
 }
 .brand h1 {
   font-size: 16px;
+}
+.top > :deep(.explore-toolbar) {
+  width: fit-content;
+  margin-top: 10px;
 }
 .brand p {
   margin: 0;

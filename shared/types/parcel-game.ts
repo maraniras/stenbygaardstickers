@@ -11,6 +11,7 @@ export type ParcelRewardKind =
   | 'vampiri'
   | 'juleskum'
   | 'white-wine'
+  | 'rta-mug'
 export interface ParcelReward {
   kind: ParcelRewardKind
   amount: number

@@ -11,6 +11,27 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.9',
+    date: '2026-11-18',
+    push: {
+      title: '🍌 Wordle er landet!',
+      body: 'Gæt dagens ord og vind bananer.',
+      url: '/nyheder',
+    },
+    notes: [
+      'Dagens Wordle: Ét ord, fem bogstaver og seks forsøg. Måske en reference? Vind op til 50 bananer hver dag',
+      'Nye Wordlebadges: Gå efter sejre, stimer og ren clairvoyance. Se også din Wordle-statistik på profilen',
+      'Mere enkel navigation: Skift mellem kort og liste under Udforsk. Filtrér på personer og lande, og vend tilbage til samme sted',
+      'Din aktivitet samlet: Find dine personlige beskeder i den nye aktivitetsoversigt på profilen',
+      'Mere pakkeleg: Tre gaver pr. deltager og tre slag dagligt, indtil bordet er tømt. Derefter to slag. Gavegrådig kræver nu mindst fem gaver ved afslutningen',
+      'Hold øje med julelysene: Julespil lyser op, når der er noget nyt at prøve. Du får også beskeder om tilmelding, spilstart og kalenderåbning',
+      'Nye stickerbelønninger: Din første sticker i hvert land giver fuld belønning. De næste giver 250 bananer plus en eventuel forbedring af din distancerekord i landet. Tidligere belønninger genberegnes også, men saldoen kommer aldrig under nul',
+      'En ekstra vinderpræmie: Første korrekte løsning af Kryds & tværs #1 vinder nu også en RTA-kop oven i 1.000 bananer og vinderbadgen',
+      'Appen i dine indstillinger: Find både Hvad er nyt og muligheden for at installere appen samme sted',
+      'Mindre fejlrettelser og forbedringer af brugeroplevelsen',
+    ],
+  },
+  {
     version: '2.8',
     date: '2026-11-16',
     push: {

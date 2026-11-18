@@ -77,13 +77,10 @@ async function choose(id: string) {
       compact
     >
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="state"
-          class="page-balance"
-          to="/spil/bananer"
-          >🍌 {{ state.wallet.balance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="state.wallet.balance"
+      /></template>
     </PageHeader>
     <div
       v-if="ready && !name"

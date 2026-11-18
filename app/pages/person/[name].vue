@@ -17,6 +17,7 @@ const stats = computed(() => statsFor(list.value))
 const jackStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.jack)
 const slotStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.slots)
 const rouletteStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.roulette)
+const wordleStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.wordle)
 const countryList = computed(() => {
   const map = new Map<string, { code: string; name: string; count: number }>()
   for (const s of list.value) {
@@ -99,6 +100,7 @@ watch(
           :name="displayName"
       /></template>
       <template #actions>
+        <ActivityButton v-if="isMe(displayName)" />
         <NuxtLink
           v-if="isMe(displayName)"
           class="page-icon-button"
@@ -148,6 +150,10 @@ watch(
       <BananaWallet
         :person="displayName"
         :own="isMe(displayName)"
+      />
+      <WordleProfileStats
+        v-if="wordleStats?.played"
+        :stats="wordleStats"
       />
       <JackProfileStats
         v-if="jackStats?.rounds"

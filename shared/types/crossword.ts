@@ -25,6 +25,8 @@ export interface CrosswordState {
   >
   winnerPushSentAt?: string
   winner: { name: string; at: string } | null
+  /** The unique physical winner prize; entitlement follows winner, not later completions. */
+  prizeDeliveredAt?: string
   finished: Record<string, { name: string; at: string }>
   attempts: Record<string, number>
   progress?: Record<

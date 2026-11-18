@@ -63,7 +63,7 @@ const helper = computed(() => {
 useHead({ title: 'Julekalender · Stenbygaard Stickers' })
 
 // Replace this image when the final calendar background is supplied.
-const background = '/images/christmas-calendar-final-v3.webp'
+const background = '/images/christmas-calendar-mixmax-v5.webp'
 // Early openings stay on scenery, gifts and sleigh; faces are in the later doors.
 const days = [8, 15, 3, 21, 17, 23, 11, 19, 22, 16, 2, 7, 20, 18, 13, 4, 24, 10, 14, 6, 12, 1, 9, 5]
 const opened = ref<number[]>([])

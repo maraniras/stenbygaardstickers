@@ -9,6 +9,8 @@ watchEffect(() => {
 })
 const { dark } = useAppearance()
 useEconomy()
+useActivity()
+useChristmasDiscovery()
 useHead(() => ({ meta: [{ name: 'theme-color', content: dark.value ? '#141418' : '#f4f4f6' }] }))
 
 // Det er .content og ikke vinduet der scroller, så Vue Router kan ikke selv nulstille.
@@ -18,16 +20,23 @@ const router = useRouter()
 const mapView = computed(() => router.currentRoute.value.path === '/')
 const saved = new Map<string, number>()
 let back = false
+let previousPath = ''
 if (import.meta.client)
   window.addEventListener('popstate', () => {
     back = true
   })
 router.beforeEach((_to, from) => {
+  previousPath = from.path
   if (content.value) saved.set(from.fullPath, content.value.scrollTop)
 })
 useNuxtApp().hook('page:finish', () => {
   if (content.value)
-    content.value.scrollTop = back ? (saved.get(router.currentRoute.value.fullPath) ?? 0) : 0
+    content.value.scrollTop =
+      back ||
+      (['/', '/liste'].includes(router.currentRoute.value.path) &&
+        !['/', '/liste'].includes(previousPath))
+        ? (saved.get(router.currentRoute.value.fullPath) ?? 0)
+        : 0
   back = false
 })
 </script>

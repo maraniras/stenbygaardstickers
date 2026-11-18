@@ -1,6 +1,7 @@
 import type { EconomyRecord, EconomyPublic } from '../../shared/types/economy'
 import { emptyDailyStats } from '../../shared/utils/economy'
 import { publicJackStats } from './jack-stats'
+import { publicWordleStats } from './wordle-stats'
 import { adventStats } from '../../shared/utils/advent-badges'
 import { boxesAchievements } from '../../shared/utils/boxes-badges'
 
@@ -114,6 +115,7 @@ export function publicEconomy(record: EconomyRecord): EconomyPublic {
     stats: record.stats,
     milestones: record.milestones,
     jack: publicJackStats(record),
+    wordle: publicWordleStats(record),
     slots: record.slotGame?.stats,
     roulette: record.rouletteGame?.stats,
   }

@@ -515,26 +515,6 @@ button.chip {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
-.page-balance {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 44px;
-  padding: 5px 9px;
-  border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.page-balance img {
-  width: 21px;
-  height: 21px;
-  object-fit: contain;
-}
 /* Luftfoto beholder sine farver */
 :root .satellite .leaflet-tile-pane {
   filter: none;

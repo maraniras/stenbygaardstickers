@@ -2,19 +2,25 @@
 // Åbning af /spil er ikke det samme som at have spillet. Status skal genhentes
 // efter spil, ved bruger-/enhedsskift og ved det danske spildøgns skift kl. 04.
 export function useDailyAvailability() {
-  const availability = useState<{ city: boolean; wheel: boolean; boxes: boolean } | null>(
-    'daily-game-availability',
-    () => null,
-  )
+  const availability = useState<{
+    city: boolean
+    wheel: boolean
+    boxes: boolean
+    wordle?: boolean
+  } | null>('daily-game-availability', () => null)
   const readyCount = computed(() =>
     availability.value
       ? Number(availability.value.city) +
         Number(availability.value.wheel) +
-        Number(availability.value.boxes)
+        Number(availability.value.boxes) +
+        Number(availability.value.wordle ?? false)
       : 0,
   )
   const dailyReadyCount = computed(
-    () => Number(availability.value?.city ?? false) + Number(availability.value?.wheel ?? false),
+    () =>
+      Number(availability.value?.city ?? false) +
+      Number(availability.value?.wheel ?? false) +
+      Number(availability.value?.wordle ?? false),
   )
   const christmasReadyCount = computed(() => Number(availability.value?.boxes ?? false))
   return { availability, readyCount, dailyReadyCount, christmasReadyCount }

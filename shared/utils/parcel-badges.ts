@@ -45,7 +45,7 @@ export function parcelAwards(game: ParcelGame, name: string): ParcelAchievements
   if (game.ended) {
     const gifts = game.parcels.filter((p) => p.owner === name).length
     if (gifts === 0) earned['parcel-empty'] = game.endsAt
-    if (gifts >= 3) earned['parcel-three'] = game.endsAt
+    if (gifts >= 5) earned['parcel-three'] = game.endsAt
     // Keep x103's stored id and icon; this is the winner of the 2026 campaign, not a 5+ threshold.
     if (game.year === 2026 && parcelChampion(game) === name) earned['parcel-five'] = game.endsAt
   }
@@ -65,7 +65,7 @@ export function parcelBadges(economy?: EconomyPublic): Badge[] {
       id: 'parcel-three',
       name: 'Gavegrådig',
       emoji: '🎁',
-      about: 'Slut pakkelegen med mindst tre gaver',
+      about: 'Slut pakkelegen med mindst fem gaver',
     },
     {
       id: 'parcel-five',

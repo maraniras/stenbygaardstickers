@@ -6,17 +6,17 @@ const context = { stickers: [], ratings: {}, comments: {} }
 const harness = (redis = false) =>
   setup(redis, ['shared/utils/parcel-game.ts', 'server/utils/parcel-game.ts'])
 
-test('gift pool contains 2.5 gifts per participant rounded upwards', () => {
+test('gift pool contains exactly three gifts per participant including the mug', () => {
   const { api: a } = harness()
   for (const [people, gifts] of [
     [0, 0],
     [1, 3],
-    [2, 5],
-    [3, 8],
-    [4, 10],
-    [7, 18],
-    [10, 25],
-    [12, 30],
+    [2, 6],
+    [3, 9],
+    [4, 12],
+    [7, 21],
+    [10, 30],
+    [12, 36],
   ])
     assert.equal(a.parcelCount(people), gifts)
 })
@@ -30,11 +30,11 @@ for (const redis of [false, true])
     const names = ['Nicole', 'Mathias', 'Norsk', 'A', 'B', 'C', 'D']
     const { game } = await a.mutateParcels(2026, names, () => {})
     assert.equal(game.players.length, 7)
-    assert.equal(game.parcels.length, 18)
+    assert.equal(game.parcels.length, 21)
     assert.equal(JSON.stringify(game.parcels[0]), original)
     const { game: repeated } = await a.mutateParcels(2026, names, () => {})
-    assert.equal(repeated.parcels.length, 18)
-    assert.equal(new Set(repeated.parcels.map((p) => p.id)).size, 18)
+    assert.equal(repeated.parcels.length, 21)
+    assert.equal(new Set(repeated.parcels.map((p) => p.id)).size, 21)
   })
 test('already assigned gifts remain unchanged when the gift ratio changes', async () => {
   const { api: a } = harness()

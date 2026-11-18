@@ -20,6 +20,7 @@ export function useEconomy() {
       city: !response.city.finished,
       wheel: !response.wheel,
       boxes: response.boxesActive && !response.boxes,
+      wordle: response.wordle ? !response.wordle.finished : false,
     }
     clearTimeout(resetTimer)
     const delay = Math.max(500, Date.parse(response.nextResetAt) - Date.now() + 250)
@@ -116,6 +117,8 @@ export function useEconomy() {
     reloadPeople,
     guess: (choice: string) =>
       act('/api/games/city/guess', { day: state.value?.day ?? '', choice }),
+    guessWordle: (guess: string, count: number) =>
+      act('/api/games/wordle', { day: state.value?.day ?? '', guess, count }),
     spin: () => act('/api/games/wheel', { day: state.value?.day ?? '' }),
     openBoxes: (choices: number[]) =>
       act('/api/games/boxes', { day: state.value?.day ?? '', choices }),

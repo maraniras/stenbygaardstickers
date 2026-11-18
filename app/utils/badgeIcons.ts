@@ -4,6 +4,11 @@
 const SHARED: Record<string, string> = { jubilee: 'jubilee', year: 'year' }
 
 const CUSTOM = new Set([
+  'wordle-wins',
+  'wordle-streak',
+  'wordle-first',
+  'wordle-last',
+  'wordle-efficient',
   'roulette-rounds',
   'roulette-wins',
   'roulette-straight',

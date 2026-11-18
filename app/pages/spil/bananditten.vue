@@ -67,16 +67,10 @@ const resetLabel = computed(() =>
     >
       <template #title>Banan<span class="game-title-accent">ditten</span></template>
       <template #actions
-        ><NuxtLink
+        ><BananaBalance
           v-if="shownBalance !== null"
-          class="page-balance"
-          to="/spil/bananer"
-          ><img
-            src="/badges/banana-baron.webp"
-            alt="Bananer"
-          />{{ shownBalance.toLocaleString('da-DK') }}</NuxtLink
-        ></template
-      >
+          :balance="shownBalance"
+      /></template>
     </PageHeader>
     <div
       v-if="ready && !name"

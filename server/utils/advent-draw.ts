@@ -106,6 +106,7 @@ export function createAdventDraw(
     'faxe-kondi',
     'faxe-kondi',
     'juleskum',
+    'rta-mug',
     'santa',
   ] as AdventReward[]) {
     const pool =

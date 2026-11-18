@@ -5,31 +5,24 @@
     aria-label="Tilføj sticker"
     title="Tilføj sticker"
   >
-    <span class="upload-icon"
-      ><svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path d="M14 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8l-6 6Z" />
-        <path d="M14 20v-4a2 2 0 0 1 2-2h4M8 9h6M11 6v6" /></svg
-    ></span>
-    <span>Tilføj sticker</span>
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path d="M12 5v14M5 12h14" />
+    </svg>
   </NuxtLink>
 </template>
 
 <style scoped>
-/* Fælles tilføj-knap over bundmenuen på kort og liste. */
+/* Shared inline action next to the map/list switch. */
 .upload {
-  position: fixed;
-  right: max(16px, env(safe-area-inset-right, 0px));
-  bottom: calc(var(--nav-space) + 8px);
-  z-index: 650;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
   height: 48px;
-  padding: 6px 15px 6px 7px;
-  border-radius: 999px;
+  border-radius: 16px;
   box-shadow: var(--shadow-sm);
   color: var(--text);
   text-decoration: none;
@@ -39,15 +32,6 @@
   transition:
     transform 0.15s,
     box-shadow 0.15s;
-}
-.upload-icon {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: #fff;
 }
 .upload:active {
   transform: scale(0.96);

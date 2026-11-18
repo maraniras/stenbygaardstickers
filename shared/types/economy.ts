@@ -20,6 +20,7 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  wordle?: import('./wordle').WordleStats
   roulette?: import('./roulette').RouletteStats
   crosswordWins?: Record<string, string>
   parcelAchievements?: import('../utils/parcel-badges').ParcelAchievements
@@ -44,6 +45,16 @@ export interface WheelRun {
   jackpotAmount?: number
 }
 export interface EconomyRecord extends EconomyPublic {
+  /** Private durable snapshots prevent country rewards resetting after deletion or edits. */
+  stickerRewards?: {
+    version: 2
+    receipts: Record<
+      string,
+      { countryCode: string; distanceKm: number; amount: number; date: string }
+    >
+    migration?: { at: string; difference: number; applied: number; forgiven: number }
+  }
+  wordleStats?: import('./wordle').WordleStatsRecord
   rouletteGame?: import('./roulette').RouletteRecord
   parcelRewards?: Record<
     string,
@@ -74,13 +85,22 @@ export interface EconomyRecord extends EconomyPublic {
   version: 1
   claims: Record<string, true>
   history: BananaTransaction[]
-  days: Record<string, { city?: CityRun; wheel?: WheelRun; boxes?: import('./boxes').BoxesRun }>
+  days: Record<
+    string,
+    {
+      city?: CityRun
+      wheel?: WheelRun
+      boxes?: import('./boxes').BoxesRun
+      wordle?: import('./wordle').WordleRun
+    }
+  >
 }
 export interface DailyCityState extends CityRun {
   options: { id: string; name: string }[]
   answer?: { id: string; name: string; country: string; countryCode: string }
 }
 export interface DailyResponse {
+  wordle?: import('./wordle').WordleView
   boxesActive: boolean
   casinoLimit?: import('./casino').CasinoDailyLimit
   day: string

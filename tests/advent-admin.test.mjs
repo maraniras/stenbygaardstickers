@@ -16,7 +16,7 @@ function fixture(redis = false) {
   return { api, draw }
 }
 
-test('admin physical overview preserves all thirteen prizes, including repeat winners and bundled finds', () => {
+test('admin physical overview preserves all fourteen prizes, including the mug and bundled finds', () => {
   const { api, draw } = fixture()
   // Put several prizes into the same opening, including a physical extra.
   for (const award of draw.awards) award.day = 24
@@ -31,8 +31,8 @@ test('admin physical overview preserves all thirteen prizes, including repeat wi
   const wallets = { norsk: { advent: { 2026: { 24: opening } } } }
   const before = JSON.stringify({ draw, wallets })
   const entries = api.adventPhysicalWinners(draw, wallets)
-  assert.equal(entries.length, 13)
-  assert.equal(new Set(entries.map((entry) => entry.id)).size, 13)
+  assert.equal(entries.length, 14)
+  assert.equal(new Set(entries.map((entry) => entry.id)).size, 14)
   assert.ok(entries.every((entry) => entry.winner === 'Norsk' && entry.day === 24))
   assert.ok(entries.every((entry) => entry.openedAt === opening.openedAt))
   assert.equal(entries.filter((entry) => entry.prize.reward === 'mix-max').length, 5)
@@ -40,6 +40,7 @@ test('admin physical overview preserves all thirteen prizes, including repeat wi
   assert.equal(entries.filter((entry) => entry.prize.reward === 'faxe-kondi').length, 2)
   assert.equal(entries.filter((entry) => entry.prize.reward === 'vampiri').length, 1)
   assert.equal(entries.filter((entry) => entry.prize.reward === 'juleskum').length, 1)
+  assert.equal(entries.filter((entry) => entry.prize.reward === 'rta-mug').length, 1)
   assert.equal(JSON.stringify({ draw, wallets }), before)
 })
 
@@ -167,7 +168,7 @@ test('admin distinguishes assigned prizes from found prizes and never invents wi
   const { api, draw } = fixture()
   assert.equal(api.adventPhysicalWinners(undefined, {}).length, 0)
   const unopened = api.adventPhysicalWinners(draw, {})
-  assert.equal(unopened.length, 13)
+  assert.equal(unopened.length, 14)
   assert.ok(unopened.every((entry) => entry.openedAt === null))
   const wallets = {
     norsk: {
@@ -222,7 +223,7 @@ test('admin API authenticates before reading wallets or the draw, is uncached an
   assert.equal(reads, 0)
   allowed = true
   const response = await exports.default({})
-  assert.equal(response.physicalWinners.length, 13)
+  assert.equal(response.physicalWinners.length, 14)
   assert.equal(headers['Cache-Control'], 'no-store')
   assert.equal(response.draw.seed, undefined)
   assert.equal(response.draw.plans, undefined)

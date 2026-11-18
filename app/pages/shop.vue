@@ -2,6 +2,7 @@
 import { SHOP_PROFILE_FRAMES, type ProfileFrame } from '../../shared/utils/profile-frames'
 useHead({ title: 'Shop · Stenbygaard Stickers' })
 const { name } = useUser()
+const { state } = useEconomy()
 const { inventory } = useProfileFrames()
 const selected = ref<ProfileFrame>()
 const preview = ref<HTMLDialogElement>()
@@ -16,7 +17,11 @@ function show(frame: ProfileFrame) {
     <PageHeader
       title="Shop"
       description="Brug dine bananer"
-    />
+      ><template #actions
+        ><BananaBalance
+          v-if="state"
+          :balance="state.wallet.balance" /></template
+    ></PageHeader>
     <p class="preview-notice">
       <span>Forhåndsvisning</span> Shoppen åbner snart. Du kan prøve rammerne her — køb er ikke
       åbnet endnu.

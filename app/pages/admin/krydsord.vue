@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { CrosswordView, CrosswordPushStatus } from '../../../shared/types/crossword'
-type AdminCrosswordView = CrosswordView & { pushStatus: CrosswordPushStatus }
+import { CROSSWORD_PHYSICAL_PRIZE } from '../../../shared/utils/crossword'
+type AdminCrosswordView = CrosswordView & {
+  pushStatus: CrosswordPushStatus
+  prizeDeliveredAt: string | null
+}
 useHead({ title: 'Krydsord · Admin' })
 const { admin, check } = useAdmin()
 const view = ref<AdminCrosswordView | null>(null)
@@ -21,6 +25,23 @@ const time = ref('')
 const error = ref('')
 const saved = ref(false)
 const busy = ref(false)
+const delivering = ref(false)
+async function delivery() {
+  if (!view.value?.winner || delivering.value) return
+  delivering.value = true
+  error.value = ''
+  try {
+    const result = await $fetch<{ deliveredAt: string | null }>('/api/admin/crossword/delivery', {
+      method: 'POST',
+      body: { delivered: !view.value.prizeDeliveredAt },
+    })
+    view.value.prizeDeliveredAt = result.deliveredAt
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Kunne ikke gemme udleveringen.'
+  } finally {
+    delivering.value = false
+  }
+}
 const helpTime = computed(() =>
   view.value?.helpAt
     ? new Date(view.value.helpAt).toLocaleString('da-DK', {
@@ -130,7 +151,12 @@ async function save() {
         Tidspunktet er gemt.
       </p>
       <div class="reward">
-        <strong>Én vinder · 1000 bananer + vinderbadge</strong>
+        <img
+          class="mug-prize"
+          :src="CROSSWORD_PHYSICAL_PRIZE.image"
+          alt="RTA-kop"
+        />
+        <strong>Én vinder · RTA-kop + 1000 bananer + vinderbadge</strong>
         <p>
           Den første servergodkendte løsning vinder. Andre må gerne færdiggøre krydsordet uden
           præmie.
@@ -139,6 +165,31 @@ async function save() {
       <p v-if="view.winner">
         Vinder: <strong>{{ view.winner.name }}</strong>
       </p>
+      <div
+        v-if="view.winner"
+        class="delivery-status"
+      >
+        <p>
+          {{
+            view.prizeDeliveredAt
+              ? 'RTA-koppen er udleveret.'
+              : 'RTA-koppen afventer udlevering til ' + view.winner.name + '.'
+          }}
+        </p>
+        <button
+          class="btn secondary"
+          :disabled="delivering"
+          @click="delivery"
+        >
+          {{
+            delivering
+              ? 'Gemmer…'
+              : view.prizeDeliveredAt
+                ? 'Fortryd udlevering'
+                : 'Markér kop som udleveret'
+          }}
+        </button>
+      </div>
       <NuxtLink
         class="answer-link"
         to="/admin/krydsord-facit"
@@ -202,6 +253,13 @@ input {
   padding-top: 18px;
   border-top: 1px solid var(--hairline);
   font-size: 13px;
+}
+.mug-prize {
+  display: block;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 12px;
 }
 .preview-link {
   display: block;

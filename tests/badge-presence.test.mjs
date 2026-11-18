@@ -55,6 +55,7 @@ function setup(remote) {
         throw Error(cmd)
       }),
     wants: (prefs, type) => prefs?.[type] !== false,
+    saveActivity: async () => {},
     findUser: async () => ({ key: 'nicole', user }),
     sendPush: async (subs, message) => {
       sent.push({ endpoints: Array.from(subs, (s) => s.endpoint), message })

@@ -31,18 +31,30 @@ export async function notifyComment(
   }
 
   const done = new Set<string>([nameKey(c.author)])
+  const recorded = new Set<string>()
   const jobs: Promise<void>[] = []
   for (const cand of candidates) {
     const key = nameKey(cand.name)
     if (done.has(key)) continue
     const found = await findUser(cand.name)
-    if (!found || !wants(found.user.notify, cand.type)) continue
+    if (!found) continue
+    if (!recorded.has(key)) {
+      recorded.add(key)
+      await saveActivity(found.key, [
+        {
+          type: cand.type,
+          message: { title: cand.title, body: cand.text, url, tag: `comment-${c.id}` },
+        },
+      ])
+    }
+    if (!wants(found.user.notify, cand.type)) continue
     done.add(key)
     jobs.push(
       notifyUser(
         cand.name,
         { title: cand.title, body: cand.text, url, tag: `comment-${c.id}` },
         cand.type,
+        false,
       ),
     )
   }
@@ -54,7 +66,7 @@ const LIKE_RESEND_MS = 3600_000
 /** "Nicole og 2 andre synes godt om din kommentar" – højst én gang i timen pr. kommentar */
 export async function notifyLike(c: CommentData, likes: CommentLikes, liker: string | undefined) {
   const found = await findUser(c.author)
-  if (!found || !wants(found.user.notify, 'likes')) return
+  if (!found) return
   const stamp = found.user.notifiedAt?.[`like:${c.id}`]
   if (stamp && Date.now() - Date.parse(stamp) < LIKE_RESEND_MS) return
   await updateUser(found.key, (u) => {
