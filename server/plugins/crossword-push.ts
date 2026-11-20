@@ -1,7 +1,5 @@
 export default defineNitroPlugin((nitro) => {
-  nitro.hooks.hook('request', async (event) => {
-    const job = checkCrosswordPushSchedule()
-    if (typeof event.waitUntil === 'function') event.waitUntil(job)
-    else await job
+  nitro.hooks.hook('request', async () => {
+    await checkCrosswordPushSchedule()
   })
 })
