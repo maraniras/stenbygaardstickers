@@ -24,14 +24,8 @@ const opening = computed(() =>
     v-if="view?.puzzle"
     class="crossword-game"
   >
-    <p
-      v-if="view.preview"
-      class="competition-banner"
-    >
-      Admin-preview · Ingen præmier eller konkurrence
-    </p>
     <div
-      v-else-if="view.winner"
+      v-if="view.winner && !view.preview"
       class="competition-banner"
       role="status"
     >
@@ -47,17 +41,6 @@ const opening = computed(() =>
           : 'RTA-koppen, 1.000 bananer og vinderbadgen er vundet. Du kan stadig løse krydsordet.'
       }}</span>
     </div>
-    <p
-      v-else
-      class="competition-banner"
-    >
-      Første korrekte løsning vinder en RTA-kop, 1.000 bananer og vinderbadgen.
-      <NuxtLink
-        v-if="!name"
-        to="/mig"
-        >Vælg dit navn for at deltage.</NuxtLink
-      >
-    </p>
     <CrosswordBoard
       :key="view.id + ':' + view.puzzle.revision + ':' + (name || 'anonym') + ':' + preview"
       :puzzle="view.puzzle"

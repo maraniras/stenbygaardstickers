@@ -11,6 +11,14 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.9.3',
+    date: '2026-11-20',
+    notes: [
+      'Kryds & tværs: Tofingerzoom er begrænset til krydsordet, og zoomknapperne vælger faste zoomniveauer',
+      'Mere plads til krydsordet: Hjælpen findes nu bag infoknappen ved ranglisten, og vinderbanneret vises først, når nogen har vundet',
+    ],
+  },
+  {
     version: '2.9.2',
     date: '2026-11-20',
     notes: ['Forbedret planlægning af påmindelser om Kryds & tværs og kommende julespil'],

@@ -77,6 +77,10 @@ const board = ref<HTMLElement>()
 const boardViewport = ref<HTMLElement>()
 const zoom = ref(1)
 const zoomed = computed(() => zoom.value > 1)
+const zoomLabel = computed(() => `${Number(zoom.value.toFixed(1))}×`)
+const showInfo = ref(false)
+let pinch: { distance: number; zoom: number; x: number; y: number } | undefined
+let zoomRevision = 0
 const dragging = ref(false)
 let pan: { id: number; x: number; y: number; left: number; top: number } | undefined
 let suppressClick = false
@@ -120,7 +124,54 @@ function onBoardClick(event: MouseEvent) {
   event.stopPropagation()
   suppressClick = false
 }
+function touchPair(event: TouchEvent) {
+  const a = event.touches[0]
+  const b = event.touches[1]
+  if (!a || !b) return
+  return {
+    distance: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY),
+    x: (a.clientX + b.clientX) / 2,
+    y: (a.clientY + b.clientY) / 2,
+  }
+}
+function startPinch(event: TouchEvent) {
+  const pair = touchPair(event)
+  const rect = board.value?.getBoundingClientRect()
+  if (!pair || !rect || !pair.distance || !rect.width || !rect.height) return
+  if (event.cancelable) event.preventDefault()
+  pan = undefined
+  dragging.value = false
+  suppressClick = true
+  pinch = {
+    distance: pair.distance,
+    zoom: zoom.value,
+    x: (pair.x - rect.left) / rect.width,
+    y: (pair.y - rect.top) / rect.height,
+  }
+}
+async function movePinch(event: TouchEvent) {
+  const pair = touchPair(event)
+  const gesture = pinch
+  if (!pair || !gesture) return
+  if (event.cancelable) event.preventDefault()
+  suppressClick = true
+  const revision = ++zoomRevision
+  zoom.value = Math.max(1, Math.min(3, (gesture.zoom * pair.distance) / gesture.distance))
+  await nextTick()
+  const viewport = boardViewport.value
+  const rect = board.value?.getBoundingClientRect()
+  if (revision !== zoomRevision || !viewport || !rect) return
+  viewport.scrollTo({
+    left: viewport.scrollLeft + rect.left + gesture.x * rect.width - pair.x,
+    top: viewport.scrollTop + rect.top + gesture.y * rect.height - pair.y,
+  })
+}
+function endPinch(event: TouchEvent) {
+  if (event.touches.length < 2) pinch = undefined
+}
 async function setZoom(value: number) {
+  pinch = undefined
+  zoomRevision++
   zoom.value = Math.max(1, Math.min(3, Math.round(value)))
   await nextTick()
   const viewport = boardViewport.value
@@ -359,7 +410,41 @@ function onKey(event: KeyboardEvent) {
       compact
     >
       <template #actions
-        ><slot name="actions" /><span class="preview-label">{{
+        ><slot name="actions" />
+        <button
+          type="button"
+          class="info-trigger"
+          aria-label="Information om krydsord og hjælp"
+          title="Information og hjælp"
+          @click="showInfo = true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+              stroke="currentColor"
+              stroke-width="1.7"
+            />
+            <path
+              d="M12 11v6"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="12"
+              cy="7"
+              r="1"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <span class="preview-label">{{
           readOnly ? 'Facit' : preview ? 'Preview' : '#' + puzzleId
         }}</span></template
       >
@@ -375,16 +460,16 @@ function onKey(event: KeyboardEvent) {
           type="button"
           aria-label="Zoom ud"
           :disabled="zoom === 1"
-          @click="setZoom(zoom - 1)"
+          @click="setZoom(Math.floor(zoom - 0.001))"
         >
           −
         </button>
-        <span aria-live="polite">{{ zoom }}×</span>
+        <span aria-live="polite">{{ zoomLabel }}</span>
         <button
           type="button"
           aria-label="Zoom ind"
           :disabled="zoom === 3"
-          @click="setZoom(zoom + 1)"
+          @click="setZoom(Math.ceil(zoom + 0.001))"
         >
           +
         </button>
@@ -405,6 +490,10 @@ function onKey(event: KeyboardEvent) {
         @pointercancel="endPan"
         @lostpointercapture="endPan"
         @click.capture="onBoardClick"
+        @touchstart="startPinch"
+        @touchmove="movePinch"
+        @touchend="endPinch"
+        @touchcancel="endPinch"
       >
         <div
           ref="board"
@@ -500,16 +589,11 @@ function onKey(event: KeyboardEvent) {
         </div>
       </div>
     </div>
-    <p class="saved">
-      {{
-        readOnly
-          ? 'Facit · Kun synligt for admin'
-          : saveError
-            ? 'Kunne ikke gemme på denne enhed'
-            : zoomed
-              ? 'Træk i gitteret for at se resten'
-              : 'Gemt på denne enhed'
-      }}
+    <p
+      v-if="readOnly || saveError"
+      class="saved"
+    >
+      {{ readOnly ? 'Facit · Kun synligt for admin' : 'Kunne ikke gemme på denne enhed' }}
     </p>
     <div class="active-clue">
       <button
@@ -569,18 +653,6 @@ function onKey(event: KeyboardEvent) {
       </div>
     </div>
     <p
-      v-if="!readOnly"
-      class="preview-note"
-    >
-      {{
-        dailyHelp?.available
-          ? 'Grønne felter er korrekte · Nyt tjek hver dag kl. 04.'
-          : firstHelpTime
-            ? 'Hjælp fra ' + firstHelpTime + ' · derefter dagligt kl. 04.'
-            : 'Hele løsningen tjekkes, når alle felter er udfyldt.'
-      }}
-    </p>
-    <p
       v-if="helpError"
       class="help-error"
       role="status"
@@ -593,6 +665,49 @@ function onKey(event: KeyboardEvent) {
         Prøv igen
       </button>
     </p>
+    <AppDialog
+      v-if="showInfo"
+      label="Information om krydsord og hjælp"
+      @close="showInfo = false"
+    >
+      <section class="image-dialog">
+        <header>
+          <h2>Information og hjælp</h2>
+          <button
+            type="button"
+            aria-label="Luk information"
+            @click="showInfo = false"
+          >
+            ×
+          </button>
+        </header>
+        <p>Hele løsningen tjekkes, når alle felter er udfyldt.</p>
+        <p>
+          {{
+            dailyHelp?.available
+              ? 'Hjælpen er startet. Grønne felter viser bogstaver, der var korrekte ved det seneste daglige tjek.'
+              : firstHelpTime
+                ? 'Hjælp starter ' + firstHelpTime + ' (dansk tid).'
+                : 'Hjælp starter kl. 04.00 efter åbningsdagen og én hel ekstra dag.'
+          }}
+        </p>
+        <p>
+          Derefter tjekkes dine gemte bogstaver igen hver dag kl. 04.00 dansk tid, indtil du har
+          løst krydsordet.
+        </p>
+        <p>
+          Zoom med to fingre inde i krydsordet, og træk for at flytte rundt. Zoomknapperne vælger
+          præcis 1×, 2× eller 3×.
+        </p>
+        <button
+          type="button"
+          class="btn"
+          @click="showInfo = false"
+        >
+          Tilbage til krydsordet
+        </button>
+      </section>
+    </AppDialog>
     <AppDialog
       v-if="openedImage?.image"
       label="Billedledetråd"
@@ -682,12 +797,13 @@ function onKey(event: KeyboardEvent) {
   display: grid;
   place-items: center;
   overflow: hidden;
+  touch-action: pan-x pan-y;
+  overscroll-behavior: contain;
 }
 .zoomed .board-scroll {
   display: block;
   overflow: auto;
   overscroll-behavior: contain;
-  touch-action: pan-x pan-y pinch-zoom;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   cursor: grab;
@@ -1011,13 +1127,20 @@ function onKey(event: KeyboardEvent) {
   color: var(--text);
   font-size: 12px;
 }
-.preview-note {
+.info-trigger {
+  display: grid;
+  place-items: center;
   flex: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
   color: var(--muted);
-  text-align: center;
-  font-size: 10px;
-  line-height: 1.4;
-  margin: 0;
+  background: var(--surface-2);
+}
+.info-trigger svg {
+  width: 20px;
+  height: 20px;
 }
 button:focus-visible,
 .crossword-board:focus-visible {
