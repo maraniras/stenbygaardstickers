@@ -9,6 +9,8 @@ const props = defineProps<{
   checkAnswers?: (answers: Record<string, string>) => Promise<{ correct: boolean }>
   readOnly?: boolean
   solution?: Record<string, string>
+  correctLetters?: Record<string, string>
+  readOnlyLabel?: string
   title?: string
   backTo?: string
   helpAt?: string | null
@@ -209,6 +211,8 @@ const firstHelpTime = computed(() =>
     : '',
 )
 function correctCell(cell: string) {
+  if (props.readOnly)
+    return !!letters.value[cell] && props.correctLetters?.[cell] === letters.value[cell]
   return (
     !props.readOnly &&
     dailyHelp.value?.available &&
@@ -445,7 +449,7 @@ function onKey(event: KeyboardEvent) {
           </svg>
         </button>
         <span class="preview-label">{{
-          readOnly ? 'Facit' : preview ? 'Preview' : '#' + puzzleId
+          readOnly ? readOnlyLabel || 'Facit' : preview ? 'Preview' : '#' + puzzleId
         }}</span></template
       >
     </PageHeader>
@@ -500,7 +504,7 @@ function onKey(event: KeyboardEvent) {
           class="crossword-board"
           tabindex="0"
           role="group"
-          :aria-label="`Krydsord, ${columns} kolonner og ${rows} rækker. ${readOnly ? 'Facit. Vælg et felt for at se ledetråden.' : 'Vælg et felt og skriv med tastaturet.'}`"
+          :aria-label="`Krydsord, ${columns} kolonner og ${rows} rækker. ${readOnly ? (readOnlyLabel || 'Facit') + '. Vælg et felt for at se ledetråden.' : 'Vælg et felt og skriv med tastaturet.'}`"
           @keydown="onKey"
         >
           <div
@@ -593,7 +597,11 @@ function onKey(event: KeyboardEvent) {
       v-if="readOnly || saveError"
       class="saved"
     >
-      {{ readOnly ? 'Facit · Kun synligt for admin' : 'Kunne ikke gemme på denne enhed' }}
+      {{
+        readOnly
+          ? (readOnlyLabel || 'Facit') + ' · Kun synligt for admin'
+          : 'Kunne ikke gemme på denne enhed'
+      }}
     </p>
     <div class="active-clue">
       <button

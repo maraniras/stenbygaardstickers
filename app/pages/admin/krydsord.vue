@@ -193,6 +193,11 @@ async function save() {
       </div>
       <NuxtLink
         class="answer-link"
+        to="/admin/krydsord-deltagere"
+        >Se deltagernes nuværende løsninger →</NuxtLink
+      >
+      <NuxtLink
+        class="answer-link"
         to="/admin/krydsord-facit"
         >Vis facit →</NuxtLink
       >

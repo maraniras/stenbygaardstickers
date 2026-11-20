@@ -1,5 +1,6 @@
 import type {
   CrosswordHelp,
+  CrosswordAdminProgress,
   CrosswordLeaderboard,
   CrosswordState,
   CrosswordView,
@@ -93,6 +94,46 @@ export function crosswordView(
       : {}),
   }
 }
+/** Admin-only projection of saved answers; never advances a player's daily help. */
+export function crosswordAdminProgress(
+  state: CrosswordState,
+  users: { name: string }[],
+): CrosswordAdminProgress {
+  const solution = crosswordSolution()
+  const subjects = new Map(
+    [...new Set([...Object.keys(state.progress || {}), ...Object.keys(state.finished)])].map(
+      (subject) => [
+        createHash('sha256')
+          .update('crossword:1:' + subject)
+          .digest('hex')
+          .slice(0, 16),
+        subject,
+      ],
+    ),
+  )
+  return {
+    puzzle: crosswordView(state, undefined, true).puzzle!,
+    totalLetters: Object.keys(solution).length,
+    players: crosswordLeaderboard(state, users).players.map((player) => {
+      const subject = subjects.get(player.id)!
+      const letters = Object.fromEntries(
+        Object.entries(state.progress?.[subject]?.letters || {})
+          .filter(([cell, value]) => Object.hasOwn(solution, cell) && /^[A-ZÆØÅ]$/i.test(value))
+          .map(([cell, value]) => [cell, value.toLocaleUpperCase('da-DK')]),
+      )
+      return {
+        id: player.id,
+        label: player.label,
+        completed: player.completed,
+        letters,
+        correctLetters: Object.fromEntries(
+          Object.entries(letters).filter(([cell, value]) => solution[cell] === value),
+        ),
+      }
+    }),
+  }
+}
+
 export function scheduleCrossword(state: CrosswordState, value: unknown, now = new Date()) {
   if (state.winner || crosswordOpen(state, now))
     throw createError({

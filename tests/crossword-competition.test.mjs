@@ -210,6 +210,53 @@ test('answer key requires admin, is not cached and changes no competition or wal
   assert.ok(preview.puzzle.entries.every((entry) => !('answer' in entry)))
 })
 
+test('admin can inspect current saved answers without advancing daily help or exposing them publicly', async () => {
+  const { api: a } = game()
+  const state = { ...a.freshCrossword(), opensAt: '2026-11-16T13:00:00Z' }
+  const solution = a.crosswordSolution()
+  const [first, second] = Object.keys(solution)
+  const wrong = solution[second] === 'A' ? 'B' : 'A'
+  a.crosswordHelp(state, 'u:nicole', { [first]: solution[first], [second]: wrong }, now)
+  a.crosswordHelp(state, 'd:anonymous', { [second]: solution[second] }, now)
+  a.crosswordHelp(state, 'u:cleared', { [first]: solution[first] }, now)
+  a.crosswordHelp(state, 'u:cleared', {}, now)
+  a.crosswordHelp(state, 'u:unstarted', {}, now)
+  // Daily help is stale; admin correctness must follow the currently saved letters.
+  state.progress['u:nicole'].correctLetters = { [second]: wrong }
+  await a.mutateCrossword((stored) => Object.assign(stored, state))
+  const get = route(a, 'server/api/admin/crossword/progress.get.ts')
+  let reads = 0
+  a.listUsers = async () => {
+    reads++
+    return [{ name: 'Nicole' }]
+  }
+  const headers = {}
+  a.setHeader = (_event, name, value) => {
+    headers[name] = value
+  }
+  const before = JSON.stringify(await a.readCrossword())
+  await assert.rejects(get({}), (error) => error.statusCode === 401)
+  assert.equal(reads, 0)
+  const result = await get({ admin: true })
+  assert.equal(headers['Cache-Control'], 'private, no-store')
+  assert.equal(result.players.length, 3)
+  const nicole = result.players.find((player) => player.label === 'Nicole')
+  assert.equal(nicole.letters[second], wrong)
+  assert.equal(nicole.correctLetters[first], solution[first])
+  assert.equal(nicole.correctLetters[second], undefined)
+  assert.equal(Object.keys(nicole.correctLetters).length, 1)
+  assert.ok(result.players.some((player) => player.label === 'Anonym 1'))
+  assert.equal(result.totalLetters, Object.keys(solution).length)
+  assert.equal(JSON.stringify(await a.readCrossword()), before)
+  assert.equal(Object.keys(await a.allEconomyRecords()).length, 0)
+  const publicView = a.crosswordLeaderboard(state, [{ name: 'Nicole' }], now)
+  assert.ok(
+    publicView.players.every(
+      (player) => !('correctLetters' in player) && typeof player.letters === 'number',
+    ),
+  )
+})
+
 test('answer definition is server-only; public board consumes lengths, not answers', () => {
   assert.equal(existsSync('app/data/crossword-preview.ts'), false)
   const board = readFileSync('app/components/CrosswordBoard.vue', 'utf8')

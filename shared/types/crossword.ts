@@ -61,6 +61,18 @@ export interface CrosswordAnswerKey {
   solution: Record<string, string>
 }
 
+export interface CrosswordAdminProgress {
+  puzzle: NonNullable<CrosswordView['puzzle']>
+  totalLetters: number
+  players: {
+    id: string
+    label: string
+    completed: boolean
+    letters: Record<string, string>
+    correctLetters: Record<string, string>
+  }[]
+}
+
 export interface CrosswordHelp {
   available: boolean
   availableAt: string | null
