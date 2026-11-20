@@ -87,7 +87,11 @@ export function settleEconomy(
 }
 export async function syncEconomy(name: string, context?: EconomyContext) {
   const data = context ?? (await economyContext())
-  return (await mutateEconomy(name, (record) => settleEconomy(record, name, data))).record
+  return (
+    await mutateEconomy(name, (record) => settleEconomy(record, name, data), {
+      skipUnchanged: true,
+    })
+  ).record
 }
 export async function syncAllEconomies(names?: string[]) {
   const keys = names ? new Set(names.map(nameKey)) : undefined

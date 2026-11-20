@@ -11,6 +11,7 @@ export function setup(redisEnabled = false, extra = []) {
     modules = new Map()
   const context = vm.createContext({
     Buffer,
+    structuredClone,
     console,
     setTimeout,
     clearTimeout,

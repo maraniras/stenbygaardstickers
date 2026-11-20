@@ -1,5 +1,9 @@
 import { createHmac, randomBytes } from 'node:crypto'
 import cities from '../data/daily-cities.json'
+import { createImmutableRead } from './immutable-read'
+
+const jackpotRead = createImmutableRead<number>()
+const challengeRead = createImmutableRead<Awaited<ReturnType<typeof loadDailyChallenge>>>()
 
 let secretPromise: Promise<string> | undefined
 export async function gameSecret() {
@@ -27,7 +31,12 @@ export async function gameBackup() {
   return { secret: await gameSecret(), wordle: await readWordleHistory() }
 }
 /** One shared, persisted amount per 04:00 Danish game day. Independent of city choice. */
-export async function dailyWheelJackpot(day: string): Promise<number> {
+export function dailyWheelJackpot(day: string): Promise<number> {
+  return redisEnabled
+    ? jackpotRead(day, () => loadDailyWheelJackpot(day))
+    : loadDailyWheelJackpot(day)
+}
+async function loadDailyWheelJackpot(day: string): Promise<number> {
   const key = `games:jackpot:${day}`
   const storage = useStorage('data')
   const existing = redisEnabled
@@ -45,7 +54,10 @@ export async function dailyWheelJackpot(day: string): Promise<number> {
   await storage.setItem(key, amount)
   return amount
 }
-export async function dailyChallenge(day: string) {
+export function dailyChallenge(day: string) {
+  return redisEnabled ? challengeRead(day, () => loadDailyChallenge(day)) : loadDailyChallenge(day)
+}
+async function loadDailyChallenge(day: string) {
   const storage = useStorage('data')
   const key = `games:challenge:${day}`
   type Challenge = { answer: (typeof cities)[number]; options: typeof cities }

@@ -49,9 +49,11 @@ export async function mutateCrossword<T>(change: (state: CrosswordState) => T) {
       const raw = await rawCrossword()
       const state: CrosswordState = raw ? JSON.parse(raw) : freshCrossword()
       const result = change(state)
+      const next = JSON.stringify(state)
+      if (next === raw) return { state, result }
       if (redisEnabled) {
-        if ((await redisEval(CAS, [STORE], [ID, raw, JSON.stringify(state)])) !== 1) continue
-      } else await useStorage('data').setItem(`${STORE}:${ID}`, JSON.stringify(state))
+        if ((await redisEval(CAS, [STORE], [ID, raw, next])) !== 1) continue
+      } else await useStorage('data').setItem(`${STORE}:${ID}`, next)
       return { state, result }
     }
     throw createError({ statusCode: 409, statusMessage: 'Krydsordet blev opdateret. Prøv igen.' })

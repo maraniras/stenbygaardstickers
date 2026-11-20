@@ -119,14 +119,10 @@ export async function mutateParcels<T>(
         }
       }
       const result = change(game)
+      const next = JSON.stringify(game)
+      if (next === raw) return { game, result }
       if (redisEnabled) {
-        if (
-          (await redisEval(
-            PARCEL_CAS,
-            [PARCEL_STORE],
-            [String(year), raw ?? '', JSON.stringify(game)],
-          )) !== 1
-        )
+        if ((await redisEval(PARCEL_CAS, [PARCEL_STORE], [String(year), raw ?? '', next])) !== 1)
           continue
       } else await useStorage('data').setItem(PARCEL_STORE, { ...local, [year]: game })
       return { game, result }

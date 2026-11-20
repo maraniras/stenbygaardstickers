@@ -3,6 +3,9 @@ import { WORDLE_ANSWERS } from '../data/wordle-answers'
 import { WORDLE_GENERAL } from '../data/wordle-general'
 import allowed from '../data/wordle-allowed.json'
 import { gameSecret } from './daily-challenge'
+import { createImmutableRead } from './immutable-read'
+
+const answerRead = createImmutableRead<string>()
 
 export interface WordleHistory {
   migrated: boolean
@@ -102,7 +105,12 @@ async function legacyAnswers(day: string, migrated: boolean) {
       .filter((value): value is string => typeof value === 'string' && /^[A-ZÆØÅ]{5}$/.test(value)),
   }))
 }
-export async function dailyWordleAnswer(day: string): Promise<string> {
+export function dailyWordleAnswer(day: string): Promise<string> {
+  return redisEnabled
+    ? answerRead(day, () => loadDailyWordleAnswer(day))
+    : loadDailyWordleAnswer(day)
+}
+async function loadDailyWordleAnswer(day: string): Promise<string> {
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(day) ||
     !Number.isFinite(Date.parse(`${day}T12:00:00Z`)) ||

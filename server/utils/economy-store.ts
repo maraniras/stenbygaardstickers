@@ -45,7 +45,7 @@ export async function readEconomy(name: string): Promise<EconomyRecord | undefin
 export async function mutateEconomy<T>(
   name: string,
   change: (record: EconomyRecord) => T,
-  options: { before?: number } = {},
+  options: { before?: number; skipUnchanged?: boolean } = {},
 ): Promise<{ record: EconomyRecord; result: T }> {
   const key = nameKey(name)
   if (!redisEnabled) {
@@ -67,7 +67,9 @@ export async function mutateEconomy<T>(
           statusCode: 409,
           statusMessage: 'Indsatserne er låst. Vent på næste runde.',
         })
-      await useStorage('data').setItem(`economy:${encodeURIComponent(key)}`, JSON.stringify(record))
+      const next = JSON.stringify(record)
+      if (!options.skipUnchanged || next !== raw)
+        await useStorage('data').setItem(`economy:${encodeURIComponent(key)}`, next)
       return { record, result }
     } finally {
       release()
@@ -79,15 +81,15 @@ export async function mutateEconomy<T>(
     const record: EconomyRecord = raw ? JSON.parse(raw) : freshEconomy()
     if (record.rouletteGame?.pending) await settleRouletteRecord(record)
     const result = change(record)
+    const next = JSON.stringify(record)
+    // Read-only synchronization may return the current snapshot without rewriting it.
+    // All actual changes and deadline-sensitive game actions still use CAS.
+    if (options.skipUnchanged && options.before === undefined && next === raw)
+      return { record, result }
     const committed = await redisEval(
       ECONOMY_CAS,
       ['economy'],
-      [
-        key,
-        raw,
-        JSON.stringify(record),
-        options.before === undefined ? '' : String(options.before),
-      ],
+      [key, raw, next, options.before === undefined ? '' : String(options.before)],
     )
     if (committed === -1)
       throw createError({

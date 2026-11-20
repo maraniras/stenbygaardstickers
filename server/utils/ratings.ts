@@ -39,17 +39,22 @@ export async function getRatings(voter: RatingVoter = {}) {
   }
   const [ids] = (await redis([['SMEMBERS', 'rated']])) as [string[]]
   if (!ids.length) return out
+  const mineFields = [voter.userKey ? userField : undefined, voter.device].filter(
+    (field): field is string => !!field,
+  )
+  const stride = mineFields.length ? 2 : 1
   const res = await redis(
     ids.flatMap((id) => [
       ['HVALS', `rating:${id}`],
-      ['HGET', `rating:${id}`, userField],
-      ['HGET', `rating:${id}`, deviceField],
+      ...(mineFields.length ? [['HMGET', `rating:${id}`, ...mineFields]] : []),
     ]),
   )
   ids.forEach((id, i) => {
-    const values = (res[i * 3] as string[]).map(Number)
+    const values = (res[i * stride] as string[]).map(Number)
     if (!values.length) return
-    const mine = (res[i * 3 + 1] ?? res[i * 3 + 2]) as string | null
+    const mine = mineFields.length
+      ? (res[i * stride + 1] as (string | null)[]).find((value) => value !== null)
+      : undefined
     out[id] = summarize(values, mine ? Number(mine) : undefined)
   })
   return out
@@ -104,18 +109,15 @@ export async function claimRatings(device: string, userKey: string, own: Set<str
   }
   const [ids] = (await redis([['SMEMBERS', 'rated']])) as [string[]]
   if (!ids.length) return 0
-  const res = await redis(
-    ids.flatMap((id) => [
-      ['HGET', `rating:${id}`, device],
-      ['HGET', `rating:${id}`, userField],
-    ]),
-  )
+  const res = (await redis(ids.map((id) => ['HMGET', `rating:${id}`, device, userField]))) as (
+    string | null
+  )[][]
   const cmds: (string | number)[][] = []
   ids.forEach((id, i) => {
-    const v = res[i * 2] as string | null
-    if (v === null) return
+    const [v, previous] = res[i]!
+    if (v === null || v === undefined) return
     cmds.push(['HDEL', `rating:${id}`, device])
-    if (!own.has(id) && res[i * 2 + 1] === null) {
+    if (!own.has(id) && previous === null) {
       cmds.push(['HSET', `rating:${id}`, userField, v])
       moved++
     }
