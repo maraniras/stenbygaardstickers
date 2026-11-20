@@ -42,7 +42,9 @@ function prizeAt(index: number) {
         class="box-flipper"
         aria-hidden="true"
       >
-        <span class="box-front"
+        <span
+          v-if="!resultVisible || !selected.includes(index - 1)"
+          class="box-front"
           ><small>{{ index }}</small
           ><span class="ribbon" /><span class="bow">∞</span><b>?</b
           ><i v-if="selected.includes(index - 1)">✓</i></span
@@ -79,7 +81,6 @@ function prizeAt(index: number) {
   border: 0;
   border-radius: 15px;
   background: transparent;
-  perspective: 750px;
   color: #fff0cb;
   min-width: 0;
   min-height: 0;
@@ -90,11 +91,6 @@ function prizeAt(index: number) {
   width: 100%;
   height: 100%;
   position: relative;
-  transform-style: preserve-3d;
-  transition: transform 800ms cubic-bezier(0.22, 0.7, 0.2, 1);
-}
-.opened .box-flipper {
-  transform: rotateY(180deg);
 }
 .box-front,
 .box-back {
@@ -105,12 +101,28 @@ function prizeAt(index: number) {
   overflow: hidden;
   border: 1px solid #a3b0a945;
   border-radius: 15px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   background: linear-gradient(140deg, #3b574d, #1c3029);
   box-shadow:
     inset 0 1px #ffffff12,
     0 4px 12px #00000016;
+}
+/* Two flat halves keep the flip illusion without Safari's nested 3D backface bug. */
+.box-front {
+  transform: scaleX(1);
+}
+.opened .box-front {
+  transform: scaleX(0);
+  visibility: hidden;
+  transition:
+    transform 400ms cubic-bezier(0.22, 0.7, 0.2, 1),
+    visibility 0s 400ms;
+}
+.opened .box-back {
+  transform: scaleX(1);
+  visibility: visible;
+  transition:
+    transform 400ms cubic-bezier(0.22, 0.7, 0.2, 1) 400ms,
+    visibility 0s 400ms;
 }
 .box-front small,
 .box-back small {
@@ -182,7 +194,8 @@ function prizeAt(index: number) {
   opacity: 0.42;
 }
 .box-back {
-  transform: rotateY(180deg);
+  transform: scaleX(0);
+  visibility: hidden;
   background: linear-gradient(145deg, #47563b, #253e30);
   border-color: #d9bc7b88;
 }
@@ -212,8 +225,9 @@ function prizeAt(index: number) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .box-flipper {
-    transition: none;
+  .box-front,
+  .box-back {
+    transition: none !important;
   }
 }
 </style>

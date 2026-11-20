@@ -11,6 +11,17 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.9.1',
+    date: '2026-11-20',
+    notes: [
+      'Dagens bokse: Rettet spejlvendte spørgsmålstegn og overlap på åbnede bokse i iOS. Rettelsen gælder også dine allerede åbnede bokse',
+      'Pakkeleg: Nu tre slag om dagen gennem hele spillet – også når du stjæler',
+      'Seks nye gaveindpakninger: svømmefødder, snorkel og briller, cykelhjul, cykelhjelm, løbesolbriller og en bil',
+      'Profilrammegaven i pakkelegen giver nu også 50 bananer. Præmiefordelingen er desuden justeret',
+      'Hotfix-opdateringer sender fremover ingen opdateringspush',
+    ],
+  },
+  {
     version: '2.9',
     date: '2026-11-18',
     push: {

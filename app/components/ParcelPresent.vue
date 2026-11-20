@@ -5,7 +5,7 @@ const props = defineProps<{
   selected?: boolean
   amount?: number
 }>()
-const shape = computed(() => props.styleIndex % 20)
+const shape = computed(() => props.styleIndex % 26)
 </script>
 <template>
   <span
@@ -25,6 +25,10 @@ const shape = computed(() => props.styleIndex % 20)
       '--turn': `${((styleIndex % 3) - 1) * 5}deg`,
     }"
   >
+    <ParcelSportWrap
+      v-if="shape >= 20"
+      :shape="shape"
+    />
     <svg
       v-if="shape === 16"
       class="novelty-wrap"
@@ -715,6 +719,57 @@ const shape = computed(() => props.styleIndex % 20)
 .shape-19 {
   --gift-width: 60px;
   --gift-height: 102px;
+}
+.shape-20,
+.shape-21,
+.shape-22,
+.shape-23,
+.shape-24,
+.shape-25 {
+  background: none;
+  box-shadow: none;
+}
+.shape-20 {
+  --gift-width: 104px;
+  --gift-height: 104px;
+}
+.shape-21 {
+  --gift-width: 118px;
+  --gift-height: 95px;
+}
+.shape-22 {
+  --gift-width: 99px;
+  --gift-height: 99px;
+}
+.shape-23 {
+  --gift-width: 112px;
+  --gift-height: 89px;
+}
+.shape-24 {
+  --gift-width: 127px;
+  --gift-height: 78px;
+}
+.shape-25 {
+  --gift-width: 132px;
+  --gift-height: 97px;
+}
+.present:is(.shape-20, .shape-21, .shape-22, .shape-23, .shape-24, .shape-25) :is(.lid, .ribbon) {
+  display: none;
+}
+.present:is(.shape-20, .shape-21, .shape-22, .shape-23, .shape-24, .shape-25) .bow {
+  top: -13px;
+  transform: scale(0.65);
+}
+.present:is(.shape-20, .shape-21, .shape-22, .shape-23, .shape-24, .shape-25) .tag {
+  position: absolute;
+  bottom: 0;
+  margin: 0;
+}
+.shape-24 .bow {
+  top: 2px !important;
+}
+.shape-25 .bow {
+  top: -2px !important;
 }
 .shape-4 .lid,
 .shape-4 .ribbon,

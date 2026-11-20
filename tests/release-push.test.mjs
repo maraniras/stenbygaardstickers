@@ -98,6 +98,25 @@ test('release dates follow Danish midnight rather than UTC midnight', async () =
   assert.equal(h.sent.length, 1)
 })
 
+test('hotfixes never send update pushes, even with explicit notification copy', async () => {
+  const db = { rank: 2009000 }
+  for (const version of ['2.9.1', '2.9.2', '2.9.10', '3.0.1']) {
+    const h = setup({ db, version, push: { title: 'Hotfix', body: 'Fix', url: '/nyheder' } })
+    await h.api.checkReleasePush()
+    await h.api.announceRelease()
+    assert.equal(h.reads(), 0)
+    assert.equal(h.sent.length, 0)
+    assert.equal(db.rank, 2009000)
+  }
+  const next = setup({ db, version: '2.10' })
+  await next.api.announceRelease()
+  await next.api.announceRelease()
+  assert.equal(next.sent.length, 1)
+  const major = setup({ db, version: '3.0.0' })
+  await major.api.announceRelease()
+  assert.equal(major.sent.length, 1)
+})
+
 test('a release can supply its own mobile notification and destination, without sending it twice', async () => {
   const push = {
     title: '🎉 Bananjack er landet!',

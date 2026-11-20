@@ -2,14 +2,16 @@ import type { ParcelGame, ParcelView } from '../types/parcel-game'
 import { gameDay } from './game-day'
 
 const playerKey = (name: string) => `u:${name}`
-export const PARCEL_DAILY_ROLLS = 2
-export const parcelDailyRolls = (game: { parcels: { owner: string | null }[] }) =>
-  game.parcels.some((p) => !p.owner) ? 3 : PARCEL_DAILY_ROLLS
+export const PARCEL_DAILY_ROLLS = 3
 export const PARCEL_ENTRY_FEE = 100
 export const parcelCount = (participants: number) => participants * 3
 /** Distinct wrapping, including a hatbox, giant box, banana and bunch; unrelated to contents. */
 export function parcelWrappingStyle(index: number) {
-  return [8, 9, 10, 11, 12, 0, 1, 2, 3, 13, 4, 5, 14, 6, 7, 15, 16, 17, 18, 19][index] ?? index % 8
+  return (
+    [8, 9, 10, 11, 12, 0, 1, 2, 3, 13, 4, 5, 14, 6, 7, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25][
+      index
+    ] ?? index % 26
+  )
 }
 export const parcelCollectionUntil = (game: ParcelGame) =>
   new Date(Date.parse(game.endsAt) + 14 * 86400000).toISOString()
@@ -107,7 +109,7 @@ export function rollParcel(
   )
     fail('Dette slag er allerede brugt.')
   if (game.pending[playerKey(name)]) fail('Vælg først din pakke.')
-  if (turns.length >= parcelDailyRolls(game)) fail('Du har brugt dagens slag.')
+  if (turns.length >= PARCEL_DAILY_ROLLS) fail('Du har brugt dagens tre slag.')
   if (!Number.isInteger(die) || die < 1 || die > 6) fail('Ugyldig terning.')
   turns.push({ id, die, at: now.toISOString() })
   if (die === 6 && parcelTargets(game, name).length)
@@ -143,7 +145,7 @@ export function parcelView(game: ParcelGame, name: string | null, now: Date): Pa
           ? 'registration'
           : 'waiting',
     day,
-    remaining: Math.max(0, parcelDailyRolls(game) - turns.length),
+    remaining: Math.max(0, PARCEL_DAILY_ROLLS - turns.length),
     players: game.players,
     parcels: game.parcels.map((p, index) => ({
       id: p.id,

@@ -30,7 +30,7 @@ test('three collection rolls, replay safety and 04 reset are enforced by the eng
   for (let i = 0; i < 3; i++) a.rollParcel(b, 'Nicole', day, `roll-${i}`, 2, 0, now)
   a.rollParcel(b, 'Nicole', day, 'roll-0', 6, 0, now)
   assert.equal(a.parcelView(b, 'Nicole', now).remaining, 0)
-  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'fourth', 2, 0, now), /dagens slag/)
+  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'fourth', 2, 0, now), /dagens tre slag/)
   const before = new Date('2026-12-02T02:59:59Z'),
     after = new Date('2026-12-02T03:00:00Z')
   assert.equal(a.parcelView(b, 'Nicole', before).remaining, 0)
@@ -54,7 +54,7 @@ test('only six grants a choice; middle must be emptied before stealing; no own g
   assert.equal(b.events[0].from, 'Mathias')
 })
 
-test('taking the last middle gift changes the limit for everyone immediately, counting used rolls', () => {
+test('three daily rolls remain available when the middle empties and stealing begins', () => {
   const { api: a } = harness(),
     b = board()
   a.rollParcel(b, 'Mathias', day, 'm1', 1, 0, now)
@@ -62,13 +62,16 @@ test('taking the last middle gift changes the limit for everyone immediately, co
   a.rollParcel(b, 'Nicole', day, 'n2', 1, 0, now)
   a.rollParcel(b, 'Nicole', day, 'n3', 6, 0, now)
   a.takeParcel(b, 'Nicole', 'p1', now)
-  assert.equal(a.parcelDailyRolls(b), 2)
+  assert.equal(a.PARCEL_DAILY_ROLLS, 3)
   assert.equal(a.parcelView(b, 'Nicole', now).remaining, 0)
-  assert.equal(a.parcelView(b, 'Mathias', now).remaining, 1)
-  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'n4', 1, 0, now), /dagens slag/)
+  assert.equal(a.parcelView(b, 'Mathias', now).remaining, 2)
+  assert.throws(() => a.rollParcel(b, 'Nicole', day, 'n4', 1, 0, now), /dagens tre slag/)
   a.rollParcel(b, 'Mathias', day, 'm2', 1, 0, now)
-  assert.throws(() => a.rollParcel(b, 'Mathias', day, 'm3', 1, 0, now), /dagens slag/)
-  assert.equal(a.parcelView(b, 'Nicole', new Date('2026-12-02T03:00:00Z')).remaining, 2)
+  a.rollParcel(b, 'Mathias', day, 'm3', 6, 0, now)
+  a.takeParcel(b, 'Mathias', 'p1', now)
+  assert.equal(b.parcels[0].owner, 'Mathias')
+  assert.throws(() => a.rollParcel(b, 'Mathias', day, 'm4', 1, 0, now), /dagens tre slag/)
+  assert.equal(a.parcelView(b, 'Nicole', new Date('2026-12-02T03:00:00Z')).remaining, 3)
   // Retrying an old roll after the phase switch remains idempotent.
   a.rollParcel(b, 'Nicole', day, 'n3', 6, 0, now)
   assert.equal(b.turns['u:Nicole'][day].length, 3)
@@ -109,7 +112,7 @@ test('prototype-like names have independent daily limits', () => {
     b = board()
   a.rollParcel(b, 'constructor', day, 'safe', 6, 0, now)
   a.takeParcel(b, 'constructor', 'p1', now)
-  assert.equal(a.parcelView(b, 'constructor', now).remaining, 1)
+  assert.equal(a.parcelView(b, 'constructor', now).remaining, 2)
 })
 for (const redis of [false, true])
   test(`global game CAS serializes competing devices (${redis ? 'Redis' : 'local'})`, async () => {

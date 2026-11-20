@@ -57,7 +57,8 @@ test('three gifts per participant include a mug, snowglobe from seven and wine f
   ])
     assert.equal(pool.filter((p) => p.kind === kind).length, 1)
   assert.equal(pool.filter((p) => p.kind === 'bottle').length, 2)
-  assert.equal(pool.filter((p) => p.kind === 'elf').length, 5)
+  assert.equal(pool.find((p) => p.kind === 'frame').amount, 50)
+  assert.equal(pool.filter((p) => p.kind === 'elf').length, 4)
   assert.equal(pool.filter((p) => p.amount === 500).length, 1)
   assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'cake')), true)
   assert.equal(pool.find((p) => p.kind === 'cake').amount, 50)
@@ -88,13 +89,25 @@ test('three gifts per participant include a mug, snowglobe from seven and wine f
     assert.equal(gifts.filter((p) => p.kind === 'white-wine').length, people >= 9 ? 1 : 0)
     assert.equal(gifts.filter((p) => p.kind === 'snowglobe').length, people >= 7 ? 1 : 0)
     assert.equal(gifts.filter((p) => p.kind === 'bottle').length, 2)
-    assert.ok(gifts.filter((p) => p.kind === 'elf').length >= 2)
+    const elves = Math.max(2, Math.ceil(count * 0.15)) - (people >= 7 && people <= 10 ? 1 : 0)
+    assert.equal(gifts.filter((p) => p.kind === 'elf').length, elves)
     assert.equal(
       a.parcelRewardIcon(gifts.find((p) => p.kind === 'rta-mug')),
       '/games/advent/rta-mug-christmas-v2.webp',
     )
   }
   assert.throws(() => a.parcelRewardPool(6), /fire deltagere/)
+  for (const [people, elves, bananas] of [
+    [6, 3, 5],
+    [7, 3, 7],
+    [8, 3, 10],
+    [9, 4, 11],
+    [10, 4, 14],
+  ]) {
+    const gifts = a.parcelRewardPool(a.parcelCount(people))
+    assert.equal(gifts.filter((p) => p.kind === 'elf').length, elves)
+    assert.equal(gifts.filter((p) => p.kind === 'bananas').length, bananas)
+  }
   for (const p of pool.filter((p) => p.kind === 'bananas'))
     assert.ok(p.amount >= 25 && p.amount <= 250)
   const small = a.parcelRewardPool(12)
@@ -218,20 +231,23 @@ test('exclusive frame is granted and equipped only when its owner opens it', asy
   const { api: a } = harness(),
     b = board(),
     user = {}
-  b.parcels[0].reward = { kind: 'frame', amount: 0, title: 'Eksklusiv profilramme' }
-  b.parcels[0].amount = 0
+  b.parcels[0].reward = { kind: 'frame', amount: 50, title: 'Eksklusiv profilramme' }
+  b.parcels[0].amount = 50
   a.updateUser = async (_key, change) => change(user)
   await a.mutateParcels(2026, [], (g) => Object.assign(g, b))
   await a.settleParcelPrizes(b)
   assert.equal(user.frame, undefined)
+  assert.equal(await a.readEconomy('Nicole'), undefined)
   a.reserveParcelOpening(b, 'Nicole', 'p1', new Date(end))
   await a.mutateParcels(2026, [], (g) => Object.assign(g, b))
   await a.settleParcelPrizes(b)
   assert.equal(user.frame, 'parcel-2026')
+  assert.equal((await a.readEconomy('Nicole')).balance, 50)
   assert.deepEqual([...user.ownedFrames], ['parcel-2026'])
   delete user.frame
   await a.settleParcelPrizes(b)
   assert.equal(user.frame, undefined)
+  assert.equal((await a.readEconomy('Nicole')).balance, 50)
   assert.deepEqual([...user.ownedFrames], ['parcel-2026'])
   assert.equal(
     (await a.readEconomy('Nicole')).parcelRewards['parcel-open:2026:p1'].reward.kind,

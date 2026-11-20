@@ -18,6 +18,7 @@ export function useParcelGame(pollMs = 5000) {
   const fullTable = testMode && useRoute().query.table === 'full'
   const registrationPreview = testMode && useRoute().query.registration === '1'
   const finishedPreview = testMode && useRoute().query.finished === '1'
+  const stealingPreview = testMode && useRoute().query.steal === '1'
   const { reload: reloadWallet } = useEconomy()
   const { reload: reloadUsers } = useUsers()
   const name = computed(() => (testMode ? user.name.value || 'Nicole' : user.name.value))
@@ -54,9 +55,13 @@ export function useParcelGame(pollMs = 5000) {
           'Mathias',
           'Norsk',
           'Tobias Frost',
-          ...(finishedPreview ? ['Emil', 'Mikkel', 'Anna', 'Jonas', 'Sofie', 'Lucas'] : []),
+          ...(finishedPreview || stealingPreview
+            ? ['Nicole', 'Emil', 'Mikkel', 'Anna', 'Jonas', 'Sofie', 'Lucas']
+            : []),
         ]),
-      ].filter((p) => !registrationPreview || p !== name.value)
+      ]
+        .filter((p) => !registrationPreview || p !== name.value)
+        .slice(0, 10)
       demo = {
         year: 2026,
         startsAt: new Date(Date.now() - 86400000).toISOString(),
@@ -71,8 +76,9 @@ export function useParcelGame(pollMs = 5000) {
           (_, i) => ({
             id: `p${i + 1}`,
             style: i % 8,
-            owner:
-              registrationPreview || fullTable || i < 4
+            owner: stealingPreview
+              ? players[i % players.length]!
+              : registrationPreview || fullTable || i < 4
                 ? null
                 : players[1 + (i % (players.length - 1))]!,
             amount: 50 * (i + 1),
@@ -102,6 +108,12 @@ export function useParcelGame(pollMs = 5000) {
       data.registrationOpen = true
     }
     return data
+  }
+  function resetDemo() {
+    if (!testMode || busy.value) return
+    demo = undefined
+    error.value = ''
+    apply(demoView())
   }
   async function refresh() {
     if (testMode) {
@@ -245,5 +257,18 @@ export function useParcelGame(pollMs = 5000) {
     stop?.()
     clearInterval(timer)
   })
-  return { state, name, busy, loading, error, seconds, refresh, act, testMode, rollStage, rollDie }
+  return {
+    state,
+    name,
+    busy,
+    loading,
+    error,
+    seconds,
+    refresh,
+    act,
+    testMode,
+    resetDemo,
+    rollStage,
+    rollDie,
+  }
 }

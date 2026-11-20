@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import type { ParcelView } from '../../../shared/types/parcel-game'
 import { isParcelPhysical } from '../../../shared/utils/parcel-rewards'
-import { parcelDailyRolls } from '../../../shared/utils/parcel-game'
+import { PARCEL_DAILY_ROLLS } from '../../../shared/utils/parcel-game'
 useHead({ title: 'Pakkeleg · Stenbygaard Stickers' })
-const { state, name, busy, loading, error, seconds, refresh, act, testMode, rollStage, rollDie } =
-  useParcelGame()
+const {
+  state,
+  name,
+  busy,
+  loading,
+  error,
+  seconds,
+  refresh,
+  act,
+  testMode,
+  resetDemo,
+  rollStage,
+  rollDie,
+} = useParcelGame()
 const local = import.meta.dev
 const rules = ref(false)
 watch(
@@ -91,7 +103,7 @@ watch(
     <div class="parcel-intro">
       <span>ÉT BORD · ALLE MOD ALLE</span>
       <h2>Hvem løber med gaverne?</h2>
-      <p>Tre slag om dagen, indtil bordet er tømt. Derefter to. Kun seksere giver pakker.</p>
+      <p>Tre slag om dagen. Kun seksere giver pakker – også når du stjæler.</p>
     </div>
     <p
       v-if="error"
@@ -348,7 +360,7 @@ watch(
             :size="66"
           />
           <div>
-            <b>{{ state.remaining }} af {{ parcelDailyRolls(state) }} slag tilbage</b
+            <b>{{ state.remaining }} af {{ PARCEL_DAILY_ROLLS }} slag tilbage</b
             ><span>{{
               state.turn
                 ? state.turn.die === 6
@@ -457,6 +469,20 @@ watch(
     >
       Test en sekser
     </button>
+    <button
+      v-if="testMode"
+      class="rules-toggle"
+      :disabled="busy"
+      @click="resetDemo"
+    >
+      Nulstil testbord
+    </button>
+    <a
+      v-if="local"
+      class="rules-toggle"
+      href="/spil/pakkeleg?preview=1&steal=1"
+      >Prøv at stjæle · lokalt testbord</a
+    >
     <div
       v-if="rules"
       id="parcel-rules"
@@ -467,9 +493,8 @@ watch(
         Pakkelegen starter 27. november kl. 04.00.
       </p>
       <p>
-        Alle deler bordet, men spiller, når de har tid. Du har tre slag pr. døgn, mens der er pakker
-        på midten, og derefter to. Allerede brugte slag tæller med, når grænsen skifter. Kun seksere
-        giver en pakke. Tag først fra midten, og stjæl derefter fra de andre.
+        Alle deler bordet, men spiller, når de har tid. Du har tre slag pr. døgn gennem hele
+        spillet. Kun seksere giver en pakke. Tag først fra midten, og stjæl derefter fra de andre.
       </p>
       <p>
         Du har 60 sekunder til at vælge. Vi vælger automatisk, hvis du går væk. Pakkerne beholder

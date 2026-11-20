@@ -4,6 +4,7 @@ import type { ParcelReward } from '../types/parcel-game'
 export function parcelRewardPool(count: number): ParcelReward[] {
   if (!count) return []
   if (count < 12) throw new Error('Der skal være mindst fire deltagere.')
+  const elves = Math.max(2, Math.ceil(count * 0.15)) - (count >= 21 && count <= 30 ? 1 : 0)
   const pool: ParcelReward[] = [
     { kind: 'mix-max', amount: 50, title: 'Mix Max' },
     { kind: 'cake', amount: 50, title: 'Træstammer' },
@@ -11,9 +12,9 @@ export function parcelRewardPool(count: number): ParcelReward[] {
     { kind: 'vampiri', amount: 50, title: 'Haribo Vampiri' },
     { kind: 'juleskum', amount: 50, title: 'Juleskum' },
     { kind: 'rta-mug', amount: 50, title: 'RTA-kop' },
-    { kind: 'frame', amount: 0, title: 'Eksklusiv juleprofilramme' },
+    { kind: 'frame', amount: 50, title: 'Eksklusiv juleprofilramme' },
     { kind: 'golden', amount: 500, title: 'Den gyldne gave' },
-    ...Array.from({ length: Math.max(2, Math.ceil(count * 0.15)) }, () => ({
+    ...Array.from({ length: elves }, () => ({
       kind: 'elf' as const,
       amount: 1,
       title: 'Drillenissens gave',

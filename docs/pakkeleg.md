@@ -5,13 +5,13 @@ Lokalt spil på `/spil/pakkeleg`. Isoleret simulation på `/spil/pakkeleg?previe
 ## Regler
 
 - Tilmelding 20. november kl. 04 til og med 26. november kl. 23.59 dansk tid. Pris 100 bananer pr. bruger. Ingen eftertilmelding.
-- Spillet starter 27. november kl. 04 dansk tid. Tre slag pr. tilmeldt bruger pr. spildøgn, mens der er pakker på midten; derefter to. Allerede brugte slag tæller med i den nye grænse samme dag, så ingen får ekstra slag ved skiftet. Nulstilling kl. 04; ingen opsparing.
+- Spillet starter 27. november kl. 04 dansk tid. Tre slag pr. tilmeldt bruger pr. spildøgn gennem hele spillet, både fra midten og ved tyveri. Nulstilling kl. 04; ingen opsparing.
 - Kun seksere giver pakkevalg. 60 sekunder, ellers automatisk valg. Serveren behandler udløbne valg inden næste handling, også efter offlineperioder.
 - Tag fra midten først. Når midten er tom, vælger man en anden brugers pakke. Egne pakker kan ikke vælges.
 - Kun betalende tilmeldte brugere er med. 3 gaver pr. deltager: 7 deltagere giver 21 gaver, 10 giver 30. Andre kan se bordet som tilskuere.
 - Fast udseende og nummer pr. pakke. Sluttidspunktet er hemmeligt til afslutningen. Indholdet er hemmeligt for alle, inklusive ejeren, indtil ejeren selv åbner pakken.
 - Slut trækkes kryptografisk én gang i intervallet 25. december kl. 00 til 31. december kl. 23.59.59, dansk tid. Når tiden er gået, låses ejerskab. Afslutningen beregnes ved næste serverforespørgsel. Ejerskab låses, men ingen uåbnede præmier udbetales automatisk.
-- Én Mix Max + 50 (to ved mindst 12 deltagere), én fysisk gave med træstammer + 50, én Faxe Kondi-flaske + 50, én Haribo Vampiri-pose + 50, én juleskumspose + 50, én RTA-kop + 50, to separate drikkedunksgaver + 50 hver, én eksklusiv profilramme, én gylden gave med 500 og mindst to drillenisser med 1 banan hver (15 % rundet op). RTA-snekugle + 50 først ved 7+ deltagere, hvidvin + 50 først ved 9+ deltagere. Resten er 25/50/100/150/250 fordelt efter vægt 3/3/2/2/2. Koppen indgår i de 3 gaver pr. deltager. Antallet tilpasses indtil præmierne er fordelt ved spilstart; allerede fordelte spil ændres ikke.
+- Én Mix Max + 50 (to ved mindst 12 deltagere), én fysisk gave med træstammer + 50, én Faxe Kondi-flaske + 50, én Haribo Vampiri-pose + 50, én juleskumspose + 50, én RTA-kop + 50, to separate drikkedunksgaver + 50 hver, én eksklusiv profilramme + 50 bananer, én gylden gave med 500 og mindst to drillenisser med 1 banan hver (15 % rundet op, dog én færre ved 7–10 deltagere: 3 ved 7–8 og 4 ved 9–10). RTA-snekugle + 50 først ved 7+ deltagere, hvidvin + 50 først ved 9+ deltagere. Resten er 25/50/100/150/250 fordelt efter vægt 3/3/2/2/2. Koppen indgår i de 3 gaver pr. deltager. Antallet tilpasses indtil præmierne er fordelt ved spilstart; allerede fordelte spil ændres ikke.
 - Minimum fire deltagere for at kunne rumme de faste præmier; ellers aflyses og 100 bananer refunderes én gang til hver tilmeldt.
 - Gaverne fordeles tilfældigt på indpakningerne én gang ved spilstart efter tilmelding.
 - Efter slut har ejerne præcis 14 dage til at åbne egne gaver. Andre ser først indhold og beløb efter åbning. Personkort summerer kun åbnede bananer, fysiske præmier og profilramme. Efter fristen skjules kortet på Spil, og pakkelegsiden viser afsluttet status. Uåbnede gaver bliver ikke automatisk udbetalt.
@@ -35,7 +35,7 @@ Gaveåbning reserverer `openingAt` på pakken i global CAS. Wallet-CAS gemmer en
 
 ## Kontrol
 
-`tests/parcel-game.test.mjs` tester tre slag før tomt bord, to derefter, kl. 04, genafsendelser, selvtyveri, krav om at tømme midten, automatisk valg efter offlineperiode, skjult sluttid/indhold, afslutning, samtidige enheder i både Redis- og lokalt CAS samt enkelt udbetaling. Mobilvisningen er kontrolleret ved 390 px med simulationen.
+`tests/parcel-game.test.mjs` tester tre slag gennem hele spillet, kl. 04, genafsendelser, selvtyveri, krav om at tømme midten, automatisk valg efter offlineperiode, skjult sluttid/indhold, afslutning, samtidige enheder i både Redis- og lokalt CAS samt enkelt udbetaling. Mobilvisningen er kontrolleret ved 390 px med simulationen.
 
 Slutvisning til lokal test: `/spil/pakkeleg?preview=1&finished=1`. Ti fiktive deltagere, 20 gaver; ingen saldoændringer eller rigtige præmier.
 
@@ -57,3 +57,7 @@ Alle tider er dansk tid. Tobias Frost undtages fra disse beskeder, og notifikati
 | Når midten er tømt | Alle brugere | Alle pakker er taget fra bordet — Nu er det tid til at stjæle. | `/spil/pakkeleg` |
 
 Planlægges automatisk på drift med QStash. Tilmelding afgøres ved afsendelsen. Status og opsætning ses under Admin → Julebeskeder. Lokal test og dev sender ingenting.
+
+Lokalt tyveri-testbord: /spil/pakkeleg?preview=1&steal=1. Ti deltagere med tre gaver hver, tom midte, tre friske slag og knapper til test-sekser og nulstilling. Kun i Nuxt dev; ingen rigtige gaver, saldoændringer, API-slag eller push.
+
+Nye indpakninger (lokalt, 19. november): svømmefødder, snorkel/briller, cykelhjul, cykelhjelm, Oakley-inspirerede løbesolbriller og bil. Nu 26 former; de første 20 beholder deres placering, og nye former vises fra gave 21. Oversigt: /preview/pakkeindpakninger (kun dev). Indpakning siger intet om præmien.

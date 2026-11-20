@@ -39,7 +39,7 @@ const boxesDone = computed(() => Boolean(state.value?.boxes))
         to="/spil/pakkeleg"
         ><span aria-hidden="true">🎁 🎲</span>
         <div>
-          <small>3 SLAG → 2 SLAG · ÉT FÆLLES BORD</small>
+          <small>TRE SLAG · ÉT FÆLLES BORD</small>
           <h2>Pakkeleg</h2>
           <p>
             {{

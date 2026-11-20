@@ -16,6 +16,8 @@ export async function announceRelease() {
   if (process.env.VERCEL_ENV !== 'production' || !redisEnabled) return
   const release = latestPublishedRelease(CHANGELOG)
   if (!release) return
+  // Patch releases stay in Hvad er nyt, but never trigger an update push.
+  if (Number(release.version.split('.')[2] ?? 0) > 0) return
   const rank = releaseRank(release.version)
   if (rank <= releaseRank(BASELINE)) return
 
