@@ -17,7 +17,8 @@ const pushMessage = computed(() => {
     scheduled:
       'Startdatoen annonceres ved gemning. Påmindelser er planlagt 24 timer og én time før start samt ved åbning. Tidspunkter, der allerede er passeret, springes over. Vinderen annonceres, når krydsordet løses.',
     failed: 'Tidspunktet er gemt, men push kunne ikke planlægges. Prøv at gemme tidspunktet igen.',
-    pending: 'Push er ikke planlagt for dette tidspunkt endnu. Gem tidspunktet igen.',
+    pending:
+      'Pushplanen mangler eller er fra en ældre version. Appen forsøger automatisk at planlægge kommende beskeder. Du kan også gemme tidspunktet igen.',
   }
   return view.value ? messages[view.value.pushStatus] : ''
 })

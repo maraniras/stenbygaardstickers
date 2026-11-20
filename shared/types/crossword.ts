@@ -18,7 +18,12 @@ export interface CrosswordClue {
 }
 export interface CrosswordState {
   opensAt: string | null
-  pushSchedule?: { opensAt: string; status: 'scheduled' | 'failed' }
+  pushSchedule?: {
+    opensAt: string
+    status: 'scheduled' | 'failed'
+    version?: number
+    tokenKey?: string
+  }
   pushSent?: Record<
     string,
     Partial<Record<'announced' | 'day-before' | 'reminder' | 'opened', string>>

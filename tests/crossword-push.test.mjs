@@ -74,6 +74,7 @@ function setup({ env = 'production', token = 'fixture-token' } = {}) {
     users,
     publicSubs,
     prefs,
+    env: context.process.env,
     failQueue: (value) => {
       failQueue = value
     },
@@ -113,6 +114,76 @@ test('three server-side jobs target 24 hours, one hour before opening and the op
   }
   assert.equal(h.api.crosswordPushAuthorized('Bearer invalid'), false)
   assert.equal(h.api.crosswordPushAuthorized(undefined), false)
+})
+
+test('deploy automatically upgrades a legacy push plan without changing the date or broadcasting an announcement', async () => {
+  const h = setup()
+  h.state.pushSchedule = { opensAt: opening, status: 'scheduled' }
+  assert.equal(h.api.crosswordPushStatus(h.state), 'pending')
+  const now = new Date(time - 48 * hour)
+  await Promise.all(Array.from({ length: 12 }, () => h.api.checkCrosswordPushSchedule(now)))
+  assert.equal(h.state.opensAt, opening)
+  assert.equal(h.jobs.length, 3)
+  assert.equal(h.pushes.length, 0)
+  assert.equal(h.api.crosswordPushStatus(h.state), 'scheduled')
+  await h.api.checkCrosswordPushSchedule(new Date(now.getTime() + 6 * 60000))
+  assert.equal(h.jobs.length, 3, 'current plans are not published again')
+  h.env.QSTASH_TOKEN = 'replacement-fixture-token'
+  assert.equal(h.api.crosswordPushStatus(h.state), 'pending')
+  await h.api.checkCrosswordPushSchedule(new Date(now.getTime() + 12 * 60000))
+  assert.equal(h.jobs.length, 6, 'token rotation repairs future callback authorization')
+  assert.equal(h.pushes.length, 0)
+  assert.equal(
+    h.api.crosswordPushAuthorized(h.jobs.at(-1).headers['Upstash-Forward-Authorization']),
+    true,
+  )
+})
+
+test('automatic planning retries a failed publish after five minutes without announcing the date', async () => {
+  const h = setup(),
+    now = new Date(time - 48 * hour)
+  h.failQueue(true)
+  await h.api.checkCrosswordPushSchedule(now)
+  assert.equal(h.api.crosswordPushStatus(h.state), 'failed')
+  h.failQueue(false)
+  await h.api.checkCrosswordPushSchedule(new Date(now.getTime() + 60000))
+  assert.equal(h.jobs.length, 0)
+  await h.api.checkCrosswordPushSchedule(new Date(now.getTime() + 5 * 60000))
+  assert.equal(h.jobs.length, 3)
+  assert.equal(h.pushes.length, 0)
+})
+
+test('automatic planning never sends old reminders, schedules ended games, or runs locally', async () => {
+  const now = new Date(time - 30 * 60000)
+  const h = setup()
+  await h.api.checkCrosswordPushSchedule(now)
+  assert.deepEqual(
+    h.jobs.map((job) => job.body.kind),
+    ['opened'],
+  )
+  assert.equal(h.pushes.length, 0)
+  for (const options of [{ env: '' }, { env: 'preview' }, { token: '' }]) {
+    const inactive = setup(options)
+    await inactive.api.checkCrosswordPushSchedule(now)
+    assert.equal(inactive.jobs.length, 0)
+    assert.equal(inactive.pushes.length, 0)
+  }
+  for (const change of [
+    (state) => {
+      state.opensAt = null
+    },
+    (state) => {
+      state.winner = { name: 'Nicole', at: opening }
+    },
+  ]) {
+    const ended = setup()
+    change(ended.state)
+    await ended.api.checkCrosswordPushSchedule(now)
+    assert.equal(ended.jobs.length, 0)
+  }
+  const expired = setup()
+  await expired.api.checkCrosswordPushSchedule(new Date(time + 1))
+  assert.equal(expired.jobs.length, 0)
 })
 
 test('Hobby-compatible relays keep every delay under seven days without sending early', async () => {

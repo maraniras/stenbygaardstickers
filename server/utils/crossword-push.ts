@@ -10,6 +10,7 @@ interface CrosswordPushJob {
 const HOUR = 3600_000
 // Stay below the free QStash seven-day delay limit, relaying longer schedules.
 const MAX_DELAY = 6 * 24 * HOUR
+const PLAN_VERSION = 2
 const DESTINATION = 'https://stenbygaardstickers.vercel.app/api/cron/crossword'
 const active = () => process.env.VERCEL_ENV === 'production' && redisEnabled
 const targetTime = (job: CrosswordPushJob) =>
@@ -33,9 +34,18 @@ export function crosswordPushStatus(state: CrosswordState) {
   if (!active()) return 'development' as const
   if (!process.env.QSTASH_TOKEN) return 'not-configured' as const
   if (!state.opensAt) return 'unscheduled' as const
-  return state.pushSchedule?.opensAt === state.opensAt
-    ? state.pushSchedule.status
+  if (state.pushSchedule?.opensAt !== state.opensAt) return 'pending' as const
+  if (state.pushSchedule.status === 'failed') return 'failed' as const
+  return state.pushSchedule.version === PLAN_VERSION &&
+    state.pushSchedule.tokenKey === planTokenKey()
+    ? ('scheduled' as const)
     : ('pending' as const)
+}
+function planTokenKey() {
+  return createHmac('sha256', process.env.QSTASH_TOKEN || '')
+    .update('crossword-plan-v2')
+    .digest('hex')
+    .slice(0, 24)
 }
 async function queueCrosswordPush(job: CrosswordPushJob, now: Date) {
   const target = targetTime(job)
@@ -68,12 +78,16 @@ async function queueCrosswordPush(job: CrosswordPushJob, now: Date) {
 }
 
 /** Called when admin saves a time. No external jobs or pushes are created locally or on preview. */
-export async function scheduleCrosswordPushes(state: CrosswordState, now = new Date()) {
+export async function scheduleCrosswordPushes(
+  state: CrosswordState,
+  now = new Date(),
+  announce = true,
+) {
   if (!active() || !state.opensAt) return crosswordPushStatus(state)
   const opensAt = state.opensAt
   let status: 'scheduled' | 'failed' = 'scheduled'
   try {
-    await announceCrosswordOpening(state, now)
+    if (announce) await announceCrosswordOpening(state, now)
   } catch {
     status = 'failed'
     console.error('Kunne ikke annoncere krydsordets starttidspunkt.')
@@ -89,9 +103,33 @@ export async function scheduleCrosswordPushes(state: CrosswordState, now = new D
     console.error('Kunne ikke planlægge krydsordets pushbeskeder.')
   }
   await mutateCrossword((current) => {
-    if (current.opensAt === opensAt) current.pushSchedule = { opensAt, status }
+    if (current.opensAt === opensAt)
+      current.pushSchedule = { opensAt, status, version: PLAN_VERSION, tokenKey: planTokenKey() }
   })
   return status
+}
+
+let checking: Promise<void> | undefined
+let retryAt = 0
+/** Reconcile future jobs after a deploy, new reminder type, token change or failed publish.
+ * Never announce the date again, deliver a past reminder, or publish from local/preview. */
+export function checkCrosswordPushSchedule(now = new Date()): Promise<void> {
+  if (!active() || !process.env.QSTASH_TOKEN) return Promise.resolve()
+  if (checking) return checking
+  if (now.getTime() < retryAt) return Promise.resolve()
+  retryAt = now.getTime() + 5 * 60_000
+  checking = (async () => {
+    const state = await readCrossword()
+    if (!state.opensAt || state.winner || Date.parse(state.opensAt) <= now.getTime()) return
+    if (crosswordPushStatus(state) !== 'scheduled') await scheduleCrosswordPushes(state, now, false)
+  })()
+    .catch(() => {
+      console.error('Kunne ikke kontrollere krydsordets pushplan.')
+    })
+    .finally(() => {
+      checking = undefined
+    })
+  return checking
 }
 
 /** Authenticated delayed callback. Stale/cancelled schedules and duplicate deliveries are harmless. */
