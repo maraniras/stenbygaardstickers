@@ -9,6 +9,7 @@ import {
   takeParcel,
   parcelSchedule,
   PARCEL_ENTRY_FEE,
+  PARCEL_MIN_PARTICIPANTS,
   reserveParcelOpening,
 } from '../../shared/utils/parcel-game'
 import type { EconomyRecord } from '../../shared/types/economy'
@@ -134,7 +135,7 @@ export async function mutateParcels<T>(
 }
 export function prepareParcelRewards(game: ParcelGame, now = new Date()) {
   if (game.prizesAssigned || now.getTime() < Date.parse(game.startsAt)) return
-  if (game.players.length < 4) {
+  if (game.players.length < PARCEL_MIN_PARTICIPANTS) {
     game.cancelled = true
     game.ended = true
     game.endsAt = game.startsAt

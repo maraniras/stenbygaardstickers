@@ -16,10 +16,21 @@ function fixture(redis = false) {
   return { api, draw }
 }
 
-test('admin physical overview preserves all fourteen prizes, including the mug and bundled finds', () => {
+test('admin physical overview preserves legacy bundled finds, including all fourteen prizes', () => {
   const { api, draw } = fixture()
-  // Put several prizes into the same opening, including a physical extra.
-  for (const award of draw.awards) award.day = 24
+  // Legacy stored draws remain readable even though new draws never bundle prizes.
+  draw.awards = [
+    ...Array(5).fill('mix-max'),
+    'red-wine',
+    'white-wine',
+    'cycling-bottle',
+    'cycling-bottle',
+    'faxe-kondi',
+    'faxe-kondi',
+    'vampiri',
+    'juleskum',
+    'rta-mug',
+  ].map((reward) => ({ reward, winner: 'Norsk', day: 24 }))
   const physical = draw.awards.filter((a) => draw.catalog[a.reward].kind === 'physical')
   const opening = {
     day: 24,
@@ -168,7 +179,7 @@ test('admin distinguishes assigned prizes from found prizes and never invents wi
   const { api, draw } = fixture()
   assert.equal(api.adventPhysicalWinners(undefined, {}).length, 0)
   const unopened = api.adventPhysicalWinners(draw, {})
-  assert.equal(unopened.length, 14)
+  assert.equal(unopened.length, 11)
   assert.ok(unopened.every((entry) => entry.openedAt === null))
   const wallets = {
     norsk: {
@@ -223,7 +234,7 @@ test('admin API authenticates before reading wallets or the draw, is uncached an
   assert.equal(reads, 0)
   allowed = true
   const response = await exports.default({})
-  assert.equal(response.physicalWinners.length, 14)
+  assert.equal(response.physicalWinners.length, 11)
   assert.equal(headers['Cache-Control'], 'no-store')
   assert.equal(response.draw.seed, undefined)
   assert.equal(response.draw.plans, undefined)

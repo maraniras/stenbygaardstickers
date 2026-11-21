@@ -10,5 +10,22 @@ export function useTheme() {
     // Produktions- og Preview-builds følger fortsat de normale sæsondatoer.
     return import.meta.dev ? 'jul' : themeForDate()
   })
+  if (import.meta.client) {
+    let timer: ReturnType<typeof setInterval> | undefined
+    const refresh = () => {
+      theme.value = import.meta.dev ? 'jul' : themeForDate()
+    }
+    onMounted(() => {
+      timer = setInterval(refresh, 30_000)
+      document.addEventListener('visibilitychange', refresh)
+      window.addEventListener('focus', refresh)
+      refresh()
+    })
+    onBeforeUnmount(() => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', refresh)
+      window.removeEventListener('focus', refresh)
+    })
+  }
   return { theme }
 }

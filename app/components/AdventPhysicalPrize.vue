@@ -4,6 +4,9 @@ import { adventPrizeIcon } from '../../shared/utils/advent-rewards'
 defineProps<{ entry: AdventPhysicalWinner; saving: string }>()
 const emit = defineEmits<{ toggle: [entry: AdventPhysicalWinner] }>()
 const names: Record<string, string> = {
+  'uno-x-bottle': 'Uno-X-drikkedunk',
+  'visma-bottle': 'Visma-drikkedunk',
+  snowglobe: 'RTA-snekugle',
   juleskum: 'Juleskum',
   vampiri: 'Haribo Vampiri',
   'faxe-kondi': 'Faxe Kondi',

@@ -29,7 +29,9 @@ test('each calendar door unlocks at 04:00 Danish time; missed doors stay availab
     ['2026-12-10T02:59:59Z', 9],
     ['2026-12-10T03:00:00Z', 10],
     ['2026-12-24T03:00:00Z', 24],
-    ['2027-01-01T12:00:00Z', 24],
+    ['2026-12-31T22:59:59Z', 24],
+    ['2026-12-31T23:00:00Z', 0],
+    ['2027-01-01T12:00:00Z', 0],
   ])
     assert.equal(a.adventAvailableDay(2026, new Date(time)), available)
   assert.equal(a.adventUnlockAt(2026, 24), '2026-12-24T03:00:00.000Z')

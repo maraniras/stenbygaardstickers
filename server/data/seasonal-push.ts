@@ -57,4 +57,13 @@ export const SEASONAL_PUSH_JOBS: SeasonalPushJob[] = [
     body: 'Åbn første låge i julekalenderen nu.',
     url: '/spil/julekalender',
   },
+  {
+    id: 'new-year-gift-2027',
+    at: '2027-01-01T11:00:00.000Z',
+    audience: 'all',
+    type: 'gifts',
+    title: 'Start året med en gave 🎁',
+    body: 'Godt nytår! Åbn appen i dag og få 500 bananer. Gaven kan hentes hele den 1. januar.',
+    url: '/spil/bananer',
+  },
 ]

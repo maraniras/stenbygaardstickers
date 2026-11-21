@@ -28,7 +28,7 @@ const demo = ref<ParcelAdminCampaign[]>(
             },
             {
               winner: 'Norsk',
-              reward: { kind: 'cake', title: 'Træstammer', amount: 50 },
+              reward: { kind: 'vampiri', title: 'Haribo Vampiri', amount: 50 },
               openedAt: null,
               deliveredAt: null,
             },
@@ -40,19 +40,29 @@ const demo = ref<ParcelAdminCampaign[]>(
             },
             {
               winner: 'Nicole',
-              reward: { kind: 'bottle', title: 'Drikkedunk', amount: 50 },
+              reward: {
+                kind: 'bottle',
+                bottle: 'sparekassen',
+                title: 'Sparekassen Danmark-drikkedunk',
+                amount: 50,
+              },
               openedAt: '2026-12-28T12:00:00Z',
               deliveredAt: null,
             },
             {
               winner: 'Tobias Frost',
-              reward: { kind: 'bottle', title: 'Drikkedunk', amount: 50 },
+              reward: {
+                kind: 'bottle',
+                bottle: 'totalenergies',
+                title: 'TotalEnergies-drikkedunk',
+                amount: 50,
+              },
               openedAt: null,
               deliveredAt: null,
             },
             {
               winner: null,
-              reward: { kind: 'snowglobe', title: 'RTA-snekugle', amount: 50 },
+              reward: { kind: 'juleskum', title: 'Juleskum', amount: 50 },
               openedAt: null,
               deliveredAt: null,
             },

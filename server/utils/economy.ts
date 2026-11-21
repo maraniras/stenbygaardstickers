@@ -4,6 +4,7 @@ import { syncWordleStats } from './wordle-stats'
 import { prepareCasinoDay } from './casino-limit'
 import { boxesAchievements } from '../../shared/utils/boxes-badges'
 import { settleStickerRewards } from './sticker-rewards'
+import { NEW_YEAR_GIFT, newYearGiftAvailable } from '../../shared/utils/new-year-gift'
 
 export async function economyContext() {
   const stickers = withDistance(
@@ -85,12 +86,36 @@ export function settleEconomy(
     if (!changed) break
   }
 }
-export async function syncEconomy(name: string, context?: EconomyContext) {
+/** Only the authenticated app-open route opts in; public/background sync never grants this gift. */
+export function claimNewYearGift(record: EconomyRecord, now = new Date()) {
+  return (
+    newYearGiftAvailable(now) &&
+    creditBananas(
+      record,
+      NEW_YEAR_GIFT.id,
+      NEW_YEAR_GIFT.amount,
+      'Godt nytår 2027 · en positiv start på året',
+      now,
+    )
+  )
+}
+export async function syncEconomy(
+  name: string,
+  context?: EconomyContext,
+  options: { appOpenedAt?: Date } = {},
+) {
   const data = context ?? (await economyContext())
   return (
-    await mutateEconomy(name, (record) => settleEconomy(record, name, data), {
-      skipUnchanged: true,
-    })
+    await mutateEconomy(
+      name,
+      (record) => {
+        if (options.appOpenedAt) claimNewYearGift(record, options.appOpenedAt)
+        settleEconomy(record, name, data, options.appOpenedAt)
+      },
+      {
+        skipUnchanged: true,
+      },
+    )
   ).record
 }
 export async function syncAllEconomies(names?: string[]) {

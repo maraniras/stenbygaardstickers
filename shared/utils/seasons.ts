@@ -32,11 +32,20 @@ export function easterPeriod(year: number) {
   return { start, end }
 }
 
+const DANISH_CALENDAR_DATE = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Copenhagen',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
 export function themeForDate(d = new Date()): Theme {
-  const m = d.getMonth() + 1
-  const day = d.getDate()
-  const noon = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12)
-  const easter = easterPeriod(d.getFullYear())
+  const parts = DANISH_CALENDAR_DATE.formatToParts(d)
+  const value = (type: string) => Number(parts.find((part) => part.type === type)!.value)
+  const year = value('year'),
+    m = value('month'),
+    day = value('day')
+  const noon = new Date(year, m - 1, day, 12)
+  const easter = easterPeriod(year)
   if (noon >= easter.start && noon <= easter.end) return 'paaske'
   if ((m === 10 && day >= 26) || (m === 11 && day === 1)) return 'halloween'
   if ((m === 11 && day >= 20) || m === 12) return 'jul'

@@ -6,8 +6,12 @@ const now = new Date('2026-12-01T03:00:00Z')
 const names = [
   'Mathias',
   'Tobias Frost',
+  'Frederik Prip',
   'Emil',
   'Norsk',
+  'Anna',
+  'Nicole',
+  'Morten',
   ...Array.from({ length: 25 }, (_, i) => `Ven ${i}`),
 ]
 const users = names.map((name) => ({ name, createdAt: '2026-11-07T12:00:00Z' }))
@@ -19,6 +23,7 @@ function harness(redis = false) {
   return h
 }
 const prizes = (plan) => plan.flatMap((d) => [d.prize, ...(d.extras ?? [])])
+const isBottle = (reward) => ['uno-x-bottle', 'visma-bottle'].includes(reward)
 
 test('100 seeded calendars respect all stocks, exclusions and individual count bounds', () => {
   const { api: a } = harness()
@@ -29,9 +34,11 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       ['mix-max', 5],
       ['red-wine', 1],
       ['white-wine', 1],
-      ['cycling-bottle', 2],
+      ['uno-x-bottle', 1],
+      ['visma-bottle', 1],
+      ['snowglobe', 1],
       ['faxe-kondi', 2],
-      ['vampiri', 1],
+      ['vampiri', 2],
       ['juleskum', 1],
       ['rta-mug', 1],
       ['santa', 1],
@@ -39,6 +46,7 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       assert.equal(all.filter((p) => p.reward === reward).length, count)
     for (const [owner, plan] of Object.entries(draw.plans)) {
       assert.equal(plan.length, 24)
+      assert.ok(plan.every((day) => !day.extras?.length))
       const items = prizes(plan)
       const count = (id) => items.filter((p) => p.reward === id).length
       assert.ok(owner === 'norsk' ? count('elf') === 7 : count('elf') >= 1 && count('elf') <= 5)
@@ -48,19 +56,218 @@ test('100 seeded calendars respect all stocks, exclusions and individual count b
       if (owner === 'mathias')
         assert.equal(
           items.filter(
-            (p) => (p.kind === 'physical' && p.reward !== 'cycling-bottle') || p.reward === 'santa',
+            (p) => (p.kind === 'physical' && !isBottle(p.reward)) || p.reward === 'santa',
+          ).length,
+          0,
+        )
+      if (owner === 'frederik prip')
+        assert.equal(
+          items.filter(
+            (p) =>
+              (p.kind === 'physical' && !isBottle(p.reward) && p.reward !== 'mix-max') ||
+              p.reward === 'santa',
           ).length,
           0,
         )
       if (owner === 'tobias frost')
         assert.equal(items.filter((p) => p.kind === 'physical' || p.reward === 'santa').length, 0)
-      if (owner === 'emil') assert.equal(count('cycling-bottle'), 0)
+      if (owner === 'emil') assert.equal(items.filter((p) => isBottle(p.reward)).length, 0)
       for (const day of plan)
         if (prizes([day]).some((p) => ['red-wine', 'white-wine'].includes(p.reward)))
-          assert.ok(day.day === 23 || day.day === 24)
+          assert.equal(day.day, 24)
       assert.equal(JSON.stringify(a.buildAdventPlan(owner, draw)), JSON.stringify(plan))
     }
   }
+})
+
+test('named prizes keep their constraints across 100 seeds, including mixed case and missing users', () => {
+  const { api: a } = harness()
+  const roster = [
+    'ANNA',
+    'nOrSk',
+    'EMIL',
+    'Nicole',
+    'Morten',
+    'Ida',
+    'Mathias',
+    'Tobias Frost',
+    'Ven',
+  ].map((name) => ({ name, createdAt: '2026-11-01T00:00:00Z' }))
+  for (let seed = 0; seed < 100; seed++) {
+    const draw = a.createAdventDraw(roster, `named-${seed}`, now)
+    const mix = draw.awards.filter((p) => p.reward === 'mix-max')
+    assert.equal(mix.length, 5)
+    assert.ok(mix.filter((p) => p.winner === 'nOrSk').length >= 2)
+    assert.ok(mix.some((p) => p.winner === 'EMIL'))
+    const foam = draw.awards.filter((p) => p.reward === 'juleskum')
+    assert.equal(foam.length, 1)
+    assert.equal(foam[0].winner, 'ANNA')
+    assert.equal(foam[0].day, 3)
+    const wine = draw.awards.filter((p) => ['red-wine', 'white-wine'].includes(p.reward))
+    assert.equal(wine.length, 2)
+    assert.equal(new Set(wine.map((p) => p.winner.toLocaleLowerCase('da'))).size, 2)
+    assert.ok(
+      wine.every(
+        (p) => ['ANNA', 'nOrSk', 'EMIL', 'Nicole', 'Morten'].includes(p.winner) && p.day === 24,
+      ),
+    )
+    assert.ok(!(wine.some((p) => p.winner === 'Nicole') && wine.some((p) => p.winner === 'nOrSk')))
+    assert.ok(
+      draw.awards
+        .filter((p) => p.reward === 'faxe-kondi')
+        .every((p) => ['Ida', 'ANNA', 'Morten', 'EMIL'].includes(p.winner)),
+    )
+    assert.ok(
+      draw.awards
+        .filter((p) => p.reward === 'rta-mug')
+        .every((p) => ['ANNA', 'EMIL', 'Morten', 'Nicole', 'nOrSk'].includes(p.winner)),
+    )
+    for (const name of draw.participants) {
+      const own = draw.awards.filter((p) => p.winner === name)
+      assert.equal(new Set(own.map((p) => p.day)).size, own.length)
+      const physical = own.filter((p) => draw.catalog[p.reward].kind === 'physical')
+      if (physical.some((p) => !['cake', 'vampiri', 'juleskum', 'snowglobe'].includes(p.reward)))
+        assert.ok(physical.some((p) => p.day === 24))
+    }
+  }
+  const withoutAnna = a.createAdventDraw(
+    roster.filter((p) => p.name !== 'ANNA'),
+    'no-anna',
+    now,
+  )
+  assert.equal(withoutAnna.awards.filter((p) => p.reward === 'juleskum').length, 0)
+  const tooLate = a.createAdventDraw(
+    ['Anna', 'Norsk', 'Emil'].map((name) => ({ name, createdAt: a.ADVENT_CUTOFF })),
+    'late-named',
+    now,
+  )
+  assert.equal(tooLate.awards.length, 0)
+  const noWineCandidates = a.createAdventDraw(
+    [{ name: 'Ida', createdAt: '2026-11-01T00:00:00Z' }],
+    'no-wine',
+    now,
+  )
+  assert.equal(
+    noWineCandidates.awards.filter((p) => ['red-wine', 'white-wine'].includes(p.reward)).length,
+    0,
+  )
+})
+
+test('Strandsbjerg may win Mix Max but no other physical prizes or Santa', () => {
+  const { api: a } = harness()
+  for (const name of ['Strandsbjerg', 'STRANDSBJERG', 'sTrAnDsBjErG']) {
+    const roster = [{ name, createdAt: '2026-11-01T00:00:00Z' }]
+    for (let seed = 0; seed < 20; seed++) {
+      const draw = a.createAdventDraw(roster, `strandsbjerg-${seed}`, now)
+      assert.equal(draw.awards.length, 5)
+      assert.ok(draw.awards.every((award) => award.winner === name && award.reward === 'mix-max'))
+      assert.equal(
+        prizes(draw.plans[name.toLocaleLowerCase('da')]).filter(
+          (p) => p.kind === 'physical' && p.reward !== 'mix-max',
+        ).length,
+        0,
+      )
+    }
+  }
+})
+
+test('Frederik Prip may win bottles and Mix Max, but no other limited prizes', () => {
+  const { api: a } = harness()
+  for (const name of ['Frederik Prip', 'FREDERIK PRIP', 'fReDeRiK pRiP']) {
+    const roster = [{ name, createdAt: '2026-11-01T00:00:00Z' }]
+    const draw = a.createAdventDraw(roster, 'frederik-eligible', now)
+    assert.equal(draw.awards.filter((award) => award.reward === 'mix-max').length, 5)
+    assert.equal(draw.awards.filter((award) => isBottle(award.reward)).length, 2)
+    assert.ok(
+      draw.awards.every(
+        (award) => award.winner === name && (award.reward === 'mix-max' || isBottle(award.reward)),
+      ),
+    )
+  }
+})
+
+test('calendar mug excludes an already decided crossword winner', () => {
+  const { api: a } = harness()
+  for (let seed = 0; seed < 60; seed++) {
+    const winner = { name: 'nIcOlE', at: '2026-11-25T12:00:00Z' }
+    const draw = a.createAdventDraw(users, `mug-winner-${seed}`, now, winner)
+    const mug = draw.awards.filter((award) => award.reward === 'rta-mug')
+    assert.equal(mug.length, 1)
+    assert.notEqual(mug[0].winner, 'Nicole')
+  }
+  const nicole = [{ name: 'Nicole', createdAt: '2026-11-01T00:00:00Z' }]
+  assert.equal(
+    a
+      .createAdventDraw(nicole, 'no-winner', now)
+      .awards.filter((award) => award.reward === 'rta-mug').length,
+    1,
+  )
+  assert.equal(
+    a
+      .createAdventDraw(nicole, 'future-winner', now, {
+        name: 'Nicole',
+        at: '2026-12-02T12:00:00Z',
+      })
+      .awards.filter((award) => award.reward === 'rta-mug').length,
+    1,
+  )
+  assert.equal(
+    a
+      .createAdventDraw(nicole, 'known-winner', now, { name: 'Nicole', at: '2026-11-25T12:00:00Z' })
+      .awards.filter((award) => award.reward === 'rta-mug').length,
+    0,
+  )
+})
+
+for (const redis of [false, true])
+  test(`initial draw reads crossword winner and keeps existing plans frozen (${redis ? 'Redis' : 'local'})`, async () => {
+    const { api: a, storage, hashes } = harness(redis)
+    const crossword = { winner: { name: 'Nicole', at: '2026-11-25T12:00:00Z' } }
+    if (redis) hashes.set('crossword-games', new Map([['1', JSON.stringify(crossword)]]))
+    else storage.set('crossword-games:1', crossword)
+    const draw = await a.ensureAdventDraw(now)
+    assert.ok(
+      draw.awards
+        .filter((award) => award.reward === 'rta-mug')
+        .every((award) => award.winner !== 'Nicole'),
+    )
+    const frozen = JSON.stringify(draw)
+    const changed = { winner: { name: 'Anna', at: '2026-12-02T12:00:00Z' } }
+    if (redis) hashes.set('crossword-games', new Map([['1', JSON.stringify(changed)]]))
+    else storage.set('crossword-games:1', changed)
+    assert.equal(JSON.stringify(await a.ensureAdventDraw(new Date('2026-12-03T12:00:00Z'))), frozen)
+  })
+
+test('snowglobe is unique before December 7 and Anna only enters the Visma bottle draw', () => {
+  const { api: a } = harness()
+  let annaWonVisma = false
+  let annaWithoutBottle = false
+  for (let seed = 0; seed < 100; seed++) {
+    const draw = a.createAdventDraw(users, `named-bottles-${seed}`, now)
+    const snowglobes = draw.awards.filter((award) => award.reward === 'snowglobe')
+    assert.equal(snowglobes.length, 1)
+    const globe = snowglobes[0]
+    assert.ok(globe.day >= 1 && globe.day < 7)
+    const prize = draw.plans[globe.winner.toLocaleLowerCase('da')][globe.day - 1].prize
+    assert.equal(prize.reward, 'snowglobe')
+    assert.equal(prize.amount, 50)
+    assert.equal(a.adventPrizeIcon(prize), '/games/advent/rta-snowglobe-christmas-v1.webp')
+    const annaBottles = draw.awards.filter(
+      (award) => award.winner === 'Anna' && isBottle(award.reward),
+    )
+    assert.ok(annaBottles.every((award) => award.reward === 'visma-bottle'))
+    annaWonVisma ||= annaBottles.length > 0
+    annaWithoutBottle ||= annaBottles.length === 0
+    for (const id of ['uno-x', 'visma']) {
+      const award = draw.awards.find((award) => award.reward === `${id}-bottle`)
+      const found = draw.plans[award.winner.toLocaleLowerCase('da')][award.day - 1].prize
+      assert.equal(found.reward, `${id}-bottle`)
+      assert.equal(found.amount, 50)
+      assert.equal(a.adventPrizeIcon(found), `/games/advent/${id}-bottle-christmas-v1.webp`)
+    }
+  }
+  assert.ok(annaWonVisma, 'Anna can win Visma')
+  assert.ok(annaWithoutBottle, 'Anna is not guaranteed a bottle')
 })
 
 test('Mathias can win bottles but no other limited prizes; Emil and Tobias remain excluded from bottles', () => {
@@ -71,16 +278,12 @@ test('Mathias can win bottles but no other limited prizes; Emil and Tobias remai
       createdAt: '2026-11-01T00:00:00Z',
     }))
     const draw = a.createAdventDraw(roster, 'mathias-bottles', now)
-    const bottles = draw.awards.filter((a) => a.reward === 'cycling-bottle')
+    const bottles = draw.awards.filter((a) => isBottle(a.reward))
     assert.equal(bottles.length, 2)
     assert.ok(bottles.every((a) => a.winner === mathias))
-    assert.ok(
-      draw.awards.filter((a) => a.winner === mathias).every((a) => a.reward === 'cycling-bottle'),
-    )
+    assert.ok(draw.awards.filter((a) => a.winner === mathias).every((a) => isBottle(a.reward)))
     assert.equal(
-      prizes(draw.plans[mathias.toLocaleLowerCase('da')]).filter(
-        (p) => p.reward === 'cycling-bottle',
-      ).length,
+      prizes(draw.plans[mathias.toLocaleLowerCase('da')]).filter((p) => isBottle(p.reward)).length,
       2,
     )
   }
@@ -89,33 +292,38 @@ test('Mathias can win bottles but no other limited prizes; Emil and Tobias remai
     'late-mathias',
     now,
   )
-  assert.equal(late.awards.filter((a) => a.reward === 'cycling-bottle').length, 0)
+  assert.equal(late.awards.filter((a) => isBottle(a.reward)).length, 0)
 })
 
-test('all limited prizes may go to the same person and stack without removing guaranteed gifts', () => {
+test('one person never gets overlapping prizes; invalid overlapping input is rejected', () => {
   const { api: a } = harness()
   const draw = a.createAdventDraw(
     [{ name: 'Norsk', createdAt: '2026-11-01T00:00:00Z' }],
     'one-winner',
     now,
   )
-  assert.equal(draw.awards.length, 15)
+  assert.equal(draw.awards.length, 12)
+  assert.equal(draw.awards.filter((p) => ['red-wine', 'white-wine'].includes(p.reward)).length, 1)
   assert.ok(draw.awards.every((p) => p.winner === 'Norsk'))
   const forced = { ...draw, awards: draw.awards.map((p) => ({ ...p, day: 24 })) }
-  const plan = a.buildAdventPlan('Norsk', forced)
-  const awards = prizes([plan[23]]).filter((p) =>
-    [
-      'mix-max',
-      'red-wine',
-      'white-wine',
-      'cycling-bottle',
-      'faxe-kondi',
-      'juleskum',
-      'rta-mug',
-      'santa',
-    ].includes(p.reward),
-  )
-  assert.equal(awards.length, 14)
+  assert.throws(() => a.buildAdventPlan('Norsk', forced), /samme låge/)
+  assert.equal(new Set(draw.awards.map((p) => p.day)).size, draw.awards.length)
+  for (const name of ['Anna', 'Norsk', 'Emil']) {
+    for (let seed = 0; seed < 100; seed++) {
+      const crowded = a.createAdventDraw(
+        [{ name, createdAt: '2026-11-01T00:00:00Z' }],
+        `crowded-${seed}`,
+        now,
+      )
+      const plan = crowded.plans[name.toLocaleLowerCase('da')]
+      assert.ok(plan.every((day) => !day.extras?.length))
+      const count = (reward) => prizes(plan).filter((p) => p.reward === reward).length
+      assert.ok(count('friend-gift') >= 1 && count('friend-gift') <= 3)
+      assert.ok(count('self-gift') >= 1 && count('self-gift') <= 3)
+      assert.ok(count('banana-large') >= 2)
+      assert.ok(name === 'Norsk' ? count('elf') === 7 : count('elf') >= 1 && count('elf') <= 5)
+    }
+  }
 })
 
 test('one optional cake prize belongs only to eligible Ida or Marc behind December10–18', () => {
@@ -158,7 +366,7 @@ test('one optional cake prize belongs only to eligible Ida or Marc behind Decemb
   assert.equal(late.awards.filter((award) => award.reward === 'cake').length, 0)
 })
 
-test('Anna has her own cake prize on December 10–18, separate from Ida/Marc and subject to cutoff', () => {
+test('Anna has no reserved cake prize; only the Ida/Marc prize remains', () => {
   const { api: a } = harness()
   for (const annaName of ['Anna', 'ANNA', 'aNnA']) {
     for (let seed = 0; seed < 30; seed++) {
@@ -168,17 +376,14 @@ test('Anna has her own cake prize on December 10–18, separate from Ida/Marc an
       ]
       const draw = a.createAdventDraw(roster, `anna-cake-${seed}`, now)
       const cakes = draw.awards.filter((award) => award.reward === 'cake')
-      assert.equal(cakes.length, 2)
+      assert.equal(cakes.length, 1)
       assert.equal(cakes.filter((c) => ['Ida', 'Marc'].includes(c.winner)).length, 1)
       const anna = cakes.filter((c) => c.winner === annaName)
-      assert.equal(anna.length, 1)
-      assert.ok(anna[0].day >= 10 && anna[0].day <= 18)
+      assert.equal(anna.length, 0)
       const gifts = prizes(draw.plans[annaName.toLocaleLowerCase('da')]).filter(
         (p) => p.reward === 'cake',
       )
-      assert.equal(gifts.length, 1)
-      assert.equal(gifts[0].amount, 50)
-      assert.equal(gifts[0].kind, 'physical')
+      assert.equal(gifts.length, 0)
     }
   }
   const onlyAnna = a.createAdventDraw(
@@ -186,7 +391,7 @@ test('Anna has her own cake prize on December 10–18, separate from Ida/Marc an
     'only-anna',
     now,
   )
-  assert.equal(onlyAnna.awards.filter((a) => a.reward === 'cake').length, 1)
+  assert.equal(onlyAnna.awards.filter((a) => a.reward === 'cake').length, 0)
   const late = a.createAdventDraw(
     [...users, { name: 'Anna', createdAt: a.ADVENT_CUTOFF }],
     'late-anna',
@@ -261,7 +466,7 @@ test('every real calendar prize pays 50 bananas except Mix Max at 250, exactly o
   const { api: a } = harness()
   const draw = a.createAdventDraw(users, 'physical-bonuses', now)
   const entries = Object.entries(draw.catalog).filter(([, prize]) => prize.kind === 'physical')
-  assert.equal(entries.length, 9)
+  assert.equal(entries.length, 12)
   const plan = entries.map(([reward, prize], i) => {
     assert.equal(prize.amount, reward === 'mix-max' ? 250 : 50)
     return { day: i + 1, published: true, prize }
@@ -273,7 +478,7 @@ test('every real calendar prize pays 50 bananas except Mix Max at 250, exactly o
     assert.equal(wallet.advent[2026][entry.day].amount, entry.prize.amount)
     assert.equal(wallet.advent[2026][entry.day].prize.kind, 'physical')
   }
-  assert.equal(wallet.balance, 650)
+  assert.equal(wallet.balance, 800)
   const saved = JSON.stringify(wallet)
   for (const entry of plan) a.openAdventDoor(wallet, 2026, entry.day, ready, plan)
   assert.equal(JSON.stringify(wallet), saved)

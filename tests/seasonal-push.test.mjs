@@ -103,7 +103,7 @@ function setup({ env = 'production', token = 'fixture-token' } = {}) {
   }
 }
 
-test('five approved dates use Danish winter time, split headings and relevant destinations', async () => {
+test('six approved dates use Danish winter time, split headings and relevant destinations', async () => {
   const h = setup()
   assert.deepEqual(
     Array.from(h.config, (job) => job.at),
@@ -113,17 +113,25 @@ test('five approved dates use Danish winter time, split headings and relevant de
       '2026-11-26T07:00:00.000Z',
       '2026-11-27T05:30:00.000Z',
       '2026-12-01T05:30:00.000Z',
+      '2027-01-01T11:00:00.000Z',
     ],
   )
   assert.deepEqual(
     Array.from(h.config, (job) => job.url),
-    ['/spil/jul', '/spil/pakkeleg', '/spil/pakkeleg', '/spil/pakkeleg', '/spil/julekalender'],
+    [
+      '/spil/jul',
+      '/spil/pakkeleg',
+      '/spil/pakkeleg',
+      '/spil/pakkeleg',
+      '/spil/julekalender',
+      '/spil/bananer',
+    ],
   )
   assert.ok(h.config.every((job) => job.title && job.body && !job.title.includes(' - ')))
   await h.api.scheduleSeasonalPushes(before)
-  assert.equal(h.jobs.length, 5)
+  assert.equal(h.jobs.length, 6)
   await h.api.scheduleSeasonalPushes(before)
-  assert.equal(h.jobs.length, 5)
+  assert.equal(h.jobs.length, 6)
   for (const job of h.jobs) {
     assert.equal(h.api.seasonalPushAuthorized(job.headers['Upstash-Forward-Authorization']), true)
     assert.ok(!job.headers['Upstash-Forward-Authorization'].includes('fixture-token'))
@@ -133,6 +141,26 @@ test('five approved dates use Danish winter time, split headings and relevant de
   }
   assert.equal(h.api.seasonalPushAuthorized('Bearer fake'), false)
   assert.equal(h.api.seasonalPushAuthorized(undefined), false)
+})
+
+test('new-year push sends at January 1 noon, respects gift preferences and does not grant bananas', async () => {
+  const h = setup()
+  h.user('Nicole')
+  h.user('Anna', ['anna'], { gifts: false })
+  const job = h.config.find((job) => job.id === 'new-year-gift-2027')
+  assert.equal(job.at, '2027-01-01T11:00:00.000Z')
+  assert.equal(job.url, '/spil/bananer')
+  assert.ok(job.body.includes('500'))
+  await h.api.deliverSeasonalPush({ id: job.id }, new Date('2027-01-01T10:59:59Z'))
+  assert.equal(h.pushes.length, 0)
+  await h.api.deliverSeasonalPush({ id: job.id }, new Date(job.at))
+  await h.api.deliverSeasonalPush({ id: job.id }, new Date(job.at))
+  assert.equal(h.pushes.length, 1)
+  assert.deepEqual(
+    Array.from(h.pushes[0].subs, (sub) => sub.endpoint),
+    ['Nicole'],
+  )
+  assert.equal(Object.keys(h.wallets).length, 0)
 })
 
 test('local and preview never queue or send; missing token is clearly reported', async () => {
@@ -159,7 +187,7 @@ test('long delays relay without sending early, and failures can be retried', asy
     new Date(Number(first.headers['Upstash-Not-Before']) * 1000),
   )
   assert.equal(h.pushes.length, 0)
-  assert.equal(h.jobs.length, 6)
+  assert.equal(h.jobs.length, 7)
   assert.ok(
     Number(h.jobs.at(-1).headers['Upstash-Not-Before']) * 1000 >
       Number(first.headers['Upstash-Not-Before']) * 1000,

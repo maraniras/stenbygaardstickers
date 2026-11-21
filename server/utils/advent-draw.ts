@@ -2,6 +2,8 @@ import { createHmac, randomBytes } from 'node:crypto'
 import type { AdventPrize, AdventReward } from '../../shared/types/advent'
 import { ADVENT_YEAR, type AdventPrizeConfig } from '../data/advent'
 import { ADVENT_REWARDS } from '../../shared/utils/advent-rewards'
+import { readCrossword } from './crossword'
+import type { CrosswordState } from '../../shared/types/crossword'
 
 const DRAW_KEY = `advent:${ADVENT_YEAR}:draw`
 export const ADVENT_CUTOFF = '2026-11-30T23:00:00.000Z' // 1 December 00:00 Copenhagen
@@ -38,6 +40,13 @@ export function buildAdventPlan(name: string, draw: AdventDraw): AdventPrizeConf
     return n < 55 ? 'banana-single' : n < 90 ? 'banana-small' : 'banana-large'
   })
   const free = Array.from({ length: 24 }, (_, i) => i)
+  // Reserve limited prizes first, so guaranteed gifts/nisses never share a door.
+  for (const award of draw.awards.filter((a) => sameName(a.winner, name))) {
+    const index = free.indexOf(award.day - 1)
+    if (index < 0) throw Error('To præmier kan ikke ligge i samme låge')
+    free.splice(index, 1)
+    rewards[award.day - 1] = award.reward
+  }
   const place = (reward: AdventReward, count: number) => {
     for (let i = 0; i < count; i++) rewards[free.splice(random(free.length), 1)[0]!] = reward
   }
@@ -56,31 +65,62 @@ export function buildAdventPlan(name: string, draw: AdventDraw): AdventPrizeConf
               ? 4
               : 5,
   )
-  place('friend-gift', 1 + random(3))
-  place('self-gift', 1 + random(3))
+  let friendGifts = 1 + random(3)
+  let selfGifts = 1 + random(3)
+  // Keep two large piles and at least one of each gift even in prize-heavy calendars.
+  while (friendGifts + selfGifts + 2 > free.length) {
+    if (friendGifts > 1 && (selfGifts === 1 || random(2) === 0)) friendGifts--
+    else if (selfGifts > 1) selfGifts--
+    else throw Error('Kalenderen har ikke plads til de garanterede fund')
+  }
+  place('friend-gift', friendGifts)
+  place('self-gift', selfGifts)
   place('banana-large', 2)
   const plan = rewards.map((reward, i) => ({
     day: i + 1,
     published: true,
     prize: structuredClone(draw.catalog[reward]),
   }))
-  for (const award of draw.awards.filter((a) => sameName(a.winner, name))) {
-    const entry = plan[award.day - 1]!
-    const extra = structuredClone(draw.catalog[award.reward])
-    // Replace ordinary bananas, but never remove a guaranteed elf/gift.
-    if (entry.prize.reward === 'banana-single' || entry.prize.reward === 'banana-small')
-      entry.prize = extra
-    else {
-      const bundled = entry as AdventPrizeConfig & { extras?: AdventPrize[] }
-      ;(bundled.extras ??= []).push(extra)
-    }
-  }
   return plan
+}
+
+function assignAwardDays(awards: Award[], seed: string) {
+  const random = randomFor(seed, 'award-days')
+  const daysFor = (award: Award) => {
+    if (award.reward === 'red-wine' || award.reward === 'white-wine') return [24]
+    if (award.reward === 'juleskum') return [3]
+    if (award.reward === 'snowglobe') return [1, 2, 3, 4, 5, 6]
+    if (award.reward === 'vampiri' && nameKey(award.winner) === 'norsk') return [18]
+    if (award.reward === 'vampiri') return Array.from({ length: 10 }, (_, i) => i + 7)
+    if (award.reward === 'cake') return Array.from({ length: 9 }, (_, i) => i + 10)
+    return Array.from({ length: 24 }, (_, i) => i + 1)
+  }
+  const reserved = new Map<string, Set<number>>()
+  // Fixed dates and restricted periods take precedence over flexible physical gifts.
+  const ordered = [...awards].sort(
+    (a, b) =>
+      daysFor(a).length - daysFor(b).length ||
+      Number(ADVENT_REWARDS[b.reward].kind === 'physical') -
+        Number(ADVENT_REWARDS[a.reward].kind === 'physical'),
+  )
+  for (const award of ordered) {
+    const key = nameKey(award.winner)
+    const used = reserved.get(key) ?? new Set<number>()
+    reserved.set(key, used)
+    const available = daysFor(award).filter((day) => !used.has(day))
+    if (!available.length) throw Error('Præmierne kan ikke fordeles uden lågeoverlap')
+    award.day =
+      ADVENT_REWARDS[award.reward].kind === 'physical' && available.includes(24)
+        ? 24
+        : available[random(available.length)]!
+    used.add(award.day)
+  }
 }
 export function createAdventDraw(
   users: { name: string; createdAt: string }[],
   seed: string,
   now = new Date(),
+  crosswordWinner: CrosswordState['winner'] = null,
 ): AdventDraw {
   if (now.getTime() < Date.parse(ADVENT_CUTOFF)) throw Error('Deltagerlisten er ikke lukket endnu')
   const participants = [
@@ -91,7 +131,17 @@ export function createAdventDraw(
     ).values(),
   ].sort((a, b) => a.localeCompare(b, 'da'))
   const random = randomFor(seed, 'awards')
-  const eligible = participants.filter((n) => !['mathias', 'tobias frost'].includes(nameKey(n)))
+  const mugExcluded =
+    crosswordWinner && Date.parse(crosswordWinner.at) <= now.getTime() ? crosswordWinner.name : null
+  const eligible = participants.filter(
+    (n) => !['mathias', 'tobias frost', 'frederik prip', 'strandsbjerg'].includes(nameKey(n)),
+  )
+  const guaranteedMixMax = eligible.flatMap((n) =>
+    nameKey(n) === 'norsk' ? [n, n] : nameKey(n) === 'emil' ? [n] : [],
+  )
+  const winePool = eligible.filter((n) =>
+    ['nicole', 'norsk', 'emil', 'morten', 'anna'].includes(nameKey(n)),
+  )
   const awards: Award[] = []
   for (const reward of [
     'mix-max',
@@ -101,36 +151,62 @@ export function createAdventDraw(
     'mix-max',
     'red-wine',
     'white-wine',
-    'cycling-bottle',
-    'cycling-bottle',
+    'uno-x-bottle',
+    'visma-bottle',
+    'snowglobe',
     'faxe-kondi',
     'faxe-kondi',
     'juleskum',
     'rta-mug',
     'santa',
   ] as AdventReward[]) {
-    const pool =
-      reward === 'cycling-bottle'
-        ? participants.filter((n) => !['tobias frost', 'emil'].includes(nameKey(n)))
+    let pool =
+      reward === 'uno-x-bottle' || reward === 'visma-bottle'
+        ? participants.filter(
+            (n) =>
+              !['tobias frost', 'emil', 'strandsbjerg'].includes(nameKey(n)) &&
+              !(reward === 'uno-x-bottle' && nameKey(n) === 'anna'),
+          )
         : eligible
+    if (reward === 'mix-max') {
+      pool = guaranteedMixMax.length
+        ? [guaranteedMixMax.shift()!]
+        : participants.filter((n) => !['mathias', 'tobias frost'].includes(nameKey(n)))
+    }
+    if (reward === 'juleskum') pool = eligible.filter((n) => nameKey(n) === 'anna')
+    if (reward === 'faxe-kondi')
+      pool = eligible.filter((n) => ['ida', 'anna', 'morten', 'emil'].includes(nameKey(n)))
+    if (reward === 'rta-mug')
+      pool = eligible.filter(
+        (n) =>
+          ['anna', 'emil', 'morten', 'nicolas', 'nicole', 'norsk'].includes(nameKey(n)) &&
+          !(mugExcluded && sameName(n, mugExcluded)),
+      )
+    if (reward === 'red-wine' || reward === 'white-wine') {
+      const previous = awards.find((a) => a.reward === 'red-wine' || a.reward === 'white-wine')
+      pool = winePool.filter((n) => {
+        if (previous && sameName(n, previous.winner)) return false
+        const pair = [nameKey(n), previous ? nameKey(previous.winner) : '']
+        return !(pair.includes('nicole') && pair.includes('norsk'))
+      })
+    }
     if (!pool.length) continue
     awards.push({
       reward,
       winner: pool[random(pool.length)]!,
-      day: reward === 'red-wine' || reward === 'white-wine' ? 23 + random(2) : 1 + random(24),
+      day: 0,
     })
   }
   // One optional prize shared by Ida and Marc, never one per participant.
   const cakePool = participants.filter((name) => ['ida', 'marc'].includes(nameKey(name)))
   if (cakePool.length)
-    awards.push({ reward: 'cake', winner: cakePool[random(cakePool.length)]!, day: 10 + random(9) })
-  // A separate cake prize reserved for Anna; never changes the Ida/Marc draw.
+    awards.push({ reward: 'cake', winner: cakePool[random(cakePool.length)]!, day: 0 })
   const anna = participants.find((name) => nameKey(name) === 'anna')
-  if (anna) awards.push({ reward: 'cake', winner: anna, day: 10 + random(9) })
   // Named Vampiri prizes still require an account created before the roster cutoff.
-  if (anna) awards.push({ reward: 'vampiri', winner: anna, day: 7 + random(10) })
+  if (anna) awards.push({ reward: 'vampiri', winner: anna, day: 0 })
   const norsk = participants.find((name) => nameKey(name) === 'norsk')
   if (norsk) awards.push({ reward: 'vampiri', winner: norsk, day: 18 })
+  assignAwardDays(awards, seed)
   const draw: AdventDraw = {
     year: ADVENT_YEAR,
     createdAt: now.toISOString(),
@@ -160,7 +236,13 @@ export async function ensureAdventDraw(now = new Date()): Promise<AdventDraw | u
   creating ??= (async () => {
     const existing = await readAdventDraw()
     if (existing) return existing
-    const candidate = createAdventDraw(await listUsers(), randomBytes(32).toString('hex'), now)
+    const [users, crossword] = await Promise.all([listUsers(), readCrossword()])
+    const candidate = createAdventDraw(
+      users,
+      randomBytes(32).toString('hex'),
+      now,
+      crossword.winner,
+    )
     if (redisEnabled) {
       await redis([['SET', DRAW_KEY, JSON.stringify(candidate), 'NX']])
       const committed = await readAdventDraw()

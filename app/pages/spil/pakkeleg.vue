@@ -168,7 +168,7 @@ watch(
           >{{ state.players.length }} tilmeldte · Sidste frist 26. november kl. 23.59 dansk
           tid</small
         >
-        <small>Mindst 4 deltagere – ellers tilbagebetales tilmeldingen.</small>
+        <small>Mindst 6 deltagere – ellers tilbagebetales tilmeldingen.</small>
       </section>
       <div
         v-if="state.phase === 'waiting'"
@@ -192,7 +192,7 @@ watch(
       >
         <b>Pakkelegen er slut! 🎁</b>
         <p v-if="state.cancelled">
-          Der var færre end fire deltagere. Pakkelegen er aflyst, og tilmeldingsgebyret er
+          Der var færre end seks deltagere. Pakkelegen er aflyst, og tilmeldingsgebyret er
           tilbagebetalt.
         </p>
         <template v-else
@@ -490,7 +490,8 @@ watch(
     >
       <p>
         Tilmelding koster 100 bananer og er åben 20.–26. november. Kun tilmeldte brugere deltager.
-        Pakkelegen starter 27. november kl. 04.00.
+        Pakkelegen starter 27. november kl. 04.00. Vi skal være mindst seks deltagere; ellers
+        tilbagebetales tilmeldingen.
       </p>
       <p>
         Alle deler bordet, men spiller, når de har tid. Du har tre slag pr. døgn gennem hele

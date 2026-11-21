@@ -11,6 +11,16 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.9.6',
+    date: '2026-11-21',
+    notes: [
+      'Flere julepræmier: Nye fysiske præmier i pakkelegen og julekalenderen',
+      'Opdateret præmieoversigt: Se, hvad du kan finde i julekalenderen',
+      'Kryds & tværs: Første hjælp starter mandag den 23. november kl. 04.00',
+      'Mindre rettelser og forbedringer',
+    ],
+  },
+  {
     version: '2.9.5',
     date: '2026-11-20',
     notes: ['Mindre rettelser og forbedringer'],

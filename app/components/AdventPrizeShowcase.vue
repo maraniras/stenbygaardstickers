@@ -92,33 +92,12 @@ onBeforeUnmount(close)
           </button>
         </header>
         <img
-          src="/games/advent/prizes-showcase-v1.webp"
+          src="/games/advent/prizes-showcase-v2.webp"
           width="1536"
           height="1024"
-          alt="Kalenderens bananer, Mix Max, Faxe Kondi, træstammer, vin, cykeldrikkedunk, gaver, drillenisse og julemand blandt gran og julelys"
+          alt="Kalenderens bananer, Mix Max, Faxe Kondi, træstammer, rødvin, hvidvin, Uno-X- og Visma-drikkedunke, RTA-snekugle, RTA-kop, Haribo Vampiri, juleskum, gaver, drillenisse og julemand blandt gran og julelys"
         />
         <div class="prize-copy">
-          <div class="extra-prize">
-            <img
-              src="/games/advent/vampiri-christmas-v1.webp"
-              alt=""
-              width="64"
-              height="64"
-            />
-            <img
-              src="/games/advent/juleskum-christmas-v1.webp"
-              alt=""
-              width="64"
-              height="64"
-            />
-            <img
-              src="/games/advent/rta-mug-christmas-v2.webp"
-              alt=""
-              width="64"
-              height="64"
-            />
-            <span>Du kan også finde Haribo Vampiri, juleskum og en RTA-kop.</span>
-          </div>
           <p>
             Bananer, rigtige præmier og gaver til dig selv og vennerne. Men pas på drillenissen —
             han kan finde på at tage bananer!
@@ -186,19 +165,6 @@ h2 {
 }
 .prize-copy {
   padding: 16px 20px 20px;
-}
-.extra-prize {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  font-size: 13px;
-  color: var(--text);
-}
-.extra-prize img {
-  width: 64px;
-  height: 64px;
-  flex: none;
 }
 .prize-copy p {
   margin: 0 0 16px;

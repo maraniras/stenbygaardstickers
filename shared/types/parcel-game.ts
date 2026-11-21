@@ -12,8 +12,14 @@ export type ParcelRewardKind =
   | 'juleskum'
   | 'white-wine'
   | 'rta-mug'
+  | 'postnord-fan'
+  | 'faxe-kondi-shirt'
+  | 'faxe-kondi-sweatbands'
+  | 'copenhagen-sprint-cap'
+  | 'garmin-cap'
 export interface ParcelReward {
   kind: ParcelRewardKind
+  bottle?: 'sparekassen' | 'totalenergies'
   amount: number
   title: string
 }

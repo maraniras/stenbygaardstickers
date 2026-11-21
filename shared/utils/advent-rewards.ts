@@ -1,6 +1,30 @@
 import type { AdventOpening, AdventPrize, AdventReward } from '../types/advent'
 
 export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
+  'uno-x-bottle': {
+    kind: 'physical',
+    reward: 'uno-x-bottle',
+    amount: 50,
+    title: 'Du har vundet en Uno-X-drikkedunk!',
+    description: 'En rigtig Uno-X / Maurten / Garmin-drikkedunk og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
+  'visma-bottle': {
+    kind: 'physical',
+    reward: 'visma-bottle',
+    amount: 50,
+    title: 'Du har vundet en Visma-drikkedunk!',
+    description: 'En rigtig Visma Lease a Bike-drikkedunk og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
+  snowglobe: {
+    kind: 'physical',
+    reward: 'snowglobe',
+    amount: 50,
+    title: 'Du har vundet en RTA-snekugle!',
+    description: 'En rigtig RTA-snekugle og 50 bananer.',
+    instructions: 'Din præmie er gemt. Kontakt Mathias om udlevering.',
+  },
   'rta-mug': {
     kind: 'physical',
     reward: 'rta-mug',
@@ -124,6 +148,9 @@ export const ADVENT_REWARDS: Record<AdventReward, AdventPrize> = {
   },
 }
 export const ADVENT_REWARD_ICONS: Record<AdventReward, string> = {
+  'uno-x-bottle': 'uno-x-bottle-christmas-v1',
+  'visma-bottle': 'visma-bottle-christmas-v1',
+  snowglobe: 'rta-snowglobe-christmas-v1',
   'rta-mug': 'rta-mug-christmas-v2',
   juleskum: 'juleskum-christmas-v1',
   vampiri: 'vampiri-christmas-v1',
@@ -147,19 +174,19 @@ export function adventPrizeIcon(prize?: AdventPrize) {
 export function adventPrizeAmount(prize: AdventPrize) {
   return prize.kind === 'bananas' || prize.kind === 'physical' ? (prize.amount ?? 0) : 0
 }
-/** A stable, no-payout demonstration; wine is still only behind 23/24. */
+/** A stable, no-payout demonstration; one wine behind door 24. */
 export function previewAdventOpening(day: number): AdventOpening {
   const rewards: AdventReward[] = [
     'faxe-kondi',
-    'banana-small',
+    'snowglobe',
     'banana-large',
     'elf',
     'mix-max',
-    'cycling-bottle',
+    'visma-bottle',
     'santa',
     'friend-gift',
     'self-gift',
-    'banana-single',
+    'uno-x-bottle',
     'vampiri',
     'elf',
     'juleskum',
@@ -172,7 +199,7 @@ export function previewAdventOpening(day: number): AdventOpening {
     'friend-gift',
     'self-gift',
     'banana-single',
-    'red-wine',
+    'banana-large',
     'white-wine',
   ]
   const prize = ADVENT_REWARDS[rewards[day - 1] ?? 'banana-single']

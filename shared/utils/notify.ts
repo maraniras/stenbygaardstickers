@@ -34,7 +34,12 @@ export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; des
     label: 'Pakkeleg',
     desc: 'Tilmelding, påmindelser, spilstart, tomt bord, stjålne pakker og præmier',
   },
-  { type: 'gifts', emoji: '🎁', label: 'Gaver', desc: 'Når en anden bruger giver dig julebananer' },
+  {
+    type: 'gifts',
+    emoji: '🎁',
+    label: 'Gaver',
+    desc: 'Gaver fra andre brugere og særlige gavekampagner',
+  },
   { type: 'stickers', emoji: '📍', label: 'Nye stickers', desc: 'Når Emil lander et nyt sted' },
   {
     type: 'updates',

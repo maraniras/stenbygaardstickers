@@ -18,6 +18,7 @@ export function adventUnlockAt(year: number, day: number) {
   return new Date(Date.UTC(year, 11, day, 3)).toISOString()
 }
 export function adventAvailableDay(year: number, now = new Date()) {
+  if (now.getTime() >= Date.UTC(year, 11, 31, 23)) return 0
   const date = gameDay(now)
   if (date < `${year}-12-01`) return 0
   if (date >= `${year}-12-24`) return 24

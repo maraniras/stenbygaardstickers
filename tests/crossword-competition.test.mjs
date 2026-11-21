@@ -257,6 +257,31 @@ test('admin can inspect current saved answers without advancing daily help or ex
   )
 })
 
+test('November 20 crossword first help starts Monday November 23 at 04:00, then daily at 04:00', () => {
+  const { api: a } = game()
+  const state = { ...a.freshCrossword(), opensAt: '2026-11-20T13:00:00Z' }
+  assert.equal(a.crosswordHelpAt(state), '2026-11-23T03:00:00.000Z')
+  const solution = a.crosswordSolution()
+  const cell = Object.keys(solution)[0]
+  const answers = { [cell]: solution[cell] }
+  const sunday = new Date('2026-11-22T03:00:00Z')
+  a.crosswordHelp(state, 'u:nicole', answers, sunday)
+  assert.equal(a.crosswordView(state, 'Nicole', false, sunday).helpAvailable, false)
+  assert.equal(a.crosswordLeaderboard(state, [{ name: 'Nicole' }], sunday).mode, 'filled')
+  assert.equal(
+    a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-23T02:59:59.999Z')).available,
+    false,
+  )
+  const monday = a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-23T03:00:00Z'))
+  assert.equal(monday.available, true)
+  assert.equal(monday.correctLetters[cell], solution[cell])
+  assert.equal(monday.nextAt, '2026-11-24T03:00:00.000Z')
+  assert.equal(
+    a.crosswordLeaderboard(state, [{ name: 'Nicole' }], new Date('2026-11-23T03:00:00Z')).mode,
+    'correct',
+  )
+})
+
 test('answer definition is server-only; public board consumes lengths, not answers', () => {
   assert.equal(existsSync('app/data/crossword-preview.ts'), false)
   const board = readFileSync('app/components/CrosswordBoard.vue', 'utf8')

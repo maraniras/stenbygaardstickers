@@ -39,29 +39,16 @@ function board() {
   }
 }
 
-test('three gifts per participant include a mug, snowglobe from seven and wine from nine', () => {
+test('three gifts per participant include two named bottles, no cake, snowglobe or wine', () => {
   const { api: a } = harness(),
     pool = a.parcelRewardPool(a.parcelCount(10))
   assert.equal(pool.length, 30)
-  for (const kind of [
-    'mix-max',
-    'cake',
-    'faxe-kondi',
-    'vampiri',
-    'juleskum',
-    'white-wine',
-    'rta-mug',
-    'frame',
-    'golden',
-    'snowglobe',
-  ])
+  for (const kind of ['mix-max', 'faxe-kondi', 'vampiri', 'juleskum', 'rta-mug', 'frame', 'golden'])
     assert.equal(pool.filter((p) => p.kind === kind).length, 1)
   assert.equal(pool.filter((p) => p.kind === 'bottle').length, 2)
   assert.equal(pool.find((p) => p.kind === 'frame').amount, 50)
-  assert.equal(pool.filter((p) => p.kind === 'elf').length, 4)
+  assert.equal(pool.filter((p) => p.kind === 'elf').length, 3)
   assert.equal(pool.filter((p) => p.amount === 500).length, 1)
-  assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'cake')), true)
-  assert.equal(pool.find((p) => p.kind === 'cake').amount, 50)
   assert.equal(pool.find((p) => p.kind === 'faxe-kondi').amount, 50)
   assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'faxe-kondi')), true)
   assert.equal(a.isParcelPhysical(pool.find((p) => p.kind === 'vampiri')), true)
@@ -70,39 +57,60 @@ test('three gifts per participant include a mug, snowglobe from seven and wine f
     a.parcelRewardIcon(pool.find((p) => p.kind === 'vampiri')),
     '/games/advent/vampiri-christmas-v1.webp',
   )
-  for (let people = 4; people <= 40; people++) {
+  for (let people = 6; people <= 40; people++) {
     const count = a.parcelCount(people)
     const gifts = a.parcelRewardPool(count)
     assert.equal(gifts.length, count)
-    assert.equal(gifts.filter((p) => p.kind === 'cake').length, 1)
+    assert.equal(gifts.filter((p) => p.kind === 'cake').length, 0)
     assert.equal(gifts.filter((p) => p.kind === 'faxe-kondi').length, 1)
     assert.equal(gifts.filter((p) => p.kind === 'vampiri').length, 1)
-    for (const kind of ['juleskum', 'rta-mug']) {
+    for (const kind of [
+      'juleskum',
+      'rta-mug',
+      'postnord-fan',
+      'faxe-kondi-shirt',
+      'faxe-kondi-sweatbands',
+      'copenhagen-sprint-cap',
+      'garmin-cap',
+    ]) {
       const physical = gifts.filter((p) => p.kind === kind)
       assert.equal(physical.length, 1)
       assert.equal(physical[0].amount, 50)
       assert.equal(a.isParcelPhysical(physical[0]), true)
+      if (!['juleskum', 'rta-mug'].includes(kind))
+        assert.equal(a.parcelRewardIcon(physical[0]), `/games/advent/${kind}-christmas-v1.webp`)
     }
     const mixMax = gifts.filter((p) => p.kind === 'mix-max')
     assert.equal(mixMax.length, people >= 12 ? 2 : 1)
     assert.ok(mixMax.every((p) => p.amount === 50))
-    assert.equal(gifts.filter((p) => p.kind === 'white-wine').length, people >= 9 ? 1 : 0)
-    assert.equal(gifts.filter((p) => p.kind === 'snowglobe').length, people >= 7 ? 1 : 0)
+    assert.equal(gifts.filter((p) => p.kind === 'white-wine').length, 0)
+    assert.equal(gifts.filter((p) => p.kind === 'snowglobe').length, 0)
     assert.equal(gifts.filter((p) => p.kind === 'bottle').length, 2)
-    const elves = Math.max(2, Math.ceil(count * 0.15)) - (people >= 7 && people <= 10 ? 1 : 0)
+    for (const [bottle, icon] of [
+      ['sparekassen', 'sparekassen'],
+      ['totalenergies', 'totalenergies'],
+    ]) {
+      const matches = gifts.filter((p) => p.kind === 'bottle' && p.bottle === bottle)
+      assert.equal(matches.length, 1)
+      assert.equal(matches[0].amount, 50)
+      assert.equal(a.isParcelPhysical(matches[0]), true)
+      assert.equal(a.parcelRewardIcon(matches[0]), `/games/advent/${icon}-bottle-christmas-v1.webp`)
+    }
+    const elves = Math.max(2, Math.ceil(count * 0.15)) - (people >= 7 && people <= 10 ? 1 : 0) - 1
     assert.equal(gifts.filter((p) => p.kind === 'elf').length, elves)
     assert.equal(
       a.parcelRewardIcon(gifts.find((p) => p.kind === 'rta-mug')),
       '/games/advent/rta-mug-christmas-v2.webp',
     )
   }
-  assert.throws(() => a.parcelRewardPool(6), /fire deltagere/)
+  for (const count of [6, 9, 12, 15])
+    assert.throws(() => a.parcelRewardPool(count), /seks deltagere/)
   for (const [people, elves, bananas] of [
-    [6, 3, 5],
-    [7, 3, 7],
-    [8, 3, 10],
-    [9, 4, 11],
-    [10, 4, 14],
+    [6, 2, 2],
+    [7, 2, 5],
+    [8, 2, 8],
+    [9, 3, 10],
+    [10, 3, 13],
   ]) {
     const gifts = a.parcelRewardPool(a.parcelCount(people))
     assert.equal(gifts.filter((p) => p.kind === 'elf').length, elves)
@@ -110,14 +118,14 @@ test('three gifts per participant include a mug, snowglobe from seven and wine f
   }
   for (const p of pool.filter((p) => p.kind === 'bananas'))
     assert.ok(p.amount >= 25 && p.amount <= 250)
-  const small = a.parcelRewardPool(12)
+  const small = a.parcelRewardPool(18)
   assert.equal(
     small.some((p) => p.kind === 'white-wine' || p.kind === 'snowglobe'),
     false,
   )
   assert.equal(
     a.parcelRewardPool(21).filter((p) => p.kind === 'bottle' || p.kind === 'snowglobe').length,
-    3,
+    2,
   )
   assert.equal(a.parcelRewardPool(a.parcelCount(10)).filter((p) => p.kind === 'mix-max').length, 1)
   assert.equal(a.parcelRewardPool(a.parcelCount(12)).filter((p) => p.kind === 'mix-max').length, 2)
@@ -227,6 +235,33 @@ test('Vampiri stays hidden until opening and pays its 50 banana bonus exactly on
   assert.equal(a.isParcelPhysical(found), true)
 })
 
+test('each new sports prize stays hidden, keeps its identity and pays 50 exactly once', async () => {
+  for (const kind of [
+    'postnord-fan',
+    'faxe-kondi-shirt',
+    'faxe-kondi-sweatbands',
+    'copenhagen-sprint-cap',
+    'garmin-cap',
+  ]) {
+    const { api: a } = harness()
+    const b = board()
+    const reward = a.parcelRewardPool(24).find((reward) => reward.kind === kind)
+    assert.ok(reward)
+    b.parcels[0].reward = reward
+    b.parcels[0].amount = reward.amount
+    assert.equal(a.parcelView(b, 'Nicole', new Date(end)).parcels[0].reward, undefined)
+    a.reserveParcelOpening(b, 'Nicole', 'p1', new Date(end))
+    await a.mutateParcels(2026, [], (game) => Object.assign(game, b))
+    await a.settleParcelPrizes(b)
+    await a.settleParcelPrizes(b)
+    const wallet = await a.readEconomy('Nicole')
+    assert.equal(wallet.balance, 50)
+    assert.equal(wallet.parcelRewards['parcel-open:2026:p1'].reward.kind, kind)
+    const { game } = await a.mutateParcels(2026, [], () => {})
+    assert.equal(a.parcelView(game, 'Mathias', new Date(end)).parcels[0].reward.kind, kind)
+  }
+})
+
 test('exclusive frame is granted and equipped only when its owner opens it', async () => {
   const { api: a } = harness(),
     b = board(),
@@ -289,16 +324,22 @@ test('full request keeps contents hidden on GET and reveals just the requested g
 })
 test('prizes freeze once at game start; too few participants receive a single refund', async () => {
   const { api: a } = harness(),
-    names = ['Nicole', 'Mathias', 'Norsk', 'Emil']
+    names = ['Nicole', 'Mathias', 'Norsk', 'Emil', 'Anna', 'Morten']
   const { game } = await a.mutateParcels(2026, names, () => {})
   a.prepareParcelRewards(game, new Date('2026-11-27T02:59:59Z'))
   assert.equal(game.prizesAssigned, undefined)
   a.prepareParcelRewards(game, new Date('2026-11-27T03:00:00Z'))
   assert.equal(game.prizesAssigned, true)
+  assert.equal(game.cancelled, undefined)
+  assert.equal(game.parcels.length, 18)
   const contents = JSON.stringify(game.parcels)
   a.prepareParcelRewards(game, new Date(end))
   assert.equal(JSON.stringify(game.parcels), contents)
-  const { game: small } = await a.mutateParcels(2027, ['Nicole', 'Mathias', 'Norsk'], () => {})
+  const { game: small } = await a.mutateParcels(
+    2027,
+    ['Nicole', 'Mathias', 'Norsk', 'Emil', 'Anna'],
+    () => {},
+  )
   await a.mutateEconomy('Nicole', (w) => {
     w.balance = 200
     a.payParcelEntry(w, 2027, new Date('2027-11-25T12:00:00Z'))

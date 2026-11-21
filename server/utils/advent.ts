@@ -40,6 +40,8 @@ export function openAdventDoor(
   if (year !== ADVENT_YEAR || !Number.isInteger(day) || Number(day) < 1 || Number(day) > 24)
     throw createError({ statusCode: 400, statusMessage: 'Ugyldig kalender eller låge.' })
   const key = String(day)
+  if (now.getTime() >= Date.UTC(ADVENT_YEAR, 11, 31, 23))
+    throw createError({ statusCode: 403, statusMessage: 'Julekalenderen er lukket for i år.' })
   const saved = record.advent?.[String(year)]?.[key]
   if (saved) return saved
   if (Number(day) > adventAvailableDay(ADVENT_YEAR, now))
