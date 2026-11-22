@@ -257,10 +257,10 @@ test('admin can inspect current saved answers without advancing daily help or ex
   )
 })
 
-test('November 20 crossword first help starts Monday November 23 at 04:00, then daily at 04:00', () => {
+test('November 20 crossword first help starts Wednesday November 25 at 04:00, then daily at 04:00', () => {
   const { api: a } = game()
   const state = { ...a.freshCrossword(), opensAt: '2026-11-20T13:00:00Z' }
-  assert.equal(a.crosswordHelpAt(state), '2026-11-23T03:00:00.000Z')
+  assert.equal(a.crosswordHelpAt(state), '2026-11-25T03:00:00.000Z')
   const solution = a.crosswordSolution()
   const cell = Object.keys(solution)[0]
   const answers = { [cell]: solution[cell] }
@@ -268,16 +268,22 @@ test('November 20 crossword first help starts Monday November 23 at 04:00, then 
   a.crosswordHelp(state, 'u:nicole', answers, sunday)
   assert.equal(a.crosswordView(state, 'Nicole', false, sunday).helpAvailable, false)
   assert.equal(a.crosswordLeaderboard(state, [{ name: 'Nicole' }], sunday).mode, 'filled')
+  for (const stamp of [
+    '2026-11-23T03:00:00Z',
+    '2026-11-24T03:00:00Z',
+    '2026-11-25T02:59:59.999Z',
+  ]) {
+    const before = new Date(stamp)
+    assert.equal(a.crosswordHelp(state, 'u:nicole', answers, before).available, false)
+    assert.equal(a.crosswordView(state, 'Nicole', false, before).helpAvailable, false)
+    assert.equal(a.crosswordLeaderboard(state, [{ name: 'Nicole' }], before).mode, 'filled')
+  }
+  const wednesday = a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-25T03:00:00Z'))
+  assert.equal(wednesday.available, true)
+  assert.equal(wednesday.correctLetters[cell], solution[cell])
+  assert.equal(wednesday.nextAt, '2026-11-26T03:00:00.000Z')
   assert.equal(
-    a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-23T02:59:59.999Z')).available,
-    false,
-  )
-  const monday = a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-23T03:00:00Z'))
-  assert.equal(monday.available, true)
-  assert.equal(monday.correctLetters[cell], solution[cell])
-  assert.equal(monday.nextAt, '2026-11-24T03:00:00.000Z')
-  assert.equal(
-    a.crosswordLeaderboard(state, [{ name: 'Nicole' }], new Date('2026-11-23T03:00:00Z')).mode,
+    a.crosswordLeaderboard(state, [{ name: 'Nicole' }], new Date('2026-11-25T03:00:00Z')).mode,
     'correct',
   )
 })

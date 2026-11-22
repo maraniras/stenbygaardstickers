@@ -11,6 +11,11 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.9.7',
+    date: '2026-11-22',
+    notes: ['Kryds & tværs: Første hjælp starter onsdag den 25. november kl. 04.00'],
+  },
+  {
     version: '2.9.6',
     date: '2026-11-21',
     notes: [

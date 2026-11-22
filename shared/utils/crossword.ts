@@ -21,8 +21,8 @@ export function crosswordHelpAt(state: Pick<CrosswordState, 'opensAt'>) {
     day: '2-digit',
   }).format(new Date(state.opensAt))
   const date = new Date(openingDate + 'T00:00:00Z')
-  // Crossword #1 opened Friday 20 November; its first help was moved to Monday at 04:00.
-  date.setUTCDate(date.getUTCDate() + (openingDate === '2026-11-20' ? 3 : 2))
+  // Crossword #1 opened Friday 20 November; first help starts Wednesday 25 November at 04:00.
+  date.setUTCDate(date.getUTCDate() + (openingDate === '2026-11-20' ? 5 : 2))
   return crosswordOpeningTime(date.toISOString().slice(0, 10) + 'T04:00')
 }
 
