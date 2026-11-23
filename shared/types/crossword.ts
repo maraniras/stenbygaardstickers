@@ -5,10 +5,17 @@ export interface CrosswordImage {
   height: number
   src: string
   alt: string
+  fit?: string
+  position?: string
+  hideCaption?: boolean
+  arrowRow?: number
+  arrowCol?: number
 }
 export type CrosswordPushStatus =
   'development' | 'not-configured' | 'unscheduled' | 'scheduled' | 'failed' | 'pending'
 export interface CrosswordClue {
+  icon?: string
+  iconKind?: string
   clue: string
   length: number
   row: number
@@ -17,6 +24,7 @@ export interface CrosswordClue {
   image?: CrosswordImage
 }
 export interface CrosswordState {
+  id?: import('../utils/crosswords').CrosswordId
   opensAt: string | null
   pushSchedule?: {
     opensAt: string
@@ -45,7 +53,10 @@ export interface CrosswordState {
   >
 }
 export interface CrosswordView {
-  id: '1'
+  id: import('../utils/crosswords').CrosswordId
+  title: string
+  winnerPrize: number
+  completionPrize: number
   opensAt: string | null
   open: boolean
   preview: boolean
@@ -53,7 +64,13 @@ export interface CrosswordView {
   completed: boolean
   helpAt: string | null
   helpAvailable: boolean
-  puzzle?: { revision: string; columns: number; rows: number; entries: CrosswordClue[] }
+  puzzle?: {
+    revision: string
+    columns: number
+    rows: number
+    entries: CrosswordClue[]
+    decorations?: CrosswordImage[]
+  }
 }
 
 export interface CrosswordAnswerKey {

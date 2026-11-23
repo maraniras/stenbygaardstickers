@@ -1,5 +1,22 @@
 <script setup lang="ts">
+import { CROSSWORDS } from '../../../shared/utils/crosswords'
+import { adminChristmasVisible } from '../../../shared/utils/admin-navigation'
 const { admin, all, check, login, logout, load } = useAdmin()
+const route = useRoute()
+const sections = [
+  { id: 'jul', title: 'Jul', icon: '🎄', description: 'Kalender, pakkeleg og beskeder' },
+  { id: 'stickers', title: 'Stickers', icon: '📍', description: 'Godkendelser og kommentarer' },
+  { id: 'casino', title: 'Casino', icon: '🎲', description: 'Spil og indstillinger' },
+  { id: 'krydsord', title: 'Krydsord', icon: '🧩', description: 'Starttider, facit og deltagere' },
+  { id: 'brugere', title: 'Brugere', icon: '👥', description: 'Profiler og enheder' },
+  { id: 'system', title: 'System', icon: '⚙️', description: 'Version, backup og drift' },
+]
+const section = computed(() => sections.find((item) => item.id === route.query.section))
+const christmasAdminVisible = ref(false)
+async function loadSection() {
+  if (admin.value && section.value?.id === 'stickers') await load()
+}
+watch(() => route.query.section, loadSection)
 const tab = ref<'pending' | 'approved'>('pending')
 const password = ref('')
 const error = ref('')
@@ -16,7 +33,8 @@ const approved = computed(() => (all.value ?? []).filter((s) => s.status === 'ap
 const shown = computed(() => (tab.value === 'pending' ? pending.value : approved.value))
 
 onMounted(async () => {
-  if (await check()) await load()
+  christmasAdminVisible.value = adminChristmasVisible()
+  if (await check()) await loadSection()
 })
 
 async function submit() {
@@ -25,7 +43,7 @@ async function submit() {
   try {
     await login(password.value)
     password.value = ''
-    await load()
+    await loadSection()
   } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Kunne ikke logge ind'
   } finally {
@@ -47,9 +65,9 @@ function submitted(s: StoredSticker) {
 <template>
   <div class="page">
     <PageHeader
-      title="Admin"
-      back-to="/mig"
-      back-label="Tilbage til indstillinger"
+      :title="section?.title || 'Admin'"
+      :back-to="section ? '/admin' : '/mig'"
+      :back-label="section ? 'Tilbage til admin' : 'Tilbage til indstillinger'"
     >
       <template #actions>
         <button
@@ -89,113 +107,140 @@ function submitted(s: StoredSticker) {
       </button>
     </form>
 
-    <template v-else-if="admin && all">
-      <div
-        class="sort"
-        role="tablist"
+    <template v-else-if="admin">
+      <nav
+        v-if="!section"
+        class="admin-menu"
+        aria-label="Adminområder"
       >
-        <button
-          :class="{ on: tab === 'pending' }"
-          @click="tab = 'pending'"
-        >
-          Venter
-          <span
-            v-if="pending.length"
-            class="n"
-            >{{ pending.length }}</span
-          >
-        </button>
-        <button
-          :class="{ on: tab === 'approved' }"
-          @click="tab = 'approved'"
-        >
-          Godkendte
-        </button>
-      </div>
-
-      <p
-        v-if="!shown.length"
-        class="empty"
-      >
-        {{
-          tab === 'pending' ? 'Ingen stickers venter på godkendelse.' : 'Ingen godkendte stickers.'
-        }}
-      </p>
-
-      <div class="rows">
         <NuxtLink
-          v-for="s in shown"
-          :key="s.id"
-          class="row"
-          :to="`/admin/${s.id}`"
+          v-for="item in sections.filter((item) => item.id !== 'jul' || christmasAdminVisible)"
+          :key="item.id"
+          :to="{ path: '/admin', query: { section: item.id } }"
+          class="admin-menu-item"
         >
-          <img
-            v-if="thumbnail(s)"
-            :src="thumbnail(s)"
-            alt=""
-          />
-          <img
-            v-else
-            src="/marker.png"
-            alt=""
-            class="fallback"
-          />
-          <div class="info">
-            <b>{{ s.title }}</b>
+          <span aria-hidden="true">{{ item.icon }}</span
+          ><strong>{{ item.title }}</strong
+          ><small>{{ item.description }}</small>
+        </NuxtLink>
+      </nav>
+      <template v-else-if="section.id === 'stickers'">
+        <div
+          class="sort"
+          role="tablist"
+        >
+          <button
+            :class="{ on: tab === 'pending' }"
+            @click="tab = 'pending'"
+          >
+            Venter
             <span
-              ><CountryFlag
-                v-if="s.countryCode"
-                :code="s.countryCode"
-              />
-              {{ s.city || 'Ukendt sted' }} · {{ formatDate(s.date) }}</span
+              v-if="pending.length"
+              class="n"
+              >{{ pending.length }}</span
             >
-            <span
-              >{{ formatNames(s.placedBy) || 'Ingen navne' }} · {{ s.media.length }}
-              {{ s.media.length === 1 ? 'medie' : 'medier' }}</span
-            >
-            <span
-              v-if="s.status === 'pending' && s.submittedAt"
-              class="when"
-              >Indsendt {{ submitted(s) }}</span
-            >
-          </div>
+          </button>
+          <button
+            :class="{ on: tab === 'approved' }"
+            @click="tab = 'approved'"
+          >
+            Godkendte
+          </button>
+        </div>
+
+        <p
+          v-if="!shown.length"
+          class="empty"
+        >
+          {{
+            tab === 'pending'
+              ? 'Ingen stickers venter på godkendelse.'
+              : 'Ingen godkendte stickers.'
+          }}
+        </p>
+
+        <div class="rows">
+          <NuxtLink
+            v-for="s in shown"
+            :key="s.id"
+            class="row"
+            :to="`/admin/${s.id}`"
+          >
+            <img
+              v-if="thumbnail(s)"
+              :src="thumbnail(s)"
+              alt=""
+            />
+            <img
+              v-else
+              src="/marker.png"
+              alt=""
+              class="fallback"
+            />
+            <div class="info">
+              <b>{{ s.title }}</b>
+              <span
+                ><CountryFlag
+                  v-if="s.countryCode"
+                  :code="s.countryCode"
+                />
+                {{ s.city || 'Ukendt sted' }} · {{ formatDate(s.date) }}</span
+              >
+              <span
+                >{{ formatNames(s.placedBy) || 'Ingen navne' }} · {{ s.media.length }}
+                {{ s.media.length === 1 ? 'medie' : 'medier' }}</span
+              >
+              <span
+                v-if="s.status === 'pending' && s.submittedAt"
+                class="when"
+                >Indsendt {{ submitted(s) }}</span
+              >
+            </div>
+            <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
+          </NuxtLink>
+        </div>
+
+        <NuxtLink
+          class="comments-link"
+          to="/admin/kommentarer"
+        >
+          <span>💬</span>
+          <b>Kommentarer</b>
           <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
         </NuxtLink>
-      </div>
 
-      <NuxtLink
-        class="comments-link"
-        to="/admin/kommentarer"
-      >
-        <span>💬</span>
-        <b>Kommentarer</b>
-        <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg>
-      </NuxtLink>
-
-      <AdminPush />
-      <AdminJackSettings />
-      <NuxtLink
-        class="chip advent-link"
-        to="/admin/julekalender"
-        >Julekalender · præmier og åbninger →</NuxtLink
-      >
-      <NuxtLink
-        class="chip advent-link"
-        to="/admin/pakkeleg"
-        >Pakkeleg · præmier og udlevering →</NuxtLink
-      >
-      <AdminUsers />
-      <NuxtLink
-        class="chip advent-link"
-        to="/admin/julebeskeder"
-        >Julebeskeder · tidspunkter og status →</NuxtLink
-      >
-      <NuxtLink
-        class="chip advent-link"
-        to="/admin/krydsord"
-        >Krydsord · åbningstidspunkt og vinder →</NuxtLink
-      >
-      <AdminBackups />
+        <AdminPush
+      /></template>
+      <AdminJackSettings v-else-if="section.id === 'casino'" />
+      <AdminUsers v-else-if="section.id === 'brugere'" />
+      <template v-else-if="section.id === 'jul'">
+        <NuxtLink
+          class="chip advent-link"
+          to="/admin/julekalender"
+          >Julekalender · præmier og åbninger →</NuxtLink
+        >
+        <NuxtLink
+          class="chip advent-link"
+          to="/admin/pakkeleg"
+          >Pakkeleg · præmier og udlevering →</NuxtLink
+        >
+        <NuxtLink
+          class="chip advent-link"
+          to="/admin/julebeskeder"
+          >Julebeskeder · tidspunkter og status →</NuxtLink
+        >
+      </template>
+      <template v-else-if="section.id === 'krydsord'">
+        <NuxtLink
+          v-for="(puzzle, id) in CROSSWORDS"
+          :key="id"
+          class="puzzle-link"
+          :to="{ path: '/admin/krydsord', query: { id } }"
+          ><strong>{{ puzzle.title }}</strong
+          ><span>Åbningstid, facit, deltagere og præmier →</span></NuxtLink
+        >
+      </template>
+      <template v-else-if="section.id === 'system'"><AdminSystem /><AdminBackups /></template>
     </template>
 
     <p
@@ -208,9 +253,64 @@ function submitted(s: StoredSticker) {
 </template>
 
 <style scoped>
+.admin-menu {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.admin-menu-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-height: 150px;
+  padding: 20px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  text-decoration: none;
+}
+.admin-menu-item > span {
+  font-size: 30px;
+}
+.admin-menu-item strong {
+  font-size: 18px;
+}
+.admin-menu-item small {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.puzzle-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 22px;
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+.puzzle-link span {
+  color: var(--muted);
+  font-size: 13px;
+}
 .advent-link {
   display: flex;
-  margin-top: 24px;
+  align-items: center;
+  min-height: 76px;
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
 }
 .page {
   max-width: 640px;

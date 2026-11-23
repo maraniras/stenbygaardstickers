@@ -4,6 +4,11 @@ useHead({ title: 'Dagens lykkehjul · Stenbygaard Stickers' })
 const { name, ready } = useUser()
 const { state, error: walletError, reload, spin } = useEconomy()
 const spinning = ref(false)
+const shownBalance = usePresentedBalance(
+  computed(() => state.value?.wallet.balance),
+  spinning,
+  computed(() => `${name.value ?? ''}:${state.value?.day ?? ''}`),
+)
 const error = ref('')
 const oddsDialog = ref<HTMLDialogElement>()
 const rotation = ref(0)
@@ -85,8 +90,8 @@ async function play(direction: 1 | -1 = 1) {
     >
       <template #actions
         ><BananaBalance
-          v-if="state"
-          :balance="state.wallet.balance"
+          v-if="shownBalance !== undefined"
+          :balance="shownBalance"
       /></template>
     </PageHeader>
 

@@ -34,6 +34,15 @@ function imageArrowStyle(index: number) {
   const entry = entries[index]!
   const image = entry.image
   if (!image || image.width === 1) return
+  if (image.arrowRow !== undefined && image.arrowCol !== undefined)
+    return {
+      width: `${100 / image.width}%`,
+      height: `${100 / image.height}%`,
+      left: `${((image.arrowCol - image.col) / image.width) * 100}%`,
+      top: `${((image.arrowRow - image.row) / image.height) * 100}%`,
+      bottom: 'auto',
+      right: 'auto',
+    }
   const size = { width: `${100 / image.width}%`, height: `${100 / image.height}%` }
   return entry.down
     ? { ...size, left: `${((entry.col - image.col) / image.width) * 100}%` }
@@ -46,13 +55,13 @@ const wordCells = entries.map((entry) =>
   })),
 )
 const answerCells = Object.fromEntries(wordCells.flat().map((cell) => [cell.key, true]))
-const clueCells = new Map(
-  entries.flatMap((entry, index) =>
-    entry.image
-      ? []
-      : [[key(entry.row - (entry.down ? 1 : 0), entry.col - (entry.down ? 0 : 1)), index]],
-  ),
-)
+const clueCells = new Map<string, number[]>()
+entries.forEach((entry, index) => {
+  if (entry.image) return
+  const cell = key(entry.row - (entry.down ? 1 : 0), entry.col - (entry.down ? 0 : 1))
+  clueCells.set(cell, [...(clueCells.get(cell) || []), index])
+})
+const decorations = props.puzzle.decorations || []
 const cells = Array.from({ length: columns * rows }, (_, index) => {
   const row = Math.floor(index / columns)
   const col = index % columns
@@ -60,10 +69,18 @@ const cells = Array.from({ length: columns * rows }, (_, index) => {
     key: key(row, col),
     row,
     col,
-    clue: clueCells.get(key(row, col)),
+    clue: clueCells.get(key(row, col))?.[0],
+    clues: clueCells.get(key(row, col)) || [],
   }
 }).filter(
   (cell) =>
+    !decorations.some(
+      (image) =>
+        cell.row >= image.row &&
+        cell.row < image.row + image.height &&
+        cell.col >= image.col &&
+        cell.col < image.col + image.width,
+    ) &&
     !imageEntries.some(
       (image) =>
         cell.row >= image.row &&
@@ -409,7 +426,7 @@ function onKey(event: KeyboardEvent) {
 <template>
   <div class="crossword-page">
     <PageHeader
-      :title="title || 'Kryds & tværs'"
+      :title="title || 'På Tværs'"
       :back-to="backTo || '/spil/oevrige'"
       compact
     >
@@ -454,7 +471,9 @@ function onKey(event: KeyboardEvent) {
       >
     </PageHeader>
     <div class="puzzle-toolbar">
-      <span>Krydsord nr. {{ puzzleId }} · {{ entries.length }} ord</span
+      <span
+        >{{ puzzleId === 'marvel' ? 'Doomsday Special' : 'Krydsord nr. ' + puzzleId }} ·
+        {{ entries.length }} ord</span
       ><span>{{ count }} / {{ total }} felter</span>
       <div
         class="zoom-controls"
@@ -507,6 +526,17 @@ function onKey(event: KeyboardEvent) {
           :aria-label="`Krydsord, ${columns} kolonner og ${rows} rækker. ${readOnly ? (readOnlyLabel || 'Facit') + '. Vælg et felt for at se ledetråden.' : 'Vælg et felt og skriv med tastaturet.'}`"
           @keydown="onKey"
         >
+          <img
+            v-for="decoration in decorations"
+            :key="decoration.src"
+            class="board-decoration"
+            :src="decoration.src"
+            :alt="decoration.alt"
+            :style="{
+              gridRow: decoration.row + 1 + ' / span ' + decoration.height,
+              gridColumn: decoration.col + 1 + ' / span ' + decoration.width,
+            }"
+          />
           <div
             v-for="image in imageEntries"
             :key="image.index"
@@ -527,9 +557,13 @@ function onKey(event: KeyboardEvent) {
                 :src="image.src"
                 draggable="false"
                 :alt="image.alt"
+                :style="{
+                  objectFit: (image.fit as 'cover' | 'contain') || undefined,
+                  objectPosition: image.position,
+                }"
               />
               <span
-                v-if="image.width > 1"
+                v-if="image.width > 1 && !image.hideCaption"
                 class="image-caption"
                 >{{ entries[image.index]!.clue }} <span aria-hidden="true">⤢</span></span
               >
@@ -555,18 +589,53 @@ function onKey(event: KeyboardEvent) {
             v-for="cell in cells"
             :key="cell.key"
           >
-            <button
+            <div
               v-if="cell.clue !== undefined"
-              type="button"
-              class="clue-cell"
+              class="clue-group"
               :style="{ gridRow: cell.row + 1, gridColumn: cell.col + 1 }"
-              :class="{ 'selected-clue': selected === cell.clue }"
-              :aria-label="`${entries[cell.clue]!.clue}, ${entries[cell.clue]!.down ? 'lodret' : 'vandret'}`"
-              @click="chooseWord(cell.clue)"
             >
-              <span>{{ entries[cell.clue]!.clue }}</span
-              ><b aria-hidden="true">{{ entries[cell.clue]!.down ? '↓' : '→' }}</b>
-            </button>
+              <button
+                v-for="index in cell.clues"
+                :key="index"
+                type="button"
+                class="clue-cell"
+                :class="{
+                  'selected-clue': selected === index,
+                  'split-clue': cell.clues.length > 1,
+                }"
+                :aria-label="
+                  entries[index]!.clue + ', ' + (entries[index]!.down ? 'lodret' : 'vandret')
+                "
+                @click="chooseWord(index)"
+              >
+                <span
+                  v-if="entries[index]!.icon"
+                  class="clue-emoji"
+                  >{{ entries[index]!.icon }}</span
+                >
+                <span
+                  v-else-if="entries[index]!.iconKind === 'pepper'"
+                  class="pepper-mill"
+                  aria-hidden="true"
+                  ><i class="mill-knob" /><i class="mill-head" /><i class="mill-neck" /><i
+                    class="mill-body" /><i class="mill-foot"
+                /></span>
+                <span
+                  v-else-if="entries[index]!.iconKind === 'cube'"
+                  class="blue-cube"
+                  aria-hidden="true"
+                  >🧊</span
+                >
+                <span
+                  v-else-if="entries[index]!.iconKind === 'ace'"
+                  class="ace-card"
+                  aria-hidden="true"
+                  >A♠</span
+                >
+                <span v-else>{{ entries[index]!.clue }}</span
+                ><b aria-hidden="true">{{ entries[index]!.down ? '↓' : '→' }}</b>
+              </button>
+            </div>
             <button
               v-else-if="cell.key in answerCells"
               type="button"
@@ -753,6 +822,87 @@ function onKey(event: KeyboardEvent) {
 </template>
 
 <style scoped>
+.board-decoration {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.clue-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.clue-group .clue-cell {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+.clue-group .split-clue {
+  font-size: calc(100cqi / var(--columns) * 0.15);
+}
+.clue-cell .clue-emoji {
+  font-size: calc(100cqi / var(--columns) * 0.56);
+}
+.clue-cell .blue-cube {
+  font-size: calc(100cqi / var(--columns) * 0.6);
+}
+.clue-cell .ace-card {
+  color: #18222a;
+  background: #fffefa;
+  border: 1px solid #8c929a;
+  font-size: calc(100cqi / var(--columns) * 0.36);
+  padding: 1px;
+}
+.pepper-mill {
+  position: relative;
+  display: block;
+  width: 50%;
+  height: 80%;
+}
+.pepper-mill i {
+  position: absolute;
+  display: block;
+  background: linear-gradient(90deg, #64351c, #bd8950 35%, #8f542a 70%, #4c2918);
+}
+.mill-knob {
+  top: 0;
+  left: 42%;
+  width: 24%;
+  height: 10%;
+  border-radius: 2px;
+  background: #cdd4d9 !important;
+}
+.mill-head {
+  top: 10%;
+  left: 12%;
+  width: 76%;
+  height: 33%;
+  border-radius: 50%;
+}
+.mill-neck {
+  top: 41%;
+  left: 24%;
+  width: 52%;
+  height: 11%;
+  border-radius: 2px;
+}
+.mill-body {
+  top: 48%;
+  left: 12%;
+  width: 76%;
+  height: 41%;
+  clip-path: polygon(20% 0, 80% 0, 67% 36%, 76% 65%, 100% 100%, 0 100%, 24% 65%, 33% 36%);
+}
+.mill-foot {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 15%;
+  border-radius: 2px;
+}
+
 .retry-check {
   margin-left: 8px;
   border: 1px solid var(--hairline);

@@ -18,6 +18,8 @@ const jackStats = computed(() => economy.value[name.value.toLocaleLowerCase('da'
 const slotStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.slots)
 const rouletteStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.roulette)
 const wordleStats = computed(() => economy.value[name.value.toLocaleLowerCase('da')]?.wordle)
+const { bannerFor } = useUsers()
+const banner = computed(() => bannerFor(name.value))
 const countryList = computed(() => {
   const map = new Map<string, { code: string; name: string; count: number }>()
   for (const s of list.value) {
@@ -90,44 +92,53 @@ watch(
 
 <template>
   <div class="page">
-    <PageHeader
-      :title="displayName"
-      :back-to="isMe(displayName) ? undefined : '/rangliste'"
+    <section
+      class="profile-identity"
+      :class="{ 'has-banner': !!banner }"
     >
-      <template #leading
-        ><UserAvatar
-          class="profile-avatar"
-          :name="displayName"
-      /></template>
-      <template #actions>
-        <ActivityButton v-if="isMe(displayName)" />
-        <NuxtLink
-          v-if="isMe(displayName)"
-          class="page-icon-button"
-          to="/mig"
-          aria-label="Indstillinger"
-          title="Indstillinger"
-        >
-          <svg viewBox="0 0 24 24">
-            <circle
-              cx="12"
-              cy="12"
-              r="3"
-            />
-            <path
-              d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"
-            />
-          </svg> </NuxtLink
-      ></template>
-      <template #description
-        >{{ earnedCount(badges) }} af {{ badges.length }} badges
-        <span
-          v-if="isMe(displayName)"
-          class="chip you"
-          >Det er dig</span
-        ></template
+      <ProfileBanner
+        v-if="banner"
+        :src="banner"
+      />
+      <PageHeader
+        :title="displayName"
+        :back-to="isMe(displayName) ? undefined : '/rangliste'"
       >
-    </PageHeader>
+        <template #leading
+          ><UserAvatar
+            class="profile-avatar"
+            :name="displayName"
+        /></template>
+        <template #actions>
+          <ActivityButton v-if="isMe(displayName)" />
+          <NuxtLink
+            v-if="isMe(displayName)"
+            class="page-icon-button"
+            to="/mig"
+            aria-label="Indstillinger"
+            title="Indstillinger"
+          >
+            <svg viewBox="0 0 24 24">
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+              />
+              <path
+                d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"
+              />
+            </svg> </NuxtLink
+        ></template>
+        <template #description
+          >{{ earnedCount(badges) }} af {{ badges.length }} badges
+          <span
+            v-if="isMe(displayName)"
+            class="chip you"
+            >Det er dig</span
+          ></template
+        >
+      </PageHeader>
+    </section>
 
     <AppTabs
       id="profile"
@@ -324,6 +335,28 @@ watch(
 </template>
 
 <style scoped>
+.profile-identity.has-banner {
+  position: relative;
+  isolation: isolate;
+  min-height: 220px;
+  padding: 20px 18px 72px;
+  margin-bottom: 20px;
+  border-radius: 22px;
+  --text: #fff;
+  --title: #fff;
+  --muted: #e1ede5;
+  --surface-2: #153a2c;
+  --accent-soft: #17462c;
+}
+.profile-identity.has-banner :deep(.page-heading) {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+}
+.profile-identity.has-banner :deep(.heading-title) {
+  color: #fff;
+}
+
 [role='tabpanel']:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;

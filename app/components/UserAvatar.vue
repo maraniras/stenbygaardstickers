@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { profileFrame } from '../../shared/utils/profile-frames'
+import { profileFrame, profileFramePortraitStyle } from '../../shared/utils/profile-frames'
 // Profilbillede eller forbogstav. Størrelse, form og farve kommer fra forælderens
 // klasse (fx class="avatar"), så den passer ind, hvor forbogstavet sad før.
 const props = defineProps<{ name: string }>()
@@ -17,8 +17,22 @@ watch(src, () => {
     class="user-avatar"
     :class="{ photo: src && !failed, framed: !!frame }"
   >
+    <span
+      v-if="frame"
+      class="avatar-portrait"
+      :style="profileFramePortraitStyle(frame, 1.44)"
+    >
+      <img
+        v-if="src && !failed"
+        :src="src"
+        alt=""
+        loading="lazy"
+        @error="failed = true"
+      />
+      <template v-else>{{ name[0] }}</template>
+    </span>
     <img
-      v-if="src && !failed"
+      v-else-if="src && !failed"
       :src="src"
       alt=""
       loading="lazy"
@@ -39,8 +53,13 @@ watch(src, () => {
   position: relative;
   overflow: visible;
 }
-.framed > img:not(.avatar-frame) {
-  border-radius: inherit;
+.avatar-portrait {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: inherit;
 }
 .avatar-frame {
   position: absolute;

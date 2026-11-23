@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProfileFrame } from '../../shared/utils/profile-frames'
+import { profileFramePortraitStyle, type ProfileFrame } from '../../shared/utils/profile-frames'
 const props = defineProps<{ frame?: ProfileFrame; name?: string | null }>()
 const { avatarFor } = useUsers()
 const avatar = computed(() => (props.name ? avatarFor(props.name) : undefined))
@@ -14,7 +14,10 @@ watch(avatar, () => {
     class="frame-preview"
     aria-hidden="true"
   >
-    <span class="portrait">
+    <span
+      class="portrait"
+      :style="profileFramePortraitStyle(frame)"
+    >
       <img
         v-if="avatar && !failed"
         :src="avatar"
@@ -41,7 +44,6 @@ watch(avatar, () => {
 }
 .portrait {
   position: absolute;
-  inset: 18%;
   display: grid;
   place-items: center;
   border-radius: 50%;

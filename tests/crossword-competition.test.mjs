@@ -3,9 +3,9 @@ import { readFileSync, existsSync } from 'node:fs'
 import vm from 'node:vm'
 import test from 'node:test'
 import ts from 'typescript'
-import { setup } from './helpers/economy-harness.mjs'
+import { crosswordSetup } from './helpers/crossword-harness.mjs'
 
-const game = (redis = false) => setup(redis, ['server/utils/crossword.ts'])
+const game = crosswordSetup
 const now = new Date('2026-11-20T12:00:00Z')
 const opened = (a) => ({ ...a.freshCrossword(), opensAt: '2026-11-20T11:00:00Z' })
 
@@ -257,10 +257,10 @@ test('admin can inspect current saved answers without advancing daily help or ex
   )
 })
 
-test('November 20 crossword first help starts Wednesday November 25 at 04:00, then daily at 04:00', () => {
+test('November 20 crossword first help starts Tuesday November 24 at 04:00, then daily at 04:00', () => {
   const { api: a } = game()
   const state = { ...a.freshCrossword(), opensAt: '2026-11-20T13:00:00Z' }
-  assert.equal(a.crosswordHelpAt(state), '2026-11-25T03:00:00.000Z')
+  assert.equal(a.crosswordHelpAt(state), '2026-11-24T03:00:00.000Z')
   const solution = a.crosswordSolution()
   const cell = Object.keys(solution)[0]
   const answers = { [cell]: solution[cell] }
@@ -268,22 +268,18 @@ test('November 20 crossword first help starts Wednesday November 25 at 04:00, th
   a.crosswordHelp(state, 'u:nicole', answers, sunday)
   assert.equal(a.crosswordView(state, 'Nicole', false, sunday).helpAvailable, false)
   assert.equal(a.crosswordLeaderboard(state, [{ name: 'Nicole' }], sunday).mode, 'filled')
-  for (const stamp of [
-    '2026-11-23T03:00:00Z',
-    '2026-11-24T03:00:00Z',
-    '2026-11-25T02:59:59.999Z',
-  ]) {
+  for (const stamp of ['2026-11-23T03:00:00Z', '2026-11-24T02:59:59.999Z']) {
     const before = new Date(stamp)
     assert.equal(a.crosswordHelp(state, 'u:nicole', answers, before).available, false)
     assert.equal(a.crosswordView(state, 'Nicole', false, before).helpAvailable, false)
     assert.equal(a.crosswordLeaderboard(state, [{ name: 'Nicole' }], before).mode, 'filled')
   }
-  const wednesday = a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-25T03:00:00Z'))
-  assert.equal(wednesday.available, true)
-  assert.equal(wednesday.correctLetters[cell], solution[cell])
-  assert.equal(wednesday.nextAt, '2026-11-26T03:00:00.000Z')
+  const tuesday = a.crosswordHelp(state, 'u:nicole', answers, new Date('2026-11-24T03:00:00Z'))
+  assert.equal(tuesday.available, true)
+  assert.equal(tuesday.correctLetters[cell], solution[cell])
+  assert.equal(tuesday.nextAt, '2026-11-25T03:00:00.000Z')
   assert.equal(
-    a.crosswordLeaderboard(state, [{ name: 'Nicole' }], new Date('2026-11-25T03:00:00Z')).mode,
+    a.crosswordLeaderboard(state, [{ name: 'Nicole' }], new Date('2026-11-24T03:00:00Z')).mode,
     'correct',
   )
 })

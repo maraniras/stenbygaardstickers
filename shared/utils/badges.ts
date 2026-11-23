@@ -894,6 +894,7 @@ const SINGLE_POINTS: Record<string, number> = {
   'roulette-colour-five': 2,
   'roulette-colour-ten': 4,
   'crossword-1-winner': 1,
+  'crossword-marvel-winner': 1,
   'parcel-empty': 1,
   'parcel-sixes': 1,
   'parcel-three': 1,

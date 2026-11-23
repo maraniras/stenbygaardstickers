@@ -1,8 +1,8 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
 // Explicitly requested delivery test. No arbitrary recipients or messages are accepted.
-const ID = 'mathias-2026-11-20-1130'
-const AT = Date.parse('2026-11-20T10:30:00.000Z')
+const ID = 'nicole-2026-11-23-2150'
+const AT = Date.parse('2026-11-23T20:50:00.000Z')
 const STORE = 'push:one-off-tests'
 const DESTINATION = 'https://stenbygaardstickers.vercel.app/api/cron/push-test'
 const active = () =>
@@ -46,7 +46,7 @@ export function scheduleOneOffPush(now = new Date()): Promise<void> {
     planned = true
   })()
     .catch(() => {
-      console.error('Kunne ikke planlægge Mathias’ aftalte push-test.')
+      console.error('Kunne ikke planlægge Nicoles aftalte pushbesked.')
     })
     .finally(() => {
       planning = undefined
@@ -62,7 +62,7 @@ export async function deliverOneOffPush(body: unknown, now = new Date()) {
     now.getTime() > AT + 5 * 60_000
   )
     return { skipped: true }
-  const found = await findUser('Mathias')
+  const found = await findUser('Nicole')
   if (!found) return { skipped: true }
   const subs = [
     ...new Map(
@@ -75,9 +75,9 @@ export async function deliverOneOffPush(body: unknown, now = new Date()) {
   const [claimed] = await redis([['HSETNX', STORE, `sent:${ID}`, now.toISOString()]])
   if (!claimed) return { skipped: true }
   await sendPush(subs, {
-    title: '🔔 Test af planlagt notifikation',
-    body: 'Hej Mathias! Dette er din testbesked til kl. 11.30.',
-    url: '/mig',
+    title: 'Hva så musse',
+    body: 'Hvorfor løser du ikke bare den kryds og tværs og stopper med at være sur?',
+    url: '/spil/krydsord',
     tag: ID,
   })
   return { sent: true, devices: subs.length }

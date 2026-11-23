@@ -1,6 +1,9 @@
 import type { CrosswordHelp, CrosswordView } from '../../shared/types/crossword'
 
-export function useCrossword(preview = false) {
+export function useCrossword(
+  preview = false,
+  id: import('../../shared/utils/crosswords').CrosswordId = '1',
+) {
   const view = ref<CrosswordView | null>(null)
   const error = ref('')
   const pending = ref(true)
@@ -10,7 +13,7 @@ export function useCrossword(preview = false) {
   let request: Promise<void> | undefined
   let alive = true
   const options = () => ({
-    query: preview ? { preview: '1' } : {},
+    query: { id, ...(preview ? { preview: '1' } : {}) },
     headers: { 'x-user-token': userToken() },
   })
   function reload() {
@@ -42,7 +45,7 @@ export function useCrossword(preview = false) {
   }
   function checkHelp(answers: Record<string, string>) {
     return $fetch<CrosswordHelp>('/api/games/crossword/help', {
-      headers: { 'x-user-token': userToken() },
+      ...options(),
       method: 'POST',
       body: { answers, device: deviceId() },
     })

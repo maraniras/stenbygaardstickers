@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { CROSSWORD_PHYSICAL_PRIZE } from '../../shared/utils/crossword'
+defineProps<{ puzzleId?: string }>()
 </script>
 <template>
   <div class="crossword-prize">
     <img
-      :src="CROSSWORD_PHYSICAL_PRIZE.image"
-      alt="Hvid RTA-kop med sort hank og inderside"
-    /><span>RTA-kop + 1.000 bananer + vinderbadge</span>
+      :src="
+        puzzleId === 'marvel'
+          ? '/badges/custom/crossword-marvel-winner.webp'
+          : CROSSWORD_PHYSICAL_PRIZE.image
+      "
+      :alt="puzzleId === 'marvel' ? 'Marvel-vinderbadge' : 'RTA-kop'"
+    /><span>{{
+      puzzleId === 'marvel'
+        ? '500 bananer + vinderbadge + profilramme og banner · Øvrige løsninger: 50 bananer'
+        : 'RTA-kop + 1.000 bananer + vinderbadge + profilramme og banner'
+    }}</span>
   </div>
 </template>
 <style scoped>

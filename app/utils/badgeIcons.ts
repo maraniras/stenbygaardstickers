@@ -17,6 +17,7 @@ const CUSTOM = new Set([
   'roulette-colour-five',
   'roulette-colour-ten',
   'crossword-1-winner',
+  'crossword-marvel-winner',
   'parcel-empty',
   'parcel-sixes',
   'parcel-three',

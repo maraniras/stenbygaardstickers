@@ -3,7 +3,7 @@ import test from 'node:test'
 import vm from 'node:vm'
 import { readFileSync, existsSync } from 'node:fs'
 import ts from 'typescript'
-import { setup } from './helpers/economy-harness.mjs'
+import { crosswordSetup } from './helpers/crossword-harness.mjs'
 
 function route(api) {
   const exports = {}
@@ -13,6 +13,7 @@ function route(api) {
   }
   api.readBody = async (event) => event.body
   api.setHeader = () => {}
+  api.getQuery = (event) => event.query || {}
   const code = ts.transpileModule(
     readFileSync('server/api/admin/crossword/delivery.post.ts', 'utf8'),
     { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } },
@@ -22,7 +23,7 @@ function route(api) {
 }
 
 test('crossword has one non-seasonal RTA mug prize alongside its existing 1000 bananas', () => {
-  const { api: a } = setup(false, ['server/utils/crossword.ts'])
+  const { api: a } = crosswordSetup()
   assert.equal(a.CROSSWORD_PRIZE, 1000)
   assert.equal(a.CROSSWORD_PHYSICAL_PRIZE.kind, 'rta-mug')
   assert.ok(existsSync('public' + a.CROSSWORD_PHYSICAL_PRIZE.image))
@@ -31,7 +32,7 @@ test('crossword has one non-seasonal RTA mug prize alongside its existing 1000 b
 
 for (const remote of [false, true])
   test(`only admin can deliver the committed winner's single mug; retries are idempotent (${remote ? 'Redis' : 'local'})`, async () => {
-    const { api: a } = setup(remote, ['server/utils/crossword.ts'])
+    const { api: a } = crosswordSetup(remote)
     const post = route(a)
     await assert.rejects(post({ body: { delivered: true } }), { statusCode: 401 })
     await assert.rejects(post({ admin: true, body: { delivered: 'yes' } }), { statusCode: 400 })

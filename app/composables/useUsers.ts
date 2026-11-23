@@ -1,3 +1,4 @@
+import { profileBannerFor } from '../../shared/utils/profile-banners'
 // Alle der har valgt et navn, med profilbillede. Hentes én gang og igen, når
 // man selv skifter billede eller navn.
 let loading: Promise<void> | undefined
@@ -29,5 +30,6 @@ export function useUsers() {
     isTaken: (name: string) => Boolean(find(name)),
     avatarFor: (name: string) => find(name)?.avatar,
     frameFor: (name: string) => find(name)?.frame,
+    bannerFor: (name: string) => profileBannerFor(find(name)),
   }
 }

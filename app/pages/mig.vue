@@ -188,6 +188,7 @@ function selectMode(value: 'name' | 'code') {
 
       <AppearanceSettings />
       <ProfileFrameSettings />
+      <ProfileBannerSettings />
 
       <section class="card">
         <h2>Brug appen på en enhed mere</h2>

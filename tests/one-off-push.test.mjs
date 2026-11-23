@@ -52,9 +52,9 @@ function setup(env = 'production') {
   )
   return { api: context.exports, jobs, pushes, names }
 }
-const at = new Date('2026-11-20T10:30:00Z')
-const body = { id: 'mathias-2026-11-20-1130' }
-test('requested test queues once for 11:30 Copenhagen, never locally or after the time', async () => {
+const at = new Date('2026-11-23T20:50:00Z')
+const body = { id: 'nicole-2026-11-23-2150' }
+test('requested test queues once for 21:50 Copenhagen, never locally or after the time', async () => {
   const h = setup()
   await Promise.all([
     h.api.scheduleOneOffPush(new Date(at - 60000)),
@@ -72,7 +72,7 @@ test('requested test queues once for 11:30 Copenhagen, never locally or after th
   await late.api.scheduleOneOffPush(at)
   assert.equal(late.jobs.length, 0)
 })
-test('only the fixed Mathias test can send, once, inside its five-minute window', async () => {
+test('only the fixed Nicole message can send, once, inside its five-minute window', async () => {
   const h = setup()
   assert.equal(h.api.oneOffPushAuthorized('Bearer wrong'), false)
   await h.api.deliverOneOffPush(body, new Date(at - 1))
@@ -81,8 +81,13 @@ test('only the fixed Mathias test can send, once, inside its five-minute window'
   assert.equal(h.names.length, 0)
   await h.api.deliverOneOffPush(body, at)
   await h.api.deliverOneOffPush(body, at)
-  assert.deepEqual(h.names, ['Mathias', 'Mathias'])
+  assert.deepEqual(h.names, ['Nicole', 'Nicole'])
   assert.equal(h.pushes.length, 1)
   assert.equal(h.pushes[0].subs.length, 1)
-  assert.equal(h.pushes[0].message.url, '/mig')
+  assert.equal(h.pushes[0].message.url, '/spil/krydsord')
+  assert.equal(h.pushes[0].message.title, 'Hva så musse')
+  assert.equal(
+    h.pushes[0].message.body,
+    'Hvorfor løser du ikke bare den kryds og tværs og stopper med at være sur?',
+  )
 })

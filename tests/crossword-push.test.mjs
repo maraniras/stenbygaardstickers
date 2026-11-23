@@ -9,8 +9,16 @@ const opening = '2026-12-01T19:00:00.000Z'
 const hour = 3600000
 const time = Date.parse(opening)
 const sub = (endpoint) => ({ endpoint, keys: { auth: 'fixture', p256dh: 'fixture' } })
-function setup({ env = 'production', token = 'fixture-token' } = {}) {
-  const state = { opensAt: opening, winner: null, finished: {}, attempts: {} }
+function setup({ env = 'production', token = 'fixture-token', id = '1' } = {}) {
+  const state = {
+    ...(id === 'marvel' ? { id } : {}),
+    opensAt: opening,
+    winner: null,
+    finished: {},
+    attempts: {},
+  }
+  const readIds = [],
+    mutateIds = []
   const jobs = [],
     pushes = [],
     users = [],
@@ -50,8 +58,14 @@ function setup({ env = 'production', token = 'fixture-token' } = {}) {
       duringLookup?.()
       return publicSubs
     },
-    readCrossword: async () => structuredClone(state),
-    mutateCrossword: async (fn) => ({ result: fn(state), state }),
+    readCrossword: async (id) => {
+      readIds.push(id)
+      return structuredClone(state)
+    },
+    mutateCrossword: async (fn, id) => {
+      mutateIds.push(id)
+      return { result: fn(state), state }
+    },
     $fetch: async (url, options) => {
       if (failQueue) throw Error('queue unavailable')
       jobs.push({ url, ...options })
@@ -68,6 +82,8 @@ function setup({ env = 'production', token = 'fixture-token' } = {}) {
   const api = load('server/utils/crossword-push.ts', context)
   return {
     api,
+    readIds,
+    mutateIds,
     state,
     jobs,
     pushes,
@@ -450,4 +466,42 @@ test('failed winner lookup is retryable and cannot fail a successful solution re
   await Promise.all(jobs)
   assert.equal(h.pushes.length, 1)
   assert.ok(h.state.winnerPushSentAt)
+})
+
+test('Marvel push jobs, receipts and destinations are scoped to Marvel', async () => {
+  const h = setup({ id: 'marvel' })
+  h.publicSubs.push(sub('reader'))
+  await h.api.scheduleCrosswordPushes(h.state, new Date(time - 48 * hour))
+  assert.equal(h.jobs.length, 3)
+  for (const job of h.jobs) assert.equal(job.body.id, 'marvel')
+  assert.match(h.pushes[0].message.title, /Doomsday Special/)
+  assert.match(h.pushes[0].message.body, /500 bananer/)
+  assert.ok(!h.pushes[0].message.body.includes('kop'))
+  await h.api.deliverCrosswordPush(
+    { id: 'marvel', opensAt: opening, kind: 'reminder' },
+    new Date(time - hour),
+  )
+  assert.match(h.pushes.at(-1).message.title, /Doomsday Special.*snart/)
+  assert.equal(h.pushes.at(-1).message.url, '/spil/oevrige')
+  await h.api.deliverCrosswordPush(
+    { id: 'marvel', opensAt: opening, kind: 'opened' },
+    new Date(time),
+  )
+  assert.equal(h.readIds.at(-1), 'marvel')
+  assert.equal(h.pushes.at(-1).message.url, '/spil/krydsord?id=marvel')
+  assert.match(h.pushes.at(-1).message.body, /500 bananer/)
+  h.state.winner = { name: 'Anna', at: opening }
+  await h.api.announceCrosswordWinner(h.state, new Date(time))
+  assert.equal(h.pushes.at(-1).message.tag, 'crossword-marvel-winner')
+  assert.ok(h.mutateIds.every((id) => id === 'marvel'))
+  const legacy = setup()
+  await legacy.api.scheduleCrosswordPushes(legacy.state, new Date(time - 48 * hour))
+  assert.notEqual(
+    legacy.jobs[0].headers['Upstash-Deduplication-Id'],
+    h.jobs[0].headers['Upstash-Deduplication-Id'],
+  )
+  await assert.rejects(
+    h.api.deliverCrosswordPush({ id: 'other', opensAt: opening, kind: 'opened' }, new Date(time)),
+    { statusCode: 400 },
+  )
 })

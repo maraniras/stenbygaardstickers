@@ -22,6 +22,8 @@ export interface UserRecord {
   activity?: ActivityItem[]
   frame?: string
   ownedFrames?: string[]
+  banner?: string
+  ownedBanners?: string[]
   name: string
   createdAt: string
   /** Sidst set bevares også, når den sidste enhed logger ud. */

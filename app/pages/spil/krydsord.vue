@@ -1,13 +1,17 @@
 <script setup lang="ts">
-useHead({ title: 'Kryds & tværs · Stenbygaard Stickers' })
-const preview = useRoute().query.preview === '1'
-const { view, pending, error, reload, submit, checkHelp } = useCrossword(preview)
+useHead({ title: 'På Tværs · Stenbygaard Stickers' })
+const route = useRoute()
+const puzzleId = route.query.id === 'marvel' ? 'marvel' : '1'
+const preview = route.query.preview === '1'
+const marvel = puzzleId === 'marvel'
+const { view, pending, error, reload, submit, checkHelp } = useCrossword(preview, puzzleId)
 const { name } = useUser()
 const showLeaderboard = ref(false)
 const { reload: reloadWallet, reloadPeople } = useEconomy()
-watch([() => view.value?.winner?.at, name], () => {
-  if (!preview && view.value?.winner && view.value.winner.name === name.value)
-    void Promise.allSettled([reloadWallet(), reloadPeople()])
+const { reload: reloadUsers } = useUsers()
+watch([() => view.value?.completed, name], () => {
+  if (!preview && view.value?.completed)
+    void Promise.allSettled([reloadWallet(), reloadPeople(), reloadUsers()])
 })
 const opening = computed(() =>
   view.value?.opensAt
@@ -33,16 +37,28 @@ const opening = computed(() =>
         ><NuxtLink :to="'/person/' + encodeURIComponent(view.winner.name)">{{
           view.winner.name
         }}</NuxtLink>
-        vandt kryds &amp; tværs #1</strong
+        vandt {{ view.title }}</strong
       >
       <span>{{
         view.winner.name === name
-          ? 'Du har vundet RTA-koppen, 1.000 bananer og vinderbadgen! Kontakt Mathias om udlevering af koppen.'
-          : 'RTA-koppen, 1.000 bananer og vinderbadgen er vundet. Du kan stadig løse krydsordet.'
+          ? marvel
+            ? 'Du har vundet 500 bananer, vinderbadgen samt den eksklusive profilramme og profilbanneret! Vælg ramme og banner under dine indstillinger.'
+            : 'Du har vundet RTA-koppen, 1.000 bananer, vinderbadgen samt en eksklusiv profilramme og et profilbanner! Vælg ramme og banner under dine indstillinger. Kontakt Mathias om udlevering af koppen.'
+          : marvel
+            ? 'Vinderen har fået 500 bananer, badgen, profilrammen og profilbanneret. Du får 50 bananer, når du løser krydsordet.'
+            : 'RTA-koppen, 1.000 bananer, vinderbadgen, profilrammen og profilbanneret er vundet. Du kan stadig løse krydsordet.'
       }}</span>
     </div>
+    <p
+      v-if="marvel && view.completed && view.winner?.name !== name && !view.preview"
+      class="competition-banner"
+      role="status"
+    >
+      Du har løst Doomsday Special og fået 50 bananer.
+    </p>
     <CrosswordBoard
       :key="view.id + ':' + view.puzzle.revision + ':' + (name || 'anonym') + ':' + preview"
+      :title="view.title"
       :puzzle="view.puzzle"
       :puzzle-id="view.id"
       :owner="name || 'anonym'"
@@ -84,6 +100,7 @@ const opening = computed(() =>
     <CrosswordLeaderboard
       v-if="showLeaderboard"
       :preview="view.preview"
+      :puzzle-id="puzzleId"
       @close="showLeaderboard = false"
     />
   </div>
@@ -92,11 +109,11 @@ const opening = computed(() =>
     class="locked-page"
   >
     <PageHeader
-      title="Kryds &amp; tværs"
+      :title="marvel ? 'Doomsday Special' : 'På Tværs #1'"
       back-to="/spil/oevrige"
     />
     <section class="locked-card">
-      <span class="eyebrow">KRYDSORD #1</span>
+      <span class="eyebrow">{{ marvel ? 'DOOMSDAY SPECIAL' : 'PÅ TVÆRS #1' }}</span>
       <h2>{{ pending ? 'Henter krydsordet…' : 'Krydsordet er ikke åbnet endnu' }}</h2>
       <p v-if="error">{{ error }}</p>
       <p v-else>
@@ -105,7 +122,7 @@ const opening = computed(() =>
         }}
       </p>
       <p>Den første korrekte løsning vinder:</p>
-      <CrosswordPrize />
+      <CrosswordPrize :puzzle-id="puzzleId" />
       <button
         v-if="error"
         type="button"

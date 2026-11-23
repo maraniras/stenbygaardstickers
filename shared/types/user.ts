@@ -26,6 +26,7 @@ export interface PairCode {
 
 /** Offentligt om en bruger */
 export interface PublicUser {
+  banner?: string
   frame?: string
   name: string
   avatar?: string

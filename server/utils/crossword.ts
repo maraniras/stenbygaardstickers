@@ -1,3 +1,10 @@
+import { crosswordDefinition, type CrosswordId } from '../../shared/utils/crosswords'
+import {
+  MARVEL_COLUMNS,
+  MARVEL_ROWS,
+  MARVEL_ENTRIES,
+  MARVEL_DECORATIONS,
+} from '../data/crossword-marvel'
 import type {
   CrosswordHelp,
   CrosswordAdminProgress,
@@ -17,6 +24,25 @@ import { CROSSWORD_PREVIEW, CROSSWORD_COLUMNS, CROSSWORD_ROWS } from '../data/cr
 
 const STORE = 'crossword-games'
 const ID = '1'
+function puzzleData(id: CrosswordId = '1') {
+  return id === 'marvel'
+    ? {
+        entries: MARVEL_ENTRIES,
+        columns: MARVEL_COLUMNS,
+        rows: MARVEL_ROWS,
+        decorations: MARVEL_DECORATIONS,
+      }
+    : {
+        entries: CROSSWORD_PREVIEW,
+        columns: CROSSWORD_COLUMNS,
+        rows: CROSSWORD_ROWS,
+        decorations: undefined,
+      }
+}
+const MARVEL_REVISION = createHash('sha256')
+  .update(JSON.stringify(MARVEL_ENTRIES))
+  .digest('hex')
+  .slice(0, 16)
 const REVISION = createHash('sha256')
   .update(JSON.stringify(CROSSWORD_PREVIEW))
   .digest('hex')
@@ -24,19 +50,22 @@ const REVISION = createHash('sha256')
 const CAS = `if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
 redis.call('HSET', KEYS[1], ARGV[1], ARGV[3]); return 1`
 let localTail = Promise.resolve()
-export function freshCrossword(): CrosswordState {
-  return { opensAt: null, winner: null, finished: {}, attempts: {} }
+export function freshCrossword(id: CrosswordId = ID): CrosswordState {
+  return { ...(id === '1' ? {} : { id }), opensAt: null, winner: null, finished: {}, attempts: {} }
 }
-async function rawCrossword() {
-  if (redisEnabled) return ((await redis([['HGET', STORE, ID]]))[0] as string | null) || ''
-  const value = await useStorage('data').getItem<string | CrosswordState>(`${STORE}:${ID}`)
+async function rawCrossword(id: CrosswordId = ID) {
+  if (redisEnabled) return ((await redis([['HGET', STORE, id]]))[0] as string | null) || ''
+  const value = await useStorage('data').getItem<string | CrosswordState>(`${STORE}:${id}`)
   return value ? (typeof value === 'string' ? value : JSON.stringify(value)) : ''
 }
-export async function readCrossword(): Promise<CrosswordState> {
-  const raw = await rawCrossword()
-  return raw ? JSON.parse(raw) : freshCrossword()
+export async function readCrossword(id: CrosswordId = ID): Promise<CrosswordState> {
+  const raw = await rawCrossword(id)
+  return raw ? JSON.parse(raw) : freshCrossword(id)
 }
-export async function mutateCrossword<T>(change: (state: CrosswordState) => T) {
+export async function mutateCrossword<T>(
+  change: (state: CrosswordState) => T,
+  id: CrosswordId = ID,
+) {
   let release = () => {}
   const previous = localTail
   if (!redisEnabled) {
@@ -47,14 +76,14 @@ export async function mutateCrossword<T>(change: (state: CrosswordState) => T) {
   }
   try {
     for (let attempt = 0; attempt < 24; attempt++) {
-      const raw = await rawCrossword()
-      const state: CrosswordState = raw ? JSON.parse(raw) : freshCrossword()
+      const raw = await rawCrossword(id)
+      const state: CrosswordState = raw ? JSON.parse(raw) : freshCrossword(id)
       const result = change(state)
       const next = JSON.stringify(state)
       if (next === raw) return { state, result }
       if (redisEnabled) {
-        if ((await redisEval(CAS, [STORE], [ID, raw, next])) !== 1) continue
-      } else await useStorage('data').setItem(`${STORE}:${ID}`, next)
+        if ((await redisEval(CAS, [STORE], [id, raw, next])) !== 1) continue
+      } else await useStorage('data').setItem(`${STORE}:${id}`, next)
       return { state, result }
     }
     throw createError({ statusCode: 409, statusMessage: 'Krydsordet blev opdateret. Prøv igen.' })
@@ -68,10 +97,16 @@ export function crosswordView(
   preview = false,
   now = new Date(),
 ): CrosswordView {
+  const id = state.id || ID
+  const definition = crosswordDefinition(id)
+  const puzzle = puzzleData(id)
   const open = crosswordOpen(state, now)
   const helpAt = crosswordHelpAt(state)
   return {
-    id: ID,
+    id,
+    title: definition.title,
+    winnerPrize: definition.winnerPrize,
+    completionPrize: definition.completionPrize,
     opensAt: state.opensAt,
     open,
     preview,
@@ -82,10 +117,11 @@ export function crosswordView(
     ...(open || preview
       ? {
           puzzle: {
-            revision: REVISION,
-            columns: CROSSWORD_COLUMNS,
-            rows: CROSSWORD_ROWS,
-            entries: CROSSWORD_PREVIEW.map(({ answer, ...entry }) => ({
+            revision: id === ID ? REVISION : MARVEL_REVISION,
+            columns: puzzle.columns,
+            rows: puzzle.rows,
+            decorations: puzzle.decorations,
+            entries: puzzle.entries.map(({ answer, ...entry }) => ({
               ...entry,
               length: answer.length,
             })),
@@ -99,12 +135,12 @@ export function crosswordAdminProgress(
   state: CrosswordState,
   users: { name: string }[],
 ): CrosswordAdminProgress {
-  const solution = crosswordSolution()
+  const solution = crosswordSolution(state.id)
   const subjects = new Map(
     [...new Set([...Object.keys(state.progress || {}), ...Object.keys(state.finished)])].map(
       (subject) => [
         createHash('sha256')
-          .update('crossword:1:' + subject)
+          .update('crossword:' + (state.id || ID) + ':' + subject)
           .digest('hex')
           .slice(0, 16),
         subject,
@@ -150,9 +186,9 @@ export function scheduleCrossword(state: CrosswordState, value: unknown, now = n
     throw createError({ statusCode: 400, statusMessage: 'Vælg et tidspunkt i fremtiden.' })
   state.opensAt = opensAt
 }
-export function crosswordSolution() {
+export function crosswordSolution(id: CrosswordId = ID) {
   return Object.fromEntries(
-    CROSSWORD_PREVIEW.flatMap((entry) =>
+    puzzleData(id).entries.flatMap((entry) =>
       [...entry.answer].map((letter, i) => [
         `${entry.row + (entry.down ? i : 0)}:${entry.col + (entry.down ? 0 : i)}`,
         letter,
@@ -174,7 +210,7 @@ export function crosswordHelp(
     throw createError({ statusCode: 400, statusMessage: 'Enheden kunne ikke genkendes.' })
   if (!answers || typeof answers !== 'object' || Array.isArray(answers))
     throw createError({ statusCode: 400, statusMessage: 'Ugyldige felter.' })
-  const solution = crosswordSolution()
+  const solution = crosswordSolution(state.id)
   const entered = Object.entries(answers)
   if (
     entered.length > Object.keys(solution).length ||
@@ -211,8 +247,8 @@ export function crosswordHelp(
   }
 }
 /** Never returns individual correctness or the answer key. */
-export function validateCrosswordAnswers(answers: unknown) {
-  const solution = crosswordSolution()
+export function validateCrosswordAnswers(answers: unknown, id: CrosswordId = ID) {
+  const solution = crosswordSolution(id)
   if (!answers || typeof answers !== 'object' || Array.isArray(answers))
     throw createError({ statusCode: 400, statusMessage: 'Udfyld hele krydsordet først.' })
   const values = answers as Record<string, unknown>
@@ -237,10 +273,10 @@ export function submitCrossword(
   if (!crosswordOpen(state, now))
     throw createError({ statusCode: 403, statusMessage: 'Krydsordet er ikke åbnet endnu.' })
   const key = `u:${nameKey(name)}`
-  if (state.finished[key]) return validateCrosswordAnswers(answers)
+  if (state.finished[key]) return validateCrosswordAnswers(answers, state.id)
   if (state.attempts[key] && now.getTime() - state.attempts[key]! < 2000)
     throw createError({ statusCode: 429, statusMessage: 'Vent et øjeblik, før du prøver igen.' })
-  const correct = validateCrosswordAnswers(answers)
+  const correct = validateCrosswordAnswers(answers, state.id)
   crosswordHelp(state, key, answers, now)
   state.attempts[key] = now.getTime()
   if (correct) {
@@ -257,7 +293,7 @@ export function crosswordLeaderboard(
   users: { name: string }[],
   now = new Date(),
 ): CrosswordLeaderboard {
-  const wordCells = CROSSWORD_PREVIEW.map((entry) =>
+  const wordCells = puzzleData(state.id).entries.map((entry) =>
     Array.from(
       { length: entry.answer.length },
       (_, i) => `${entry.row + (entry.down ? i : 0)}:${entry.col + (entry.down ? 0 : i)}`,
@@ -266,7 +302,7 @@ export function crosswordLeaderboard(
   const allCells = new Set(wordCells.flat())
   const helpAt = crosswordHelpAt(state)
   const mode = helpAt && Date.parse(helpAt) <= now.getTime() ? 'correct' : 'filled'
-  const solution = mode === 'correct' ? crosswordSolution() : {}
+  const solution = mode === 'correct' ? crosswordSolution(state.id) : {}
   const day = gameDay(now)
   const names = new Map(users.map((user) => [nameKey(user.name), user.name]))
   const subjects = new Set([...Object.keys(state.progress || {}), ...Object.keys(state.finished)])
@@ -300,7 +336,7 @@ export function crosswordLeaderboard(
     return [
       {
         id: createHash('sha256')
-          .update('crossword:1:' + subject)
+          .update('crossword:' + (state.id || ID) + ':' + subject)
           .digest('hex')
           .slice(0, 16),
         name,
@@ -341,18 +377,79 @@ export function crosswordLeaderboard(
 export async function settleCrosswordWinner(state: CrosswordState) {
   if (!state.winner) return false
   const winner = state.winner
+  const id = state.id || ID
+  const definition = crosswordDefinition(id)
+  const receipt = `crossword:${id}:winner`
   const existing = await readEconomy(winner.name)
-  if (existing?.claims['crossword:1:winner'] && existing.crosswordWins?.[ID]) return false
+  const frameReceipt = `crossword:${id}:frame`
+  const needsFrame = !!definition.profileFrame && !existing?.claims[frameReceipt]
+  const bannerReceipt = `crossword:${id}:banner`
+  const needsBanner = !!definition.profileBanner && !existing?.claims[bannerReceipt]
+  if (existing?.claims[receipt] && existing.crosswordWins?.[id] && !needsFrame && !needsBanner)
+    return false
+  let frameGranted = false
+  let bannerGranted = false
+  if (needsFrame || needsBanner) {
+    const user = await updateUser(nameKey(winner.name), (user) => {
+      if (needsFrame) {
+        const frame = definition.profileFrame!
+        const owned = new Set([...(user.ownedFrames ?? []), ...(user.frame ? [user.frame] : [])])
+        if (!owned.has(frame)) {
+          owned.add(frame)
+          if (!user.frame) user.frame = frame
+        }
+        user.ownedFrames = [...owned]
+      }
+      if (needsBanner) {
+        user.ownedBanners = [
+          ...new Set([
+            ...(user.ownedBanners ?? []),
+            ...(user.banner ? [user.banner] : []),
+            definition.profileBanner!,
+          ]),
+        ]
+      }
+    })
+    frameGranted = needsFrame && !!user
+    bannerGranted = needsBanner && !!user
+  }
   const { result } = await mutateEconomy(winner.name, (wallet) => {
     const paid = creditBananas(
       wallet,
-      'crossword:1:winner',
-      CROSSWORD_PRIZE,
-      'Kryds & tværs #1 · første korrekte løsning',
+      receipt,
+      id === ID ? CROSSWORD_PRIZE : definition.winnerPrize,
+      definition.title + ' · første korrekte løsning',
       new Date(winner.at),
     )
-    ;(wallet.crosswordWins ??= {})[ID] = winner.at
-    return paid
+    ;(wallet.crosswordWins ??= {})[id] = winner.at
+    if (frameGranted) wallet.claims[frameReceipt] = true
+    if (bannerGranted) wallet.claims[bannerReceipt] = true
+    return paid || frameGranted || bannerGranted
   })
+  return result
+}
+
+/** Retryable completion receipt: the winner never receives the runner-up amount. */
+export async function settleCrosswordCompletion(state: CrosswordState, name: string) {
+  const id = state.id || ID
+  const definition = crosswordDefinition(id)
+  const finished = state.finished[`u:${nameKey(name)}`]
+  if (
+    !finished ||
+    !definition.completionPrize ||
+    (state.winner && nameKey(state.winner.name) === nameKey(name))
+  )
+    return false
+  const receipt = `crossword:${id}:completed`
+  if ((await readEconomy(name))?.claims[receipt]) return false
+  const { result } = await mutateEconomy(name, (wallet) =>
+    creditBananas(
+      wallet,
+      receipt,
+      definition.completionPrize,
+      definition.title + ' · gennemført',
+      new Date(finished.at),
+    ),
+  )
   return result
 }

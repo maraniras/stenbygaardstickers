@@ -80,6 +80,7 @@ export function setup(redisEnabled = false, extra = []) {
     'shared/utils/badges.ts',
     'shared/utils/economy.ts',
     'shared/utils/game-day.ts',
+    'server/utils/crossword-id.ts',
     'server/utils/economy-store.ts',
     'server/utils/economy.ts',
     'server/utils/daily-challenge.ts',

@@ -6,8 +6,15 @@ export interface CrosswordImage {
   height: number
   src: string
   alt: string
+  fit?: string
+  position?: string
+  hideCaption?: boolean
+  arrowRow?: number
+  arrowCol?: number
 }
 export interface CrosswordEntry {
+  icon?: string
+  iconKind?: string
   clue: string
   answer: string
   row: number

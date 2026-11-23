@@ -4,8 +4,23 @@ useHead({ title: 'Øvrige spil · Stenbygaard Stickers' })
 const { season } = useChristmasGames()
 const { state } = useEconomy()
 const { view, now } = useCrossword()
+const { view: marvelView } = useCrossword(false, 'marvel')
 const countdown = computed(() =>
   crosswordCountdown(view.value?.open ? null : view.value?.opensAt, now.value),
+)
+const marvelCountdown = computed(() =>
+  crosswordCountdown(marvelView.value?.open ? null : marvelView.value?.opensAt, now.value),
+)
+const marvelOpening = computed(() =>
+  marvelView.value?.opensAt
+    ? new Date(marvelView.value.opensAt).toLocaleString('da-DK', {
+        timeZone: 'Europe/Copenhagen',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '',
 )
 const cardLink = resolveComponent('NuxtLink')
 const opening = computed(() =>
@@ -46,7 +61,7 @@ const opening = computed(() =>
       </div>
       <div class="card-body">
         <div>
-          <h2>Kryds &amp; tværs #1</h2>
+          <h2>På Tværs #1</h2>
           <p>Ét ord ad gangen. Hvem løser hele krydsordet først?</p>
         </div>
         <div
@@ -76,10 +91,99 @@ const opening = computed(() =>
         }}</strong>
       </div>
     </component>
+    <component
+      :is="marvelView?.open ? cardLink : 'div'"
+      class="crossword-card marvel-card"
+      :to="marvelView?.open ? '/spil/krydsord?id=marvel' : undefined"
+      :aria-disabled="!marvelView?.open || undefined"
+    >
+      <span
+        v-if="!marvelView?.open"
+        class="coming-soon-ribbon"
+        >Kommer snart</span
+      >
+      <div class="card-top">
+        <span>ORDSPIL</span
+        ><span
+          v-if="marvelView?.open"
+          class="preview"
+          >Åbent</span
+        >
+      </div>
+      <div class="card-body">
+        <div>
+          <h2>På Tværs: Doomsday Special</h2>
+          <p>Helte, skurke og referencer. Hvem løser Marvel-krydsordet først?</p>
+        </div>
+        <div
+          class="mini-crossword"
+          aria-hidden="true"
+        >
+          <span
+            v-for="i in 25"
+            :key="i"
+            :class="{ empty: [2, 5, 7, 13, 16, 19, 22].includes(i) }"
+          />
+        </div>
+      </div>
+      <div
+        v-if="marvelCountdown"
+        class="countdown"
+        role="timer"
+        aria-label="Tid til krydsordet åbner, i timer, minutter og sekunder"
+      >
+        <span>Åbner om</span><strong>{{ marvelCountdown }}</strong>
+      </div>
+      <div class="card-bottom">
+        <span v-if="marvelView?.winner">Vundet af {{ marvelView.winner.name }}</span>
+        <CrosswordPrize
+          v-else
+          puzzle-id="marvel"
+        />
+        <strong>{{
+          marvelView?.open
+            ? 'Åbn krydsord →'
+            : marvelOpening
+              ? 'Åbner ' + marvelOpening
+              : 'Tidspunkt følger'
+        }}</strong>
+      </div>
+    </component>
   </div>
 </template>
 
 <style scoped>
+.marvel-card {
+  position: relative;
+  overflow: hidden;
+  margin-top: 18px;
+}
+.coming-soon-ribbon {
+  position: absolute;
+  z-index: 1;
+  top: 30px;
+  right: -46px;
+  width: 190px;
+  padding: 7px 0;
+  transform: rotate(35deg);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 3px 10px #0002;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-align: center;
+  pointer-events: none;
+}
+.marvel-card .mini-crossword::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/games/crossword/marvel/marvel.svg') center / 94% auto no-repeat;
+  opacity: 0.48;
+  transform: rotate(-5deg);
+  pointer-events: none;
+}
 .other-games {
   max-width: 480px;
   margin: 0 auto;
@@ -131,6 +235,7 @@ p {
   margin: 10px 0 0;
 }
 .mini-crossword {
+  position: relative;
   flex: none;
   display: grid;
   grid-template-columns: repeat(5, 18px);

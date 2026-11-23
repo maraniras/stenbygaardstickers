@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { CROSSWORDS } from '../../../shared/utils/crosswords'
+const puzzleId = useRoute().query.id === 'marvel' ? 'marvel' : '1'
+const definition = CROSSWORDS[puzzleId]
+const puzzleQuery = { id: puzzleId }
+
 import type { CrosswordAnswerKey } from '../../../shared/types/crossword'
-useHead({ title: 'Facit · Krydsord #1 · Admin' })
+useHead({ title: 'Facit · ' + definition.title + ' · Admin' })
 const { admin, check } = useAdmin()
 const answerKey = ref<CrosswordAnswerKey | null>(null)
 const error = ref('')
@@ -10,7 +15,9 @@ async function load() {
   error.value = ''
   try {
     if (!(await check())) return
-    answerKey.value = await $fetch<CrosswordAnswerKey>('/api/admin/crossword/solution')
+    answerKey.value = await $fetch<CrosswordAnswerKey>('/api/admin/crossword/solution', {
+      query: puzzleQuery,
+    })
   } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Kunne ikke hente facit.'
   } finally {
@@ -23,10 +30,10 @@ onMounted(load)
   <CrosswordBoard
     v-if="answerKey && admin"
     :key="answerKey.puzzle.revision"
-    title="Facit · Krydsord #1"
-    back-to="/admin/krydsord"
+    :title="'Facit · ' + definition.title"
+    :back-to="'/admin/krydsord?id=' + puzzleId"
     :puzzle="answerKey.puzzle"
-    puzzle-id="1"
+    :puzzle-id="puzzleId"
     owner="admin-facit"
     :preview="true"
     :read-only="true"
@@ -37,7 +44,7 @@ onMounted(load)
     class="answer-key-status"
   >
     <PageHeader
-      title="Facit · Krydsord #1"
+      :title="'Facit · ' + definition.title"
       back-to="/admin/krydsord"
     />
     <p

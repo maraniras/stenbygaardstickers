@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { CROSSWORDS } from '../../../shared/utils/crosswords'
+const puzzleId = useRoute().query.id === 'marvel' ? 'marvel' : '1'
+const definition = CROSSWORDS[puzzleId]
+const puzzleQuery = { id: puzzleId }
+
 import type { CrosswordAdminProgress } from '../../../shared/types/crossword'
 
-useHead({ title: 'Deltagernes løsninger · Krydsord · Admin' })
+useHead({ title: 'Deltagernes løsninger · ' + definition.title + ' · Admin' })
 const { admin, check } = useAdmin()
 const route = useRoute()
 const progress = ref<CrosswordAdminProgress | null>(null)
@@ -20,7 +25,9 @@ async function load() {
       progress.value = null
       return
     }
-    progress.value = await $fetch<CrosswordAdminProgress>('/api/admin/crossword/progress')
+    progress.value = await $fetch<CrosswordAdminProgress>('/api/admin/crossword/progress', {
+      query: puzzleQuery,
+    })
     revision.value++
   } catch (err: any) {
     progress.value = null
@@ -40,9 +47,9 @@ onMounted(load)
     <CrosswordBoard
       :key="selected.id + ':' + revision"
       :title="selected.label"
-      back-to="/admin/krydsord-deltagere"
+      :back-to="'/admin/krydsord-deltagere?id=' + puzzleId"
       :puzzle="progress.puzzle"
-      puzzle-id="1"
+      :puzzle-id="puzzleId"
       owner="admin-deltager"
       :preview="true"
       :read-only="true"
@@ -71,7 +78,7 @@ onMounted(load)
   >
     <PageHeader
       title="Deltagernes løsninger"
-      back-to="/admin/krydsord"
+      :back-to="'/admin/krydsord?id=' + puzzleId"
     />
     <p v-if="admin === false">Log ind på <NuxtLink to="/admin">adminsiden</NuxtLink> først.</p>
     <template v-else>
@@ -99,7 +106,12 @@ onMounted(load)
             v-for="player in progress.players"
             :key="player.id"
           >
-            <NuxtLink :to="{ path: '/admin/krydsord-deltagere', query: { player: player.id } }">
+            <NuxtLink
+              :to="{
+                path: '/admin/krydsord-deltagere',
+                query: { id: puzzleId, player: player.id },
+              }"
+            >
               <strong>{{ player.label }} <span v-if="player.completed">· Gennemført</span></strong>
               <span
                 >{{ Object.keys(player.letters).length }} /

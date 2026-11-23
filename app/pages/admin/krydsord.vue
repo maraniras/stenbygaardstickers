@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { CROSSWORDS } from '../../../shared/utils/crosswords'
+const puzzleId = useRoute().query.id === 'marvel' ? 'marvel' : '1'
+const definition = CROSSWORDS[puzzleId]
+const puzzleQuery = { id: puzzleId }
+
 import type { CrosswordView, CrosswordPushStatus } from '../../../shared/types/crossword'
 import { CROSSWORD_PHYSICAL_PRIZE } from '../../../shared/utils/crossword'
 type AdminCrosswordView = CrosswordView & {
@@ -33,6 +38,7 @@ async function delivery() {
   error.value = ''
   try {
     const result = await $fetch<{ deliveredAt: string | null }>('/api/admin/crossword/delivery', {
+      query: puzzleQuery,
       method: 'POST',
       body: { delivered: !view.value.prizeDeliveredAt },
     })
@@ -71,7 +77,7 @@ function setView(data: AdminCrosswordView) {
 onMounted(async () => {
   if (!(await check())) return
   try {
-    setView(await $fetch<AdminCrosswordView>('/api/admin/crossword'))
+    setView(await $fetch<AdminCrosswordView>('/api/admin/crossword', { query: puzzleQuery }))
   } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Kunne ikke hente krydsordet.'
   }
@@ -83,6 +89,7 @@ async function save() {
   try {
     setView(
       await $fetch<AdminCrosswordView>('/api/admin/crossword', {
+        query: puzzleQuery,
         method: 'PUT',
         body: { opensAt: time.value || null },
       }),
@@ -98,8 +105,8 @@ async function save() {
 <template>
   <div class="admin-crossword">
     <PageHeader
-      title="Krydsord #1"
-      back-to="/admin"
+      :title="definition.title"
+      back-to="/admin?section=krydsord"
     />
     <p v-if="admin === false">Log ind på <NuxtLink to="/admin">adminsiden</NuxtLink> først.</p>
     <section
@@ -154,20 +161,36 @@ async function save() {
       <div class="reward">
         <img
           class="mug-prize"
-          :src="CROSSWORD_PHYSICAL_PRIZE.image"
-          alt="RTA-kop"
+          :src="
+            definition.physicalPrize
+              ? CROSSWORD_PHYSICAL_PRIZE.image
+              : '/badges/custom/crossword-marvel-winner.webp'
+          "
+          alt="Vinderpræmie"
         />
-        <strong>Én vinder · RTA-kop + 1000 bananer + vinderbadge</strong>
+        <strong
+          >Én vinder · {{ definition.physicalPrize ? 'RTA-kop + ' : ''
+          }}{{ definition.winnerPrize }} bananer + vinderbadge</strong
+        >
+        <p v-if="definition.profileFrame">
+          Vinderen får også en eksklusiv profilramme og et profilbanner til {{ definition.title }}.
+        </p>
         <p>
-          Den første servergodkendte løsning vinder. Andre må gerne færdiggøre krydsordet uden
-          præmie.
+          Den første servergodkendte løsning vinder.
+          {{
+            definition.completionPrize
+              ? 'Øvrige brugere får ' +
+                definition.completionPrize +
+                ' bananer én gang for at gennemføre.'
+              : 'Andre må gerne færdiggøre krydsordet uden præmie.'
+          }}
         </p>
       </div>
       <p v-if="view.winner">
         Vinder: <strong>{{ view.winner.name }}</strong>
       </p>
       <div
-        v-if="view.winner"
+        v-if="view.winner && definition.physicalPrize"
         class="delivery-status"
       >
         <p>
@@ -193,17 +216,17 @@ async function save() {
       </div>
       <NuxtLink
         class="answer-link"
-        to="/admin/krydsord-deltagere"
+        :to="'/admin/krydsord-deltagere?id=' + puzzleId"
         >Se deltagernes nuværende løsninger →</NuxtLink
       >
       <NuxtLink
         class="answer-link"
-        to="/admin/krydsord-facit"
+        :to="'/admin/krydsord-facit?id=' + puzzleId"
         >Vis facit →</NuxtLink
       >
       <NuxtLink
         class="preview-link"
-        to="/spil/krydsord?preview=1"
+        :to="'/spil/krydsord?preview=1&id=' + puzzleId"
         >Forhåndsvis krydsordet uden præmier →</NuxtLink
       >
     </section>
@@ -268,13 +291,22 @@ input {
   margin-bottom: 12px;
 }
 .preview-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--surface-2);
+  text-decoration: none;
   margin-top: 22px;
   font-size: 13px;
   font-weight: 700;
 }
 .answer-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: 64px;
   margin-top: 24px;
   padding: 14px 16px;
   border: 1px solid var(--hairline);

@@ -4,9 +4,22 @@ import type { PushMessage } from './push'
 
 type CrosswordPushKind = 'day-before' | 'reminder' | 'opened'
 interface CrosswordPushJob {
+  id?: '1' | 'marvel'
   opensAt: string
   kind: CrosswordPushKind
 }
+const pushInfo = (state: Pick<CrosswordState, 'id'>) =>
+  state.id === 'marvel'
+    ? {
+        title: 'På Tværs: Doomsday Special',
+        prize: '500 bananer, en særlig badge og en eksklusiv profilramme og et profilbanner',
+        url: '/spil/krydsord?id=marvel',
+      }
+    : {
+        title: 'På Tværs #1',
+        prize: 'en RTA-kop, 1.000 bananer, en særlig badge, en profilramme og et profilbanner',
+        url: '/spil/krydsord',
+      }
 const HOUR = 3600_000
 // Stay below the free QStash seven-day delay limit, relaying longer schedules.
 const MAX_DELAY = 6 * 24 * HOUR
@@ -70,7 +83,7 @@ async function queueCrosswordPush(job: CrosswordPushJob, now: Date) {
       'Upstash-Retries': '3',
       'Upstash-Timeout': '30s',
       'Upstash-Deduplication-Id': createHash('sha256')
-        .update(`${job.opensAt}:${job.kind}:${timestamp}`)
+        .update(`${job.id === 'marvel' ? 'marvel:' : ''}${job.opensAt}:${job.kind}:${timestamp}`)
         .digest('hex'),
     },
     body: job,
@@ -95,7 +108,7 @@ export async function scheduleCrosswordPushes(
   if (!process.env.QSTASH_TOKEN) return crosswordPushStatus(state)
   try {
     for (const kind of ['day-before', 'reminder', 'opened'] as const) {
-      const job = { opensAt, kind }
+      const job = { ...(state.id === 'marvel' ? { id: state.id } : {}), opensAt, kind }
       if (targetTime(job) >= now.getTime() && !sent(state, job)) await queueCrosswordPush(job, now)
     }
   } catch {
@@ -105,7 +118,7 @@ export async function scheduleCrosswordPushes(
   await mutateCrossword((current) => {
     if (current.opensAt === opensAt)
       current.pushSchedule = { opensAt, status, version: PLAN_VERSION, tokenKey: planTokenKey() }
-  })
+  }, state.id)
   return status
 }
 
@@ -119,9 +132,12 @@ export function checkCrosswordPushSchedule(now = new Date()): Promise<void> {
   if (now.getTime() < retryAt) return Promise.resolve()
   retryAt = now.getTime() + 5 * 60_000
   checking = (async () => {
-    const state = await readCrossword()
-    if (!state.opensAt || state.winner || Date.parse(state.opensAt) <= now.getTime()) return
-    if (crosswordPushStatus(state) !== 'scheduled') await scheduleCrosswordPushes(state, now, false)
+    for (const id of ['1', 'marvel'] as const) {
+      const state = await readCrossword(id)
+      if (!state.opensAt || state.winner || Date.parse(state.opensAt) <= now.getTime()) continue
+      if (crosswordPushStatus(state) !== 'scheduled')
+        await scheduleCrosswordPushes(state, now, false)
+    }
   })()
     .catch(() => {
       console.error('Kunne ikke kontrollere krydsordets pushplan.')
@@ -139,12 +155,13 @@ export async function deliverCrosswordPush(body: unknown, now = new Date()) {
   if (
     !candidate ||
     typeof candidate.opensAt !== 'string' ||
+    (candidate.id !== undefined && candidate.id !== '1' && candidate.id !== 'marvel') ||
     !['day-before', 'reminder', 'opened'].includes(candidate.kind || '') ||
     !Number.isFinite(Date.parse(candidate.opensAt))
   )
     throw createError({ statusCode: 400, statusMessage: 'Ugyldig krydsordsbesked.' })
   const job = candidate as CrosswordPushJob
-  const state = await readCrossword()
+  const state = await readCrossword(job.id)
   if (state.opensAt !== job.opensAt || state.winner || sent(state, job)) return { skipped: true }
   const target = targetTime(job)
   if (now.getTime() < target) {
@@ -159,21 +176,22 @@ export async function deliverCrosswordPush(body: unknown, now = new Date()) {
         : now.getTime() - target > HOUR
   if (expired()) return { skipped: true }
 
+  const info = pushInfo(state)
   const opening = crosswordOpeningLabel(job.opensAt)
   return broadcastCrosswordPush(
     {
       title:
         job.kind === 'day-before'
-          ? '🧩 Kryds & tværs #1 åbner om 24 timer'
+          ? `🧩 ${info.title} åbner om 24 timer`
           : job.kind === 'reminder'
-            ? '🧩 Kryds & tværs #1 åbner snart'
-            : '🧩 Kryds & tværs #1 er åbent!',
+            ? `🧩 ${info.title} åbner snart`
+            : `🧩 ${info.title} er åbent!`,
       body:
         job.kind !== 'opened'
-          ? `Vi starter ${opening}. Første korrekte løsning vinder en RTA-kop, 1.000 bananer og en særlig badge.`
-          : 'Nu kan du spille! Første korrekte løsning vinder en RTA-kop, 1.000 bananer og en særlig badge.',
-      url: job.kind !== 'opened' ? '/spil/oevrige' : '/spil/krydsord',
-      tag: `crossword-1-${job.kind}-${Date.parse(job.opensAt)}`,
+          ? `Vi starter ${opening}. Første korrekte løsning vinder ${info.prize}.`
+          : `Nu kan du spille! Første korrekte løsning vinder ${info.prize}.`,
+      url: job.kind !== 'opened' ? '/spil/oevrige' : info.url,
+      tag: `crossword-${job.id || '1'}-${job.kind}-${Date.parse(job.opensAt)}`,
     },
     async () =>
       (
@@ -184,7 +202,7 @@ export async function deliverCrosswordPush(body: unknown, now = new Date()) {
           current.pushSent[job.opensAt] ??= {}
           current.pushSent[job.opensAt]![job.kind] = now.toISOString()
           return true
-        })
+        }, state.id)
       ).result,
   )
 }
@@ -211,6 +229,7 @@ export function crosswordOpeningLabel(opensAt: string) {
 
 export async function announceCrosswordOpening(state: CrosswordState, now = new Date()) {
   const opensAt = state.opensAt
+  const info = pushInfo(state)
   if (
     !active() ||
     !opensAt ||
@@ -221,10 +240,10 @@ export async function announceCrosswordOpening(state: CrosswordState, now = new 
     return { skipped: true }
   return broadcastCrosswordPush(
     {
-      title: '🧩 Kryds & tværs #1 har fået en startdato',
-      body: `Vi starter ${crosswordOpeningLabel(opensAt)}. Første korrekte løsning vinder en RTA-kop, 1.000 bananer og en særlig badge.`,
+      title: `🧩 ${info.title} har fået en startdato`,
+      body: `Vi starter ${crosswordOpeningLabel(opensAt)}. Første korrekte løsning vinder ${info.prize}.`,
       url: '/spil/oevrige',
-      tag: `crossword-1-announced-${Date.parse(opensAt)}`,
+      tag: `crossword-${state.id || '1'}-announced-${Date.parse(opensAt)}`,
     },
     async () =>
       (
@@ -239,20 +258,21 @@ export async function announceCrosswordOpening(state: CrosswordState, now = new 
           current.pushSent[opensAt] ??= {}
           current.pushSent[opensAt]!.announced = now.toISOString()
           return true
-        })
+        }, state.id)
       ).result,
   )
 }
 
 export async function announceCrosswordWinner(state: CrosswordState, now = new Date()) {
   const winner = state.winner
+  const info = pushInfo(state)
   if (!active() || !winner || state.winnerPushSentAt) return { skipped: true }
   return broadcastCrosswordPush(
     {
-      title: '🏆 Kryds & tværs #1 har fået en vinder!',
-      body: `${winner.name} løste krydsordet først og vandt en RTA-kop, 1.000 bananer og vinderbadgen. Du kan stadig løse det færdigt.`,
-      url: '/spil/krydsord',
-      tag: 'crossword-1-winner',
+      title: `🏆 ${info.title} har fået en vinder!`,
+      body: `${winner.name} løste krydsordet først og vandt ${info.prize}. Du kan stadig løse det færdigt.`,
+      url: info.url,
+      tag: `crossword-${state.id || '1'}-winner`,
     },
     async () =>
       (
@@ -265,7 +285,7 @@ export async function announceCrosswordWinner(state: CrosswordState, now = new D
             return false
           current.winnerPushSentAt = now.toISOString()
           return true
-        })
+        }, state.id)
       ).result,
   )
 }

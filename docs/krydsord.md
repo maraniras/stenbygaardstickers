@@ -1,4 +1,4 @@
-# Kryds & tværs #1
+# På Tværs #1
 
 Spillet er lukket som standard. Admin vælger et fremtidigt åbningstidspunkt på `/admin/krydsord` i dansk tid (Europe/Copenhagen). Uden tidspunkt står der »Tidspunkt følger« i menuen. Menukortet bruger et neutralt gitter, ingen svarord eller bananillustration. Direkte links afslører heller ikke opgaven før åbningen.
 
@@ -49,6 +49,8 @@ OK bruger et genereret håndikon i `public/games/crossword/ok-hand-v3.webp` som 
 »Vis facit« på `/admin/krydsord` åbner `/admin/krydsord-facit`. Her vises hele løsningen i et skrivebeskyttet gitter med de samme 1×/2×/3× zoomtrin og panorering. Facit hentes kun fra adminbeskyttet GET `/api/admin/crossword/solution` med `Cache-Control: private, no-store`. Den almindelige spil- og preview-API indeholder fortsat ingen facitdata. Visningen læser og skriver ikke spillerens lokale svar, validerer ikke indsendelser og ændrer ingen præmier, gennemførelser, vinder eller åbningstid. Starttidspunktet vælges fortsat på `/admin/krydsord` i dansk tid.
 
 ## Daglig hjælp kl. 04
+
+For På Tværs #1, åbnet 20. november 2026, starter første hjælp som en særregel tirsdag den 24. november kl. 04.00 dansk tid. Derefter fortsætter de daglige tjek kl. 04.
 
 Første hjælp kommer kl. 04.00 dansk tid på åbningsdatoen plus to kalenderdage. Eksempel: åbner spillet mandag (uanset klokkeslæt), starter hjælpen onsdag kl. 04. Beregningen følger Europe/Copenhagen og sommer-/vintertid, ikke en fast 48-timers forsinkelse. Derefter genberegnes markeringerne hver dag kl. 04, indtil brugerens løsning er godkendt.
 

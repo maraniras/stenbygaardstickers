@@ -78,7 +78,6 @@ export function useBananditten() {
     busy.value = true
     error.value = ''
     animation.value = true
-    shownBalance.value = before.balance - bet.value
     sound.start()
     try {
       const response = await $fetch<SlotResponse>('/api/games/slots', {

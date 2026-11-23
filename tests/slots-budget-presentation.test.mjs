@@ -91,11 +91,13 @@ for (const netLoss of [215, 190]) {
     await a.refresh()
     a.responses.push(response(netLoss, 1))
     const running = a.spin()
+    assert.equal(a.shownBalance.value, 290)
     await new Promise(setImmediate)
     assert.equal(a.rolling.value, true)
     assert.equal(a.data.value.dailyLimit.netLoss, netLoss)
     assert.equal(a.dailyLimit.value.netLoss, 210)
     assert.equal(a.dailyLimit.value.remaining, 90)
+    assert.equal(a.shownBalance.value, 290)
     a.pending[0].finish()
     await running
     assert.equal(a.dailyLimit.value.netLoss, netLoss)

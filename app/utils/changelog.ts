@@ -11,6 +11,17 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.0',
+    date: '2026-11-23',
+    notes: [
+      'På Tværs #1: Hjælpen starter tirsdag den 24. november kl. 04.00. Korrekte bogstaver markeres grønt og tjekkes igen hver dag kl. 04.',
+      'Vinderen af På Tværs #1 får også en eksklusiv profilramme og et profilbanner i guld og grønt.',
+      'På Tværs: Doomsday Special — første korrekte løsning vinder 500 bananer, en eksklusiv badge, en profilramme og et profilbanner. Alle øvrige får 50 bananer for at gennemføre.',
+      'Vælg dine profilbannere i indstillingerne og vis dem på din profil og i brugerlisten.',
+      'Forbedret pasform på profilrammer. Lykkehjulets gevinst vises først i saldoen, når hjulet er færdigt.',
+    ],
+  },
+  {
     version: '2.9.7',
     date: '2026-11-22',
     notes: ['Kryds & tværs: Første hjælp starter onsdag den 25. november kl. 04.00'],

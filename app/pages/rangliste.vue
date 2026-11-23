@@ -14,7 +14,7 @@ const registeredOnly = useState('people-registered', () => false)
 const busy = ref(false)
 const { name: me } = useUser()
 const { people: economies, reloadPeople } = useEconomy()
-const { users, failed: usersFailed, reload: reloadUsers } = useUsers()
+const { users, bannerFor, failed: usersFailed, reload: reloadUsers } = useUsers()
 const { stickers, people } = useStickers()
 const { ratings, enabled: ratingsEnabled, reload: reloadRatings } = useRatings()
 const { commentStats, failed: commentsFailed, reload: reloadComments } = useCommentStats()
@@ -44,6 +44,7 @@ const rows = computed(() => {
     const level = levelFor(points)
     return {
       ...person,
+      banner: bannerFor(person.name),
       bananas: economies.value[key(person.name)]?.balance ?? null,
       points,
       level: level.level,
@@ -123,7 +124,7 @@ function unit(n: number | null) {
         ><input
           v-model="query"
           type="search"
-          placeholder="Fx Mathias"
+          placeholder="Søg"
           autocomplete="off"
       /></label>
       <label class="field"
@@ -214,9 +215,13 @@ function unit(n: number | null) {
         >
           <NuxtLink
             class="person"
-            :class="{ yours: me && sameName(p.name, me) }"
+            :class="{ yours: me && sameName(p.name, me), 'has-banner': !!p.banner }"
             :to="personUrl(p.name)"
           >
+            <ProfileBanner
+              v-if="p.banner"
+              :src="p.banner"
+            />
             <div class="person-top">
               <span class="position">{{ p.rank }}</span
               ><UserAvatar
@@ -288,6 +293,20 @@ function unit(n: number | null) {
 </template>
 
 <style scoped>
+.person.has-banner {
+  position: relative;
+  isolation: isolate;
+  --text: #fff;
+  --muted: #e1ede5;
+  --hairline: #ffffff40;
+  --accent-soft: #17462c;
+  padding-bottom: 56px;
+}
+.person.has-banner > :not(.profile-banner) {
+  position: relative;
+  z-index: 1;
+}
+
 .updating {
   margin: 0 0 10px;
   color: var(--muted);

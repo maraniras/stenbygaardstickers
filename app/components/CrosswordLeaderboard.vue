@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CrosswordLeaderboard } from '../../shared/types/crossword'
-const props = defineProps<{ preview: boolean }>()
+const props = defineProps<{ preview: boolean; puzzleId?: string }>()
 const emit = defineEmits<{ close: [] }>()
 const liveData = ref<CrosswordLeaderboard | null>(null)
 const example = ref(false)
@@ -38,7 +38,7 @@ function load() {
   request = (async () => {
     try {
       const result = await $fetch<CrosswordLeaderboard>('/api/games/crossword/leaderboard', {
-        query: props.preview ? { preview: '1' } : {},
+        query: { id: props.puzzleId || '1', ...(props.preview ? { preview: '1' } : {}) },
         timeout: 10000,
         retry: 0,
       })
