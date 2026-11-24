@@ -208,4 +208,12 @@ Spildøgnet skifter kl. 04 dansk tid. Tabte/oversprungne døgn bryder den aktuel
 
 Øvrige brugere får 50 bananer én gang for at gennemføre Doomsday Special. Vinderen får i alt 500 bananer.
 
-Næste ledige nummer: **x118**
+## Købt hjælp i På Tværs
+
+| Nr. | Badge (id) | Krav | Bananer | Point |
+| --- | --- | --- | --- | --- |
+| x118 | HJÆÆÆÆLP (`crossword-help`) | Køb 1 / 5 / 10 / 25 / 50 bogstaver på tværs af krydsord | 20 / 40 / 60 / 80 / 100 | 1 / 2 / 3 / 4 / 5 |
+
+Hvert betalt, unikt bogstav tæller én gang. Gratis morgenhjælp, genforsøg og admin-preview tæller ikke. Optællingen bruger de permanente købsbilag, ikke den begrænsede transaktionshistorik. Trinmotivet viser Emil på en børnecykel med støttehjul og sut; medaljekanten følger trinnet.
+
+Næste ledige nummer: **x119**

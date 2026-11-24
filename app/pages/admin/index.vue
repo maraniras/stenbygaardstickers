@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CROSSWORDS } from '../../../shared/utils/crosswords'
+import { CROSSWORDS, CROSSWORD_IDS } from '../../../shared/utils/crosswords'
 import { adminChristmasVisible } from '../../../shared/utils/admin-navigation'
 const { admin, all, check, login, logout, load } = useAdmin()
 const route = useRoute()
@@ -232,11 +232,11 @@ function submitted(s: StoredSticker) {
       </template>
       <template v-else-if="section.id === 'krydsord'">
         <NuxtLink
-          v-for="(puzzle, id) in CROSSWORDS"
+          v-for="id in CROSSWORD_IDS"
           :key="id"
           class="puzzle-link"
           :to="{ path: '/admin/krydsord', query: { id } }"
-          ><strong>{{ puzzle.title }}</strong
+          ><strong>{{ CROSSWORDS[id].title }}</strong
           ><span>Åbningstid, facit, deltagere og præmier →</span></NuxtLink
         >
       </template>

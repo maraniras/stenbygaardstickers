@@ -854,6 +854,7 @@ export function earnedCount(badges: Badge[]) {
 
 /** Point pr. trin */
 const TIER_POINTS: Record<string, number[]> = {
+  'crossword-help': [1, 2, 3, 4, 5],
   'wordle-wins': [1, 2, 3, 4, 5],
   'wordle-streak': [1, 2, 3, 4, 5],
   'roulette-rounds': [1, 2, 3, 4, 5],

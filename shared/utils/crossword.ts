@@ -23,7 +23,7 @@ export function crosswordHelpAt(state: Pick<CrosswordState, 'opensAt' | 'id'>) {
   const date = new Date(openingDate + 'T00:00:00Z')
   // Crossword #1 opened Friday 20 November; first help starts Tuesday 24 November at 04:00.
   date.setUTCDate(
-    date.getUTCDate() + (state.id !== 'marvel' && openingDate === '2026-11-20' ? 4 : 2),
+    date.getUTCDate() + ((!state.id || state.id === '1') && openingDate === '2026-11-20' ? 4 : 2),
   )
   return crosswordOpeningTime(date.toISOString().slice(0, 10) + 'T04:00')
 }

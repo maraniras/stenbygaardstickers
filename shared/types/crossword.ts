@@ -14,6 +14,8 @@ export interface CrosswordImage {
 export type CrosswordPushStatus =
   'development' | 'not-configured' | 'unscheduled' | 'scheduled' | 'failed' | 'pending'
 export interface CrosswordClue {
+  clueRow?: number
+  clueCol?: number
   icon?: string
   iconKind?: string
   clue: string
@@ -49,10 +51,12 @@ export interface CrosswordState {
       startedAt?: string
       checkedDay?: string
       correctLetters?: Record<string, string>
+      incorrectLetters?: Record<string, string>
     }
   >
 }
 export interface CrosswordView {
+  letterShop?: import('../utils/crossword-letters').CrosswordLetterShop
   id: import('../utils/crosswords').CrosswordId
   title: string
   winnerPrize: number
@@ -91,6 +95,8 @@ export interface CrosswordAdminProgress {
 }
 
 export interface CrosswordHelp {
+  /** Entered wrong values from the daily snapshot, never the correct answer. */
+  incorrectLetters?: Record<string, string>
   available: boolean
   availableAt: string | null
   nextAt: string | null

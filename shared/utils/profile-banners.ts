@@ -1,6 +1,27 @@
 export const DOOMSDAY_PROFILE_BANNER = '/games/crossword/marvel/winner-banner.webp'
 export const DOOMSDAY_BANNER_ID = 'doomsday-winner'
+export interface ProfileBanner {
+  id: string
+  name: string
+  image: string
+  description?: string
+}
+export const SHOP_PROFILE_BANNERS: ProfileBanner[] = [
+  {
+    id: 'bananparadis',
+    name: 'Bananparadis',
+    image: '/shop/banners/bananparadis-v1.webp',
+    description: 'Gyldent aftenlys, bananer og frodige tropiske blade.',
+  },
+  {
+    id: 'nordlys',
+    name: 'Nordlys',
+    image: '/shop/banners/nordlys-v1.webp',
+    description: 'Turkis og violet nordlys over en stille bjergsø.',
+  },
+]
 export const PROFILE_BANNERS = [
+  ...SHOP_PROFILE_BANNERS,
   {
     id: 'original-winner',
     name: 'På Tværs #1 · Vinder',

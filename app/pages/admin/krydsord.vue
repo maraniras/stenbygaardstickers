@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { CROSSWORDS } from '../../../shared/utils/crosswords'
-const puzzleId = useRoute().query.id === 'marvel' ? 'marvel' : '1'
+definePageMeta({ key: (route) => route.fullPath })
+import { CROSSWORDS, isCrosswordId } from '../../../shared/utils/crosswords'
+const requestedId = useRoute().query.id
+const puzzleId = isCrosswordId(requestedId) ? requestedId : '1'
 const definition = CROSSWORDS[puzzleId]
 const puzzleQuery = { id: puzzleId }
 
@@ -160,6 +162,7 @@ async function save() {
       </p>
       <div class="reward">
         <img
+          v-if="definition.physicalPrize || definition.badge"
           class="mug-prize"
           :src="
             definition.physicalPrize
@@ -170,7 +173,9 @@ async function save() {
         />
         <strong
           >Én vinder · {{ definition.physicalPrize ? 'RTA-kop + ' : ''
-          }}{{ definition.winnerPrize }} bananer + vinderbadge</strong
+          }}{{ definition.winnerPrize }} bananer{{
+            definition.badge ? ' + vinderbadge' : ''
+          }}</strong
         >
         <p v-if="definition.profileFrame">
           Vinderen får også en eksklusiv profilramme og et profilbanner til {{ definition.title }}.

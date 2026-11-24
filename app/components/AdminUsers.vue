@@ -4,6 +4,7 @@ const users = ref<UserSummary[]>()
 const recovery = ref<{ name: string; code: string; expiresAt: string }>()
 const busy = ref(false)
 const error = ref('')
+const transactionUser = ref<string>()
 
 async function load() {
   try {
@@ -87,14 +88,24 @@ onMounted(load)
             {{ when(u.lastSeen) }}</span
           >
         </div>
-        <button
-          class="chip"
-          :disabled="busy"
-          :aria-label="`Gendan adgang for ${u.name}`"
-          @click="recover(u.name)"
-        >
-          Gendan adgang
-        </button>
+        <div class="actions">
+          <button
+            type="button"
+            class="chip"
+            :aria-label="`Se banantransaktioner for ${u.name}`"
+            @click="transactionUser = u.name"
+          >
+            Banantransaktioner
+          </button>
+          <button
+            class="chip"
+            :disabled="busy"
+            :aria-label="`Gendan adgang for ${u.name}`"
+            @click="recover(u.name)"
+          >
+            Gendan adgang
+          </button>
+        </div>
       </li>
     </ul>
     <p
@@ -104,6 +115,12 @@ onMounted(load)
       Ingen har valgt et navn endnu.
     </p>
   </section>
+  <AdminUserTransactions
+    v-if="transactionUser"
+    :key="transactionUser"
+    :name="transactionUser"
+    @close="transactionUser = undefined"
+  />
 </template>
 
 <style scoped>
@@ -143,6 +160,25 @@ onMounted(load)
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.actions .chip {
+  min-height: 44px;
+}
+@media (max-width: 520px) {
+  .list li {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 2px;
+  }
+  .actions {
+    justify-content: flex-start;
+  }
 }
 .info span {
   font-size: 13px;

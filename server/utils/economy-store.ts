@@ -4,6 +4,7 @@ import { publicJackStats } from './jack-stats'
 import { publicWordleStats } from './wordle-stats'
 import { adventStats } from '../../shared/utils/advent-badges'
 import { boxesAchievements } from '../../shared/utils/boxes-badges'
+import { crosswordHelpPurchaseCount } from '../../shared/utils/crossword-badges'
 
 export const ECONOMY_CAS = `if ARGV[4] and ARGV[4] ~= '' then
 local clock = redis.call('TIME')
@@ -108,6 +109,7 @@ export function publicEconomy(record: EconomyRecord): EconomyPublic {
   const advent = adventStats(record)
   const boxes = boxesAchievements(record)
   return {
+    crosswordHelpPurchases: crosswordHelpPurchaseCount(record),
     ...(record.crosswordWins ? { crosswordWins: record.crosswordWins } : {}),
     ...(advent ? { adventStats: advent } : {}),
     ...(boxes ? { boxesAchievements: boxes } : {}),

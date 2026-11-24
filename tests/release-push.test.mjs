@@ -100,7 +100,7 @@ test('release dates follow Danish midnight rather than UTC midnight', async () =
 
 test('hotfixes never send update pushes, even with explicit notification copy', async () => {
   const db = { rank: 2009000 }
-  for (const version of ['2.9.1', '2.9.2', '2.9.10', '3.0.1']) {
+  for (const version of ['2.9.1', '2.9.2', '2.9.10', '3.0.1', '2.10.1.1', '3.0.0.1']) {
     const h = setup({ db, version, push: { title: 'Hotfix', body: 'Fix', url: '/nyheder' } })
     await h.api.checkReleasePush()
     await h.api.announceRelease()
@@ -115,6 +115,19 @@ test('hotfixes never send update pushes, even with explicit notification copy', 
   const major = setup({ db, version: '3.0.0' })
   await major.api.announceRelease()
   assert.equal(major.sent.length, 1)
+})
+
+test('four-part major, feature and minor releases send once, preserving the existing Redis rank', async () => {
+  const db = { rank: 2010000 }
+  for (const version of ['2.10.1.0', '2.10.2.0', '2.11.0.0', '3.0.0.0']) {
+    const h = setup({ db, version })
+    await h.api.announceRelease()
+    await h.api.announceRelease()
+    assert.equal(h.sent.length, 1)
+  }
+  const rollback = setup({ db, version: '2.10.1.0' })
+  await rollback.api.announceRelease()
+  assert.equal(rollback.sent.length, 0)
 })
 
 test('a release can supply its own mobile notification and destination, without sending it twice', async () => {

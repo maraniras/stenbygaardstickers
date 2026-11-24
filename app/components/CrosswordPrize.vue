@@ -5,6 +5,7 @@ defineProps<{ puzzleId?: string }>()
 <template>
   <div class="crossword-prize">
     <img
+      v-if="puzzleId !== '2'"
       :src="
         puzzleId === 'marvel'
           ? '/badges/custom/crossword-marvel-winner.webp'
@@ -12,9 +13,11 @@ defineProps<{ puzzleId?: string }>()
       "
       :alt="puzzleId === 'marvel' ? 'Marvel-vinderbadge' : 'RTA-kop'"
     /><span>{{
-      puzzleId === 'marvel'
-        ? '500 bananer + vinderbadge + profilramme og banner · Øvrige løsninger: 50 bananer'
-        : 'RTA-kop + 1.000 bananer + vinderbadge + profilramme og banner'
+      puzzleId === '2'
+        ? '1.000 bananer · Øvrige løsninger: 50 bananer'
+        : puzzleId === 'marvel'
+          ? '500 bananer + vinderbadge + profilramme og banner · Øvrige løsninger: 50 bananer'
+          : 'RTA-kop + 1.000 bananer + vinderbadge + profilramme og banner'
     }}</span>
   </div>
 </template>

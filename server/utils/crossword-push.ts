@@ -4,22 +4,24 @@ import type { PushMessage } from './push'
 
 type CrosswordPushKind = 'day-before' | 'reminder' | 'opened'
 interface CrosswordPushJob {
-  id?: '1' | 'marvel'
+  id?: '1' | 'marvel' | '2'
   opensAt: string
   kind: CrosswordPushKind
 }
 const pushInfo = (state: Pick<CrosswordState, 'id'>) =>
-  state.id === 'marvel'
-    ? {
-        title: 'På Tværs: Doomsday Special',
-        prize: '500 bananer, en særlig badge og en eksklusiv profilramme og et profilbanner',
-        url: '/spil/krydsord?id=marvel',
-      }
-    : {
-        title: 'På Tværs #1',
-        prize: 'en RTA-kop, 1.000 bananer, en særlig badge, en profilramme og et profilbanner',
-        url: '/spil/krydsord',
-      }
+  state.id === '2'
+    ? { title: 'På Tværs #2', prize: '1.000 bananer', url: '/spil/krydsord?id=2' }
+    : state.id === 'marvel'
+      ? {
+          title: 'På Tværs: Doomsday Special',
+          prize: '500 bananer, en særlig badge og en eksklusiv profilramme og et profilbanner',
+          url: '/spil/krydsord?id=marvel',
+        }
+      : {
+          title: 'På Tværs #1',
+          prize: 'en RTA-kop, 1.000 bananer, en særlig badge, en profilramme og et profilbanner',
+          url: '/spil/krydsord',
+        }
 const HOUR = 3600_000
 // Stay below the free QStash seven-day delay limit, relaying longer schedules.
 const MAX_DELAY = 6 * 24 * HOUR
@@ -83,7 +85,9 @@ async function queueCrosswordPush(job: CrosswordPushJob, now: Date) {
       'Upstash-Retries': '3',
       'Upstash-Timeout': '30s',
       'Upstash-Deduplication-Id': createHash('sha256')
-        .update(`${job.id === 'marvel' ? 'marvel:' : ''}${job.opensAt}:${job.kind}:${timestamp}`)
+        .update(
+          `${job.id && job.id !== '1' ? job.id + ':' : ''}${job.opensAt}:${job.kind}:${timestamp}`,
+        )
         .digest('hex'),
     },
     body: job,
@@ -108,7 +112,7 @@ export async function scheduleCrosswordPushes(
   if (!process.env.QSTASH_TOKEN) return crosswordPushStatus(state)
   try {
     for (const kind of ['day-before', 'reminder', 'opened'] as const) {
-      const job = { ...(state.id === 'marvel' ? { id: state.id } : {}), opensAt, kind }
+      const job = { ...(state.id && state.id !== '1' ? { id: state.id } : {}), opensAt, kind }
       if (targetTime(job) >= now.getTime() && !sent(state, job)) await queueCrosswordPush(job, now)
     }
   } catch {
@@ -132,7 +136,7 @@ export function checkCrosswordPushSchedule(now = new Date()): Promise<void> {
   if (now.getTime() < retryAt) return Promise.resolve()
   retryAt = now.getTime() + 5 * 60_000
   checking = (async () => {
-    for (const id of ['1', 'marvel'] as const) {
+    for (const id of ['1', 'marvel', '2'] as const) {
       const state = await readCrossword(id)
       if (!state.opensAt || state.winner || Date.parse(state.opensAt) <= now.getTime()) continue
       if (crosswordPushStatus(state) !== 'scheduled')
@@ -155,7 +159,7 @@ export async function deliverCrosswordPush(body: unknown, now = new Date()) {
   if (
     !candidate ||
     typeof candidate.opensAt !== 'string' ||
-    (candidate.id !== undefined && candidate.id !== '1' && candidate.id !== 'marvel') ||
+    (candidate.id !== undefined && !['1', 'marvel', '2'].includes(candidate.id)) ||
     !['day-before', 'reminder', 'opened'].includes(candidate.kind || '') ||
     !Number.isFinite(Date.parse(candidate.opensAt))
   )

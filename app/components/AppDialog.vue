@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ label: string; centered?: boolean }>()
+defineProps<{ label: string; centered?: boolean; fullscreen?: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 const dialog = ref<HTMLDialogElement>()
 onMounted(() => dialog.value?.showModal())
@@ -10,7 +10,7 @@ onBeforeUnmount(() => dialog.value?.close())
   <Teleport to="body">
     <dialog
       ref="dialog"
-      :class="['app-dialog', { centered }]"
+      :class="['app-dialog', { centered, fullscreen }]"
       :aria-label="label"
       @cancel.prevent="emit('close')"
       @close="emit('close')"
@@ -48,6 +48,14 @@ onBeforeUnmount(() => dialog.value?.close())
 }
 .app-dialog[open] {
   animation: dialog-in 0.18s ease-out;
+}
+.fullscreen {
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  border-radius: 0;
+  overflow: hidden;
 }
 @keyframes dialog-in {
   from {

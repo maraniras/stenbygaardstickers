@@ -54,7 +54,7 @@ export async function createBackup(): Promise<Backup> {
     adventDraw: await readAdventDraw(),
     parcelGames: await parcelBackup(),
     crossword: await readCrossword(),
-    crosswords: { marvel: await readCrossword('marvel') },
+    crosswords: { marvel: await readCrossword('marvel'), '2': await readCrossword('2') },
   }
 }
 

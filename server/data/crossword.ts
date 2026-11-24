@@ -13,6 +13,8 @@ export interface CrosswordImage {
   arrowCol?: number
 }
 export interface CrosswordEntry {
+  clueRow?: number
+  clueCol?: number
   icon?: string
   iconKind?: string
   clue: string

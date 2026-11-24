@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { CROSSWORDS } from '../../../shared/utils/crosswords'
-const puzzleId = useRoute().query.id === 'marvel' ? 'marvel' : '1'
+definePageMeta({ key: (route) => route.fullPath })
+import { CROSSWORDS, isCrosswordId } from '../../../shared/utils/crosswords'
+const requestedId = useRoute().query.id
+const puzzleId = isCrosswordId(requestedId) ? requestedId : '1'
 const definition = CROSSWORDS[puzzleId]
 const puzzleQuery = { id: puzzleId }
 

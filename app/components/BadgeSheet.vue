@@ -7,6 +7,13 @@ const props = defineProps<{ badge: Badge; person: string }>()
 const emit = defineEmits<{ close: [] }>()
 
 const b = computed(() => props.badge)
+const zoom = ref(false)
+watch(
+  () => props.badge.id,
+  () => {
+    zoom.value = false
+  },
+)
 const bananasText = computed(() => {
   const x = b.value
   if (x.kind === 'record')
@@ -70,6 +77,26 @@ const pointsText = computed(() => {
             big
           />
         </div>
+        <button
+          type="button"
+          class="zoom-button"
+          :aria-label="`Zoom ind på ${b.name}`"
+          @click="zoom = true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle
+              cx="10"
+              cy="10"
+              r="6"
+            />
+            <path d="m15 15 5 5M7 10h6m-3-3v6" />
+          </svg>
+          Zoom
+        </button>
         <span
           class="status"
           :class="{ earned: b.earned }"
@@ -200,6 +227,11 @@ const pointsText = computed(() => {
       </p>
     </div>
   </AppDialog>
+  <BadgeZoom
+    v-if="zoom"
+    :badge="b"
+    @close="zoom = false"
+  />
 </template>
 
 <style scoped>
@@ -249,6 +281,33 @@ const pointsText = computed(() => {
 }
 .medal-wrap {
   pointer-events: none;
+}
+.zoom-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  margin: 4px 0 6px;
+  padding: 9px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.zoom-button svg {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.zoom-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 .status {
   margin-top: 4px;

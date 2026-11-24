@@ -20,6 +20,8 @@ export interface BananaTransaction {
   at: string
 }
 export interface EconomyPublic {
+  /** Aggregate only; purchased coordinates and letters remain private. */
+  crosswordHelpPurchases?: number
   wordle?: import('./wordle').WordleStats
   roulette?: import('./roulette').RouletteStats
   crosswordWins?: Record<string, string>
@@ -45,6 +47,8 @@ export interface WheelRun {
   jackpotAmount?: number
 }
 export interface EconomyRecord extends EconomyPublic {
+  /** Private, durable paid cells. Stored with the debit in the same atomic wallet update. */
+  crosswordLetterPurchases?: Record<string, string[]>
   /** Private durable snapshots prevent country rewards resetting after deletion or edits. */
   stickerRewards?: {
     version: 2

@@ -5,6 +5,21 @@ const { season } = useChristmasGames()
 const { state } = useEconomy()
 const { view, now } = useCrossword()
 const { view: marvelView } = useCrossword(false, 'marvel')
+const { view: secondView } = useCrossword(false, '2')
+const secondCountdown = computed(() =>
+  crosswordCountdown(secondView.value?.open ? null : secondView.value?.opensAt, now.value),
+)
+const secondOpening = computed(() =>
+  secondView.value?.opensAt
+    ? new Date(secondView.value.opensAt).toLocaleString('da-DK', {
+        timeZone: 'Europe/Copenhagen',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '',
+)
 const countdown = computed(() =>
   crosswordCountdown(view.value?.open ? null : view.value?.opensAt, now.value),
 )
@@ -149,10 +164,107 @@ const opening = computed(() =>
         }}</strong>
       </div>
     </component>
+    <component
+      :is="secondView?.open ? cardLink : 'div'"
+      class="crossword-card second-card"
+      :to="secondView?.open ? '/spil/krydsord?id=2' : undefined"
+      :aria-disabled="!secondView?.open || undefined"
+    >
+      <div class="card-top">
+        <span>ORDSPIL</span
+        ><span
+          v-if="secondView?.open"
+          class="preview"
+          >Åbent</span
+        >
+      </div>
+      <h2>På Tværs #2</h2>
+      <div
+        v-if="!secondView?.open"
+        class="second-teaser"
+      >
+        <strong class="second-banner second-soon">KOMMER SNART</strong>
+        <strong class="second-banner second-champion">KAN ANNA VINDE IGEN?</strong>
+        <strong class="second-banner second-more">OVER 50% FLERE ORD</strong>
+      </div>
+      <p v-else>Flere ord. Flere krydsninger. Flere referencer.</p>
+      <div
+        v-if="secondCountdown"
+        class="countdown"
+        role="timer"
+        aria-label="Tid til På Tværs #2 åbner"
+      >
+        <span>Åbner om</span><strong>{{ secondCountdown }}</strong>
+      </div>
+      <div class="card-bottom">
+        <span v-if="secondView?.winner">Vundet af {{ secondView.winner.name }}</span>
+        <CrosswordPrize
+          v-else
+          puzzle-id="2"
+        />
+        <strong>{{
+          secondView?.open
+            ? 'Åbn krydsord →'
+            : secondOpening
+              ? 'Åbner ' + secondOpening
+              : 'Tidspunkt følger'
+        }}</strong>
+      </div>
+    </component>
   </div>
 </template>
 
 <style scoped>
+.second-card {
+  margin-top: 18px;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 18%, var(--surface)),
+    var(--surface)
+  );
+}
+.second-card h2 {
+  margin-top: 16px;
+}
+.second-teaser {
+  display: grid;
+  gap: 10px;
+  margin: 22px 0;
+  text-align: center;
+}
+.second-banner {
+  display: block;
+  padding: 16px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  font-size: clamp(15px, 4.5vw, 20px);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+.second-soon {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  color: var(--on-accent);
+  font-size: clamp(21px, 6vw, 28px);
+}
+.second-champion {
+  background: linear-gradient(135deg, var(--surface), var(--surface-2));
+}
+.second-more {
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface));
+}
+.second-card .card-bottom {
+  flex-wrap: wrap;
+}
+.second-card .countdown {
+  margin-top: 20px;
+}
+.second-card > p {
+  margin-bottom: 22px;
+}
 .marvel-card {
   position: relative;
   overflow: hidden;

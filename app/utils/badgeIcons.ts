@@ -4,6 +4,7 @@
 const SHARED: Record<string, string> = { jubilee: 'jubilee', year: 'year' }
 
 const CUSTOM = new Set([
+  'crossword-help',
   'wordle-wins',
   'wordle-streak',
   'wordle-first',
@@ -111,6 +112,11 @@ const CUSTOM = new Set([
   'jack-five-card',
   'jack-dealer-bust',
 ])
+
+export function badgeZoomIcon(id: string) {
+  if (id === 'crossword-help') return '/badges/full/crossword-help.webp'
+  return badgeIcon(id)
+}
 
 export function badgeIcon(id: string) {
   const advent: Record<string, string> = {

@@ -1,5 +1,5 @@
 import { CHANGELOG } from '../../app/utils/changelog'
-import { releaseRank, latestPublishedRelease } from '../../shared/utils/releases'
+import { releaseRank, latestPublishedRelease, isHotfixRelease } from '../../shared/utils/releases'
 
 // 2.2 predates release notifications and must never generate a retrospective push.
 const BASELINE = '2.2'
@@ -16,8 +16,8 @@ export async function announceRelease() {
   if (process.env.VERCEL_ENV !== 'production' || !redisEnabled) return
   const release = latestPublishedRelease(CHANGELOG)
   if (!release) return
-  // Patch releases stay in Hvad er nyt, but never trigger an update push.
-  if (Number(release.version.split('.')[2] ?? 0) > 0) return
+  // Hotfixes stay in Hvad er nyt, but never trigger an update push.
+  if (isHotfixRelease(release.version)) return
   const rank = releaseRank(release.version)
   if (rank <= releaseRank(BASELINE)) return
 

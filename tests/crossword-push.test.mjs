@@ -11,7 +11,7 @@ const time = Date.parse(opening)
 const sub = (endpoint) => ({ endpoint, keys: { auth: 'fixture', p256dh: 'fixture' } })
 function setup({ env = 'production', token = 'fixture-token', id = '1' } = {}) {
   const state = {
-    ...(id === 'marvel' ? { id } : {}),
+    ...(id !== '1' ? { id } : {}),
     opensAt: opening,
     winner: null,
     finished: {},
@@ -466,6 +466,22 @@ test('failed winner lookup is retryable and cannot fail a successful solution re
   await Promise.all(jobs)
   assert.equal(h.pushes.length, 1)
   assert.ok(h.state.winnerPushSentAt)
+})
+
+test('crossword two schedules independent reminders, opening and winner notifications', async () => {
+  const h = setup({ id: '2' })
+  h.publicSubs.push(sub('reader'))
+  await h.api.scheduleCrosswordPushes(h.state, new Date(time - 48 * hour))
+  assert.equal(h.jobs.length, 3)
+  assert.ok(h.jobs.every((job) => job.body.id === '2'))
+  assert.match(h.pushes[0].message.title, /På Tværs #2/)
+  assert.match(h.pushes[0].message.body, /1.000 bananer/)
+  await h.api.deliverCrosswordPush({ id: '2', opensAt: opening, kind: 'opened' }, new Date(time))
+  assert.equal(h.pushes.at(-1).message.url, '/spil/krydsord?id=2')
+  h.state.winner = { name: 'Anna', at: opening }
+  await h.api.announceCrosswordWinner(h.state, new Date(time))
+  assert.equal(h.pushes.at(-1).message.tag, 'crossword-2-winner')
+  assert.ok(h.mutateIds.every((id) => id === '2'))
 })
 
 test('Marvel push jobs, receipts and destinations are scoped to Marvel', async () => {

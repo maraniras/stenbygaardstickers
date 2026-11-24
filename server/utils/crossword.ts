@@ -1,5 +1,14 @@
 import { crosswordDefinition, type CrosswordId } from '../../shared/utils/crosswords'
 import {
+  CROSSWORD_HELP_THRESHOLDS,
+  crosswordHelpPurchaseCount,
+} from '../../shared/utils/crossword-badges'
+import {
+  CROSSWORD_LETTER_PRICES,
+  type CrosswordLetterShop,
+} from '../../shared/utils/crossword-letters'
+import type { EconomyRecord } from '../../shared/types/economy'
+import {
   MARVEL_COLUMNS,
   MARVEL_ROWS,
   MARVEL_ENTRIES,
@@ -21,10 +30,18 @@ import {
 } from '../../shared/utils/crossword'
 import { gameDay, nextGameReset } from '../../shared/utils/game-day'
 import { CROSSWORD_PREVIEW, CROSSWORD_COLUMNS, CROSSWORD_ROWS } from '../data/crossword'
+import { CROSSWORD_2_COLUMNS, CROSSWORD_2_ROWS, CROSSWORD_2_ENTRIES } from '../data/crossword-2'
 
 const STORE = 'crossword-games'
 const ID = '1'
 function puzzleData(id: CrosswordId = '1') {
+  if (id === '2')
+    return {
+      entries: CROSSWORD_2_ENTRIES,
+      columns: CROSSWORD_2_COLUMNS,
+      rows: CROSSWORD_2_ROWS,
+      decorations: undefined,
+    }
   return id === 'marvel'
     ? {
         entries: MARVEL_ENTRIES,
@@ -41,6 +58,10 @@ function puzzleData(id: CrosswordId = '1') {
 }
 const MARVEL_REVISION = createHash('sha256')
   .update(JSON.stringify(MARVEL_ENTRIES))
+  .digest('hex')
+  .slice(0, 16)
+const TWO_REVISION = createHash('sha256')
+  .update(JSON.stringify(CROSSWORD_2_ENTRIES))
   .digest('hex')
   .slice(0, 16)
 const REVISION = createHash('sha256')
@@ -117,7 +138,7 @@ export function crosswordView(
     ...(open || preview
       ? {
           puzzle: {
-            revision: id === ID ? REVISION : MARVEL_REVISION,
+            revision: id === ID ? REVISION : id === '2' ? TWO_REVISION : MARVEL_REVISION,
             columns: puzzle.columns,
             rows: puzzle.rows,
             decorations: puzzle.decorations,
@@ -130,6 +151,82 @@ export function crosswordView(
       : {}),
   }
 }
+export function crosswordLetterShop(
+  record: EconomyRecord | undefined,
+  id: CrosswordId,
+): CrosswordLetterShop {
+  const cells = record?.crosswordLetterPurchases?.[id] ?? []
+  const solution = crosswordSolution(id)
+  return {
+    bought: cells.length,
+    limit: CROSSWORD_LETTER_PRICES.length,
+    nextPrice: CROSSWORD_LETTER_PRICES[cells.length] ?? null,
+    letters: Object.fromEntries(cells.map((cell) => [cell, solution[cell]!])),
+  }
+}
+
+/** Only the authenticated owner sees their purchased cells, and only after opening. */
+export async function crosswordViewForUser(state: CrosswordState, name?: string, preview = false) {
+  const view = crosswordView(state, name, preview)
+  if (view.id !== '1' && view.open && name && !preview)
+    view.letterShop = crosswordLetterShop(await readEconomy(name), view.id)
+  return view
+}
+
+export async function buyCrosswordLetter(
+  state: CrosswordState,
+  name: string,
+  cell: unknown,
+  price: unknown,
+  now = new Date(),
+) {
+  const id = state.id || ID
+  if (id === '1')
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Bogstavkøb er ikke tilgængeligt i På Tværs #1.',
+    })
+  if (!crosswordOpen(state, now))
+    throw createError({ statusCode: 403, statusMessage: 'Krydsordet er ikke åbnet endnu.' })
+  if (state.finished[`u:${nameKey(name)}`])
+    throw createError({ statusCode: 409, statusMessage: 'Du har allerede løst krydsordet.' })
+  const solution = crosswordSolution(id)
+  if (typeof cell !== 'string' || !Object.hasOwn(solution, cell))
+    throw createError({ statusCode: 400, statusMessage: 'Vælg et bogstavfelt.' })
+  const { record } = await mutateEconomy(name, (wallet) => {
+    const cells = wallet.crosswordLetterPurchases?.[id] ?? []
+    // Retrying a lost response restores the same letter without another debit.
+    if (cells.includes(cell)) return
+    const expected = CROSSWORD_LETTER_PRICES[cells.length]
+    if (expected === undefined)
+      throw createError({
+        statusCode: 409,
+        statusMessage: `Du har købt alle ${CROSSWORD_LETTER_PRICES.length} bogstaver i dette krydsord.`,
+      })
+    if (price !== expected)
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'Prisen er ændret. Hent krydsordet igen og bekræft den nye pris.',
+      })
+    if (wallet.balance < expected)
+      throw createError({ statusCode: 400, statusMessage: 'Du har ikke nok bananer.' })
+    wallet.balance -= expected
+    ;(wallet.crosswordLetterPurchases ??= {})[id] = [...cells, cell]
+    const bought = crosswordHelpPurchaseCount(wallet)
+    CROSSWORD_HELP_THRESHOLDS.forEach((at, index) => {
+      if (bought >= at) wallet.milestones[`crossword-help:${index + 1}`] ??= now.toISOString()
+    })
+    wallet.history.unshift({
+      id: `crossword:${id}:letter:${cell}`,
+      amount: -expected,
+      label: `${crosswordDefinition(id).title} · bogstav ${cells.length + 1}/${CROSSWORD_LETTER_PRICES.length}`,
+      at: now.toISOString(),
+    })
+    wallet.history = wallet.history.slice(0, 250)
+  })
+  return crosswordLetterShop(record, id)
+}
+
 /** Admin-only projection of saved answers; never advances a player's daily help. */
 export function crosswordAdminProgress(
   state: CrosswordState,
@@ -230,20 +327,42 @@ export function crosswordHelp(
     progress.startedAt = now.toISOString()
   const completed = !!state.finished[subject]
   const day = gameDay(now)
-  if (available && !completed && progress.checkedDay !== day) {
+  if (
+    available &&
+    !completed &&
+    (progress.checkedDay !== day || progress.incorrectLetters === undefined)
+  ) {
     // Use the last saved progress, before applying edits received after the reset.
-    progress.correctLetters = Object.fromEntries(
-      Object.entries(progress.letters).filter(([cell, value]) => value === solution[cell]),
+    progress.correctLetters = {
+      ...Object.fromEntries(
+        Object.entries(progress.correctLetters ?? {}).filter(
+          ([cell, value]) => value === solution[cell],
+        ),
+      ),
+      ...Object.fromEntries(
+        Object.entries(progress.letters).filter(([cell, value]) => value === solution[cell]),
+      ),
+    }
+    progress.incorrectLetters = Object.fromEntries(
+      Object.entries(progress.letters).filter(
+        ([cell, value]) => value !== solution[cell] && !progress.correctLetters?.[cell],
+      ),
     )
     progress.checkedDay = day
   }
-  progress.letters = letters
+  if (available) {
+    for (const [cell, value] of Object.entries(progress.incorrectLetters ?? {}))
+      if (letters[cell] !== value) delete progress.incorrectLetters![cell]
+  }
+  // Confirmed letters remain correct, even when another device has an older local copy.
+  progress.letters = { ...letters, ...(available ? progress.correctLetters : {}) }
   return {
     available,
     availableAt,
     nextAt: completed ? null : available ? nextGameReset(now) : availableAt,
     checkedDay: progress.checkedDay || null,
     correctLetters: available ? { ...progress.correctLetters } : {},
+    incorrectLetters: available ? { ...progress.incorrectLetters } : {},
   }
 }
 /** Never returns individual correctness or the answer key. */

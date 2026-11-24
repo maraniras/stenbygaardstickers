@@ -1,13 +1,27 @@
 <script setup lang="ts">
 import { SHOP_PROFILE_FRAMES, type ProfileFrame } from '../../shared/utils/profile-frames'
+import { SHOP_PROFILE_BANNERS, type ProfileBanner } from '../../shared/utils/profile-banners'
 useHead({ title: 'Shop · Stenbygaard Stickers' })
 const { name } = useUser()
 const { state } = useEconomy()
 const { inventory } = useProfileFrames()
+const { inventory: bannerInventory } = useProfileBanners()
+const section = ref('frames')
+const sections = [
+  { id: 'frames', name: 'Profilrammer', count: SHOP_PROFILE_FRAMES.length },
+  { id: 'banners', name: 'Profilbannere', count: SHOP_PROFILE_BANNERS.length },
+]
+const selectedBanner = ref<ProfileBanner>()
 const selected = ref<ProfileFrame>()
 const preview = ref<HTMLDialogElement>()
 function show(frame: ProfileFrame) {
+  selectedBanner.value = undefined
   selected.value = frame
+  preview.value?.showModal()
+}
+function showBanner(banner: ProfileBanner) {
+  selected.value = undefined
+  selectedBanner.value = banner
   preview.value?.showModal()
 }
 </script>
@@ -23,13 +37,30 @@ function show(frame: ProfileFrame) {
           :balance="state.wallet.balance" /></template
     ></PageHeader>
     <p class="preview-notice">
-      <span>Forhåndsvisning</span> Shoppen åbner snart. Du kan prøve rammerne her — køb er ikke
-      åbnet endnu.
+      <span>Forhåndsvisning</span> Shoppen åbner snart. Du kan prøve rammer og bannere her — køb er
+      ikke åbnet endnu.
     </p>
-    <section aria-labelledby="profile-frames-title">
+    <nav
+      class="shop-sections"
+      aria-label="Shopsektioner"
+    >
+      <button
+        v-for="item in sections"
+        :key="item.id"
+        type="button"
+        :aria-pressed="section === item.id"
+        @click="section = item.id"
+      >
+        {{ item.name }} <span>{{ item.count }}</span>
+      </button>
+    </nav>
+    <section
+      v-if="section === 'frames'"
+      aria-labelledby="profile-frames-title"
+    >
       <div class="section-title">
         <h2 id="profile-frames-title">Profilrammer</h2>
-        <span>8 rammer</span>
+        <span>{{ SHOP_PROFILE_FRAMES.length }} rammer</span>
       </div>
       <div class="frames">
         <button
@@ -49,6 +80,36 @@ function show(frame: ProfileFrame) {
             inventory.owned.includes(frame.id) ? 'Ejet' : 'Kommer snart'
           }}</span>
           <span class="try-label">Se ramme ↗</span>
+        </button>
+      </div>
+    </section>
+    <section
+      v-else
+      aria-labelledby="profile-banners-title"
+    >
+      <div class="section-title">
+        <h2 id="profile-banners-title">Profilbannere</h2>
+        <span>{{ SHOP_PROFILE_BANNERS.length }} bannere</span>
+      </div>
+      <div class="frames">
+        <button
+          v-for="banner in SHOP_PROFILE_BANNERS"
+          :key="banner.id"
+          class="frame-card"
+          type="button"
+          :aria-label="`Se ${banner.name} på din profil`"
+          @click="showBanner(banner)"
+        >
+          <span class="banner-artwork"
+            ><ProfileBannerPreview
+              :banner="banner"
+              :name="name"
+          /></span>
+          <h3>{{ banner.name }}</h3>
+          <span class="availability">{{
+            bannerInventory.owned.includes(banner.id) ? 'Ejet' : 'Kommer snart'
+          }}</span>
+          <span class="try-label">Se banner ↗</span>
         </button>
       </div>
     </section>
@@ -96,6 +157,45 @@ function show(frame: ProfileFrame) {
           }}
         </p>
       </template>
+      <template v-else-if="selectedBanner">
+        <button
+          class="close"
+          type="button"
+          aria-label="Luk forhåndsvisning"
+          @click="preview?.close()"
+        >
+          ×
+        </button>
+        <ProfileBannerPreview
+          class="large-banner"
+          :banner="selectedBanner"
+          :name="name"
+        />
+        <h2 id="frame-preview-title">{{ selectedBanner.name }}</h2>
+        <p>{{ selectedBanner.description }}</p>
+        <NuxtLink
+          v-if="bannerInventory.owned.includes(selectedBanner.id)"
+          class="btn"
+          to="/mig"
+          @click="preview?.close()"
+          >Vælg i indstillinger</NuxtLink
+        >
+        <button
+          v-else
+          class="btn"
+          type="button"
+          disabled
+        >
+          Køb åbner snart
+        </button>
+        <p class="small">
+          {{
+            bannerInventory.owned.includes(selectedBanner.id)
+              ? 'Du ejer allerede dette banner.'
+              : 'Pris kommer senere. Der trækkes ingen bananer.'
+          }}
+        </p>
+      </template>
     </dialog>
   </div>
 </template>
@@ -127,6 +227,43 @@ function show(frame: ProfileFrame) {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 14px;
+}
+.shop-sections {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+  margin-bottom: 20px;
+}
+.shop-sections button {
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.shop-sections button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.shop-sections button span {
+  margin-left: 6px;
+  opacity: 0.7;
+}
+.banner-artwork {
+  display: flex;
+  align-items: center;
+  aspect-ratio: 1;
+}
+.large-banner {
+  margin: 34px 0 20px;
 }
 .section-title h2 {
   font-size: 21px;

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { CrosswordHelp, CrosswordView } from '../../shared/types/crossword'
 import { DANISH_KEY_ROWS } from '../../shared/utils/danish-keyboard'
+import {
+  CROSSWORD_LETTER_PRICES,
+  type CrosswordLetterShop,
+} from '../../shared/utils/crossword-letters'
 const props = defineProps<{
   puzzle: NonNullable<CrosswordView['puzzle']>
   puzzleId: string
@@ -17,6 +21,8 @@ const props = defineProps<{
   helpAvailable?: boolean
   completed?: boolean
   checkHelp?: (answers: Record<string, string>) => Promise<CrosswordHelp>
+  letterShop?: CrosswordLetterShop
+  buyLetter?: (cell: string, price: number) => Promise<CrosswordLetterShop>
 }>()
 const entries = props.puzzle.entries
 const columns = props.puzzle.columns
@@ -58,7 +64,10 @@ const answerCells = Object.fromEntries(wordCells.flat().map((cell) => [cell.key,
 const clueCells = new Map<string, number[]>()
 entries.forEach((entry, index) => {
   if (entry.image) return
-  const cell = key(entry.row - (entry.down ? 1 : 0), entry.col - (entry.down ? 0 : 1))
+  const cell = key(
+    entry.clueRow ?? entry.row - (entry.down ? 1 : 0),
+    entry.clueCol ?? entry.col - (entry.down ? 0 : 1),
+  )
   clueCells.set(cell, [...(clueCells.get(cell) || []), index])
 })
 const decorations = props.puzzle.decorations || []
@@ -208,7 +217,54 @@ async function setZoom(value: number) {
   })
 }
 const loaded = ref(false)
+const purchase = ref<{ cell: string; price: number } | null>(null)
+const buying = ref(false)
+const purchaseError = ref('')
+const canBuy = computed(
+  () =>
+    !!props.letterShop &&
+    !!props.buyLetter &&
+    !props.preview &&
+    !props.readOnly &&
+    !props.completed,
+)
+const { reload: reloadBalance } = useEconomy()
+function offerLetter() {
+  if (!canBuy.value || props.letterShop?.nextPrice == null || correctCell(cursor.value)) return
+  purchaseError.value = ''
+  purchase.value = { cell: cursor.value, price: props.letterShop.nextPrice }
+}
+async function confirmLetter() {
+  if (!purchase.value || !props.buyLetter || buying.value) return
+  buying.value = true
+  purchaseError.value = ''
+  const target = { ...purchase.value }
+  try {
+    const shop = await props.buyLetter(target.cell, target.price)
+    if (stopped) return
+    Object.assign(letters.value, shop.letters)
+    purchase.value = null
+    // Refresh the visual balance after the revealed letter is on screen.
+    await nextTick()
+    void reloadBalance()
+  } catch (err: any) {
+    if (!stopped)
+      purchaseError.value =
+        err?.data?.statusMessage || err?.message || 'Bogstavet kunne ikke købes. Prøv igen.'
+  } finally {
+    buying.value = false
+  }
+}
+watch(
+  [() => props.letterShop?.letters, loaded],
+  () => {
+    if (loaded.value && props.letterShop) Object.assign(letters.value, props.letterShop.letters)
+  },
+  { deep: true },
+)
 const dailyHelp = ref<CrosswordHelp | null>(null)
+const clearedIncorrect = ref<Record<string, true>>({})
+let feedbackDay: string | null = null
 const helpError = ref(false)
 let progressTimer: ReturnType<typeof setTimeout> | undefined
 let progressClock: ReturnType<typeof setInterval> | undefined
@@ -227,7 +283,35 @@ const firstHelpTime = computed(() =>
       })
     : '',
 )
+function lockedCell(cell: string) {
+  return (
+    !!props.letterShop?.letters[cell] ||
+    !!(dailyHelp.value?.available && dailyHelp.value.correctLetters[cell])
+  )
+}
+function incorrectCell(cell: string) {
+  return (
+    !props.readOnly &&
+    !!dailyHelp.value?.available &&
+    !clearedIncorrect.value[cell] &&
+    !!letters.value[cell] &&
+    dailyHelp.value.incorrectLetters?.[cell] === letters.value[cell] &&
+    !lockedCell(cell)
+  )
+}
+function clearIncorrect(cell: string) {
+  if (!dailyHelp.value?.incorrectLetters?.[cell]) return
+  clearedIncorrect.value[cell] = true
+  try {
+    localStorage.setItem(
+      storageKey + ':feedback',
+      JSON.stringify({ day: feedbackDay, cells: Object.keys(clearedIncorrect.value) }),
+    )
+  } catch {}
+}
 function correctCell(cell: string) {
+  if (props.letterShop?.letters[cell] && props.letterShop.letters[cell] === letters.value[cell])
+    return true
   if (props.readOnly)
     return !!letters.value[cell] && props.correctLetters?.[cell] === letters.value[cell]
   return (
@@ -260,7 +344,23 @@ async function syncProgress() {
   helpError.value = false
   try {
     const response = await props.checkHelp({ ...letters.value })
-    if (!stopped) dailyHelp.value = response
+    if (!stopped) {
+      if (response.checkedDay !== feedbackDay) {
+        feedbackDay = response.checkedDay
+        clearedIncorrect.value = {}
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey + ':feedback') || '{}')
+          if (saved.day === feedbackDay && Array.isArray(saved.cells))
+            clearedIncorrect.value = Object.fromEntries(
+              saved.cells
+                .filter((cell: unknown) => typeof cell === 'string' && cell in answerCells)
+                .map((cell: string) => [cell, true]),
+            )
+        } catch {}
+      }
+      dailyHelp.value = response
+      if (response.available) Object.assign(letters.value, response.correctLetters)
+    }
   } catch {
     if (!stopped) helpError.value = true
   } finally {
@@ -293,8 +393,10 @@ const storageKey =
   ':' +
   props.owner +
   (props.preview ? ':preview' : '')
+let celebratedCompletion = false
 async function checkWholePuzzle() {
   if (props.readOnly || !props.checkAnswers || count.value !== total || checking.value) return
+  const canCelebrate = !props.preview && !props.completed && !celebratedCompletion
   const revision = ++checkRevision
   checking.value = true
   retryable.value = false
@@ -306,6 +408,11 @@ async function checkWholePuzzle() {
         ? 'Hele krydsordet er korrekt. Preview giver ingen præmie.'
         : 'Hele krydsordet er korrekt!'
       : 'Der er stadig fejl i løsningen. Du kan rette videre.'
+    if (response.correct && canCelebrate) {
+      celebratedCompletion = true
+      await nextTick()
+      if (revision === checkRevision) void shootConfetti().catch(() => {})
+    }
   } catch (error: any) {
     if (revision !== checkRevision) return
     result.value =
@@ -406,11 +513,22 @@ function typeLetter(letter: string) {
   if (props.readOnly) return
   const index = activeCells.value.findIndex((cell) => cell.key === cursor.value)
   if (letter === '⌫') {
-    if (!letters.value[cursor.value] && index > 0) cursor.value = activeCells.value[index - 1]!.key
+    if (lockedCell(cursor.value)) return
+    if (!letters.value[cursor.value] && index > 0) {
+      let previous = index - 1
+      while (previous >= 0 && lockedCell(activeCells.value[previous]!.key)) previous--
+      if (previous < 0) return
+      cursor.value = activeCells.value[previous]!.key
+    }
+    clearIncorrect(cursor.value)
     delete letters.value[cursor.value]
   } else if (/^[A-ZÆØÅ]$/.test(letter)) {
+    if (lockedCell(cursor.value)) return
+    clearIncorrect(cursor.value)
     letters.value[cursor.value] = letter
-    if (index < activeCells.value.length - 1) cursor.value = activeCells.value[index + 1]!.key
+    let next = index + 1
+    while (next < activeCells.value.length && lockedCell(activeCells.value[next]!.key)) next++
+    if (next < activeCells.value.length) cursor.value = activeCells.value[next]!.key
   }
 }
 function onKey(event: KeyboardEvent) {
@@ -609,7 +727,12 @@ function onKey(event: KeyboardEvent) {
                 @click="chooseWord(index)"
               >
                 <span
-                  v-if="entries[index]!.icon"
+                  v-if="entries[index]!.iconKind === 'denmark'"
+                  class="denmark-icon"
+                  aria-hidden="true"
+                />
+                <span
+                  v-else-if="entries[index]!.icon"
                   class="clue-emoji"
                   >{{ entries[index]!.icon }}</span
                 >
@@ -633,7 +756,15 @@ function onKey(event: KeyboardEvent) {
                   >A♠</span
                 >
                 <span v-else>{{ entries[index]!.clue }}</span
-                ><b aria-hidden="true">{{ entries[index]!.down ? '↓' : '→' }}</b>
+                ><b aria-hidden="true">{{
+                  entries[index]!.clueRow !== undefined
+                    ? entries[index]!.down
+                      ? '↘↓'
+                      : '↘→'
+                    : entries[index]!.down
+                      ? '↓'
+                      : '→'
+                }}</b>
               </button>
             </div>
             <button
@@ -645,8 +776,9 @@ function onKey(event: KeyboardEvent) {
                 'in-word': activeCells.some((item) => item.key === cell.key),
                 current: cursor === cell.key,
                 'correct-letter': correctCell(cell.key),
+                'incorrect-letter': incorrectCell(cell.key),
               }"
-              :aria-label="`Række ${cell.row + 1}, felt ${cell.col + 1}: ${letters[cell.key] || 'tomt'}${correctCell(cell.key) ? ', korrekt' : ''}`"
+              :aria-label="`Række ${cell.row + 1}, felt ${cell.col + 1}: ${letters[cell.key] || 'tomt'}${correctCell(cell.key) ? ', korrekt og låst' : incorrectCell(cell.key) ? ', forkert ved seneste tjek' : ''}`"
               :aria-pressed="cursor === cell.key"
               @click="chooseCell(cell.key)"
             >
@@ -693,6 +825,22 @@ function onKey(event: KeyboardEvent) {
         ›
       </button>
     </div>
+    <button
+      v-if="canBuy"
+      class="buy-letter"
+      type="button"
+      :disabled="buying || letterShop?.nextPrice == null || correctCell(cursor)"
+      @click="offerLetter"
+    >
+      {{
+        letterShop?.nextPrice == null
+          ? `Alle ${letterShop?.limit} bogstaver er købt`
+          : correctCell(cursor)
+            ? 'Feltet er bekræftet korrekt'
+            : `Køb valgt bogstav · ${letterShop.nextPrice} 🍌`
+      }}
+      <small>{{ letterShop?.bought }}/{{ letterShop?.limit }} købt</small>
+    </button>
     <p
       v-if="result || checking"
       class="result"
@@ -743,6 +891,52 @@ function onKey(event: KeyboardEvent) {
       </button>
     </p>
     <AppDialog
+      v-if="purchase"
+      label="Køb bogstav"
+      centered
+      @close="!buying && (purchase = null)"
+    >
+      <section class="purchase-dialog">
+        <span class="purchase-kicker"
+          >Bogstav {{ (letterShop?.bought ?? 0) + 1 }} af {{ letterShop?.limit }}</span
+        >
+        <h2>En lille hjælp?</h2>
+        <p>
+          Afslør det rigtige bogstav i række {{ Number(purchase.cell.split(':')[0]) + 1 }}, kolonne
+          {{ Number(purchase.cell.split(':')[1]) + 1 }}.
+        </p>
+        <div class="purchase-price">
+          <img
+            src="/badges/banana-baron.webp"
+            alt=""
+          /><strong>{{ purchase.price }}<small>bananer</small></strong>
+        </div>
+        <p class="purchase-note">Bogstavet gemmes på din bruger og følger med på alle enheder.</p>
+        <p
+          v-if="purchaseError"
+          role="alert"
+        >
+          {{ purchaseError }}
+        </p>
+        <button
+          type="button"
+          class="purchase-confirm"
+          :disabled="buying"
+          @click="confirmLetter"
+        >
+          {{ buying ? 'Afslører bogstav…' : `Køb for ${purchase.price} bananer` }}
+        </button>
+        <button
+          type="button"
+          class="purchase-cancel"
+          :disabled="buying"
+          @click="purchase = null"
+        >
+          Annuller
+        </button>
+      </section>
+    </AppDialog>
+    <AppDialog
       v-if="showInfo"
       label="Information om krydsord og hjælp"
       @close="showInfo = false"
@@ -759,10 +953,17 @@ function onKey(event: KeyboardEvent) {
           </button>
         </header>
         <p>Hele løsningen tjekkes, når alle felter er udfyldt.</p>
+        <p v-if="letterShop">
+          Vælg et felt og tryk på »Køb valgt bogstav« for at få det rigtige bogstav. Du kan købe
+          højst {{ letterShop.limit }} pr. krydsord. Prisen starter på
+          {{ CROSSWORD_LETTER_PRICES[0] }} bananer og stiger med 50 for hvert køb, op til
+          {{ CROSSWORD_LETTER_PRICES.at(-1) }} bananer. Købsgrænsen og prisen nulstilles for hvert
+          krydsord. Købte bogstaver gemmes på din bruger og markeres grønt.
+        </p>
         <p>
           {{
             dailyHelp?.available
-              ? 'Hjælpen er startet. Grønne felter viser bogstaver, der var korrekte ved det seneste daglige tjek.'
+              ? 'Grønne felter er korrekte og låst. Røde felter var forkerte ved det seneste daglige tjek. Den røde markering forsvinder, når du retter eller sletter bogstavet.'
               : firstHelpTime
                 ? 'Hjælp starter ' + firstHelpTime + ' (dansk tid).'
                 : 'Hjælp starter kl. 04.00 efter åbningsdagen og én hel ekstra dag.'
@@ -822,6 +1023,125 @@ function onKey(event: KeyboardEvent) {
 </template>
 
 <style scoped>
+.denmark-icon {
+  display: block;
+  width: 80%;
+  height: 60%;
+  margin: auto;
+  background:
+    linear-gradient(90deg, transparent 29%, white 29% 41%, transparent 41%),
+    linear-gradient(transparent 42%, white 42% 58%, transparent 58%), #c8102e;
+}
+.purchase-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px 22px 22px;
+  text-align: center;
+}
+.purchase-kicker {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.purchase-dialog h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+.purchase-dialog p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.purchase-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  background: var(--surface-2);
+}
+.purchase-price img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+.purchase-price strong {
+  display: grid;
+  text-align: left;
+  font-size: 30px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.purchase-price small {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.purchase-dialog .purchase-note {
+  font-size: 12px;
+}
+.purchase-confirm,
+.purchase-cancel {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.purchase-confirm {
+  margin-top: 4px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.purchase-cancel {
+  border: 1px solid var(--hairline);
+  background: var(--surface-2);
+  color: var(--text);
+}
+.purchase-confirm:focus-visible,
+.purchase-cancel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.purchase-confirm:disabled,
+.purchase-cancel:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.buy-letter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 38px;
+  margin: 4px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+.buy-letter small {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.buy-letter:disabled {
+  opacity: 0.6;
+}
 .board-decoration {
   width: 100%;
   height: 100%;
@@ -1196,6 +1516,14 @@ function onKey(event: KeyboardEvent) {
 }
 .letter-cell.correct-letter.current {
   box-shadow: inset 0 0 0 2px light-dark(#287343, #95d7ac);
+}
+.letter-cell.incorrect-letter {
+  background: light-dark(#fbe0df, #672e35);
+  border-color: light-dark(#ca7774, #d7868b);
+  color: light-dark(#872e2b, #ffe0e1);
+}
+.letter-cell.incorrect-letter.current {
+  box-shadow: inset 0 0 0 2px light-dark(#aa3935, #f4b6bb);
 }
 .help-error {
   margin: 0;

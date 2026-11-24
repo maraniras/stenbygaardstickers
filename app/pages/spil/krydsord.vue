@@ -1,10 +1,15 @@
 <script setup lang="ts">
+definePageMeta({ key: (route) => route.fullPath })
+import { CROSSWORDS, isCrosswordId } from '../../../shared/utils/crosswords'
 useHead({ title: 'På Tværs · Stenbygaard Stickers' })
 const route = useRoute()
-const puzzleId = route.query.id === 'marvel' ? 'marvel' : '1'
+const puzzleId = isCrosswordId(route.query.id) ? route.query.id : '1'
 const preview = route.query.preview === '1'
 const marvel = puzzleId === 'marvel'
-const { view, pending, error, reload, submit, checkHelp } = useCrossword(preview, puzzleId)
+const { view, pending, error, reload, submit, checkHelp, buyLetter } = useCrossword(
+  preview,
+  puzzleId,
+)
 const { name } = useUser()
 const showLeaderboard = ref(false)
 const { reload: reloadWallet, reloadPeople } = useEconomy()
@@ -40,21 +45,25 @@ const opening = computed(() =>
         vandt {{ view.title }}</strong
       >
       <span>{{
-        view.winner.name === name
-          ? marvel
-            ? 'Du har vundet 500 bananer, vinderbadgen samt den eksklusive profilramme og profilbanneret! Vælg ramme og banner under dine indstillinger.'
-            : 'Du har vundet RTA-koppen, 1.000 bananer, vinderbadgen samt en eksklusiv profilramme og et profilbanner! Vælg ramme og banner under dine indstillinger. Kontakt Mathias om udlevering af koppen.'
-          : marvel
-            ? 'Vinderen har fået 500 bananer, badgen, profilrammen og profilbanneret. Du får 50 bananer, når du løser krydsordet.'
-            : 'RTA-koppen, 1.000 bananer, vinderbadgen, profilrammen og profilbanneret er vundet. Du kan stadig løse krydsordet.'
+        puzzleId === '2'
+          ? view.winner.name === name
+            ? 'Du har vundet 1.000 bananer!'
+            : 'Vinderen har fået 1.000 bananer. Du får 50 bananer, når du løser krydsordet.'
+          : view.winner.name === name
+            ? marvel
+              ? 'Du har vundet 500 bananer, vinderbadgen samt den eksklusive profilramme og profilbanneret! Vælg ramme og banner under dine indstillinger.'
+              : 'Du har vundet RTA-koppen, 1.000 bananer, vinderbadgen samt en eksklusiv profilramme og et profilbanner! Vælg ramme og banner under dine indstillinger. Kontakt Mathias om udlevering af koppen.'
+            : marvel
+              ? 'Vinderen har fået 500 bananer, badgen, profilrammen og profilbanneret. Du får 50 bananer, når du løser krydsordet.'
+              : 'RTA-koppen, 1.000 bananer, vinderbadgen, profilrammen og profilbanneret er vundet. Du kan stadig løse krydsordet.'
       }}</span>
     </div>
     <p
-      v-if="marvel && view.completed && view.winner?.name !== name && !view.preview"
+      v-if="view.completionPrize && view.completed && view.winner?.name !== name && !view.preview"
       class="competition-banner"
       role="status"
     >
-      Du har løst Doomsday Special og fået 50 bananer.
+      Du har løst {{ view.title }} og fået {{ view.completionPrize }} bananer.
     </p>
     <CrosswordBoard
       :key="view.id + ':' + view.puzzle.revision + ':' + (name || 'anonym') + ':' + preview"
@@ -68,6 +77,8 @@ const opening = computed(() =>
       :help-available="view.helpAvailable"
       :completed="view.completed"
       :check-help="checkHelp"
+      :letter-shop="view.letterShop"
+      :buy-letter="buyLetter"
     >
       <template #actions>
         <button
@@ -109,11 +120,11 @@ const opening = computed(() =>
     class="locked-page"
   >
     <PageHeader
-      :title="marvel ? 'Doomsday Special' : 'På Tværs #1'"
+      :title="CROSSWORDS[puzzleId].title"
       back-to="/spil/oevrige"
     />
     <section class="locked-card">
-      <span class="eyebrow">{{ marvel ? 'DOOMSDAY SPECIAL' : 'PÅ TVÆRS #1' }}</span>
+      <span class="eyebrow">{{ CROSSWORDS[puzzleId].title }}</span>
       <h2>{{ pending ? 'Henter krydsordet…' : 'Krydsordet er ikke åbnet endnu' }}</h2>
       <p v-if="error">{{ error }}</p>
       <p v-else>

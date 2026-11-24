@@ -17,8 +17,22 @@ export const CROSSWORDS = {
     profileFrame: 'doomsday-winner',
     profileBanner: 'doomsday-winner',
   },
+  '2': {
+    title: 'På Tværs #2',
+    winnerPrize: 1000,
+    completionPrize: 50,
+    badge: '',
+    physicalPrize: false,
+    profileFrame: null,
+    profileBanner: null,
+  },
 } as const
 export type CrosswordId = keyof typeof CROSSWORDS
+// Integer object keys enumerate before named keys; keep the intended menu order explicit.
+export const CROSSWORD_IDS: CrosswordId[] = ['1', 'marvel', '2']
+export function isCrosswordId(id: unknown): id is CrosswordId {
+  return typeof id === 'string' && Object.hasOwn(CROSSWORDS, id)
+}
 export function crosswordDefinition(id: CrosswordId = '1') {
   return CROSSWORDS[id]
 }

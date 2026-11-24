@@ -11,6 +11,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.1.0',
+    date: '2026-11-24',
+    notes: [
+      'På Tværs #2 er på vej! Find det nederst under Øvrige spil. Denne gang bliver det større.',
+      'På Tværs: Korrekte felter låses grønt ved det daglige tjek. Forkerte felter bliver røde, indtil du retter eller sletter bogstavet.',
+      'Fra På Tværs: Doomsday Special kan du købe op til ti bogstaver pr. krydsord. Prisen starter på 50 bananer og stiger med 50 pr. køb til 500. Pris og grænse nulstilles for hvert krydsord. Købte bogstaver følger din bruger på alle enheder.',
+    ],
+  },
+  {
     version: '2.10.0',
     date: '2026-11-23',
     notes: [

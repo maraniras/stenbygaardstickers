@@ -13,6 +13,16 @@ vm.runInNewContext(compile(readFileSync('shared/utils/releases.ts', 'utf8')), {
   exports: releaseUtils,
 })
 const now = new Date('2026-11-05T12:00:00Z')
+
+test('four-part version ordering preserves legacy ranks and compares every component', () => {
+  assert.equal(releaseUtils.releaseRank('2.10.0'), 2010000)
+  assert.equal(releaseUtils.releaseRank('2.10.0.0'), 2010000)
+  const versions = ['2.10.0', '2.10.0.1', '2.10.0.999', '2.10.1.0', '2.11.0.0', '3.0.0.0']
+  for (let i = 1; i < versions.length; i++)
+    assert.ok(releaseUtils.releaseRank(versions[i]) > releaseUtils.releaseRank(versions[i - 1]))
+  assert.equal(releaseUtils.releaseRank('2.10.1.0.1'), 0)
+  assert.equal(releaseUtils.releaseRank('2.10.x.0'), 0)
+})
 test('announcements choose only the newest published version in Danish time', () => {
   const releases = [
     { version: '2.4' },
