@@ -1,0 +1,146 @@
+{
+  "source": "C:/Users/MARA/.codex/visualizations/2026/10/28/01a181c6-2fab-71d2-8c4e-29693ebc8fea",
+  "archivedAt": "2026-11-25",
+  "files": [
+    {
+      "original": "build-market-v2-view.py",
+      "stored": "build-market-v2-view.py",
+      "bytes": 3386,
+      "storedBytes": 3386,
+      "sha256": "0f3f49f885404ac54588c2d4b5377bf466e13eebd3d2222c8e1cda536123b04e"
+    },
+    {
+      "original": "build-market-view.py",
+      "stored": "build-market-view.py",
+      "bytes": 1196,
+      "storedBytes": 1196,
+      "sha256": "18e207ff0475bda90642c9820affe46c46b344c801963d75b2248f30d3b755dd"
+    },
+    {
+      "original": "market-growth-20261101.json",
+      "stored": "market-growth-20261101.json.gz",
+      "bytes": 9868950,
+      "storedBytes": 4612464,
+      "sha256": "39ad2dc31af5294815c2dd141aac959ae8aaaefd69b696f9041800cf01b55bf1"
+    },
+    {
+      "original": "market-growth-20261102.json",
+      "stored": "market-growth-20261102.json.gz",
+      "bytes": 9814265,
+      "storedBytes": 4591533,
+      "sha256": "e3d6535f704c5b9f737dfa7bedadae6d6811fe022764f48ea83c093beff8ba42"
+    },
+    {
+      "original": "market-growth-portfolios.json",
+      "stored": "market-growth-portfolios.json",
+      "bytes": 3797,
+      "storedBytes": 3797,
+      "sha256": "2703ef35cb0d654db858a9881fd8004083dff7af006d186f6d3c96a72132a8d0"
+    },
+    {
+      "original": "market-simulation.csv",
+      "stored": "market-simulation.csv",
+      "bytes": 2345,
+      "storedBytes": 2345,
+      "sha256": "29624b34c96f5afda99f27662432c914f7caff64406a3558de85dcb951fb2225"
+    },
+    {
+      "original": "market-simulation.html",
+      "stored": "market-simulation.html",
+      "bytes": 176425,
+      "storedBytes": 176425,
+      "sha256": "62db03eb900da5f3394de42c64aedd87f398e457ffe3907c113a6a40436367c0"
+    },
+    {
+      "original": "market-simulation.json",
+      "stored": "market-simulation.json.gz",
+      "bytes": 5197724,
+      "storedBytes": 2363196,
+      "sha256": "891c3e60b1cfdf91da5148c522c9ab92986467038204aa7b6ab2a786222f150c"
+    },
+    {
+      "original": "market-template.html",
+      "stored": "market-template.html",
+      "bytes": 10784,
+      "storedBytes": 10784,
+      "sha256": "d08f026cc66578a272b61d84ab6a7a08e3146cfabd20888676e9d4b5808b910d"
+    },
+    {
+      "original": "market-trading-tests-wandering.json",
+      "stored": "market-trading-tests-wandering.json",
+      "bytes": 29595,
+      "storedBytes": 29595,
+      "sha256": "7cc1237201ba565fd60d1da23fe267712323fbfec2274b15d8e6a9b23fee84cf"
+    },
+    {
+      "original": "market-trading-tests.json",
+      "stored": "market-trading-tests.json",
+      "bytes": 29497,
+      "storedBytes": 29497,
+      "sha256": "3c274909d9d067d86c675772a95771259c8f33436b2016c9fefce3c0abf476a2"
+    },
+    {
+      "original": "market-v2-t0.2-v0.4.csv",
+      "stored": "market-v2-t0.2-v0.4.csv",
+      "bytes": 3895,
+      "storedBytes": 3895,
+      "sha256": "b1bc2ea9911d1c3d268a0b472f8cec557405867d4994fdb74453b92533feb74d"
+    },
+    {
+      "original": "market-v2-t0.2-v0.4.json",
+      "stored": "market-v2-t0.2-v0.4.json.gz",
+      "bytes": 1920653,
+      "storedBytes": 859316,
+      "sha256": "8dc99ac5fb61dff3a7572ba55b69c0d60cd06494aff111d5e7c5abbe5457faa5"
+    },
+    {
+      "original": "market-v2-t1-v1.csv",
+      "stored": "market-v2-t1-v1.csv",
+      "bytes": 3928,
+      "storedBytes": 3928,
+      "sha256": "370d043d8785e0857f0989e6911615b1d52c57b4300d1fc924dc36b7a895aa63"
+    },
+    {
+      "original": "market-v2-t1-v1.json",
+      "stored": "market-v2-t1-v1.json.gz",
+      "bytes": 1887512,
+      "storedBytes": 855886,
+      "sha256": "42af0a78e6a9fbed708d89b08fd827d125699b6d8d1bde4f61d0439de095554f"
+    },
+    {
+      "original": "market-v2.html",
+      "stored": "market-v2.html",
+      "bytes": 286061,
+      "storedBytes": 286061,
+      "sha256": "b77af1532e6a8a5551b0730d5836741848dd9d6abd34af639089325398866500"
+    },
+    {
+      "original": "simulate-market-growth.py",
+      "stored": "simulate-market-growth.py",
+      "bytes": 9811,
+      "storedBytes": 9811,
+      "sha256": "d3d6f24945cbb171c4931e5168855aa15a39dd1a5f474aa2a9146049e3ca24a2"
+    },
+    {
+      "original": "simulate-market-v2.py",
+      "stored": "simulate-market-v2.py",
+      "bytes": 10347,
+      "storedBytes": 10347,
+      "sha256": "3b9e7183903f9c4df40bde03fdcfb932eb38dd7cb195729ec9a72c40fabe54cf"
+    },
+    {
+      "original": "simulate-market.py",
+      "stored": "simulate-market.py",
+      "bytes": 7027,
+      "storedBytes": 7027,
+      "sha256": "9d9ab1b1315abb68b3bed07b742176b903a68eaefdb1513e865da2c370977442"
+    },
+    {
+      "original": "test-market-trading.py",
+      "stored": "test-market-trading.py",
+      "bytes": 8717,
+      "storedBytes": 8717,
+      "sha256": "1a1c650e08c6c3f0d137a1ba21279e2122fb781356eb934b8b67ad2c8056c1a6"
+    }
+  ]
+}

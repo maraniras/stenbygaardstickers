@@ -1,0 +1,962 @@
+{
+  "seed": 20261031,
+  "replications": 50,
+  "stockYears": 1000,
+  "minutesPerStock": 525600,
+  "variant": "wandering",
+  "anchorDailyVolatility": [
+    0.04,
+    0.07,
+    0.1
+  ],
+  "anchorHalfLifeDays": 365,
+  "initialWallet": 1000,
+  "feesPerSide": [
+    0,
+    0.0025,
+    0.005
+  ],
+  "parameters": {
+    "seed": 20261029,
+    "ensembleSeed": 20261030,
+    "replications": 100,
+    "dailyVolatility": [
+      0.05,
+      0.1,
+      0.18
+    ],
+    "halfLifeDays": [
+      12,
+      24,
+      36
+    ],
+    "trendDailyLogDrift": [
+      0.1,
+      0.2,
+      0.35
+    ],
+    "regimeProbabilities": [
+      0.5,
+      0.2,
+      0.2,
+      0.1
+    ],
+    "regimeMinutes": [
+      30,
+      180
+    ],
+    "turbulentVolatilityMultiplier": 1.5,
+    "upperPressureStart": 250,
+    "upperPressurePerDay": 0.02,
+    "hardCap": 2500,
+    "maxMinuteLogMove": 0.01,
+    "minuteIntervals": 525600
+  },
+  "shortWindows": {
+    "10": {
+      "Lav": {
+        "windows": 60000,
+        "grossReturnP05P50P95": [
+          -0.7236819452512194,
+          -0.0064803155718216425,
+          0.7237377789659041
+        ],
+        "medianAbsoluteMovePercent": 0.2942456305027008,
+        "netPositivePercent": 12.43,
+        "meanNetPercent": -0.501305324051894,
+        "medianNetPercent": -0.5052011120024678
+      },
+      "Mellem": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -1.439332178544737,
+          0.0020220584498701704,
+          1.4677391845178192
+        ],
+        "medianAbsoluteMovePercent": 0.5850692987442017,
+        "netPositivePercent": 28.435714285714287,
+        "meanNetPercent": -0.49097292304975904,
+        "medianNetPercent": -0.4967411438311532
+      },
+      "Høj": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -2.4595092841488215,
+          -0.003215914277879576,
+          2.5128530164158427
+        ],
+        "medianAbsoluteMovePercent": 1.0191682577133179,
+        "netPositivePercent": 36.97571428571428,
+        "meanNetPercent": -0.4907496947662196,
+        "medianNetPercent": -0.5019529920027357
+      }
+    },
+    "60": {
+      "Lav": {
+        "windows": 60000,
+        "grossReturnP05P50P95": [
+          -1.8152981278245484,
+          0.009801663081988798,
+          1.823662403480399
+        ],
+        "medianAbsoluteMovePercent": 0.7328140735626221,
+        "netPositivePercent": 32.391666666666666,
+        "meanNetPercent": -0.4901283828418111,
+        "medianNetPercent": -0.48900034021747096
+      },
+      "Mellem": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -3.573024467800915,
+          0.0077484656224460075,
+          3.6834521733564434
+        ],
+        "medianAbsoluteMovePercent": 1.4574459791183472,
+        "netPositivePercent": 41.08,
+        "meanNetPercent": -0.4757334404059025,
+        "medianNetPercent": -0.4910432972959303
+      },
+      "Høj": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -6.029077738645283,
+          -0.016739141773099705,
+          6.3344863159991185
+        ],
+        "medianAbsoluteMovePercent": 2.5344343185424805,
+        "netPositivePercent": 44.51428571428571,
+        "meanNetPercent": -0.4454875258563347,
+        "medianNetPercent": -0.5154087719069466
+      }
+    },
+    "180": {
+      "Lav": {
+        "windows": 60000,
+        "grossReturnP05P50P95": [
+          -3.177629040545126,
+          -0.017941498425735277,
+          3.250605093081422
+        ],
+        "medianAbsoluteMovePercent": 1.3151413202285767,
+        "netPositivePercent": 39.58833333333333,
+        "meanNetPercent": -0.49213631623600823,
+        "medianNetPercent": -0.51660513184672
+      },
+      "Mellem": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -6.223328185976833,
+          0.006412358962591299,
+          6.675505189241745
+        ],
+        "medianAbsoluteMovePercent": 2.629713773727417,
+        "netPositivePercent": 44.98,
+        "meanNetPercent": -0.4184465267762858,
+        "medianNetPercent": -0.4923727400386515
+      },
+      "Høj": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -10.397496392293395,
+          0.029894585998856416,
+          11.635752165998607
+        ],
+        "medianAbsoluteMovePercent": 4.46650505065918,
+        "netPositivePercent": 47.174285714285716,
+        "meanNetPercent": -0.26759007291778,
+        "medianNetPercent": -0.46900763137637935
+      }
+    },
+    "1440": {
+      "Lav": {
+        "windows": 60000,
+        "grossReturnP05P50P95": [
+          -8.778164910253969,
+          -0.008473776348332733,
+          9.527528389684749
+        ],
+        "medianAbsoluteMovePercent": 3.733335018157959,
+        "netPositivePercent": 46.35,
+        "meanNetPercent": -0.375499236250985,
+        "medianNetPercent": -0.5071846303302517
+      },
+      "Mellem": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -16.71757438973861,
+          0.005306852490786459,
+          20.233621933687598
+        ],
+        "medianAbsoluteMovePercent": 7.513460636138916,
+        "netPositivePercent": 48.254285714285714,
+        "meanNetPercent": 0.15187677641829525,
+        "medianNetPercent": -0.4934727327431003
+      },
+      "Høj": {
+        "windows": 70000,
+        "grossReturnP05P50P95": [
+          -27.1822345923602,
+          -0.02355465163133726,
+          36.58482653171964
+        ],
+        "medianAbsoluteMovePercent": 12.769049644470215,
+        "netPositivePercent": 48.88,
+        "meanNetPercent": 1.2470620487275426,
+        "medianNetPercent": -0.5221902889887717
+      }
+    }
+  },
+  "strategies": {
+    "0": {
+      "buyHold": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -59.22967493016167,
+            0.2646450348375374,
+            139.23066717495396
+          ],
+          "meanAnnualReturnPercent": 14.598705574698245,
+          "positiveWalletPercent": 50.66666666666667,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -82.22816399758268,
+            0.4800924248613342,
+            454.5861791996963
+          ],
+          "meanAnnualReturnPercent": 72.68139174150699,
+          "positiveWalletPercent": 50.28571428571429,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -93.97790907712444,
+            -14.331291132488989,
+            889.5234017836611
+          ],
+          "meanAnnualReturnPercent": 149.53771106752384,
+          "positiveWalletPercent": 46.0,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "randomDaily": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -66.86917589803613,
+            4.074159225743269,
+            168.509842824293
+          ],
+          "meanAnnualReturnPercent": 19.2035886157549,
+          "positiveWalletPercent": 51.66666666666667,
+          "medianRoundTrips": 92.0,
+          "meanRoundTrips": 91.58333333333333,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -87.97727655004314,
+            6.06251941746779,
+            523.8739392593849
+          ],
+          "meanAnnualReturnPercent": 91.92113838250638,
+          "positiveWalletPercent": 51.714285714285715,
+          "medianRoundTrips": 92.0,
+          "meanRoundTrips": 91.58571428571429,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -96.75565817245688,
+            -9.539816412233229,
+            2412.065837963143
+          ],
+          "meanAnnualReturnPercent": 555.8228210427667,
+          "positiveWalletPercent": 48.57142857142857,
+          "medianRoundTrips": 91.0,
+          "meanRoundTrips": 91.17428571428572,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "momentum": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            41.48634848211042,
+            254.80698377204686,
+            852.952936799769
+          ],
+          "meanAnnualReturnPercent": 336.4759913651593,
+          "positiveWalletPercent": 97.66666666666667,
+          "medianRoundTrips": 1417.0,
+          "meanRoundTrips": 1417.7366666666667,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            154.6920105663679,
+            1881.381757443322,
+            13964.58453142339
+          ],
+          "meanAnnualReturnPercent": 3748.0557260380638,
+          "positiveWalletPercent": 98.85714285714286,
+          "medianRoundTrips": 2361.0,
+          "meanRoundTrips": 2361.5885714285714,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            627.1144614180932,
+            12173.960020464181,
+            210856.87690060612
+          ],
+          "meanAnnualReturnPercent": 52902.61582100359,
+          "positiveWalletPercent": 100.0,
+          "medianRoundTrips": 3010.0,
+          "meanRoundTrips": 3009.2971428571427,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "buyDip": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -38.45560513702406,
+            34.11331720040675,
+            210.00262271450651
+          ],
+          "meanAnnualReturnPercent": 57.97260192089918,
+          "positiveWalletPercent": 75.66666666666667,
+          "medianRoundTrips": 2.0,
+          "meanRoundTrips": 2.4566666666666666,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -59.52822366989699,
+            156.32946505113608,
+            919.9662230332793
+          ],
+          "meanAnnualReturnPercent": 271.8931902002296,
+          "positiveWalletPercent": 85.42857142857143,
+          "medianRoundTrips": 5.0,
+          "meanRoundTrips": 5.671428571428572,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -76.20511161840317,
+            440.49599418831326,
+            4901.262802934187
+          ],
+          "meanAnnualReturnPercent": 1578.0735336310456,
+          "positiveWalletPercent": 85.71428571428571,
+          "medianRoundTrips": 9.0,
+          "meanRoundTrips": 9.457142857142857,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "buyDipLimited": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -38.409424576059976,
+            38.451860388001805,
+            214.49994987793724
+          ],
+          "meanAnnualReturnPercent": 59.62161574077446,
+          "positiveWalletPercent": 76.0,
+          "medianRoundTrips": 6.0,
+          "meanRoundTrips": 6.216666666666667,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -59.35282041642047,
+            157.68589812566552,
+            845.904491084958
+          ],
+          "meanAnnualReturnPercent": 268.869370376554,
+          "positiveWalletPercent": 85.42857142857143,
+          "medianRoundTrips": 13.0,
+          "meanRoundTrips": 12.32857142857143,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -73.67669568240036,
+            458.98755434804923,
+            4927.5803617683105
+          ],
+          "meanAnnualReturnPercent": 1568.8325561631118,
+          "positiveWalletPercent": 85.71428571428571,
+          "medianRoundTrips": 25.0,
+          "meanRoundTrips": 23.865714285714287,
+          "medianMaxDrawdownPercent": null
+        }
+      }
+    },
+    "0.0025": {
+      "buyHold": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -59.43301819734291,
+            -0.2354280077302202,
+            138.03749676510384
+          ],
+          "meanAnnualReturnPercent": 14.0271409583656,
+          "positiveWalletPercent": 49.333333333333336,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": -65.77233817723277
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -82.31680158362965,
+            -0.021055168280108172,
+            451.82016334333883
+          ],
+          "meanAnnualReturnPercent": 71.82013791735983,
+          "positiveWalletPercent": 50.0,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": -87.28427044035014
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -94.00794444332332,
+            -14.758566488436665,
+            884.5881229717727
+          ],
+          "meanAnnualReturnPercent": 148.29313395496766,
+          "positiveWalletPercent": 45.714285714285715,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": -97.76312738994476
+        }
+      },
+      "randomDaily": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -78.67433139464002,
+            -35.0864134455617,
+            71.4166844314396
+          ],
+          "meanAnnualReturnPercent": -24.5148281383021,
+          "positiveWalletPercent": 23.666666666666668,
+          "medianRoundTrips": 92.0,
+          "meanRoundTrips": 91.58333333333333,
+          "medianMaxDrawdownPercent": -63.74900866203903
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -92.38675052039477,
+            -34.48294490071254,
+            297.695060590852
+          ],
+          "meanAnnualReturnPercent": 21.446311250645895,
+          "positiveWalletPercent": 31.71428571428571,
+          "medianRoundTrips": 92.0,
+          "meanRoundTrips": 91.58571428571429,
+          "medianMaxDrawdownPercent": -83.51161209156419
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -97.90153745812766,
+            -43.43926769138051,
+            1503.646891874779
+          ],
+          "meanAnnualReturnPercent": 312.48494420531097,
+          "positiveWalletPercent": 37.714285714285715,
+          "medianRoundTrips": 91.0,
+          "meanRoundTrips": 91.17428571428572,
+          "medianMaxDrawdownPercent": -95.51322214307416
+        }
+      },
+      "momentum": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -99.89114023860793,
+            -99.70244078957603,
+            -99.11423224301433
+          ],
+          "meanAnnualReturnPercent": -99.61701271230702,
+          "positiveWalletPercent": 0.0,
+          "medianRoundTrips": 1417.0,
+          "meanRoundTrips": 1417.7366666666667,
+          "medianMaxDrawdownPercent": -99.72819808915976
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -99.99844040800419,
+            -99.98552266109348,
+            -99.87606542485355
+          ],
+          "meanAnnualReturnPercent": -99.96801543942442,
+          "positiveWalletPercent": 0.0,
+          "medianRoundTrips": 2361.0,
+          "meanRoundTrips": 2361.5885714285714,
+          "medianMaxDrawdownPercent": -99.9891174180307
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -99.99984447364503,
+            -99.9963976324843,
+            -99.9266475659028
+          ],
+          "meanAnnualReturnPercent": -99.9822195761066,
+          "positiveWalletPercent": 0.0,
+          "medianRoundTrips": 3010.0,
+          "meanRoundTrips": 3009.2971428571427,
+          "medianMaxDrawdownPercent": -99.99800667312755
+        }
+      },
+      "buyDip": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -38.773389972008914,
+            32.778864631575416,
+            202.34861494085473
+          ],
+          "meanAnnualReturnPercent": 55.58011361289199,
+          "positiveWalletPercent": 75.66666666666667,
+          "medianRoundTrips": 2.0,
+          "meanRoundTrips": 2.4566666666666666,
+          "medianMaxDrawdownPercent": -38.45412512495411
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -60.54556030926219,
+            151.03938825821535,
+            870.2217822809611
+          ],
+          "meanAnnualReturnPercent": 257.3746572678262,
+          "positiveWalletPercent": 85.42857142857143,
+          "medianRoundTrips": 5.0,
+          "meanRoundTrips": 5.671428571428572,
+          "medianMaxDrawdownPercent": -64.67676786212388
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -76.85519546533511,
+            421.905821397977,
+            4503.833372624504
+          ],
+          "meanAnnualReturnPercent": 1434.1860684785413,
+          "positiveWalletPercent": 85.71428571428571,
+          "medianRoundTrips": 9.0,
+          "meanRoundTrips": 9.457142857142857,
+          "medianMaxDrawdownPercent": -88.27718705386374
+        }
+      },
+      "buyDipLimited": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -41.459258804663776,
+            32.893525260735856,
+            204.02981622500073
+          ],
+          "meanAnnualReturnPercent": 54.69000245929639,
+          "positiveWalletPercent": 74.66666666666667,
+          "medianRoundTrips": 6.0,
+          "meanRoundTrips": 6.216666666666667,
+          "medianMaxDrawdownPercent": -38.748280541028386
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -63.67142980463132,
+            148.28260165400923,
+            761.2730189606222
+          ],
+          "meanAnnualReturnPercent": 245.11026277508213,
+          "positiveWalletPercent": 84.85714285714285,
+          "medianRoundTrips": 13.0,
+          "meanRoundTrips": 12.32857142857143,
+          "medianMaxDrawdownPercent": -64.82118950141127
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -77.57831565964186,
+            402.5732439830275,
+            4268.141139685339
+          ],
+          "meanAnnualReturnPercent": 1329.749927743656,
+          "positiveWalletPercent": 84.85714285714285,
+          "medianRoundTrips": 25.0,
+          "meanRoundTrips": 23.865714285714287,
+          "medianMaxDrawdownPercent": -88.49664850439041
+        }
+      }
+    },
+    "0.005": {
+      "buyHold": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -59.635349806478466,
+            -0.7330131247130747,
+            136.850262526447
+          ],
+          "meanAnnualReturnPercent": 13.458419947089318,
+          "positiveWalletPercent": 49.333333333333336,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -82.40499818666147,
+            -0.5197094898138929,
+            449.0679087598984
+          ],
+          "meanAnnualReturnPercent": 70.96316893810891,
+          "positiveWalletPercent": 49.714285714285715,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -94.03783037983962,
+            -15.18371609634481,
+            879.6773977858137
+          ],
+          "meanAnnualReturnPercent": 147.05474876834452,
+          "positiveWalletPercent": 45.42857142857143,
+          "medianRoundTrips": 1.0,
+          "meanRoundTrips": 1.0,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "randomDaily": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -86.69376179729493,
+            -59.317197961734756,
+            8.573482168681853
+          ],
+          "meanAnnualReturnPercent": -52.17546985190056,
+          "positiveWalletPercent": 6.666666666666667,
+          "medianRoundTrips": 92.0,
+          "meanRoundTrips": 91.58333333333333,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -95.31033445645059,
+            -59.2226193361239,
+            156.74287022668278
+          ],
+          "meanAnnualReturnPercent": -23.10871713105744,
+          "positiveWalletPercent": 18.571428571428573,
+          "medianRoundTrips": 92.0,
+          "meanRoundTrips": 91.58571428571429,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -98.66570226578952,
+            -63.93347541667124,
+            892.1114329099423
+          ],
+          "meanAnnualReturnPercent": 159.58917128420336,
+          "positiveWalletPercent": 28.57142857142857,
+          "medianRoundTrips": 91.0,
+          "meanRoundTrips": 91.17428571428572,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "momentum": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -99.99991994342896,
+            -99.9997474678305,
+            -99.99916388558356
+          ],
+          "meanAnnualReturnPercent": -99.99965994381861,
+          "positiveWalletPercent": 0.0,
+          "medianRoundTrips": 1417.0,
+          "meanRoundTrips": 1417.7366666666667,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -99.99999999024625,
+            -99.99999989179003,
+            -99.9999988920105
+          ],
+          "meanAnnualReturnPercent": -99.99999973054048,
+          "positiveWalletPercent": 0.0,
+          "medianRoundTrips": 2361.0,
+          "meanRoundTrips": 2361.5885714285714,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -99.99999999996648,
+            -99.99999999895056,
+            -99.9999999748274
+          ],
+          "meanAnnualReturnPercent": -99.99999999395506,
+          "positiveWalletPercent": 0.0,
+          "medianRoundTrips": 3010.0,
+          "meanRoundTrips": 3009.2971428571427,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "buyDip": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -39.07876340573249,
+            31.45767368266401,
+            194.8834935284412
+          ],
+          "meanAnnualReturnPercent": 53.23560051834112,
+          "positiveWalletPercent": 75.33333333333333,
+          "medianRoundTrips": 2.0,
+          "meanRoundTrips": 2.4566666666666666,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -61.5363825062819,
+            145.82232601667445,
+            822.9028346357707
+          ],
+          "meanAnnualReturnPercent": 243.5119021759834,
+          "positiveWalletPercent": 85.42857142857143,
+          "medianRoundTrips": 5.0,
+          "meanRoundTrips": 5.671428571428572,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -77.58321420148462,
+            403.9548306869582,
+            4138.007721866391
+          ],
+          "meanAnnualReturnPercent": 1304.2232954567953,
+          "positiveWalletPercent": 85.14285714285714,
+          "medianRoundTrips": 9.0,
+          "meanRoundTrips": 9.457142857142857,
+          "medianMaxDrawdownPercent": null
+        }
+      },
+      "buyDipLimited": {
+        "Lav": {
+          "paths": 300,
+          "annualReturnP05P50P95": [
+            -43.25926482699705,
+            29.18288395859851,
+            190.6515479699722
+          ],
+          "meanAnnualReturnPercent": 49.966169415665796,
+          "positiveWalletPercent": 73.0,
+          "medianRoundTrips": 6.0,
+          "meanRoundTrips": 6.216666666666667,
+          "medianMaxDrawdownPercent": null
+        },
+        "Mellem": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -67.53104693538903,
+            141.96398666573404,
+            693.9239377102379
+          ],
+          "meanAnnualReturnPercent": 223.1162752812379,
+          "positiveWalletPercent": 83.14285714285714,
+          "medianRoundTrips": 13.0,
+          "meanRoundTrips": 12.32857142857143,
+          "medianMaxDrawdownPercent": null
+        },
+        "Høj": {
+          "paths": 350,
+          "annualReturnP05P50P95": [
+            -80.49873152041332,
+            348.621879081301,
+            3624.533767105192
+          ],
+          "meanAnnualReturnPercent": 1127.375403650902,
+          "positiveWalletPercent": 84.0,
+          "medianRoundTrips": 25.0,
+          "meanRoundTrips": 23.865714285714287,
+          "medianMaxDrawdownPercent": null
+        }
+      }
+    }
+  },
+  "medianEquityHistory": [
+    {
+      "day": 30,
+      "strategies": [
+        -1.2185235710245823,
+        -2.604914321200641,
+        -46.427600428509905,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "day": 60,
+      "strategies": [
+        -2.7371190515724564,
+        -6.8964005536101105,
+        -72.37936588410663,
+        21.13547132960165,
+        18.51432043488651
+      ]
+    },
+    {
+      "day": 90,
+      "strategies": [
+        -2.2045410388727094,
+        -11.548220135303739,
+        -85.39263872823788,
+        25.28587068268713,
+        25.23413364609304
+      ]
+    },
+    {
+      "day": 120,
+      "strategies": [
+        -5.597686709036881,
+        -17.311631024540038,
+        -92.47197983320133,
+        27.309156090891783,
+        26.9157735553595
+      ]
+    },
+    {
+      "day": 150,
+      "strategies": [
+        -5.422276789291103,
+        -18.96728272902414,
+        -96.29446543026023,
+        47.02735865681975,
+        41.20389410126462
+      ]
+    },
+    {
+      "day": 180,
+      "strategies": [
+        -5.568842891948167,
+        -20.59157857772001,
+        -98.13702771829004,
+        56.16732209129677,
+        54.34399947740716
+      ]
+    },
+    {
+      "day": 210,
+      "strategies": [
+        -6.2711159261752245,
+        -23.15912135529055,
+        -99.1500437983722,
+        58.538620873481285,
+        57.84595139125788
+      ]
+    },
+    {
+      "day": 240,
+      "strategies": [
+        -3.4624159253416495,
+        -25.63781221257182,
+        -99.57952662294683,
+        62.44831000030562,
+        61.263150929785745
+      ]
+    },
+    {
+      "day": 270,
+      "strategies": [
+        -2.8435014797792646,
+        -26.88577310297965,
+        -99.78514416012108,
+        83.19165663580519,
+        76.75178700736616
+      ]
+    },
+    {
+      "day": 300,
+      "strategies": [
+        -2.550614773643284,
+        -33.58055248353021,
+        -99.90390478311443,
+        95.77053293874953,
+        93.31912302447319
+      ]
+    },
+    {
+      "day": 330,
+      "strategies": [
+        -0.9447274526754312,
+        -32.82794714336075,
+        -99.9518383582389,
+        98.56545010020213,
+        97.22326494041269
+      ]
+    },
+    {
+      "day": 360,
+      "strategies": [
+        -4.264971073441304,
+        -36.71275525514932,
+        -99.97467717295847,
+        112.41066615640476,
+        111.44412993886678
+      ]
+    }
+  ],
+  "method": {
+    "windows": "200 shared random endpoints per horizon after day 30; windows may overlap, not independent trials",
+    "strategies": "All-in or cash, fractional shares, no leverage, separate wallet per stock, next-minute execution, final liquidation",
+    "momentum": "Buy after +1% over last hour; sell after -1% over last hour; decisions every 10min",
+    "buyDip": "Buy below 80% of fixed public base; sell at base; forced liquidation at year end",
+    "buyDipLimited": "Same, with 30% stop-loss from entry and 30-day maximum holding period; re-entry allowed next decision",
+    "randomDaily": "Daily independent 50% choice of invested or cash"
+  }
+}

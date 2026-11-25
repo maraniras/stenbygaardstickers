@@ -1,0 +1,102 @@
+<style>
+#market-study .controls { display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin:14px 0; }
+#market-study .controls label { flex:1; min-width:140px; }
+#market-study .plot { position:relative; width:100%; }
+#market-study .plot svg { display:block; width:100%; }
+#market-study .plot svg text { fill:var(--foreground); font-size:12px; font-weight:400; }
+#market-study .legend { display:flex; flex-wrap:wrap; gap:14px; margin:8px 0; }
+#market-study .legend span { display:inline-flex; gap:6px; align-items:center; }
+#market-study .swatch { width:16px; height:3px; display:inline-block; }
+#market-study .tooltip { position:absolute; padding:8px 10px; pointer-events:none; background:var(--popover); color:var(--popover-foreground); max-width:230px; }
+#market-study .readout { min-height:24px; margin:10px 0; }
+#market-study table button { font:inherit; }
+#market-study .table-note { margin:12px 0; }
+</style>
+<div id="market-study">
+  <h2>20 aktier · et simuleret år</h2>
+  <div class="controls">
+    <label class="form-label">Periode<select class="form-select" id="market-period"></select></label>
+    <label class="form-label">Visning<select class="form-select" id="market-unit"><option value="relative">Start = 100 · sammenlign udvikling</option><option value="price">Kurs i bananer</option></select></label>
+    <label class="form-label">Aktie<select class="form-select" id="market-stock"><option value="all">Alle 20 aktier</option></select></label>
+  </div>
+  <div class="legend text-small"><span><i class="swatch" style="background:var(--viz-series-1)"></i>Lav risiko</span><span><i class="swatch" style="background:var(--viz-series-2)"></i>Mellem risiko</span><span><i class="swatch" style="background:var(--viz-series-3)"></i>Høj risiko</span></div>
+  <div class="plot"><svg role="img" aria-label="Simulerede aktiekurser over tid"></svg><div class="tooltip" role="tooltip" hidden></div></div>
+  <p class="readout tabular-nums" aria-live="polite"></p>
+  <p class="text-small text-muted">Beregnet hvert minut. Grafen viser timepunkter de første 7 dage, derefter 12-timerspunkter. Tabel og årets min./maks. bruger minutdata.</p>
+  <div class="table-responsive"><table class="table table-sm"><caption>Kurser ved periodens slutning · 🍌 pr. aktie</caption><thead></thead><tbody></tbody></table></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script type="application/json" id="market-data">__MARKET_DATA__</script>
+<script>
+(() => {
+  const root=document.getElementById('market-study');
+  const data=JSON.parse(document.getElementById('market-data').textContent);
+  const format=new Intl.NumberFormat('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const precise=n=>new Intl.NumberFormat('da-DK',{maximumSignificantDigits:4}).format(n);
+  const period=root.querySelector('#market-period'),unit=root.querySelector('#market-unit'),stock=root.querySelector('#market-stock');
+  const plot=root.querySelector('.plot'), svg=d3.select(root.querySelector('svg')), tooltip=root.querySelector('.tooltip');
+  const saved=window.openai?.widgetState?.modelContent;
+  const state={period:data.horizons.some(h=>h.key===saved?.period)?saved.period:'year',unit:saved?.unit==='price'?'price':'relative',stock:Number.isInteger(saved?.stock)&&saved.stock>=0&&saved.stock<20?String(saved.stock):'all'};
+  data.horizons.forEach(h=>{const o=document.createElement('option');o.value=h.key;o.textContent=h.label;period.append(o);});
+  data.stocks.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name+' · '+s.risk;stock.append(o);});
+  const header=root.querySelector('thead');
+  const tr=document.createElement('tr');
+  ['Aktie','Risiko','Start',...data.horizons.map(h=>h.label),'Årets min.','Årets maks.'].forEach((label,i)=>{const th=document.createElement('th');th.scope='col';th.textContent=label;if(i>1)th.className='text-end';tr.append(th);});header.append(tr);
+  const tbody=root.querySelector('tbody');
+  data.stocks.forEach((s,i)=>{
+    const row=document.createElement('tr');
+    [s.name,s.risk,format.format(s.base),...data.horizons.map(h=>format.format(data.endpoints[h.key][i])),precise(data.min[i]),precise(data.max[i])].forEach((value,j)=>{const cell=document.createElement(j===0?'th':'td');if(j===0)cell.scope='row';cell.textContent=value;if(j>1)cell.className='text-end tabular-nums';row.append(cell);});tbody.append(row);
+  });
+  function persist(){window.openai?.setWidgetState?.({modelContent:{period:state.period,unit:state.unit,stock:state.stock==='all'?null:Number(state.stock)}})?.catch(()=>{});}
+  function draw(){
+    period.value=state.period;unit.value=state.unit;stock.value=state.stock;
+    const horizon=data.horizons.find(h=>h.key===state.period);
+    const indexes=state.stock==='all'?data.stocks.map((s,i)=>i):[Number(state.stock)];
+    const points=data.times.map((time,i)=>({time,values:data.series[i]})).filter(p=>p.time<=horizon.days);
+    const value=(p,i)=>state.unit==='relative'?p.values[i]/data.stocks[i].base*100:p.values[i];
+    const width=Math.max(290,plot.getBoundingClientRect().width),height=330,m={top:16,right:16,bottom:54,left:70};
+    svg.attr('viewBox',`0 0 ${width} ${height}`);svg.selectAll('*').remove();tooltip.hidden=true;
+    const raw=d3.extent(points.flatMap(p=>indexes.map(i=>value(p,i))));
+    const span=Math.max(raw[1]-raw[0],raw[1]*.02,.01);
+    const x=d3.scaleLinear().domain([0,horizon.days]).range([m.left+2,width-m.right-2]);
+    const y=d3.scaleLinear().domain([Math.max(0,raw[0]-span*.08),raw[1]+span*.08]).nice().range([height-m.bottom-2,m.top+2]);
+    svg.append('rect').attr('data-chart-frame','').attr('x',m.left).attr('y',m.top).attr('width',width-m.left-m.right).attr('height',height-m.top-m.bottom).attr('fill','none').attr('stroke','var(--border)');
+    svg.append('defs').append('clipPath').attr('id','market-chart-clip').append('rect').attr('x',m.left).attr('y',m.top).attr('width',width-m.left-m.right).attr('height',height-m.top-m.bottom);
+    const ax=svg.append('g').attr('transform',`translate(0,${height-m.bottom})`).call(d3.axisBottom(x).ticks(width<420?3:6).tickFormat(n=>horizon.days===1?Math.round(n*24)+' t':format.format(n).replace(',00','')+' d'));
+    const ay=svg.append('g').attr('transform',`translate(${m.left},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(n=>precise(n)));
+    ax.selectAll('path,line').attr('stroke','var(--border)');ay.selectAll('path,line').attr('stroke','var(--border)');
+    svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(m.left+width-m.right)/2).attr('y',height-9).attr('text-anchor','middle').text('Tid fra start · '+(horizon.days===1?'timer':'dage'));
+    svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform',`translate(14,${(m.top+height-m.bottom)/2}) rotate(-90)`).attr('text-anchor','middle').text(state.unit==='relative'?'Indeks · start = 100':'Kurs · 🍌 pr. aktie');
+    const clipped=svg.append('g').attr('clip-path','url(#market-chart-clip)');
+    indexes.forEach(i=>clipped.append('path').datum(points).attr('fill','none').attr('stroke',`var(--viz-series-${['Lav','Mellem','Høj'].indexOf(data.stocks[i].risk)+1})`).attr('stroke-width',indexes.length===1?2:1.2).attr('opacity',indexes.length===1?1:.65).attr('d',d3.line().x(p=>x(p.time)).y(p=>y(value(p,i)))));
+    const guide=clipped.append('line').attr('data-chart-hover-guide','').attr('y1',m.top).attr('y2',height-m.bottom).attr('stroke','var(--muted-foreground)').attr('visibility','hidden');
+    const dots=clipped.append('g');
+    const overlay=svg.append('rect').attr('data-chart-hit','').attr('data-chart-hover-overlay','cross-series').attr('x',m.left).attr('y',m.top).attr('width',width-m.left-m.right).attr('height',height-m.top-m.bottom).attr('fill','transparent');
+    function hover(event){
+      const px=Math.max(x(0),Math.min(x(horizon.days),d3.pointer(event)[0]));
+      const time=x.invert(px);
+      let j=d3.bisector(p=>p.time).left(points,time);j=Math.max(1,Math.min(points.length-1,j));
+      const a=points[j-1],b=points[j],t=(time-a.time)/(b.time-a.time);
+      const entries=indexes.map(i=>({i,v:value(a,i)+(value(b,i)-value(a,i))*t})).sort((a,b)=>b.v-a.v);
+      guide.attr('x1',px).attr('x2',px).attr('visibility','visible');dots.selectAll('*').remove();
+      entries.forEach(e=>dots.append('circle').attr('data-chart-hover-marker','').attr('cx',px).attr('cy',y(e.v)).attr('r',3).attr('fill',`var(--viz-series-${['Lav','Mellem','Høj'].indexOf(data.stocks[e.i].risk)+1})`));
+      tooltip.replaceChildren();
+      const heading=document.createElement('div');heading.textContent='Dag '+format.format(time);tooltip.append(heading);
+      entries.forEach(e=>{const line=document.createElement('div');line.textContent=data.stocks[e.i].name+': '+precise(e.v)+(state.unit==='price'?' 🍌':'');tooltip.append(line);});
+      tooltip.hidden=false;
+      tooltip.style.left=Math.max(0,Math.min(width-tooltip.offsetWidth,px+12))+'px';
+      tooltip.style.top='20px';
+    }
+    overlay.on('pointermove',hover).on('pointerleave',()=>{tooltip.hidden=true;guide.attr('visibility','hidden');dots.selectAll('*').remove();}).on('click',hover);
+    if(indexes.length===1){const i=indexes[0],s=data.stocks[i],last=data.endpoints[state.period][i];root.querySelector('.readout').textContent=s.name+' · '+s.risk+' risiko · '+precise(s.base)+' → '+precise(last)+' 🍌 · '+format.format((last/s.base-1)*100)+' %';}
+    else {const ratios=indexes.map(i=>(data.endpoints[state.period][i]/data.stocks[i].base-1)*100);root.querySelector('.readout').textContent=horizon.label+' · '+ratios.filter(r=>r>0).length+' af 20 over startkurs · median '+format.format(d3.median(ratios))+' %';}
+    // Drop optional tick labels if formatted bounds collide at narrow widths.
+    [ax,ay].forEach(axis=>{let previous=null;axis.selectAll('.tick text').each(function(){const bounds=this.getBoundingClientRect();if(previous && bounds.left<previous.right+4 && bounds.top<previous.bottom+4 && bounds.bottom>previous.top-4)this.style.visibility='hidden';else previous=bounds;});});
+  }
+  period.addEventListener('change',()=>{state.period=period.value;draw();persist();});
+  unit.addEventListener('change',()=>{state.unit=unit.value;draw();persist();});
+  stock.addEventListener('change',()=>{state.stock=stock.value;draw();persist();});
+  window.addEventListener('openai:set_globals',event=>{const s=event.detail?.globals?.widgetState?.modelContent;if(!s)return;if(data.horizons.some(h=>h.key===s.period))state.period=s.period;if(['price','relative'].includes(s.unit))state.unit=s.unit;state.stock=Number.isInteger(s.stock)&&s.stock>=0&&s.stock<20?String(s.stock):'all';draw();});
+  new ResizeObserver(draw).observe(plot);draw();
+})();
+</script>

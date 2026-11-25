@@ -1,0 +1,145 @@
+{
+  "seed": 20261102,
+  "initialTotalWallet": 1000,
+  "method": "50 held-out portfolios of 20 stocks; initial equal coin allocation; no rebalancing; buy minute 1; sell year end; 5% of positive gain per stock; losses do not offset other stocks gains",
+  "results": {
+    "noGrowth": {
+      "all": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 20,
+        "p05p50p95": [
+          -36.4992556893007,
+          -8.509889260513848,
+          51.8138013104251
+        ],
+        "mean": -0.8117720337664287,
+        "positivePercent": 40.0
+      },
+      "Lav": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 6,
+        "p05p50p95": [
+          -30.00213699241725,
+          -4.531293564140815,
+          29.7725830713395
+        ],
+        "mean": -2.5288343566477947,
+        "positivePercent": 40.0
+      },
+      "Mellem": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 7,
+        "p05p50p95": [
+          -46.07837124564718,
+          -5.811822995954014,
+          65.18546577970953
+        ],
+        "mean": -0.46047753643583006,
+        "positivePercent": 42.0
+      },
+      "Høj": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 7,
+        "p05p50p95": [
+          -67.95308941826612,
+          -30.737880654968627,
+          167.19337301108763
+        ],
+        "mean": 0.30870117422986026,
+        "positivePercent": 36.0
+      }
+    },
+    "smallGrowth": {
+      "all": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 20,
+        "p05p50p95": [
+          -27.156271259052662,
+          3.961964397633131,
+          70.98319452603705
+        ],
+        "mean": 13.552901043690325,
+        "positivePercent": 66.0
+      },
+      "Lav": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 6,
+        "p05p50p95": [
+          -24.432318958125098,
+          2.9538289981711756,
+          39.89436971742527
+        ],
+        "mean": 5.1027067475628245,
+        "positivePercent": 60.0
+      },
+      "Mellem": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 7,
+        "p05p50p95": [
+          -38.115512146385754,
+          7.994946836628884,
+          86.04235087949505
+        ],
+        "mean": 13.714168085951137,
+        "positivePercent": 60.0
+      },
+      "Høj": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 7,
+        "p05p50p95": [
+          -59.94137878200228,
+          -14.202394267870694,
+          192.17186453729275
+        ],
+        "mean": 20.634657683824507,
+        "positivePercent": 42.0
+      }
+    },
+    "riskCompensatedGrowth": {
+      "all": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 20,
+        "p05p50p95": [
+          1.901865155084595,
+          49.96979157342979,
+          173.28311139580754
+        ],
+        "mean": 69.719908317062,
+        "positivePercent": 96.0
+      },
+      "Lav": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 6,
+        "p05p50p95": [
+          -20.28367936037343,
+          8.545693102468686,
+          47.468625277772354
+        ],
+        "mean": 10.794332413816628,
+        "positivePercent": 70.0
+      },
+      "Mellem": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 7,
+        "p05p50p95": [
+          -21.843717381128677,
+          36.30595048972688,
+          128.5161302917821
+        ],
+        "mean": 42.482465958618484,
+        "positivePercent": 84.0
+      },
+      "Høj": {
+        "portfolios": 50,
+        "stocksPerPortfolio": 7,
+        "p05p50p95": [
+          -10.409858866676531,
+          82.51138559960506,
+          396.04509425423265
+        ],
+        "mean": 147.46498716400157,
+        "positivePercent": 92.0
+      }
+    }
+  }
+}

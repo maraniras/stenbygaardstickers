@@ -1,0 +1,7 @@
+# Historical originals are verified byte-for-byte by manifest.json.
+# Preserve their original LF/CRLF endings on every checkout.
+*.py -text
+*.html -text
+*.json -text
+*.csv -text
+*.gz -text
