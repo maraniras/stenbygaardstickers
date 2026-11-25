@@ -2,33 +2,75 @@
 defineProps<{ balance: number }>()
 </script>
 <template>
-  <NuxtLink
-    class="banana-balance"
-    to="/spil/bananer"
-    :aria-label="`Åbn dit bananlager, ${balance.toLocaleString('da-DK')} bananer`"
-    title="Dit bananlager"
-  >
-    <img
-      src="/badges/banana-baron.webp"
-      alt=""
-    /><span>{{ balance.toLocaleString('da-DK') }}</span
-    ><svg
-      class="arrow"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
+  <div class="balance-actions">
+    <NuxtLink
+      class="market-link"
+      to="/marked"
+      aria-label="Åbn aktiemarkedet"
+      title="Aktiemarked"
     >
-      <path
-        d="m6 4 4 4-4 4"
-        stroke="currentColor"
-        stroke-width="1.8"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  </NuxtLink>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path d="M4 4v16h16M7 14l4-4 4 3 5-7M16 6h4v4" />
+      </svg>
+    </NuxtLink>
+    <NuxtLink
+      class="banana-balance"
+      to="/spil/bananer"
+      :aria-label="`Åbn dit bananlager, ${balance.toLocaleString('da-DK')} bananer`"
+      title="Dit bananlager"
+    >
+      <img
+        src="/badges/banana-baron.webp"
+        alt=""
+      /><span>{{ balance.toLocaleString('da-DK') }}</span
+      ><svg
+        class="arrow"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="m6 4 4 4-4 4"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </NuxtLink>
+  </div>
 </template>
 <style scoped>
+.balance-actions {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+}
+.market-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--text);
+  text-decoration: none;
+}
+.market-link svg {
+  width: 23px;
+  height: 23px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .banana-balance {
   display: inline-flex;
   flex: none;

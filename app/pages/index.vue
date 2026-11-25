@@ -10,6 +10,7 @@ const selected = ref<Sticker>()
 const toolsOpen = ref(false)
 const { stickers, stickersBy, getSticker } = useStickers()
 const { basemap, toggle: toggleBasemap } = useBasemap()
+const { state: economy } = useEconomy()
 
 const person = computed(() => (typeof route.query.by === 'string' ? route.query.by : ''))
 const country = computed(() => (typeof route.query.country === 'string' ? route.query.country : ''))
@@ -241,18 +242,24 @@ function showOverview() {
     />
 
     <header class="top">
-      <div class="brand glass">
-        <img
-          src="/logo.png"
-          alt=""
-        />
-        <div>
-          <h1>Stenbygaard Stickers</h1>
-          <p>
-            {{ visible.length }} {{ visible.length === 1 ? 'sticker' : 'stickers' }} ·
-            {{ countries }} {{ countries === 1 ? 'land' : 'lande' }}
-          </p>
+      <div class="map-heading">
+        <div class="brand glass">
+          <img
+            src="/logo.png"
+            alt=""
+          />
+          <div>
+            <h1>Stenbygaard Stickers</h1>
+            <p>
+              {{ visible.length }} {{ visible.length === 1 ? 'sticker' : 'stickers' }} ·
+              {{ countries }} {{ countries === 1 ? 'land' : 'lande' }}
+            </p>
+          </div>
         </div>
+        <BananaBalance
+          v-if="economy"
+          :balance="economy.wallet.balance"
+        />
       </div>
       <ExploreToolbar view="map" />
       <div
@@ -388,23 +395,36 @@ function showOverview() {
 .top > * {
   pointer-events: auto;
 }
+.map-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .brand {
-  display: inline-flex;
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
   align-items: center;
   gap: 10px;
-  padding: 6px 18px 6px 6px;
+  padding: 6px 10px 6px 6px;
   border-radius: 999px;
 }
 .brand img {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
+  flex: none;
   padding: 3px;
   border-radius: 50%;
   background: linear-gradient(160deg, var(--accent-light), var(--accent));
   object-fit: contain;
 }
 .brand h1 {
-  font-size: 16px;
+  font-size: clamp(12px, 3.5vw, 16px);
+  line-height: 1.2;
+}
+.brand > div {
+  min-width: 0;
 }
 .top > :deep(.explore-toolbar) {
   width: fit-content;

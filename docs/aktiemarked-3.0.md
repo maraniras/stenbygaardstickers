@@ -26,6 +26,10 @@ Det fælles marked og kontobundne handler er også nødvendige integrationshensy
 
 ## Den seneste afprøvede retning
 
+Opdateret i samtalen efter arkivgennemgangen: Indgangen skal være et aktieikon ved siden af banansaldoen i toppen. Saldo og ikon skal også vises på stickerkortet. På denne branch linker ikonet til `/marked`, som foreløbig er en ærlig forhåndsvisning uden handel.
+
+Der er nu valgt en hybrid med baggrundsberegning hvert **15. minut** via QStash, også uden besøgende. Minutpunkterne bevares; ved besøg eller handel indhentes de sidste manglende minutter. Fejlede baggrundskørsler skal kunne indhentes ved næste kørsel/besøg. Selve job- og markedsmotoren er endnu ikke implementeret. Tidligere forsøg med andre intervaller er ikke den valgte retning.
+
 1. **Ingen tilbagevenden til grundkursen.** Startprisen bruges kun ved start, ikke som et forudsigeligt fremtidigt kursmål. Dette afløser det oprindelige ønske om fast grundkurs.
 2. **Gratis køb og 5 % af positiv realiseret gevinst ved salg.** Intet gebyr ved tab eller nulgevinst, intet minimum. Dette er den seneste afprøvede gebyrmodel, ikke færdig handelsfunktionalitet.
 3. **Gennemsnitlig kostpris** ved flere køb og delvise salg. Tab på en aktie eller en senere handel refunderer ikke allerede betalte gevinstgebyrer i forsøgene.
