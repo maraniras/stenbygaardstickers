@@ -87,6 +87,7 @@ export async function notifyUser(
 ) {
   try {
     const found = await findUser(name)
+    if (found?.user.deactivatedAt) return
     if (found && activity) await saveActivity(found.key, [{ type, message }])
     if (found && wants(found.user.notify, type))
       await pushToUser(found.key, found.user, [{ type, message }])
@@ -124,7 +125,7 @@ export async function mutedEndpoints(type: NotifyType) {
     for (const d of Object.values(u.devices))
       if (d.push) {
         registered.add(d.push.endpoint)
-        if (!wants(u.notify, type)) out.add(d.push.endpoint)
+        if (u.deactivatedAt || !wants(u.notify, type)) out.add(d.push.endpoint)
       }
   }
   for (const [endpoint, prefs] of Object.entries(await publicPushPrefs()))
@@ -137,7 +138,9 @@ export async function syncBadges(names?: string[]) {
   try {
     await syncAllEconomies(names)
     const keys = names ? new Set(names.map(nameKey)) : undefined
-    const users = (await listUsers()).filter((user) => !keys || keys.has(nameKey(user.name)))
+    const users = (await listUsers()).filter(
+      (user) => !user.deactivatedAt && (!keys || keys.has(nameKey(user.name))),
+    )
     if (!users.length) return
     const lookup = await badgeLookup()
     const now = Date.now()

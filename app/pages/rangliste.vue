@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { leaderboardPeople } from '../../shared/utils/leaderboard-people'
 type Metric = 'points' | 'level' | 'badges' | 'stickers' | 'countries' | 'bananas'
 const options: { key: Metric; label: string; unit: string }[] = [
   { key: 'points', label: 'Point', unit: 'point' },
@@ -31,10 +32,7 @@ async function refresh() {
 onMounted(refresh)
 const key = (name: string) => name.normalize('NFC').toLocaleLowerCase('da')
 const rows = computed(() => {
-  const names = new Map<string, { name: string; registered: boolean }>()
-  for (const p of people.value) names.set(key(p.name), { name: p.name, registered: false })
-  for (const u of users.value) names.set(key(u.name), { name: u.name, registered: true })
-  return [...names.values()].map((person) => {
+  return leaderboardPeople(people.value, users.value).map((person) => {
     const mine = stickers.value.filter((s) => s.placedBy.some((n) => sameName(n, person.name)))
     const badges = badgesFor(person.name, stickers.value, ratings.value, {
       comments: commentStats.value,

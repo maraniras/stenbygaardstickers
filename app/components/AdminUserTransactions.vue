@@ -59,14 +59,11 @@ onBeforeUnmount(() => {
           <span class="eyebrow">Banantransaktioner</span>
           <h2>{{ name }}</h2>
         </div>
-        <button
-          type="button"
+        <AppCloseButton
           class="close"
-          aria-label="Luk transaktioner"
+          label="Luk transaktioner"
           @click="emit('close')"
-        >
-          ×
-        </button>
+        />
       </header>
       <p
         v-if="pending"

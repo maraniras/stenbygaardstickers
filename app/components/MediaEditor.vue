@@ -14,15 +14,49 @@ interface Job {
 }
 const jobs = ref<Job[]>([])
 const fileInput = ref<HTMLInputElement>()
+// Keep the original camera file while this page is open, including after a failed request.
+const filesById = new Map<number, File>()
+let alive = true
 let nextId = 0
 
 watch(
   jobs,
   (list) => {
-    busy.value = list.some((j) => !j.error)
+    busy.value = list.length > 0
   },
-  { deep: true },
+  { deep: true, flush: 'sync' },
 )
+
+onBeforeUnmount(() => {
+  alive = false
+  filesById.clear()
+})
+
+async function uploadJob(job: Job) {
+  const file = filesById.get(job.id)
+  if (!file || !alive) return
+  job.error = undefined
+  job.pct = 0
+  try {
+    const date = await photoDate(file)
+    if (!alive) return
+    if (date) emit('photoDate', date)
+    const media = await uploadMedia(file, (pct) => {
+      if (alive) job.pct = pct
+    })
+    if (!alive) return
+    model.value = [...model.value, media]
+    filesById.delete(job.id)
+    jobs.value = jobs.value.filter((j) => j.id !== job.id)
+  } catch (err) {
+    if (alive) job.error = err instanceof Error ? err.message : 'Upload fejlede'
+  }
+}
+
+async function retry(job: Job) {
+  if (!job.error) return
+  await uploadJob(job)
+}
 
 async function onFiles(e: Event) {
   const files = [...((e.target as HTMLInputElement).files ?? [])]
@@ -34,24 +68,12 @@ async function onFiles(e: Event) {
       video: file.type.startsWith('video/'),
       pct: 0,
     })
+    filesById.set(job.id, file)
     jobs.value.push(job)
     return job
   })
   // Én ad gangen, så rækkefølgen bliver som valgt
-  for (const [i, file] of files.entries()) {
-    const job = batch[i]!
-    const date = await photoDate(file)
-    if (date) emit('photoDate', date)
-    try {
-      const m = await uploadMedia(file, (pct) => {
-        job.pct = pct
-      })
-      model.value = [...model.value, m]
-      jobs.value = jobs.value.filter((j) => j !== job)
-    } catch (err) {
-      job.error = err instanceof Error ? err.message : 'Upload fejlede'
-    }
-  }
+  for (const job of batch) await uploadJob(job)
 }
 
 function remove(i: number) {
@@ -65,6 +87,7 @@ function makeCover(i: number) {
 }
 
 function dismiss(job: Job) {
+  filesById.delete(job.id)
   jobs.value = jobs.value.filter((j) => j !== job)
 }
 </script>
@@ -130,8 +153,15 @@ function dismiss(job: Job) {
         <span class="msg">{{ j.error }}</span>
         <button
           type="button"
+          class="retry"
+          @click="retry(j)"
+        >
+          Prøv igen
+        </button>
+        <button
+          type="button"
           class="x"
-          aria-label="Luk"
+          aria-label="Fjern filen fra upload"
           @click="dismiss(j)"
         >
           <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
@@ -149,6 +179,14 @@ function dismiss(job: Job) {
         />
       </template>
     </div>
+
+    <p
+      v-if="jobs.some((job) => job.error)"
+      class="upload-warning"
+      role="alert"
+    >
+      En fil blev ikke uploadet. Tryk »Prøv igen«, eller fjern filen, før du sender stickeren.
+    </p>
 
     <button
       type="button"
@@ -253,6 +291,22 @@ function dismiss(job: Job) {
 }
 .failed .msg {
   color: #c62828;
+}
+.retry {
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+.upload-warning {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 4px 0;
 }
 .bar {
   position: absolute;

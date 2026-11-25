@@ -82,14 +82,11 @@ onBeforeUnmount(close)
             <span class="eyebrow">JULEKALENDER {{ year }}</span>
             <h2>Det kan du finde</h2>
           </div>
-          <button
+          <AppCloseButton
             class="close"
-            type="button"
-            aria-label="Luk præmieoversigten"
+            label="Luk præmieoversigten"
             @click="close"
-          >
-            ×
-          </button>
+          />
         </header>
         <img
           src="/games/advent/prizes-showcase-v2.webp"

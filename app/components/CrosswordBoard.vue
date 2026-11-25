@@ -944,13 +944,10 @@ function onKey(event: KeyboardEvent) {
       <section class="image-dialog">
         <header>
           <h2>Information og hjælp</h2>
-          <button
-            type="button"
-            aria-label="Luk information"
+          <AppCloseButton
+            label="Luk information"
             @click="showInfo = false"
-          >
-            ×
-          </button>
+          />
         </header>
         <p>Hele løsningen tjekkes, når alle felter er udfyldt.</p>
         <p v-if="letterShop">
@@ -994,13 +991,10 @@ function onKey(event: KeyboardEvent) {
       <section class="image-dialog">
         <header>
           <h2>{{ openedImage.clue }}</h2>
-          <button
-            type="button"
-            aria-label="Luk billedet"
+          <AppCloseButton
+            label="Luk billedet"
             @click="imageOpen = null"
-          >
-            ×
-          </button>
+          />
         </header>
         <img
           :src="openedImage.image.src"

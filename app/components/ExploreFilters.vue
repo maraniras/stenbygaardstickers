@@ -55,14 +55,11 @@ async function apply() {
       >
         <header>
           <h2 id="filters-title">Filtrér stickers</h2>
-          <button
-            type="button"
+          <AppCloseButton
             class="page-icon-button"
-            aria-label="Luk filtre"
+            label="Luk filtre"
             @click="dialog?.close()"
-          >
-            ×
-          </button>
+          />
         </header>
         <label
           >Land<select v-model="country">

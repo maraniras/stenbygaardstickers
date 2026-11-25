@@ -105,6 +105,7 @@ async function broadcast(
   const wallets = audience === 'all' ? {} : await allEconomyRecords()
   const eligible = users.filter(
     (user) =>
+      !user.deactivatedAt &&
       !excluded(user.name) &&
       (audience === 'all' ||
         Boolean(wallets[nameKey(user.name)]?.claims['parcel-entry:2026']) ===
@@ -112,7 +113,7 @@ async function broadcast(
   )
   const blocked = new Set(
     users
-      .filter((user) => excluded(user.name) || !wants(user.notify, type))
+      .filter((user) => user.deactivatedAt || excluded(user.name) || !wants(user.notify, type))
       .flatMap((user) =>
         Object.values(user.devices).flatMap((d) => (d.push ? [d.push.endpoint] : [])),
       ),

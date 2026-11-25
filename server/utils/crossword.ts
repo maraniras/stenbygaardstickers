@@ -409,7 +409,7 @@ export function submitCrossword(
 /** Uses filled counts before help, then only the fixed daily correctness snapshot. */
 export function crosswordLeaderboard(
   state: CrosswordState,
-  users: { name: string }[],
+  users: { name: string; deactivatedAt?: string }[],
   now = new Date(),
 ): CrosswordLeaderboard {
   const wordCells = puzzleData(state.id).entries.map((entry) =>
@@ -424,8 +424,12 @@ export function crosswordLeaderboard(
   const solution = mode === 'correct' ? crosswordSolution(state.id) : {}
   const day = gameDay(now)
   const names = new Map(users.map((user) => [nameKey(user.name), user.name]))
+  const hidden = new Set(
+    users.filter((user) => user.deactivatedAt).map((user) => nameKey(user.name)),
+  )
   const subjects = new Set([...Object.keys(state.progress || {}), ...Object.keys(state.finished)])
   const rows = [...subjects].flatMap((subject) => {
+    if (subject.startsWith('u:') && hidden.has(subject.slice(2))) return []
     const progress = state.progress?.[subject]
     const finished = state.finished[subject]
     const entered = Object.fromEntries(

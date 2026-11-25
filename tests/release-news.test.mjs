@@ -40,7 +40,7 @@ test('announcements choose only the newest published version in Danish time', ()
   )
   assert.equal(releaseUtils.latestPublishedRelease([{ version: '2.4' }], now), undefined)
 })
-function notice(storage = new Map(), version = '2.3.1') {
+function notice(storage = new Map(), version = '2.10.1.0') {
   const states = new Map(),
     hooks = [],
     cleanup = [],
@@ -100,11 +100,11 @@ test('release modal appears once per version/device, survives reload and never r
   await nextTick()
   assert.equal(again.pending.value, false)
   again.stop()
-  const rollback = notice(storage, '2.3')
+  const rollback = notice(storage, '2.10.0.0')
   await nextTick()
   assert.equal(rollback.pending.value, false)
   rollback.stop()
-  const newer = notice(storage, '2.3.2')
+  const newer = notice(storage, '2.10.2.0')
   await nextTick()
   assert.equal(newer.pending.value, true)
   newer.stop()
@@ -116,13 +116,34 @@ test('reading an update on another tab closes its modal and releases notificatio
   const a = notice()
   await nextTick()
   a.open.value = true
-  a.storage.set('stenbygaard-release-seen', '2.3.1')
+  a.storage.set('stenbygaard-release-seen', '2.10.1.0')
   a.events.get('storage')({ key: 'stenbygaard-release-seen' })
   await nextTick()
   assert.equal(a.pending.value, false)
   assert.equal(a.open.value, false)
   a.stop()
 })
+test('hotfix notes remain available without a popup or blocking other prompts, also on a new device', async () => {
+  for (const version of ['2.10.1.1', '2.10.1.2', '2.9.7']) {
+    const h = notice(new Map(), version)
+    await nextTick()
+    assert.equal(h.release.value.version, version)
+    assert.equal(h.release.value.notes.length, 1)
+    assert.equal(h.pending.value, false)
+    assert.equal(h.open.value, false)
+    h.stop()
+  }
+  const storage = new Map([['stenbygaard-release-seen', '2.10.1.0']])
+  const hotfix = notice(storage, '2.10.1.1')
+  await nextTick()
+  assert.equal(hotfix.pending.value, false)
+  hotfix.stop()
+  const next = notice(storage, '2.10.2.0')
+  await nextTick()
+  assert.equal(next.pending.value, true)
+  next.stop()
+})
+
 test('release modal waits for onboarding and animations, also when opening the news page from push', async () => {
   const scope = effectScope(),
     states = new Map(),

@@ -50,13 +50,11 @@ function allUpdates() {
     @close="dismiss"
   >
     <div class="release-news">
-      <button
+      <AppCloseButton
         class="close"
-        aria-label="Luk Hvad er nyt"
+        label="Luk Hvad er nyt"
         @click="dismiss"
-      >
-        ×
-      </button>
+      />
       <span class="eyebrow">Ny opdatering · Version {{ release.version }}</span>
       <h2>Hvad er nyt?</h2>
       <p>Her er det nye i denne opdatering.</p>

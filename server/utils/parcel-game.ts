@@ -78,6 +78,25 @@ function freshParcels(year: number, names: string[]): ParcelGame {
     events: [],
   }
 }
+/** Remove deactivated entrants without rerolling prizes or erasing completed winnings. */
+export function excludeDeactivatedParcelPlayers(
+  game: ParcelGame,
+  names: string[],
+  now = new Date(),
+) {
+  const hidden = new Set(names.map(nameKey))
+  if (!game.players.some((name) => hidden.has(nameKey(name)))) return
+  game.players = game.players.filter((name) => !hidden.has(nameKey(name)))
+  for (const key of Object.keys(game.pending))
+    if (key.startsWith('u:') && hidden.has(nameKey(key.slice(2)))) delete game.pending[key]
+  if (game.ended) return
+  for (const parcel of game.parcels)
+    if (parcel.owner && hidden.has(nameKey(parcel.owner)) && !parcel.openedAt && !parcel.openingAt)
+      parcel.owner = null
+  // Before the first prize allocation, only the active entrants determine the pool size.
+  if (!game.prizesAssigned && now.getTime() < Date.parse(game.startsAt))
+    game.parcels = game.parcels.slice(0, parcelCount(game.players.length))
+}
 /** One global CAS protects ownership, all devices' daily rolls and pending choices together. */
 export async function mutateParcels<T>(
   year: number,
@@ -267,6 +286,13 @@ export async function parcelRequest(
     ),
   )
   const eventYear = month < 11 ? year - 1 : year
+  const users = await listUsers()
+  const inactive = users.filter((user) => user.deactivatedAt).map((user) => user.name)
+  if (name && inactive.some((user) => sameName(user, name)))
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Din bruger er deaktiveret og kan ikke deltage i pakkelegen.',
+    })
   if (action?.kind === 'enroll' && name) {
     const context = await economyContext()
     await mutateEconomy(name, (wallet) => {
@@ -274,15 +300,18 @@ export async function parcelRequest(
       payParcelEntry(wallet, eventYear, new Date())
     })
   }
-  const [users, wallets] = await Promise.all([listUsers(), allEconomyRecords()])
+  const wallets = await allEconomyRecords()
   const names = users
-    .filter((u) => wallets[nameKey(u.name)]?.claims[parcelEntryClaim(eventYear)])
+    .filter(
+      (u) => !u.deactivatedAt && wallets[nameKey(u.name)]?.claims[parcelEntryClaim(eventYear)],
+    )
     .map((u) => u.name)
   const die = randomInt(1, 7),
     ticket = randomInt(0x1000000)
   const { game, result: events } = await mutateParcels(eventYear, names, (board) => {
     const now = new Date()
     const before = new Set(board.events.map((e) => e.id))
+    excludeDeactivatedParcelPlayers(board, inactive, now)
     prepareParcelRewards(board, now)
     advanceParcels(board, now)
     try {

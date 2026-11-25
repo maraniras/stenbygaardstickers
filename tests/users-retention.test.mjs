@@ -91,6 +91,36 @@ function setup(redisEnabled) {
 
 for (const mode of [false, true]) {
   const label = mode ? 'Redis' : 'lokal storage'
+  test(`${label}: deactivation is reversible and preserves devices, reserved name and profile history`, async () => {
+    const u = setup(mode)
+    const token = await u.claimName('Nicole')
+    const found = await u.userForToken(token)
+    await u.updateUser(found.key, (user) => {
+      user.avatar = '/api/media/nicole.webp'
+      user.badgeKeys = ['original']
+      user.ownedFrames = ['original-winner']
+    })
+    const before = JSON.stringify((await u.findUser('Nicole')).user)
+    await Promise.all([
+      u.setUserActive(found.key, false),
+      u.updateUser(found.key, (user) => {
+        user.banner = 'original-winner'
+      }),
+    ])
+    const inactive = (await u.findUser('Nicole')).user
+    assert.ok(inactive.deactivatedAt)
+    assert.equal(inactive.banner, 'original-winner')
+    const again = await u.setUserActive(found.key, false)
+    assert.equal(again.deactivatedAt, inactive.deactivatedAt)
+    assert.ok(await u.userForToken(token), 'hiding a profile must not revoke its access')
+    assert.equal(await u.claimName('Nicole'), undefined)
+    await u.setUserActive(found.key, true)
+    await u.updateUser(found.key, (user) => {
+      delete user.banner
+    })
+    assert.equal(JSON.stringify((await u.findUser('Nicole')).user), before)
+    assert.equal(await u.setUserActive('missing', false), undefined)
+  })
   test(`${label}: sidste logud bevarer konto, profilbillede, badges og reserveret navn`, async () => {
     const u = setup(mode)
     const token = await u.claimName('Nicole')

@@ -11,6 +11,16 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.1.1',
+    date: '2026-11-25',
+    notes: [
+      'Mere sikker billedupload: Prøv fejlede uploads igen. Stickeren kan først sendes, når de valgte filer er uploadet eller fjernet. Bedre håndtering af kamerafotos på mobilen.',
+      'Lukknapperne er centreret i blandt andet krydsordets rangliste, information og billedvisning.',
+      'Rettede ledetråde i På Tværs #2.',
+      'Hotfixes kan stadig læses under Hvad er nyt, men åbner ikke længere en automatisk pop-up.',
+    ],
+  },
+  {
     version: '2.10.1.0',
     date: '2026-11-24',
     notes: [

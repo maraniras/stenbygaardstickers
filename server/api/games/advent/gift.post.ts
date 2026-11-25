@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store')
   const body = await readBody<{ year?: unknown; day?: unknown; to?: unknown }>(event)
   const recipient = await findUser(cleanName(body?.to))
-  if (!recipient)
+  if (!recipient || recipient.user.deactivatedAt)
     throw createError({ statusCode: 404, statusMessage: 'Modtageren skal have en bruger.' })
   const context = await economyContext()
   const { result: delivery } = await mutateEconomy(user.name, (wallet) =>

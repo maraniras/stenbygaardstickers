@@ -5,7 +5,7 @@ export const CROSSWORD_2_ROWS = 34
 export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   {
     answer: 'GASVÆRKSVEJ',
-    clue: 'afjog',
+    clue: 'Afjog',
     row: 17,
     col: 13,
     down: true,
@@ -68,7 +68,7 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'SKIFTEZONE',
-    clue: 'T2',
+    clue: 'Opbevarings sted',
     row: 10,
     col: 6,
     down: false,
@@ -117,7 +117,7 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'ANNA',
-    clue: 'palindrom',
+    clue: 'Palindrom',
     row: 11,
     col: 21,
     down: true,
@@ -131,7 +131,7 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'SKALDET',
-    clue: 'Ingen hår',
+    clue: 'Morten',
     row: 18,
     col: 28,
     down: false,
@@ -173,11 +173,10 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'BUMLE',
-    clue: '(Se ikon)',
+    clue: 'Falck',
     row: 20,
     col: 22,
     down: true,
-    icon: '🏗️',
   },
   {
     answer: 'BARE',
@@ -443,7 +442,7 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'KØDBOLLER',
-    clue: 'svensk',
+    clue: 'Svensk',
     row: 31,
     col: 25,
     down: false,
@@ -478,11 +477,10 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'CLASSIC',
-    clue: '(Se ikon)',
+    clue: 'En ramme af den',
     row: 2,
     col: 29,
     down: true,
-    icon: '💪',
   },
   {
     answer: 'SAUCONY',
@@ -575,7 +573,7 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'FNAT',
-    clue: 'klør',
+    clue: 'Klør',
     row: 20,
     col: 4,
     down: true,
@@ -631,11 +629,10 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'SKAT',
-    clue: '(Se ikon)',
+    clue: 'Gravet ned',
     row: 29,
     col: 17,
     down: false,
-    icon: '🧰',
   },
   {
     answer: 'KENDT',
@@ -749,11 +746,10 @@ export const CROSSWORD_2_ENTRIES: CrosswordEntry[] = [
   },
   {
     answer: 'PIL',
-    clue: '(Se ikon)',
+    clue: 'Ammo',
     row: 24,
     col: 14,
     down: true,
-    icon: '↗️',
   },
   {
     answer: 'VI',

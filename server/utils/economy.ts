@@ -120,7 +120,9 @@ export async function syncEconomy(
 }
 export async function syncAllEconomies(names?: string[]) {
   const keys = names ? new Set(names.map(nameKey)) : undefined
-  const users = (await listUsers()).filter((user) => !keys || keys.has(nameKey(user.name)))
+  const users = (await listUsers()).filter(
+    (user) => !user.deactivatedAt && (!keys || keys.has(nameKey(user.name))),
+  )
   if (!users.length) return
   const context = await economyContext()
   for (const user of users) await syncEconomy(user.name, context)

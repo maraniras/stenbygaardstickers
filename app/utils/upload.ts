@@ -4,6 +4,14 @@
 import { upload, uploadPresigned } from '@vercel/blob/client'
 
 export const MAX_VIDEO_BYTES = 100 * 1024 * 1024
+// Camera captures may have an empty MIME type even when the filename identifies the format.
+export function isImageFile(file: File) {
+  return (
+    file.type.startsWith('image/') ||
+    ((!file.type || file.type === 'application/octet-stream') &&
+      /\.(jpe?g|png|webp|gif|avif|hei[cf]|hif|bmp)$/i.test(file.name))
+  )
+}
 
 type Mode = 'blob' | 'presigned' | 'local' | 'off'
 let modePromise: Promise<{ mode: Mode; folder: string }> | undefined
@@ -83,15 +91,28 @@ async function encodeCanvas(canvas: HTMLCanvasElement) {
 async function loadImage(file: File) {
   try {
     const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' })
-    return { source: bmp as CanvasImageSource, w: bmp.width, h: bmp.height }
+    return {
+      source: bmp as CanvasImageSource,
+      w: bmp.width,
+      h: bmp.height,
+      done: () => bmp.close(),
+    }
   } catch {
     // Ældre Safari
     const url = URL.createObjectURL(file)
     const img = new Image()
-    img.src = url
-    await img.decode()
-    URL.revokeObjectURL(url)
-    return { source: img as CanvasImageSource, w: img.naturalWidth, h: img.naturalHeight }
+    try {
+      img.src = url
+      await img.decode()
+      return {
+        source: img as CanvasImageSource,
+        w: img.naturalWidth,
+        h: img.naturalHeight,
+        done: () => {},
+      }
+    } finally {
+      URL.revokeObjectURL(url)
+    }
   }
 }
 
@@ -129,7 +150,7 @@ function videoFrame(file: File) {
 /** Datoen billedet er taget (EXIF), hvis telefonen har gemt den. Skal læses før
  *  komprimeringen, som fjerner EXIF. Biblioteket hentes først, når det skal bruges. */
 export async function photoDate(file: File) {
-  if (!file.type.startsWith('image/') && !/\.hei[cf]$/i.test(file.name)) return undefined
+  if (!isImageFile(file)) return undefined
   try {
     const exifr = (await import('exifr')).default
     const tags = await exifr.parse(file, ['DateTimeOriginal', 'CreateDate'])
@@ -143,17 +164,20 @@ export async function photoDate(file: File) {
 
 /** Profilbillede: midten skæres ud som et kvadrat på 400×400 */
 export async function uploadAvatar(file: File) {
-  if (!file.type.startsWith('image/') && !/\.hei[cf]$/i.test(file.name))
-    throw new Error('Vælg et billede')
-  const { source, w, h } = await loadImage(file)
+  if (!isImageFile(file)) throw new Error('Vælg et billede')
+  const { source, w, h, done } = await loadImage(file)
   const side = Math.min(w, h)
   const size = Math.min(400, side)
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
-  canvas
-    .getContext('2d')!
-    .drawImage(source, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size)
+  try {
+    canvas
+      .getContext('2d')!
+      .drawImage(source, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size)
+  } finally {
+    done()
+  }
   const img = await encodeCanvas(canvas)
   return send(img.blob, img.ext, undefined, 'avatars')
 }
@@ -182,9 +206,14 @@ export async function uploadMedia(
       height: frame?.h || undefined,
     }
   }
-  if (!file.type.startsWith('image/')) throw new Error('Kun billeder og videoer')
-  const { source, w, h } = await loadImage(file)
-  const img = await encode(source, w, h, 1600)
+  if (!isImageFile(file)) throw new Error('Kun billeder og videoer')
+  const { source, w, h, done } = await loadImage(file)
+  let img: Awaited<ReturnType<typeof encode>>
+  try {
+    img = await encode(source, w, h, 1600)
+  } finally {
+    done()
+  }
   const src = await send(img.blob, img.ext, onProgress)
   return { type: 'image', src, width: img.width, height: img.height }
 }

@@ -19,6 +19,8 @@ interface UserDevice {
 }
 
 export interface UserRecord {
+  /** Admin deactivation is reversible; the reserved name and all profile data remain. */
+  deactivatedAt?: string
   activity?: ActivityItem[]
   frame?: string
   ownedFrames?: string[]
@@ -173,6 +175,13 @@ export async function updateUser(key: string, change: (user: UserRecord) => void
       return user
     })
   ).user
+}
+export async function setUserActive(key: string, active: boolean) {
+  const now = new Date().toISOString()
+  return updateUser(key, (user) => {
+    if (active) delete user.deactivatedAt
+    else user.deactivatedAt ??= now
+  })
 }
 export async function touchDevice(key: string, hash: string, user: UserRecord) {
   if (!user.devices[hash] || Date.now() - Date.parse(user.devices[hash]!.lastSeen) < 12 * 3600_000)

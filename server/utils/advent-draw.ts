@@ -117,7 +117,7 @@ function assignAwardDays(awards: Award[], seed: string) {
   }
 }
 export function createAdventDraw(
-  users: { name: string; createdAt: string }[],
+  users: { name: string; createdAt: string; deactivatedAt?: string }[],
   seed: string,
   now = new Date(),
   crosswordWinner: CrosswordState['winner'] = null,
@@ -126,7 +126,7 @@ export function createAdventDraw(
   const participants = [
     ...new Map(
       users
-        .filter((u) => Date.parse(u.createdAt) < Date.parse(ADVENT_CUTOFF))
+        .filter((u) => !u.deactivatedAt && Date.parse(u.createdAt) < Date.parse(ADVENT_CUTOFF))
         .map((u) => [nameKey(u.name), u.name]),
     ).values(),
   ].sort((a, b) => a.localeCompare(b, 'da'))

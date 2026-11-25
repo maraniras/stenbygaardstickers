@@ -77,14 +77,11 @@ onBeforeUnmount(() => {
           <span class="eyebrow">KRYDS &amp; TVÆRS #1</span>
           <h2>Rangliste</h2>
         </div>
-        <button
-          type="button"
+        <AppCloseButton
           class="close"
-          aria-label="Luk ranglisten"
+          label="Luk ranglisten"
           @click="emit('close')"
-        >
-          ×
-        </button>
+        />
       </header>
       <div
         v-if="preview && liveData"

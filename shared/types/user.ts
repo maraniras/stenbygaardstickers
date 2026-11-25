@@ -26,6 +26,7 @@ export interface PairCode {
 
 /** Offentligt om en bruger */
 export interface PublicUser {
+  inactive?: boolean
   banner?: string
   frame?: string
   name: string
@@ -34,6 +35,7 @@ export interface PublicUser {
 
 /** Til admin */
 export interface UserSummary {
+  deactivatedAt?: string
   name: string
   createdAt: string
   devices: number

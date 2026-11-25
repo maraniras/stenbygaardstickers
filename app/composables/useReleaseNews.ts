@@ -1,5 +1,5 @@
 import { CHANGELOG } from '../utils/changelog'
-import { latestPublishedRelease, releaseRank } from '../../shared/utils/releases'
+import { latestPublishedRelease, releaseRank, isHotfixRelease } from '../../shared/utils/releases'
 const KEY = 'stenbygaard-release-seen'
 export function useReleaseNews() {
   const seen = useState('release-news-seen', () => '')
@@ -11,6 +11,7 @@ export function useReleaseNews() {
     () =>
       ready.value &&
       !!release.value &&
+      !isHotfixRelease(release.value.version) &&
       releaseRank(release.value.version) > releaseRank(seen.value),
   )
   function sync() {

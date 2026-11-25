@@ -5,6 +5,25 @@ const recovery = ref<{ name: string; code: string; expiresAt: string }>()
 const busy = ref(false)
 const error = ref('')
 const transactionUser = ref<string>()
+const { reload: reloadPublicUsers } = useUsers()
+
+async function changeStatus(user: UserSummary) {
+  if (busy.value) return
+  busy.value = true
+  error.value = ''
+  try {
+    const result = await $fetch<{ name: string; deactivatedAt: string | null }>(
+      `/api/admin/users/${encodeURIComponent(user.name)}/status`,
+      { method: 'PUT', body: { active: !!user.deactivatedAt } },
+    )
+    user.deactivatedAt = result.deactivatedAt ?? undefined
+    await reloadPublicUsers()
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Kunne ikke ændre brugerens status.'
+  } finally {
+    busy.value = false
+  }
+}
 
 async function load() {
   try {
@@ -43,6 +62,10 @@ onMounted(load)
     <p class="hint-text">
       Profiler bevares, også når alle enheder er logget ud. Har nogen mistet adgangen, kan du give
       dem en kode til deres eksisterende profil.
+    </p>
+    <p class="hint-text">
+      Deaktiverede brugere er skjult fra ranglisterne og kan ikke deltage i spil, lodtrækninger
+      eller modtage nye julegaver. Profil og historik bevares, og du kan altid genaktivere dem.
     </p>
     <p
       v-if="error"
@@ -84,11 +107,25 @@ onMounted(load)
         <div class="info">
           <b>{{ u.name }}</b>
           <span
+            v-if="u.deactivatedAt"
+            class="inactive-label"
+            >Deaktiveret · skjult fra ranglister</span
+          >
+          <span
             >{{ u.devices }} {{ u.devices === 1 ? 'enhed' : 'enheder' }} · sidst set
             {{ when(u.lastSeen) }}</span
           >
         </div>
         <div class="actions">
+          <button
+            type="button"
+            class="chip"
+            :disabled="busy"
+            :aria-label="`${u.deactivatedAt ? 'Genaktiver' : 'Deaktiver'} ${u.name}`"
+            @click="changeStatus(u)"
+          >
+            {{ u.deactivatedAt ? 'Genaktiver' : 'Deaktiver' }}
+          </button>
           <button
             type="button"
             class="chip"

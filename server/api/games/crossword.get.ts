@@ -4,6 +4,7 @@ export default defineEventHandler(async (event) => {
   const preview = getQuery(event).preview === '1'
   if (preview) requireAdmin(event)
   const found = await userForToken(readToken(event))
+  if (found?.user.deactivatedAt && !preview) requireActivePlayer(found.user)
   const state = await readCrossword(id)
   if (!preview && (await settleCrosswordWinner(state)) && state.winner)
     await syncBadgesLater(event, [state.winner.name])

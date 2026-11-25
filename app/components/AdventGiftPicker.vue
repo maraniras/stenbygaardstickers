@@ -8,7 +8,7 @@ const to = ref(props.opening.gift?.to ?? '')
 const sending = ref(false),
   error = ref('')
 const recipients = computed(() =>
-  users.value.filter((user) => !sameName(user.name, name.value ?? '')),
+  users.value.filter((user) => !user.inactive && !sameName(user.name, name.value ?? '')),
 )
 const delivered = computed(() => Boolean(props.opening.gift?.deliveredAt))
 async function send() {
