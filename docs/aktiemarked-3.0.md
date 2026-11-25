@@ -11,7 +11,15 @@ Samlet 25. november 2026 fra projektets eksisterende noter, simulationskode, res
 - Der er endnu ingen aktiemarkedsside, handels-API eller aktieportefølje i appen. Der findes analyseværktøjer og designforsøg. Oprettelsen af denne branch aktiverer ikke et marked og ændrer ikke driftens banansaldi.
 - Rod-workspacets lokale ændringer er bevaret. Branchens app-kode starter fra den udgivne hotfix.
 
-## Nyeste sammenligning — 25. november 2026
+## Hurtigere spiltempo — efterfølgende test 25. november 2026
+
+Brugeren ønsker nu at afprøve et marked, hvor den tidligere årsudvikling kan foregå over en måned, med omkring 23 % gennemsnitlig månedlig stigning som eksempel og mulighed for større gevinster og tab. [Tempo-, risiko- og væksttest](experiments/market-tempo/README.md) indeholder syv pilotkombinationer og fem efterfølgende kontrolkombinationer på nye forløb.
+
+200 markeder pr. runde med 20 aktier. Den direkte år→måned-komprimering gav +17,7 % i pilot og +22,2 % i kontrol, samlet +20,0 % på 400 markeder. I kontrolrunden gav ekstra normal vækst +28,1 % i gennemsnit og +22,8 % i median. Større udsving med ekstra vækst gav +28,7 % i gennemsnit; meget store udsving med ekstra vækst gav +29,7 %. Disse er testresultater, ikke et fast månedligt afkast. Alle tal er efter 5 % af positiv realiseret gevinst ved slutlikvidation.
+
+Normal år→måned-takt er et muligt næste udgangspunkt nær brugerens ønskede størrelsesorden. Den skal ikke forveksles med et allerede valgt eller implementeret marked. Brugeren har endnu ikke besluttet en af de testede vækst-/risikokombinationer. Aktiv handel i det nye tempo er ikke gentestet.
+
+## Første forbedringsrunde — 25. november 2026
 
 Efter den nye årssimulering blev fem varianter testet på de samme 200 markeder med 20 aktier, i alt 4.000 aktieår pr. variant. [Fuld sammenligning og metode](experiments/market-improvements/README.md).
 
