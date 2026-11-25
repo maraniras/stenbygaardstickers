@@ -32,7 +32,13 @@ SCENARIOS=[
 
 
 @njit(cache=True,nogil=True)
-def simulate(seed,base,risk,vol,quiet,wild,growth,checkpoints):
+def recent_growth_brake(log_price,log_average,strength,threshold):
+    excess=max(log_price-log_average-threshold,0.)
+    return strength*excess*excess/17520
+
+
+@njit(cache=True,nogil=True)
+def simulate(seed,base,risk,vol,quiet,wild,growth,checkpoints,company_drift=None,price_rules=None,recent_rules=None,stock_noise=None):
     np.random.seed(seed)
     m_count=vol.shape[0]
     n=len(checkpoints)
@@ -41,6 +47,11 @@ def simulate(seed,base,risk,vol,quiet,wild,growth,checkpoints):
         for i in range(20):
             price[m,i]=math.log(base[i])
     initial=price.copy()
+    recent_average=price.copy()
+    recent_alpha=np.zeros(m_count)
+    if recent_rules is not None:
+        for m in range(m_count):
+            recent_alpha[m]=1-math.exp(-1/(recent_rules[m,2]*17520))
     peaks=price.copy()
     troughs=price.copy()
     dd=np.zeros_like(price)
@@ -78,13 +89,25 @@ def simulate(seed,base,risk,vol,quiet,wild,growth,checkpoints):
             turbulent=regime[i]==3
             trend=trend_rates[r] if regime[i]==1 else -trend_rates[r] if regime[i]==2 else 0.
             for m in range(m_count):
-                noise=min(.01,max(-.01,vol[m,r]*(1.5 if turbulent else 1)*z))
-                pressure=.02*max(price[m,i]-log250,0.)**2/1440
-                price[m,i]=min(price[m,i]+trend-pressure+noise-(wild[m,r] if turbulent else quiet[m,r])+growth[m,r],logcap)
+                sigma=vol[m,r] if stock_noise is None else stock_noise[m,i,0]
+                correction=(wild[m,r] if turbulent else quiet[m,r]) if stock_noise is None else (stock_noise[m,i,2] if turbulent else stock_noise[m,i,1])
+                noise=min(.01,max(-.01,sigma*(1.5 if turbulent else 1)*z))
+                pressure_strength=.02 if price_rules is None else price_rules[m,0]
+                ceiling=logcap if price_rules is None else price_rules[m,1]
+                pressure=pressure_strength*max(price[m,i]-log250,0.)**2/1440
+                recent_pressure=0.
+                if recent_rules is not None:
+                    recent_pressure=recent_growth_brake(price[m,i],recent_average[m,i],recent_rules[m,0],recent_rules[m,1])
+                # Optional slow company trend, measured per virtual minute.
+                # One real day is 17520 virtual minutes at the 365/30 clock.
+                company=0. if company_drift is None else company_drift[m,(minute-1)//17520,i]
+                price[m,i]=min(price[m,i]+trend+company-pressure-recent_pressure+noise-correction+growth[m,r],ceiling)
+                if recent_rules is not None:
+                    recent_average[m,i]+=recent_alpha[m]*(price[m,i]-recent_average[m,i])
                 peaks[m,i]=max(peaks[m,i],price[m,i])
                 troughs[m,i]=min(troughs[m,i],price[m,i])
                 dd[m,i]=min(dd[m,i],price[m,i]-peaks[m,i])
-                if price[m,i]>=logcap-1e-12:
+                if price[m,i]>=ceiling-1e-12:
                     caps[m,i]=1
             remaining[i]-=1
         # Hourly virtual-time valuation; 5-20 real minutes at the chosen speeds.

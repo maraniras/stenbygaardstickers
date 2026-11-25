@@ -1,0 +1,43 @@
+{
+  "markets": 80,
+  "stocksPerMarket": 20,
+  "models": {
+    "bounded": {
+      "cheapStocksPerMarket": 7,
+      "cheapFinishGain1000Percent": 10.535714285714286,
+      "cheapFinishGain2000Percent": 6.607142857142857,
+      "cheapEverGain1000Percent": 18.392857142857142,
+      "cheapEverGain2000Percent": 12.857142857142858,
+      "cheapYearPositivePercent": 61.78571428571429,
+      "cheapYearMeanNetPercent": 404.6290551927767,
+      "meanFresh30DayPortfolioReturnPercent": 15.428820113609339,
+      "resistanceDipBeatsHoldPercent": 98.75,
+      "maximumQuote": 772.7508724039143
+    },
+    "cheapGrowth": {
+      "cheapStocksPerMarket": 7,
+      "cheapFinishGain1000Percent": 8.214285714285715,
+      "cheapFinishGain2000Percent": 4.642857142857142,
+      "cheapEverGain1000Percent": 15.714285714285715,
+      "cheapEverGain2000Percent": 9.285714285714285,
+      "cheapYearPositivePercent": 52.5,
+      "cheapYearMeanNetPercent": 291.0333329542307,
+      "meanFresh30DayPortfolioReturnPercent": 14.230127268588276,
+      "resistanceDipBeatsHoldPercent": 98.75,
+      "maximumQuote": 772.7508724039143
+    },
+    "cheapGrowthAndNoise": {
+      "cheapStocksPerMarket": 7,
+      "cheapFinishGain1000Percent": 6.071428571428571,
+      "cheapFinishGain2000Percent": 2.857142857142857,
+      "cheapEverGain1000Percent": 11.964285714285714,
+      "cheapEverGain2000Percent": 6.071428571428571,
+      "cheapYearPositivePercent": 53.57142857142857,
+      "cheapYearMeanNetPercent": 207.24515832775785,
+      "meanFresh30DayPortfolioReturnPercent": 12.694453485213991,
+      "resistanceDipBeatsHoldPercent": 98.75,
+      "maximumQuote": 772.7508724039143
+    }
+  },
+  "method": "Equal-size batches pooled with equal weights for means and proportions. No averaged medians. Cheap: original quote <=10. Gain percentages in threshold metrics are gross, not after sale fee. New monthly investments; overlapping windows dependent."
+}

@@ -1,0 +1,38 @@
+{
+  "markets": 80,
+  "stocksPerMarket": 20,
+  "models": {
+    "unbounded": {
+      "maximumObservedQuote": 471147.80755984347,
+      "stockPeakAbove1000Percent": 12.3125,
+      "stockPeakAbove10000Percent": 2.25,
+      "meanFresh30DayPortfolioReturnPercent": 21.261538644025705,
+      "stockYearLossPercent": 33.9375,
+      "overheatedStrategyBeatsHoldPercent": 25,
+      "weekMomentumBeatsHoldPercent": 6.25,
+      "resistanceDipBeatsHoldPercent": 35
+    },
+    "recentGentle": {
+      "maximumObservedQuote": 45436.42433170252,
+      "stockPeakAbove1000Percent": 6.875,
+      "stockPeakAbove10000Percent": 0.4375,
+      "meanFresh30DayPortfolioReturnPercent": 15.745614423502838,
+      "stockYearLossPercent": 37,
+      "overheatedStrategyBeatsHoldPercent": 53.75,
+      "weekMomentumBeatsHoldPercent": 7.5,
+      "resistanceDipBeatsHoldPercent": 56.25
+    },
+    "recentStrong": {
+      "maximumObservedQuote": 12318.291565206066,
+      "stockPeakAbove1000Percent": 3.8125,
+      "stockPeakAbove10000Percent": 0.1875,
+      "meanFresh30DayPortfolioReturnPercent": 12.371453868423197,
+      "stockYearLossPercent": 41.875,
+      "overheatedStrategyBeatsHoldPercent": 82.5,
+      "weekMomentumBeatsHoldPercent": 7.5,
+      "resistanceDipBeatsHoldPercent": 65
+    }
+  },
+  "method": "Equal-size batches: means and proportions pooled with equal weights; maxima use maximum across both batches; no averaged percentiles. Overlapping 30-day windows are dependent.",
+  "recommendation": "Experimental comparison only; see DAMPING.md for assessment. Neither variant is automatically promoted."
+}

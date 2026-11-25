@@ -1,5 +1,7 @@
 # Aktiemarked til version 3.0 — samlet arbejdsgrundlag
 
+**Fast gemt algoritme:** [Aktiealgoritme v1](aktiemarked-algoritme-v1.md) er brugerens valgte simulationsgrundlag pr. 25. november 2026. Git-tag `aktiealgoritme-v1` fastholder det samlede snapshot; manifestet i eksperimentmappen registrerer filernes SHA-256. Det aktiverer ikke markedet i appen.
+
 Samlet 25. november 2026 fra projektets eksisterende noter, simulationskode, resultater og to tidligere interaktive visninger. Dette dokument erstatter ikke brugerens senere beslutninger. Noterne beskriver flere forkastede modeller; historiske tal er ikke forventninger eller garantier for den kommende app.
 
 ## Branch og status
@@ -12,6 +14,18 @@ Samlet 25. november 2026 fra projektets eksisterende noter, simulationskode, res
 - Rod-workspacets lokale ændringer er bevaret. Branchens app-kode starter fra den udgivne hotfix.
 
 ## Hurtigere spiltempo — efterfølgende test 25. november 2026
+
+**Seneste ændring:** Efter brugerens ønske om færre +1.000–2.000 %-stigninger for billige aktier er [lavere vækst og støj under startkurs 25](experiments/market-company-trends/CHEAP.md) valgt i simulationsmodellen. 80 nye markeder: for startkurs højst 10 faldt andelen med mindst +1.000 % ved årets slutning fra 10,54 % til 6,07 % og mindst +2.000 % fra 6,61 % til 2,86 %. I plus: 61,79 % → 53,57 %. Spredte friske 30-dagesafkast faldt samtidig fra +15,43 % til +12,69 % i gennemsnit. Startkurs mindst 25 giver uændrede kursforløb. Skjult loft 2.500, modstand over 250 og 7–28-dages virksomhedsperioder er bevaret. `candidate-settings.json` og `year.py --variant cheap` er det aktuelle simulationsvalg. Ingen aktivering i app eller drift.
+
+**Gældende aftale efter nedenstående forsøg:** Brugeren ønsker rimelige nominelle aktiekurser og et loft, som ikke oplyses til spillerne. Simulationsgrundlaget er derfor igen modstand over 250 og loft 2.500 med de svagere virksomhedsperioder (faktor 1,25, 7–28 dage) uden den forsøgte relative dæmpning. `candidate-settings.json` og `year.py --variant bounded` afspejler aftalen. [Det nye årseksempel](experiments/market-company-trends/README.md) endte med 16/20 aktier i plus, højeste kurs 516,19 og 1.000 → 5.012,31 efter gebyr. Ingen ramte loftet; største porteføljefald var 60,38 %. Ét eksempel, ikke en prognose. Tidligere konklusioner om at forkaste modstand på grund af en strategi, der slår behold, er tilsidesat: strategiens tab og risiko skal indgå i vurderingen. Skjult loft forhindrer ikke, at en spiller kan opdage mønstre. Ingen driftændring.
+
+**Tidligere afklaring før aftalen om skjult loft:** Den nedenfor valgte ubegrænsede kandidat blev vurderet som utilstrækkelig på grund af ekstremkurser omkring 1,8 mio. [Dæmpningsforsøget](experiments/market-company-trends/DAMPING.md) undersøgte relativ dæmpning efter store stigninger; det er ikke aktiveret i appen.
+
+Dæmpningsforsøget er afsluttet på 80 nye markeder, tre varianter og syv strategier. Maksimumkurs faldt fra 471.148 i den parrede baseline til 45.436 ved mild og 12.318 ved kraftig dæmpning. Men månedsafkast faldt fra +21,3 % til +15,7/+12,4 %, og salg efter store stigninger slog behold i 54/83 % mod 25 % i baseline. Ingen dæmpningsvariant promoveres til færdig algoritme; de er gemt som reproducerbare forsøg. Baselineforløbene er andre end den tidligere 1,8 mio.-observation.
+
+Efter [års- og handelstesten](experiments/market-company-trends/STRESS.md) er den valgte simulationskandidat nu svagere virksomhedstrends (log(1,25)/30 pr. rigtig dag) uden den faste modstand ved 250 og uden loftet på 2.500. 180 markeder med tre varianter og seks strategier afslørede en fordel ved den gamle prisgrænse. I sidste kontrolrunde faldt andelen af markeder, hvor køb under 200/salg ved 250 slog behold, fra 93 % til 37 %. Virksomhedsperioder varer stadig 7–28 dage med to dages glatning; risiko, grundvækst og 5 % gebyr af positiv gevinst er uændrede. Afvejningen er ekstreme vindere: maksimumkurs cirka 1,8 mio. og stærkt skævt årsafkast. Kandidaten er en simulation, ikke en aktiv produktionsmotor. `candidate-settings.json` og `year.py --variant candidate` beskriver det aktuelle valg; tidligere grafer og resultater er historiske.
+
+Brugeren har efterfølgende godkendt længere virksomhedsspecifik medvind/modvind på 1–4 rigtige uger. [Virksomhedsperioder](experiments/market-company-trends/README.md) beskriver den implementerede simulationsvariant og en parret 90-dages sammenligning. Ingen handels-API eller live markedsmotor er aktiveret. Aktiv handel med langsomme trends skal stadig undersøges før åbning.
 
 Brugeren bad derefter om ét helt år med den normale hurtige variant og 20 aktier. [Årssimuleringen](experiments/market-fast-year/README.md) forlænger det allerede valgte første piloteksempel til 365 virkelige dage uden ekstra vækst. I dette ene forløb blev 1.000 bananer til 4.812 efter gebyr, 16 af 20 aktier sluttede i plus, men første måned gav −11 % og største porteføljefald undervejs var cirka 59 %. Dette er et enkelt forløb, ikke et forventet årsafkast eller en endelig godkendelse af algoritmen.
 

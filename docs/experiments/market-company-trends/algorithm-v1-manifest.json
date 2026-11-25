@@ -1,0 +1,73 @@
+{
+  "algorithmVersion": "1",
+  "savedOn": "2026-11-25",
+  "gitTag": "aktiealgoritme-v1",
+  "branch": "codex/v3.0-aktiemarked",
+  "environment": {
+    "python": "3.12.16",
+    "numpy": "2.5.5",
+    "numba": "0.68.1"
+  },
+  "files": [
+    {
+      "path": "docs/experiments/market-tempo/compare.py",
+      "sha256": "0001e5d9da5aa03984aae744ade41ea41869e3cb657749056be4c72ebd4253e1"
+    },
+    {
+      "path": "docs/experiments/market-improvements/compare.py",
+      "sha256": "8f2f15dae94e3b719449f5b4fe80c1889700e24948ffb4578dae8287b6571e9a"
+    },
+    {
+      "path": "docs/experiments/market-growth/market-simulation.json",
+      "sha256": "ff46414fe7b10decb91a1f074fb0fd442e1e2a6c86c2ae8cf3d7e45fd5df6960"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/candidate-settings.json",
+      "sha256": "1446a6151c46cd1828e3456472ecf79ae399fd4adbda17d9f473e0fbc6ecc126"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/company.py",
+      "sha256": "eeb235e740f436fda5eac714b896cfd829affb47680e2195b15a521607f85d91"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/cheap.py",
+      "sha256": "4bd3743ecc257e04c2a5fc3c38b97c215d0187a58fa1dec6886a1ebb258f03b2"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/year.py",
+      "sha256": "66f32fa21063a4fe3ba1d1165cc814d272b61fb9f840e83d104ba6b986528d9d"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/stress.py",
+      "sha256": "73d9cd766e20876ba6d7ade7bfa32015e5df1b9b02167a32238ef00b57762954"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/summarize-cheap.mjs",
+      "sha256": "2a685a10a6884b674e48d5681fa7a5a320b44ba6e2591e3de24a11fb35ce1547"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/requirements-algorithm-v1.txt",
+      "sha256": "b87b9f59fb0da92fb730c25b8eb80444a397bff2f86c72ecc7b1737791cd7a48"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/stress-cheapPilot-20261125.json",
+      "sha256": "d379e188bf10f3c0c5361c9a768da7f01c6b928e5713d5033f09cfd2fe23c54b"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/stress-cheapValidation-20261125.json",
+      "sha256": "c42e7362b28d4eb53b39728cc215d63152d4d87bae7d3c3044fb017b3096f221"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/cheap-summary-20261125.json",
+      "sha256": "6361cc367e76a44f28ab525615e20f7b94e5b66dd11c4f0e582a2c9646089fb1"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/year-cheap-20261125.json",
+      "sha256": "aa29a3a9c4e205fafd68d4371b7abc38b6eb7a59f1590b503797439a0142b9fc"
+    },
+    {
+      "path": "docs/experiments/market-company-trends/year-cheap-20261125.csv",
+      "sha256": "a60b77af151d9d9bd45c1fd52713888073b0b4f5b5c84331df34abe2e5b94743"
+    }
+  ]
+}
