@@ -10,7 +10,11 @@ interface CrosswordPushJob {
 }
 const pushInfo = (state: Pick<CrosswordState, 'id'>) =>
   state.id === '2'
-    ? { title: 'På Tværs #2', prize: '1.000 bananer', url: '/spil/krydsord?id=2' }
+    ? {
+        title: 'På Tværs #2',
+        prize: '1.000 bananer, en eksklusiv profilramme og et profilbanner',
+        url: '/spil/krydsord?id=2',
+      }
     : state.id === 'marvel'
       ? {
           title: 'På Tværs: Doomsday Special',

@@ -11,6 +11,16 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.1.2',
+    date: '2026-11-25',
+    notes: [
+      'På Tværs #2 får en eksklusiv profilramme og et banner som vinderpræmier sammen med 1.000 bananer. Rammen vises i menuen, og spilkortet skifter til normalt layout ved åbning.',
+      'Din eneste profilramme eller dit eneste banner vælges automatisk. Du kan stadig vælge det fra.',
+      'Øvrige spil sorteres efter status. Åbne spil uden en vinder markeres med LIVE.',
+      'Grupperede stickers på kortet viser nu også Emil-ikonet.',
+    ],
+  },
+  {
     version: '2.10.1.1',
     date: '2026-11-25',
     notes: [

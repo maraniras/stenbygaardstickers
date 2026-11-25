@@ -519,7 +519,7 @@ export async function settleCrosswordWinner(state: CrosswordState) {
         const owned = new Set([...(user.ownedFrames ?? []), ...(user.frame ? [user.frame] : [])])
         if (!owned.has(frame)) {
           owned.add(frame)
-          if (!user.frame) user.frame = frame
+          if (!user.frame && !user.frameHidden) user.frame = frame
         }
         user.ownedFrames = [...owned]
       }

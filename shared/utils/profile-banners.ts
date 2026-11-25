@@ -23,6 +23,11 @@ export const SHOP_PROFILE_BANNERS: ProfileBanner[] = [
 export const PROFILE_BANNERS = [
   ...SHOP_PROFILE_BANNERS,
   {
+    id: 'crossword-2-winner',
+    name: 'På Tværs #2 · Vinder',
+    image: '/games/crossword-2/winner-banner.webp',
+  },
+  {
     id: 'original-winner',
     name: 'På Tværs #1 · Vinder',
     image: '/games/crossword/original/winner-banner.webp',
@@ -42,9 +47,25 @@ export function ownedProfileBanners(user: { ownedBanners?: string[]; banner?: st
     (id) => !!profileBanner(id),
   )
 }
-/** Display only the selected banner; ownership alone never equips it. */
-export function profileBannerFor(user?: { banner?: string }) {
-  return profileBanner(user?.banner)?.image
+export function equippedProfileBanner(user: {
+  ownedBanners?: string[]
+  banner?: string
+  bannerHidden?: boolean
+}): string | undefined {
+  if (user.bannerHidden) return undefined
+  const owned = ownedProfileBanners(user)
+  return user.banner && owned.includes(user.banner)
+    ? user.banner
+    : owned.length === 1
+      ? owned[0]
+      : undefined
+}
+export function profileBannerFor(user?: {
+  ownedBanners?: string[]
+  banner?: string
+  bannerHidden?: boolean
+}) {
+  return profileBanner(user && equippedProfileBanner(user))?.image
 }
 export interface ProfileBannerInventory {
   owned: string[]

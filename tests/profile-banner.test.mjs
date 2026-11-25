@@ -12,7 +12,7 @@ test('owned banners are selectable independently of frames and can be removed wi
     'server/utils/profile-banners.ts',
   ])
   const user = { name: 'Anna', devices: {}, ownedBanners: ['doomsday-winner'], frame: 'lava' }
-  assert.equal(a.profileBannerFor(user), undefined)
+  assert.equal(a.profileBannerFor(user), a.DOOMSDAY_PROFILE_BANNER)
   a.equipProfileBanner(user, 'doomsday-winner')
   assert.equal(a.profileBannerFor(user), a.DOOMSDAY_PROFILE_BANNER)
   assert.equal(user.frame, 'lava')

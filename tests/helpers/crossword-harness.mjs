@@ -1,7 +1,8 @@
 import { setup } from './economy-harness.mjs'
 
-export function crosswordSetup(remote = false) {
+export function crosswordSetup(remote = false, extra = []) {
   const h = setup(remote, [
+    ...extra,
     'server/utils/crossword.ts',
     'shared/utils/profile-frames.ts',
     'shared/utils/profile-banners.ts',

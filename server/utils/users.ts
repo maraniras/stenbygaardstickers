@@ -23,8 +23,10 @@ export interface UserRecord {
   deactivatedAt?: string
   activity?: ActivityItem[]
   frame?: string
+  frameHidden?: boolean
   ownedFrames?: string[]
   banner?: string
+  bannerHidden?: boolean
   ownedBanners?: string[]
   name: string
   createdAt: string

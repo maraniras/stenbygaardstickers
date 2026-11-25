@@ -47,8 +47,8 @@ const opening = computed(() =>
       <span>{{
         puzzleId === '2'
           ? view.winner.name === name
-            ? 'Du har vundet 1.000 bananer!'
-            : 'Vinderen har fået 1.000 bananer. Du får 50 bananer, når du løser krydsordet.'
+            ? 'Du har vundet 1.000 bananer samt den eksklusive profilramme og profilbanneret! Find dem under dine indstillinger.'
+            : 'Vinderen har fået 1.000 bananer, profilrammen og profilbanneret. Du får 50 bananer, når du løser krydsordet.'
           : view.winner.name === name
             ? marvel
               ? 'Du har vundet 500 bananer, vinderbadgen samt den eksklusive profilramme og profilbanneret! Vælg ramme og banner under dine indstillinger.'

@@ -1,3 +1,4 @@
+import { compareAdminUsers } from '../../../shared/utils/admin-user-order'
 export default defineEventHandler(async (event): Promise<UserSummary[]> => {
   requireAdmin(event)
   return (await listUsers())
@@ -11,5 +12,5 @@ export default defineEventHandler(async (event): Promise<UserSummary[]> => {
         lastSeen: [u.lastSeen ?? u.createdAt, ...devices.map((d) => d.lastSeen)].sort().at(-1)!,
       }
     })
-    .sort((a, b) => a.name.localeCompare(b.name, 'da'))
+    .sort(compareAdminUsers)
 })

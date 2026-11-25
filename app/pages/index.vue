@@ -162,12 +162,15 @@ onMounted(async () => {
   cluster = L.markerClusterGroup({
     showCoverageOnHover: false,
     maxClusterRadius: 50,
-    iconCreateFunction: (c) =>
-      L.divIcon({
+    iconCreateFunction: (c) => {
+      const count = c.getChildCount()
+      return L.divIcon({
         className: 'sticker-cluster',
-        html: `<div>${c.getChildCount()}</div>`,
-        iconSize: [44, 44],
-      }),
+        html: `<div class="cluster-shell" role="img" aria-label="${count} stickers"><div class="pin"><img src="/marker.png" alt="" draggable="false"></div><span class="cluster-count" aria-hidden="true">${count}</span></div>`,
+        iconSize: [56, 56],
+        iconAnchor: [28, 28],
+      })
+    },
   })
 
   const icon = L.divIcon({

@@ -23,8 +23,8 @@ export const CROSSWORDS = {
     completionPrize: 50,
     badge: '',
     physicalPrize: false,
-    profileFrame: null,
-    profileBanner: null,
+    profileFrame: 'crossword-2-winner',
+    profileBanner: 'crossword-2-winner',
   },
 } as const
 export type CrosswordId = keyof typeof CROSSWORDS

@@ -11,6 +11,7 @@ test('every photo ellipse covers the entire transparent opening without spilling
     a.profileFrame('parcel-2026'),
     a.profileFrame('doomsday-winner'),
     a.profileFrame('original-winner'),
+    a.profileFrame('crossword-2-winner'),
   ]) {
     const { data, info } = await sharp('public' + frame.image)
       .ensureAlpha()

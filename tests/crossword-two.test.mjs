@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { existsSync } from 'node:fs'
-import { setup } from './helpers/economy-harness.mjs'
+import { crosswordSetup } from './helpers/crossword-harness.mjs'
 
 const now = new Date('2027-01-04T12:00:00Z')
-const game = (remote = false) =>
-  setup(remote, ['server/data/crossword-2.ts', 'server/utils/crossword.ts'])
+const game = (remote = false) => crosswordSetup(remote, ['server/data/crossword-2.ts'])
 
 test('crossword two stays locked, including direct submissions, and preview contains no answers', () => {
   const { api: a } = game()

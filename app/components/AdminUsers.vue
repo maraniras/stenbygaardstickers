@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { compareAdminUsers } from '../../shared/utils/admin-user-order'
 // Hjælp en bruger tilbage på sin eksisterende profil, hvis alle enheder er logget ud.
 const users = ref<UserSummary[]>()
+const orderedUsers = computed(() => [...(users.value ?? [])].sort(compareAdminUsers))
 const recovery = ref<{ name: string; code: string; expiresAt: string }>()
 const busy = ref(false)
 const error = ref('')
@@ -101,15 +103,16 @@ onMounted(load)
       class="list"
     >
       <li
-        v-for="u in users"
+        v-for="u in orderedUsers"
         :key="u.name"
+        :class="{ inactive: !!u.deactivatedAt }"
       >
         <div class="info">
           <b>{{ u.name }}</b>
           <span
             v-if="u.deactivatedAt"
             class="inactive-label"
-            >Deaktiveret · skjult fra ranglister</span
+            >Deaktiveret</span
           >
           <span
             >{{ u.devices }} {{ u.devices === 1 ? 'enhed' : 'enheder' }} · sidst set
@@ -197,6 +200,30 @@ onMounted(load)
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+.list li.inactive {
+  margin-top: 10px;
+  padding: 14px 12px;
+  border: 1px dashed var(--hairline);
+  border-left: 3px solid var(--muted);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.inactive .info b {
+  color: var(--muted);
+}
+.info .inactive-label {
+  align-self: flex-start;
+  margin: 6px 0;
+  padding: 4px 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .actions {
   display: flex;

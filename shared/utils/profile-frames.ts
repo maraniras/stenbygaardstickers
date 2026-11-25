@@ -102,7 +102,22 @@ export const ORIGINAL_FRAME: ProfileFrame = {
   },
 }
 
+export const SECOND_FRAME: ProfileFrame = {
+  id: 'crossword-2-winner',
+  name: 'På Tværs #2 · Vinder',
+  image: '/games/crossword-2/winner-frame.webp',
+  description: 'Eksklusiv profilramme til vinderen af På Tværs #2.',
+  portrait: {
+    left: 10,
+    top: 10,
+    width: 80,
+    height: 80,
+    mask: '/games/crossword-2/winner-portrait-mask.svg',
+  },
+}
+
 export function profileFrame(id: unknown): ProfileFrame | undefined {
+  if (id === SECOND_FRAME.id) return SECOND_FRAME
   if (id === ORIGINAL_FRAME.id) return ORIGINAL_FRAME
   if (id === PRIZE_FRAME.id) return PRIZE_FRAME
   if (id === DOOMSDAY_FRAME.id) return DOOMSDAY_FRAME
@@ -136,6 +151,21 @@ export function ownedProfileFrames(user: { ownedFrames?: string[]; frame?: strin
   return [...new Set([...(user.ownedFrames ?? []), ...(user.frame ? [user.frame] : [])])].filter(
     (id) => !!profileFrame(id),
   )
+}
+
+/** Default existing and future single-item inventories, while retaining an explicit opt-out. */
+export function equippedProfileFrame(user: {
+  ownedFrames?: string[]
+  frame?: string
+  frameHidden?: boolean
+}): string | undefined {
+  if (user.frameHidden) return undefined
+  const owned = ownedProfileFrames(user)
+  return user.frame && owned.includes(user.frame)
+    ? user.frame
+    : owned.length === 1
+      ? owned[0]
+      : undefined
 }
 
 export interface ProfileFrameInventory {

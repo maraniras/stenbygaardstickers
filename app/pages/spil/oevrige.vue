@@ -1,54 +1,61 @@
 <script setup lang="ts">
 import { crosswordCountdown } from '../../utils/crosswordCountdown'
+import { sortGameMenu } from '../../utils/gameMenuOrder'
+import { CROSSWORDS } from '../../../shared/utils/crosswords'
 useHead({ title: 'Øvrige spil · Stenbygaard Stickers' })
 const { season } = useChristmasGames()
 const { state } = useEconomy()
-const { view, now } = useCrossword()
+const livePreview = import.meta.dev && useRoute().query.livePreview === '1'
+const { view: firstState, now } = useCrossword()
+// Local display only; the server's opening time, winner and rewards stay untouched.
+const view = computed(() =>
+  livePreview
+    ? { ...firstState.value, open: true, winner: null, opensAt: null, completed: false }
+    : firstState.value,
+)
 const { view: marvelView } = useCrossword(false, 'marvel')
 const { view: secondView } = useCrossword(false, '2')
-const secondCountdown = computed(() =>
-  crosswordCountdown(secondView.value?.open ? null : secondView.value?.opensAt, now.value),
-)
-const secondOpening = computed(() =>
-  secondView.value?.opensAt
-    ? new Date(secondView.value.opensAt).toLocaleString('da-DK', {
-        timeZone: 'Europe/Copenhagen',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '',
-)
-const countdown = computed(() =>
-  crosswordCountdown(view.value?.open ? null : view.value?.opensAt, now.value),
-)
-const marvelCountdown = computed(() =>
-  crosswordCountdown(marvelView.value?.open ? null : marvelView.value?.opensAt, now.value),
-)
-const marvelOpening = computed(() =>
-  marvelView.value?.opensAt
-    ? new Date(marvelView.value.opensAt).toLocaleString('da-DK', {
-        timeZone: 'Europe/Copenhagen',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '',
-)
 const cardLink = resolveComponent('NuxtLink')
-const opening = computed(() =>
-  view.value?.opensAt
-    ? new Date(view.value.opensAt).toLocaleString('da-DK', {
+function openingLabel(opensAt: string | null | undefined) {
+  return opensAt
+    ? new Date(opensAt).toLocaleString('da-DK', {
         timeZone: 'Europe/Copenhagen',
         day: 'numeric',
         month: 'short',
         hour: '2-digit',
         minute: '2-digit',
       })
-    : '',
+    : ''
+}
+const cards = computed(() =>
+  [
+    {
+      id: '1',
+      kind: 'original',
+      title: CROSSWORDS['1'].title,
+      description: 'Ét ord ad gangen. Hvem løser hele krydsordet først?',
+      to: '/spil/krydsord',
+      state: view.value,
+    },
+    {
+      id: 'marvel',
+      kind: 'marvel',
+      title: CROSSWORDS.marvel.title,
+      description: 'Helte, skurke og referencer. Hvem løser Marvel-krydsordet først?',
+      to: '/spil/krydsord?id=marvel',
+      state: marvelView.value,
+    },
+    {
+      id: '2',
+      kind: 'second',
+      title: CROSSWORDS['2'].title,
+      description: 'Flere ord. Flere krydsninger. Flere referencer.',
+      to: '/spil/krydsord?id=2',
+      state: secondView.value,
+    },
+  ].map((card) => ({ ...card, opening: openingLabel(card.state?.opensAt) })),
 )
+const games = computed(() => sortGameMenu(cards.value, now.value))
 </script>
 
 <template>
@@ -56,167 +63,128 @@ const opening = computed(() =>
     <PageHeader
       title="Spil"
       description="En lille pause i dit eget tempo."
-      ><template #actions
+    >
+      <template #actions
         ><BananaBalance
           v-if="state"
-          :balance="state.wallet.balance" /></template
-    ></PageHeader>
+          :balance="state.wallet.balance"
+      /></template>
+    </PageHeader>
     <GameSectionNav
       section="other"
       :christmas-visible="season.visible"
     />
-    <component
-      :is="view?.open ? cardLink : 'div'"
-      class="crossword-card"
-      :to="view?.open ? '/spil/krydsord' : undefined"
-      :aria-disabled="!view?.open || undefined"
+    <p
+      v-if="livePreview"
+      class="live-preview-note"
+      role="status"
     >
-      <div class="card-top">
-        <span>ORDSPIL</span><span class="preview">{{ view?.open ? 'Åbent' : 'Kommer snart' }}</span>
-      </div>
-      <div class="card-body">
-        <div>
-          <h2>På Tværs #1</h2>
-          <p>Ét ord ad gangen. Hvem løser hele krydsordet først?</p>
+      Lokal forhåndsvisning: På Tværs #1 er vist som åbent uden vinder.
+    </p>
+    <div class="game-list">
+      <component
+        :is="game.state?.open ? cardLink : 'div'"
+        v-for="game in games"
+        :key="game.id"
+        class="crossword-card"
+        :class="{
+          'marvel-card': game.kind === 'marvel',
+          'second-card': game.kind === 'second' && !game.state?.open,
+        }"
+        :to="game.state?.open ? game.to : undefined"
+        :aria-disabled="!game.state?.open || undefined"
+      >
+        <span
+          v-if="game.kind === 'marvel' && !game.state?.open"
+          class="coming-soon-ribbon"
+          >Kommer snart</span
+        >
+        <div class="card-top">
+          <span>ORDSPIL</span>
+          <GameLiveBadge
+            :started="game.state?.open"
+            :winner="game.state?.winner"
+          />
+          <span
+            v-if="!game.state?.open || game.state?.winner"
+            class="preview"
+            >{{
+              game.state?.completed ? 'Gennemført' : game.state?.open ? 'Åbent' : 'Kommer snart'
+            }}</span
+          >
         </div>
         <div
-          class="mini-crossword"
-          aria-hidden="true"
+          v-if="game.kind !== 'second' || game.state?.open"
+          class="card-body"
         >
-          <span
-            v-for="i in 25"
-            :key="i"
-            :class="{ empty: [2, 5, 7, 13, 16, 19, 22].includes(i) }"
-          />
+          <div>
+            <h2>{{ game.title }}</h2>
+            <p>{{ game.description }}</p>
+          </div>
+          <div
+            class="mini-crossword"
+            aria-hidden="true"
+          >
+            <span
+              v-for="i in 25"
+              :key="i"
+              :class="{ empty: [2, 5, 7, 13, 16, 19, 22].includes(i) }"
+            />
+          </div>
         </div>
-      </div>
-      <div
-        v-if="countdown"
-        class="countdown"
-        role="timer"
-        aria-label="Tid til krydsordet åbner, i timer, minutter og sekunder"
-      >
-        <span>Åbner om</span><strong>{{ countdown }}</strong>
-      </div>
-      <div class="card-bottom">
-        <span v-if="view?.winner">Vundet af {{ view.winner.name }}</span>
-        <CrosswordPrize v-else />
-        <strong>{{
-          view?.open ? 'Åbn krydsord →' : opening ? 'Åbner ' + opening : 'Tidspunkt følger'
-        }}</strong>
-      </div>
-    </component>
-    <component
-      :is="marvelView?.open ? cardLink : 'div'"
-      class="crossword-card marvel-card"
-      :to="marvelView?.open ? '/spil/krydsord?id=marvel' : undefined"
-      :aria-disabled="!marvelView?.open || undefined"
-    >
-      <span
-        v-if="!marvelView?.open"
-        class="coming-soon-ribbon"
-        >Kommer snart</span
-      >
-      <div class="card-top">
-        <span>ORDSPIL</span
-        ><span
-          v-if="marvelView?.open"
-          class="preview"
-          >Åbent</span
-        >
-      </div>
-      <div class="card-body">
-        <div>
-          <h2>På Tværs: Doomsday Special</h2>
-          <p>Helte, skurke og referencer. Hvem løser Marvel-krydsordet først?</p>
-        </div>
+        <template v-else>
+          <h2>{{ game.title }}</h2>
+          <div
+            v-if="!game.state?.open"
+            class="second-teaser"
+          >
+            <strong class="second-banner second-soon">KOMMER SNART</strong>
+            <strong class="second-banner second-champion">KAN ANNA VINDE IGEN?</strong>
+            <strong class="second-banner second-more">592 BOGSTAVER</strong>
+          </div>
+          <p v-else>{{ game.description }}</p>
+        </template>
         <div
-          class="mini-crossword"
-          aria-hidden="true"
+          v-if="crosswordCountdown(game.state?.open ? null : game.state?.opensAt, now)"
+          class="countdown"
+          role="timer"
+          :aria-label="'Tid til ' + game.title + ' åbner'"
         >
-          <span
-            v-for="i in 25"
-            :key="i"
-            :class="{ empty: [2, 5, 7, 13, 16, 19, 22].includes(i) }"
-          />
+          <span>Åbner om</span
+          ><strong>{{
+            crosswordCountdown(game.state?.open ? null : game.state?.opensAt, now)
+          }}</strong>
         </div>
-      </div>
-      <div
-        v-if="marvelCountdown"
-        class="countdown"
-        role="timer"
-        aria-label="Tid til krydsordet åbner, i timer, minutter og sekunder"
-      >
-        <span>Åbner om</span><strong>{{ marvelCountdown }}</strong>
-      </div>
-      <div class="card-bottom">
-        <span v-if="marvelView?.winner">Vundet af {{ marvelView.winner.name }}</span>
-        <CrosswordPrize
-          v-else
-          puzzle-id="marvel"
-        />
-        <strong>{{
-          marvelView?.open
-            ? 'Åbn krydsord →'
-            : marvelOpening
-              ? 'Åbner ' + marvelOpening
-              : 'Tidspunkt følger'
-        }}</strong>
-      </div>
-    </component>
-    <component
-      :is="secondView?.open ? cardLink : 'div'"
-      class="crossword-card second-card"
-      :to="secondView?.open ? '/spil/krydsord?id=2' : undefined"
-      :aria-disabled="!secondView?.open || undefined"
-    >
-      <div class="card-top">
-        <span>ORDSPIL</span
-        ><span
-          v-if="secondView?.open"
-          class="preview"
-          >Åbent</span
-        >
-      </div>
-      <h2>På Tværs #2</h2>
-      <div
-        v-if="!secondView?.open"
-        class="second-teaser"
-      >
-        <strong class="second-banner second-soon">KOMMER SNART</strong>
-        <strong class="second-banner second-champion">KAN ANNA VINDE IGEN?</strong>
-        <strong class="second-banner second-more">OVER 50% FLERE ORD</strong>
-      </div>
-      <p v-else>Flere ord. Flere krydsninger. Flere referencer.</p>
-      <div
-        v-if="secondCountdown"
-        class="countdown"
-        role="timer"
-        aria-label="Tid til På Tværs #2 åbner"
-      >
-        <span>Åbner om</span><strong>{{ secondCountdown }}</strong>
-      </div>
-      <div class="card-bottom">
-        <span v-if="secondView?.winner">Vundet af {{ secondView.winner.name }}</span>
-        <CrosswordPrize
-          v-else
-          puzzle-id="2"
-        />
-        <strong>{{
-          secondView?.open
-            ? 'Åbn krydsord →'
-            : secondOpening
-              ? 'Åbner ' + secondOpening
-              : 'Tidspunkt følger'
-        }}</strong>
-      </div>
-    </component>
+        <div class="card-bottom">
+          <span v-if="game.state?.winner">Vundet af {{ game.state.winner.name }}</span>
+          <CrosswordPrize
+            v-else
+            :puzzle-id="game.id"
+          />
+          <strong>{{
+            game.state?.open
+              ? 'Åbn krydsord →'
+              : game.opening
+                ? 'Åbner ' + game.opening
+                : 'Tidspunkt følger'
+          }}</strong>
+        </div>
+      </component>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.game-list {
+  display: grid;
+  gap: 18px;
+}
+.live-preview-note {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
 .second-card {
-  margin-top: 18px;
   overflow: hidden;
   background: linear-gradient(
     135deg,
@@ -268,7 +236,6 @@ const opening = computed(() =>
 .marvel-card {
   position: relative;
   overflow: hidden;
-  margin-top: 18px;
 }
 .coming-soon-ribbon {
   position: absolute;
