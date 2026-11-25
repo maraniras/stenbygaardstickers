@@ -11,6 +11,14 @@ Samlet 25. november 2026 fra projektets eksisterende noter, simulationskode, res
 - Der er endnu ingen aktiemarkedsside, handels-API eller aktieportefølje i appen. Der findes analyseværktøjer og designforsøg. Oprettelsen af denne branch aktiverer ikke et marked og ændrer ikke driftens banansaldi.
 - Rod-workspacets lokale ændringer er bevaret. Branchens app-kode starter fra den udgivne hotfix.
 
+## Nyeste sammenligning — 25. november 2026
+
+Efter den nye årssimulering blev fem varianter testet på de samme 200 markeder med 20 aktier, i alt 4.000 aktieår pr. variant. [Fuld sammenligning og metode](experiments/market-improvements/README.md).
+
+Den nuværende models median for enkeltaktier var −18,8 % efter gebyr; lavere støj og justeret vækst gav +5,3 %. Med 30 % fælles støjvarians var medianen +6,5 %, og andelen af aktier, der sluttede mindst halveret, faldt fra 30,0 % til 7,1 %. Andelen af ligeligt spredte porteføljer i plus var 66 % med fælles faktor mod 90,5 % uden. Bløde trendskift ændrede næsten ikke årsresultaterne.
+
+Ny anbefalet kandidat er lavere støj + justeret vækst + fælles markedsstøj. Det er endnu ikke en endelig produktbeslutning. Det observerede gennemsnit for en spredt portefølje steg til +22,8 % netto årligt; banantilførsel og den stadig stærke simple momentum-strategi skal indgå i vurderingen før åbning. Sjældne kurser omkring 1.000 blev ikke observeret i den nye kandidat. De historiske afsnit nedenfor bevares som beslutningsgrundlag.
+
 ## Produktønsker, som allerede var noteret
 
 - Fiktive aktier købes og sælges med appens bananer.
