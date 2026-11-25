@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { CasinoDailyLimit } from '../../shared/types/casino'
-defineProps<{ limit?: CasinoDailyLimit | null }>()
+defineProps<{ limit?: CasinoDailyLimit | null; compact?: boolean }>()
 </script>
 <template>
   <div
     v-if="limit"
     class="casino-limit"
+    :class="{ compact }"
     role="status"
   >
     <div class="limit-heading">
@@ -21,7 +22,8 @@ defineProps<{ limit?: CasinoDailyLimit | null }>()
         >Nettotab {{ limit.netLoss.toLocaleString('da-DK') }} / {{ limit.amount }} 🍌</span
       >
     </div>
-    <span
+    <span v-if="compact">{{ limit.remaining.toLocaleString('da-DK') }} 🍌 tilbage</span>
+    <span v-else
       >{{ limit.remaining.toLocaleString('da-DK') }} 🍌 til nye indsatser · fælles tabsgrænse
       {{ limit.amount }} 🍌</span
     >
@@ -59,5 +61,18 @@ defineProps<{ limit?: CasinoDailyLimit | null }>()
 }
 small {
   font-size: 10px;
+}
+.compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.compact .limit-heading {
+  display: contents;
 }
 </style>

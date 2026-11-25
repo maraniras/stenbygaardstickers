@@ -95,6 +95,7 @@ test('a muted mention is saved once while push falls back to replies, with no se
   const saved = [],
     sent = []
   const a = load('server/utils/comment-notify.ts', {
+    listComments: async () => [],
     nameKey: (name) => name.toLowerCase(),
     snippet: (text) => text,
     findUser: async (name) => ({ key: name.toLowerCase(), user: { notify: { tags: false } } }),

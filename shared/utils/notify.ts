@@ -65,8 +65,8 @@ export const NOTIFY_TYPES: { type: NotifyType; emoji: string; label: string; des
   {
     type: 'comments',
     emoji: '💬',
-    label: 'Kommentarer på dine stickers',
-    desc: 'Når nogen kommenterer en sticker, du har sat op',
+    label: 'Kommentarer',
+    desc: 'På stickers, du har sat op eller selv har kommenteret',
   },
   {
     type: 'likes',

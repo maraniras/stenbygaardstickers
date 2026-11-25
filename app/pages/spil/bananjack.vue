@@ -162,7 +162,6 @@ const {
       role="status"
       aria-live="polite"
     >
-      <span class="result-kicker">Runden er slut</span>
       <div>
         <b>{{ resultText }}</b
         ><strong>{{ net > 0 ? '+' : '' }}{{ net }} 🍌</strong>
@@ -182,14 +181,14 @@ const {
       class="actions"
     >
       <button
-        v-for="action in ['hit', 'stand', 'double', 'split'] as const"
+        v-for="action in ['split', 'double', 'hit', 'stand'] as const"
         :key="action"
+        :class="{ 'hit-action': action === 'hit' }"
         :disabled="locked || !game?.actions.includes(action)"
         @click="play(action)"
       >
         {{ { hit: 'Træk kort', stand: 'Stå', double: 'Fordobl', split: 'Split' }[action] }}
       </button>
-      <p>Fordobl: indsatsen fordobles, du får ét kort og står.</p>
     </div>
     <div
       v-else-if="name && limitReached && !busy"
@@ -240,11 +239,12 @@ const {
         >Flere bananer? Tag dagens gratis spil →</NuxtLink
       >
     </div>
-    <CasinoLimit
-      class="casino-budget"
-      :limit="dailyLimit"
-    />
     <div class="table-tools">
+      <CasinoLimit
+        class="casino-budget"
+        :limit="dailyLimit"
+        compact
+      />
       <button
         class="rules-button"
         :aria-pressed="soundEnabled"
@@ -328,7 +328,8 @@ const {
   padding: calc(14px + var(--safe-t)) 16px 18px;
 }
 .casino-budget {
-  margin-top: 18px;
+  flex: 1 1 160px;
+  min-width: 0;
 }
 button {
   cursor: pointer;
@@ -346,8 +347,9 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 6px;
 }
 .table {
   margin-top: 12px;
@@ -443,13 +445,13 @@ button {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-height: 57px;
+  min-height: 44px;
   justify-content: center;
   text-align: center;
-  padding: 10px 0;
+  padding: 6px 0;
 }
 .status > b {
-  font-size: 17px;
+  font-size: 14px;
 }
 .status > span {
   font-size: 11px;
@@ -502,19 +504,18 @@ button:disabled {
 }
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
 }
-.actions > button:first-child {
+.actions > button {
+  min-width: 0;
+  padding: 6px 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.actions > .hit-action {
   background: var(--ink);
   color: white;
-}
-.actions > p {
-  grid-column: 1/-1;
-  text-align: center;
-  font-size: 10px;
-  color: var(--muted);
-  margin: 2px 0;
 }
 .note {
   display: block;
@@ -680,10 +681,10 @@ button:focus-visible {
   border-color: #a8b8cd;
 }
 .round-result {
-  margin: 13px 0;
-  padding: 14px 15px;
+  margin: 6px 0;
+  padding: 6px 10px;
   border: 1px solid;
-  border-radius: 16px;
+  border-radius: 12px;
   animation: jack-result-in 0.4s cubic-bezier(0.18, 0.8, 0.3, 1.1);
 }
 .round-result.win {
@@ -698,32 +699,25 @@ button:focus-visible {
   border-color: light-dark(#9aa7ba, #6f7c98);
   background: light-dark(#edf0f8, #272e3e);
 }
-.result-kicker {
-  font-size: 9px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  font-weight: 800;
-  color: var(--muted);
-}
 .round-result > div {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin: 6px 0;
+  margin: 0;
 }
 .round-result b {
-  font-size: 21px;
+  font-size: 15px;
   letter-spacing: -0.03em;
 }
 .round-result strong {
-  font-size: 27px;
+  font-size: 19px;
   white-space: nowrap;
   letter-spacing: -0.045em;
 }
 .round-result > span:last-child {
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.25;
   color: var(--muted);
 }
 @keyframes jack-result-in {
@@ -763,15 +757,6 @@ button:focus-visible {
 }
 .hand {
   padding: 6px;
-}
-.round-result {
-  padding: 12px 14px;
-}
-.round-result > div {
-  margin: 5px 0;
-}
-.round-result b {
-  font-size: 20px;
 }
 </style>
 <style scoped>

@@ -1,5 +1,6 @@
 // Besked om kommentarer: taggede, svar på ens kommentar og nye kommentarer på ens
-// sticker. Hver modtager får kun én besked pr. kommentar (tag > svar > egen sticker –
+// sticker eller en sticker, man tidligere har kommenteret. Én besked pr. kommentar
+// (tag > svar > egen sticker > tidligere kommentator –
 // har man slået en type fra, prøves den næste), og man får aldrig besked om sin egen.
 
 export async function notifyComment(
@@ -28,6 +29,19 @@ export async function notifyComment(
         title: `💬 Ny kommentar på ${sticker.title}`,
         text: `${c.author}: ${body}`,
       })
+    const commenters = new Set(sticker.placedBy.map(nameKey))
+    for (const previous of await listComments(sticker.id)) {
+      if (previous.id === c.id || previous.createdAt > c.createdAt) continue
+      const key = nameKey(previous.author)
+      if (commenters.has(key)) continue
+      commenters.add(key)
+      candidates.push({
+        name: previous.author,
+        type: 'comments',
+        title: `💬 Ny kommentar på ${sticker.title}`,
+        text: `${c.author}: ${body}`,
+      })
+    }
   }
 
   const done = new Set<string>([nameKey(c.author)])
@@ -37,7 +51,7 @@ export async function notifyComment(
     const key = nameKey(cand.name)
     if (done.has(key)) continue
     const found = await findUser(cand.name)
-    if (!found) continue
+    if (!found || found.user.deactivatedAt) continue
     if (!recorded.has(key)) {
       recorded.add(key)
       await saveActivity(found.key, [

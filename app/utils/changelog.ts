@@ -11,6 +11,14 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.1.3',
+    date: '2026-11-25',
+    notes: [
+      'Bananjack fylder mindre på mobilen: kompakt resultatbesked og casinotal samt Split, Fordobl, Træk kort og Stå på én række.',
+      'Du får nu også besked om nye kommentarer på stickers, du tidligere har kommenteret. Tags og kommentarer på dine egne stickers giver fortsat besked uden dubletter.',
+    ],
+  },
+  {
     version: '2.10.1.2',
     date: '2026-11-25',
     notes: [
