@@ -13,6 +13,8 @@ Samlet 25. november 2026 fra projektets eksisterende noter, simulationskode, res
 
 ## Hurtigere spiltempo — efterfølgende test 25. november 2026
 
+Brugeren bad derefter om ét helt år med den normale hurtige variant og 20 aktier. [Årssimuleringen](experiments/market-fast-year/README.md) forlænger det allerede valgte første piloteksempel til 365 virkelige dage uden ekstra vækst. I dette ene forløb blev 1.000 bananer til 4.812 efter gebyr, 16 af 20 aktier sluttede i plus, men første måned gav −11 % og største porteføljefald undervejs var cirka 59 %. Dette er et enkelt forløb, ikke et forventet årsafkast eller en endelig godkendelse af algoritmen.
+
 Brugeren ønsker nu at afprøve et marked, hvor den tidligere årsudvikling kan foregå over en måned, med omkring 23 % gennemsnitlig månedlig stigning som eksempel og mulighed for større gevinster og tab. [Tempo-, risiko- og væksttest](experiments/market-tempo/README.md) indeholder syv pilotkombinationer og fem efterfølgende kontrolkombinationer på nye forløb.
 
 200 markeder pr. runde med 20 aktier. Den direkte år→måned-komprimering gav +17,7 % i pilot og +22,2 % i kontrol, samlet +20,0 % på 400 markeder. I kontrolrunden gav ekstra normal vækst +28,1 % i gennemsnit og +22,8 % i median. Større udsving med ekstra vækst gav +28,7 % i gennemsnit; meget store udsving med ekstra vækst gav +29,7 %. Disse er testresultater, ikke et fast månedligt afkast. Alle tal er efter 5 % af positiv realiseret gevinst ved slutlikvidation.
