@@ -3,7 +3,7 @@ import type { NotifyType } from '../../shared/utils/notify'
 export interface SeasonalPushJob {
   id: string
   at: string
-  audience: 'all' | 'not-joined' | 'joined'
+  audience: 'all' | 'not-joined' | 'joined' | 'unused-rolls'
   type: NotifyType
   title: string
   body: string
@@ -66,4 +66,16 @@ export const SEASONAL_PUSH_JOBS: SeasonalPushJob[] = [
     body: 'Godt nytår! Åbn appen i dag og få 500 bananer. Gaven kan hentes hele den 1. januar.',
     url: '/spil/bananer',
   },
+  ...Array.from({ length: 35 }, (_, index): SeasonalPushJob => {
+    const at = new Date(Date.UTC(2026, 10, 27 + index, 19)).toISOString()
+    return {
+      id: `parcel-unused-rolls-${at.slice(0, 10)}`,
+      at,
+      audience: 'unused-rolls',
+      type: 'parcels',
+      title: 'Du har terningeslag tilbage 🎲',
+      body: 'Husk dagens slag i pakkelegen. Antallet kontrolleres ved afsendelse.',
+      url: '/spil/pakkeleg',
+    }
+  }),
 ]

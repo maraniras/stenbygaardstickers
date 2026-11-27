@@ -10,7 +10,12 @@ const view = ref<Status | null>(null)
 const error = ref('')
 const busy = ref(false)
 useHead({ title: 'Julebeskeder · Admin' })
-const audience = { all: 'Alle', joined: 'Kun tilmeldte', 'not-joined': 'Kun ikke tilmeldte' }
+const audience = {
+  all: 'Alle',
+  joined: 'Kun tilmeldte',
+  'not-joined': 'Kun ikke tilmeldte',
+  'unused-rolls': 'Kun deltagere med ubrugte slag · sendes kun mens spillet er i gang',
+}
 const labels: Record<string, string> = {
   pending: 'Afventer planlægning',
   queued: 'Planlagt',
