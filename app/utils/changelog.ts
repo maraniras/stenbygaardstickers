@@ -11,6 +11,16 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.1.4',
+    date: '2026-11-27',
+    notes: [
+      '9 nye badges til pakkelegen — for seksere, gavetyverier og julemirakler.',
+      'Se dine seksere, stjålne og mistede gaver i din egen spillerboks.',
+      'Se, hvor mange af dagens tre slag hver spiller har brugt.',
+      'Få en påmindelse kl. 20.00, hvis du stadig har terningeslag tilbage.',
+    ],
+  },
+  {
     version: '2.10.1.3',
     date: '2026-11-25',
     notes: [
