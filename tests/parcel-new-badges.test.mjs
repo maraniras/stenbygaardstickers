@@ -57,6 +57,11 @@ test('theft totals and repeated loss survive event pruning and a persisted reloa
     assert.ok(earned[id], id)
   assert.equal(a.parcelAwards(board(), 'A')['parcel-steal-ten'], undefined)
   assert.equal(a.parcelView(loaded, 'A', stamp).badgeTracking, undefined)
+  const view = a.parcelView(loaded, 'A', stamp)
+  assert.equal(view.myStats.stolen, 65)
+  assert.equal(view.myStats.lost, 65)
+  assert.equal(a.parcelView(loaded, null, stamp).myStats, undefined)
+  assert.equal(a.parcelView(loaded, 'Spectator', stamp).myStats, undefined)
 })
 
 test('distinct opponents require five different people, and table gifts are not thefts', () => {

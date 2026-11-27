@@ -15,12 +15,13 @@ const win = () => ({
   answer: 'BANAN',
 })
 const flush = () => new Promise(setImmediate)
-function client(initial = empty()) {
+function client(initial = empty(), celebrate) {
   const source = ref(initial),
     identity = ref('Test:2026-11-16'),
     scope = effectScope()
   const timers = new Map(),
     exports = {}
+  const notificationLock = ref(false)
   let id = 0,
     wins = 0
   vm.runInNewContext(
@@ -32,6 +33,8 @@ function client(initial = empty()) {
       ref,
       watch,
       onScopeDispose,
+      nextTick,
+      useState: () => notificationLock,
       setTimeout: (fn, ms) => {
         const key = ++id
         timers.set(key, { fn, ms })
@@ -40,13 +43,19 @@ function client(initial = empty()) {
       clearTimeout: (key) => timers.delete(key),
     },
   )
-  const c = scope.run(() => exports.useWordleReveal(source, identity, () => wins++))
+  const c = scope.run(() =>
+    exports.useWordleReveal(source, identity, () => {
+      wins++
+      return celebrate?.()
+    }),
+  )
   return {
     ...c,
     source,
     identity,
     scope,
     timers,
+    notificationLock,
     wins: () => wins,
     step: async () => {
       const [key, timer] = timers.entries().next().value
@@ -61,6 +70,7 @@ function client(initial = empty()) {
 test('each tile reveals at its midpoint; result, keyboard and celebration wait for the whole row', async () => {
   const c = client()
   c.expectReveal('BANAN')
+  assert.equal(c.notificationLock.value, true, 'block before the server can publish badges')
   c.source.value = win()
   await nextTick()
   assert.equal(c.animating.value, true)
@@ -71,6 +81,7 @@ test('each tile reveals at its midpoint; result, keyboard and celebration wait f
     assert.equal(c.shown.value.marks[0].length, col)
     assert.equal(c.keyboard.value.guesses.length, 0)
     assert.equal(c.wins(), 0)
+    assert.equal(c.notificationLock.value, true)
     assert.equal(await c.step(), 200)
     assert.equal(c.shown.value.marks[0][col], 'correct')
     assert.equal(await c.step(), 220)
@@ -81,6 +92,7 @@ test('each tile reveals at its midpoint; result, keyboard and celebration wait f
   assert.equal(c.shown.value.reward, 50)
   assert.equal(c.keyboard.value.guesses.length, 1)
   assert.equal(c.wins(), 1)
+  assert.equal(c.notificationLock.value, false)
   c.scope.stop()
 })
 
@@ -103,6 +115,7 @@ test('reload restores results without replay; account/day change and unmount can
     assert.equal(c.animating.value, false)
     assert.equal(c.timers.size, 0, action)
     assert.equal(c.wins(), 0)
+    assert.equal(c.notificationLock.value, false)
     if (action === 'identity') {
       assert.equal(c.shown.value.guesses.length, 0)
       c.scope.stop()
@@ -122,9 +135,59 @@ test('background same-count refresh preserves pending animation and disarm preve
   const rejected = client()
   rejected.expectReveal('BANAN')
   rejected.disarm()
+  assert.equal(rejected.notificationLock.value, false)
   rejected.source.value = win()
   await nextTick()
   assert.equal(rejected.animating.value, false)
   assert.equal(rejected.wins(), 0)
   rejected.scope.stop()
+})
+
+test('badge lock waits for celebration completion and survives a same-result refresh', async () => {
+  let finish
+  const celebration = new Promise((resolve) => {
+    finish = resolve
+  })
+  const c = client(empty(), () => celebration)
+  c.expectReveal('BANAN')
+  c.source.value = win()
+  await nextTick()
+  for (let i = 0; i < 10; i++) await c.step()
+  assert.equal(c.animating.value, false)
+  assert.equal(c.shown.value.finished, true)
+  assert.equal(c.notificationLock.value, true, 'confetti is still running')
+  c.source.value = win()
+  await nextTick()
+  assert.equal(c.notificationLock.value, true)
+  finish()
+  await flush()
+  assert.equal(c.notificationLock.value, false)
+  c.scope.stop()
+})
+
+test('a failed celebration and leaving during confetti both release the popup lock', async () => {
+  for (const exit of ['failure', 'unmount', 'identity']) {
+    let finish
+    const c = client(empty(), () =>
+      exit === 'failure'
+        ? Promise.reject(Error('optional visual failed'))
+        : new Promise((resolve) => {
+            finish = resolve
+          }),
+    )
+    c.expectReveal('BANAN')
+    c.source.value = win()
+    await nextTick()
+    for (let i = 0; i < 10; i++) await c.step()
+    if (exit === 'unmount') c.scope.stop()
+    if (exit === 'identity') {
+      c.identity.value = 'Other:2026-11-17'
+      c.source.value = empty()
+      await nextTick()
+    }
+    assert.equal(c.notificationLock.value, false)
+    finish?.()
+    await flush()
+    c.scope.stop()
+  }
 })

@@ -4,8 +4,9 @@ import type { WordleView } from '../../shared/types/wordle'
 export function useWordleReveal(
   source: Ref<WordleView | undefined>,
   identity: Ref<string>,
-  onWin: () => void,
+  onWin: () => void | Promise<void>,
 ) {
+  const notificationLock = useState('daily-game-animation', () => false)
   const shown = ref<WordleView>()
   const keyboard = ref<WordleView>()
   const animating = ref(false)
@@ -25,6 +26,7 @@ export function useWordleReveal(
     timers.clear()
     animating.value = false
     flipping.value = null
+    notificationLock.value = false
   }
   const pause = (ms: number) =>
     new Promise<void>((resolve) => {
@@ -39,6 +41,7 @@ export function useWordleReveal(
     const current = generation
     const row = run.guesses.length - 1
     animating.value = true
+    notificationLock.value = true
     shown.value = {
       ...clone(run)!,
       marks: [...run.marks.slice(0, row).map((m) => [...m]), []],
@@ -59,7 +62,16 @@ export function useWordleReveal(
     shown.value = clone(run)
     keyboard.value = clone(run)
     animating.value = false
-    if (run.won) onWin()
+    // Paint the full result before starting celebration; defer all reward popups until it ends.
+    await nextTick()
+    if (current !== generation) return
+    try {
+      if (run.won) await onWin()
+    } catch {
+      // A failed optional celebration must never leave badges blocked.
+    } finally {
+      if (current === generation) notificationLock.value = false
+    }
   }
   watch(
     [identity, source],
@@ -86,7 +98,11 @@ export function useWordleReveal(
         run.guesses.length === shown.value?.guesses.length
       )
         return
-      if (sameOwner && animating.value && run?.guesses.join('|') === shown.value?.guesses.join('|'))
+      if (
+        sameOwner &&
+        notificationLock.value &&
+        run?.guesses.join('|') === shown.value?.guesses.join('|')
+      )
         return
       pending = undefined
       cancel()
@@ -103,8 +119,10 @@ export function useWordleReveal(
     flipping,
     expectReveal: (guess: string) => {
       pending = { identity: identity.value, guess }
+      notificationLock.value = true
     },
     disarm: () => {
+      if (pending) notificationLock.value = false
       pending = undefined
     },
   }

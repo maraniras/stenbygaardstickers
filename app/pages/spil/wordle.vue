@@ -14,9 +14,7 @@ const {
   flipping,
   expectReveal,
   disarm,
-} = useWordleReveal(serverRun, identity, () => {
-  void shootConfetti()
-})
+} = useWordleReveal(serverRun, identity, () => shootConfetti('normal', true))
 const input = ref('')
 const boardRows = computed(() => wordleRows(run.value, input.value))
 const busy = ref(false)

@@ -1,6 +1,6 @@
 import type { ParcelGame, ParcelView } from '../types/parcel-game'
 import { gameDay } from './game-day'
-import { recordParcelTransfer } from './parcel-progress'
+import { recordParcelTransfer, ensureParcelProgress } from './parcel-progress'
 
 const playerKey = (name: string) => `u:${name}`
 export const PARCEL_DAILY_ROLLS = 3
@@ -127,13 +127,26 @@ export function parcelView(game: ParcelGame, name: string | null, now: Date): Pa
   const day = gameDay(now)
   const turns = name ? (game.turns[playerKey(name)]?.[day] ?? []) : []
   const pending = name ? game.pending[playerKey(name)] : undefined
+  const joined = !!name && game.players.includes(name)
+  const progress = joined ? ensureParcelProgress(game).players[playerKey(name!)] : undefined
   return {
     year: game.year,
     serverNow: now.toISOString(),
     ...schedule,
     // Demo boards can start before the real calendar dates.
     startsAt: game.startsAt,
-    joined: !!name && game.players.includes(name),
+    joined,
+    ...(joined
+      ? {
+          myStats: {
+            sixes: Object.values(game.turns[playerKey(name!)] ?? {})
+              .flat()
+              .filter((turn) => turn.die === 6).length,
+            stolen: progress?.stolen ?? 0,
+            lost: progress?.lost ?? 0,
+          },
+        }
+      : {}),
     entryFee: PARCEL_ENTRY_FEE,
     ...(game.ended
       ? { collectionUntil: parcelCollectionUntil(game), cancelled: game.cancelled ?? false }

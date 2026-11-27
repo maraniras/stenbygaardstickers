@@ -29,6 +29,11 @@ watch(
 const middle = computed(() => state.value?.parcels.filter((p) => !p.owner) ?? [])
 const mine = computed(() => state.value?.parcels.filter((p) => p.owner === name.value) ?? [])
 const unopened = computed(() => mine.value.filter((p) => !p.openedAt))
+const seatedPlayers = computed(() =>
+  [...(state.value?.players ?? [])].sort(
+    (a, b) => Number(b === name.value) - Number(a === name.value),
+  ),
+)
 const openingId = ref<string | null>(null)
 const opening = computed(() => state.value?.parcels.find((p) => p.id === openingId.value))
 function canOpen(p: ParcelView['parcels'][number]) {
@@ -280,7 +285,7 @@ watch(
         </div>
         <div class="players">
           <article
-            v-for="player in state.players"
+            v-for="player in seatedPlayers"
             :key="player"
             class="player-seat"
             :class="{ me: player === name }"
@@ -341,6 +346,21 @@ watch(
                 >Fysiske præmier ({{ summary(player).physical.length }}):
                 {{ summary(player).physical.join(', ') }}</span
               ><span v-if="summary(player).frame">Eksklusiv profilramme</span>
+            </div>
+            <div
+              v-if="player === name && state.myStats"
+              class="personal-stats"
+              aria-label="Din statistik i denne pakkeleg"
+            >
+              <span
+                >🎲 Seksere: <b>{{ state.myStats.sixes }}</b></span
+              >
+              <span
+                >🎁 Stjålet: <b>{{ state.myStats.stolen }}</b></span
+              >
+              <span
+                >😿 Mistet: <b>{{ state.myStats.lost }}</b></span
+              >
             </div>
           </article>
         </div>
@@ -698,6 +718,24 @@ watch(
   align-items: start;
   gap: 12px;
   margin: 22px 0;
+}
+.personal-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.personal-stats span {
+  white-space: nowrap;
+}
+.personal-stats b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .player-seat {
   background: var(--surface);

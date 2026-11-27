@@ -42,8 +42,8 @@ function record(tracking: ParcelBadgeTracking, event: ParcelGame['events'][numbe
   }
   const thief = player(tracking, event.to),
     victim = player(tracking, event.from)
-  thief.stolen = Math.min(10, thief.stolen + 1)
-  victim.lost = Math.min(10, victim.lost + 1)
+  thief.stolen++
+  victim.lost++
   if (!thief.victims.includes(event.from) && thief.victims.length < 5)
     thief.victims.push(event.from)
   if (!victim.thieves.includes(event.to) && victim.thieves.length < 5) victim.thieves.push(event.to)
