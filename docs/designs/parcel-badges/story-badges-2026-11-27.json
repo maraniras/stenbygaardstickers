@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-27",
+  "generator": "Built-in image_gen",
+  "status": "Designforslag",
+  "badges": [
+    {
+      "id": "parcel-return-to-sender",
+      "name": "Tilbage til afsender",
+      "prompt": "Use case: stylized-concept. Create one premium cartoon 3D Christmas achievement badge icon for a Danish game. Reference image is STYLE AND CAT IDENTITY only, not a target to copy. Match glossy polished red/green/gold Christmas objects, soft lavender-grey plush Miv cat, huge amber eyes, pink nose. Compact cohesive square composition, generous safe margins, genuinely transparent alpha background. No background panel, no watermark, no badge title, no outer medal rim. Subject: a single luxurious red wrapped Christmas gift with gold bow, surrounded by ONE thick shiny curved green return arrow curling around it and pointing back toward the gift. Small holly leaves and fir accents. Strong simple readable silhouette at tiny icon size. No cat needed, no text or numbers. Meaning: stealing back your own gift."
+    },
+    {
+      "id": "parcel-mine-again",
+      "name": "Den var min!",
+      "prompt": "Use case: stylized-concept. Create one premium cartoon 3D Christmas achievement badge icon for a Danish game. Reference image is STYLE AND CAT IDENTITY only, not a target to copy. Match glossy polished red/green/gold Christmas objects, soft lavender-grey plush Miv cat, huge amber eyes, pink nose. Compact cohesive square composition, generous safe margins, genuinely transparent alpha background. No background panel, no watermark, no badge title, no outer medal rim. Subject: exactly ONE distressed Miv kitten wearing red knit snowflake scarf, desperately hugging a red gift with gold ribbon while a black-gloved thief hand pulls the ribbon away. Kitten's huge tearful amber eyes and determined grip tell the story. Integrated small red-and-gold gift tag reads exactly '3×'. Minimal fir and holly accent underneath. Paws anatomically coherent, no extra limbs. Meaning: the very same gift stolen away from you three times."
+    },
+    {
+      "id": "parcel-zero-to-christmas",
+      "name": "Fra nul til jul",
+      "prompt": "Use case: stylized-concept. Create one premium cartoon 3D Christmas achievement badge icon for a Danish game. Reference image is STYLE AND CAT IDENTITY only, not a target to copy. Match glossy polished red/green/gold Christmas objects, soft lavender-grey plush Miv cat, huge amber eyes, pink nose. Compact cohesive square composition, generous safe margins, genuinely transparent alpha background. No background panel, no watermark, no badge title, no outer medal rim. Subject: exactly ONE jubilant Miv kitten with raised front paws, red Christmas cap and scarf, sitting atop a compact mound of FIVE distinct wrapped presents in red green gold and ivory. Happy relieved expression, sparkling amber eyes. A small integrated elegant gift tag reads exactly '0 → 5'. Small holly and fir accents. Anatomically coherent single cat, no extra limbs. Meaning: coming back from zero gifts to finish with at least five."
+    }
+  ]
+}

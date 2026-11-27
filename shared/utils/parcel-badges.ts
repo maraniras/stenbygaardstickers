@@ -1,8 +1,15 @@
 import type { Badge } from './badges'
 import type { EconomyPublic } from '../types/economy'
 import type { ParcelGame } from '../types/parcel-game'
+import { NEW_PARCEL_BADGES } from './parcel-badge-rules'
+import { ensureParcelProgress } from './parcel-progress'
 
-export type ParcelBadgeId = 'parcel-empty' | 'parcel-sixes' | 'parcel-three' | 'parcel-five'
+export type ParcelBadgeId =
+  | 'parcel-empty'
+  | 'parcel-sixes'
+  | 'parcel-three'
+  | 'parcel-five'
+  | (typeof NEW_PARCEL_BADGES)[number]['id']
 export type ParcelAchievements = Partial<Record<ParcelBadgeId, string>>
 
 /** Contents, not opening order, wallet balance or badge bonuses decide the champion. */
@@ -42,10 +49,23 @@ export function parcelAwards(game: ParcelGame, name: string): ParcelAchievements
     .filter((turn) => turn.die === 6)
     .sort((a, b) => a.at.localeCompare(b.at))
   if (sixes.length >= 6) earned['parcel-sixes'] = sixes[5]!.at
+  if (sixes.length >= 20) earned['parcel-twenty-sixes'] = sixes[19]!.at
+  for (const turns of Object.values(game.turns[`u:${name}`] ?? {})) {
+    if (turns.length !== 3 || !turns.every((turn) => turn.die === 6)) continue
+    const at = turns.map((turn) => turn.at).sort()[2]!
+    if (!earned['parcel-christmas-miracle'] || at < earned['parcel-christmas-miracle'])
+      earned['parcel-christmas-miracle'] = at
+  }
+  const progress = ensureParcelProgress(game).players[`u:${name}`]
+  for (const rule of NEW_PARCEL_BADGES) {
+    const at = progress?.awards[rule.id]
+    if (at) earned[rule.id] = at
+  }
   if (game.ended) {
     const gifts = game.parcels.filter((p) => p.owner === name).length
     if (gifts === 0) earned['parcel-empty'] = game.endsAt
     if (gifts >= 5) earned['parcel-three'] = game.endsAt
+    if (gifts >= 5 && progress?.zeroAt) earned['parcel-zero-to-christmas'] = game.endsAt
     // Keep x103's stored id and icon; this is the winner of the 2026 campaign, not a 5+ threshold.
     if (game.year === 2026 && parcelChampion(game) === name) earned['parcel-five'] = game.endsAt
   }
@@ -54,6 +74,7 @@ export function parcelAwards(game: ParcelGame, name: string): ParcelAchievements
 
 export function parcelBadges(economy?: EconomyPublic): Badge[] {
   const rules: { id: ParcelBadgeId; name: string; emoji: string; about: string }[] = [
+    ...NEW_PARCEL_BADGES,
     { id: 'parcel-empty', name: 'Røvrendt', emoji: '🫠', about: 'Slut pakkelegen uden gaver' },
     {
       id: 'parcel-sixes',

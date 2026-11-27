@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-27",
+  "generator": "Built-in image_gen",
+  "status": "Designforslag",
+  "badges": [
+    {
+      "id": "parcel-twenty-sixes",
+      "name": "Seksermaskinen",
+      "prompt": "Use case: stylized-concept. Create ONE new premium cartoon 3D achievement badge icon for a Danish Christmas gift-exchange game. The reference is style guidance, not an image to reproduce unchanged. Achievement: roll at least TWENTY sixes within one game. Design a triumphant dynamic pair of red enamel and warm ivory dice with gold recessed pips, each main FRONT face showing exactly SIX pips in two columns of three; polished festive holly and small fir branches surround the lower edges. A prominent integrated red-and-gold little medallion/tag at the front reads exactly \"20+\" in bold ivory lettering, extremely legible. Strong compact circular silhouette, cheerful high quality collectible app icon, tactile materials, rounded cartoon forms, soft studio lighting, warm highlights matching the existing reference icon. No outer medal frame, no rectangular card, no title, no other text, no background scenery, no watermark. All objects fully visible with generous safe margin, centered square composition. Genuine transparent alpha background.",
+      "references": [
+        "docs/designs/parcel-badges/parcel-sixes.png"
+      ]
+    },
+    {
+      "id": "parcel-steal-ten",
+      "name": "Gavetyven",
+      "prompt": "Use case: stylized-concept. Create ONE new cartoon 3D Christmas game achievement badge icon for stealing at least TEN gifts from other players in a single gift-exchange game. Image1 is CHARACTER IDENTITY reference: use only ONE of these same recognizable Miv cats: soft pale lavender-grey fluffy fur, huge amber golden eyes, tiny pink nose, rounded plush face and paws. Image2 is style guidance for premium rounded festive app achievement art. Turn the cat into a mischievous but adorable gift burglar: a small black domino mask around the eyes, confident cheeky pleased grin, a red knit Christmas cap, crouching with a black fabric loot sack overflowing with three clearly wrapped gifts in red, green and gold. One paw grips the sack, another hugs a stolen present. Small integrated gold-edged red gift tag reads exactly \"10+\". Tiny holly/fir accents at the base; keep focus on the expressive cat and gifts, compact roughly circular silhouette, polished toy-like 3D cartoon rendering, warm soft studio light. No existing three-cat group: exactly one cat. No outer badge frame, no rectangular card, no title or extra words, no environment, no watermark. Fully contained centered square icon with safe margins and genuine transparent alpha background.",
+      "references": [
+        "docs/designs/boxes-badges/boxes-miv-v1.png",
+        "docs/designs/parcel-badges/parcel-sixes.png"
+      ]
+    },
+    {
+      "id": "parcel-stolen-ten",
+      "name": "MIV, mine gaver!",
+      "prompt": "Use case: stylized-concept. Create ONE new emotionally funny cartoon 3D Christmas game achievement badge icon: have at least TEN gifts stolen from you in the same gift-exchange game. Image1 is CHARACTER IDENTITY reference. Feature exactly ONE recognizable Miv cat: soft pale lavender-grey plush fur, huge amber eyes, tiny pink nose, very sad downturned eyebrows, tears, with a red knitted snowflake scarf. The cat sits centrally, distraught and reaching with both front paws toward its LAST beautifully wrapped red-and-gold gift. At the upper-right edge, a cheeky black-gloved burglar hand is pulling that present away; the composition must clearly tell 'my gifts are being stolen', not just an empty box. The hand remains fully inside the icon and is secondary to the cat. Beside the cat, one empty open green gift box emphasizes its loss. Small integrated festive tag reads exactly \"10+\". Fir/holly accents at bottom only. Cute melodramatic expression, no violence, soft polished toy-like premium cartoon 3D illustration matching image2 festive badge materials. Compact circular silhouette, square centered composition, safe margins around all objects, genuine transparent alpha background. No outer medal frame, no card, no title, no other text, no watermark.",
+      "references": [
+        "docs/designs/boxes-badges/boxes-miv-v1.png",
+        "docs/designs/parcel-badges/parcel-sixes.png"
+      ]
+    }
+  ]
+}

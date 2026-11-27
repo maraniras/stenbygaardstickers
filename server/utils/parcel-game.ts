@@ -14,6 +14,7 @@ import {
 } from '../../shared/utils/parcel-game'
 import type { EconomyRecord } from '../../shared/types/economy'
 import { parcelAwards } from '../../shared/utils/parcel-badges'
+import { ensureParcelProgress } from '../../shared/utils/parcel-progress'
 import { notifyParcelTableEmpty } from './seasonal-push'
 
 const PARCEL_CAS = `if (redis.call('HGET', KEYS[1], ARGV[1]) or '') ~= ARGV[2] then return 0 end
@@ -312,6 +313,7 @@ export async function parcelRequest(
     const now = new Date()
     const before = new Set(board.events.map((e) => e.id))
     excludeDeactivatedParcelPlayers(board, inactive, now)
+    ensureParcelProgress(board)
     prepareParcelRewards(board, now)
     advanceParcels(board, now)
     try {

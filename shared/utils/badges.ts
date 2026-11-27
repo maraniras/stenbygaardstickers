@@ -16,6 +16,7 @@ import { slotBadges } from './slotBadges'
 import { adventBadges } from './advent-badges'
 import { boxesBadges } from './boxes-badges'
 import { parcelBadges } from './parcel-badges'
+import { NEW_PARCEL_BADGES } from './parcel-badge-rules'
 import { crosswordBadges } from './crossword-badges'
 import { rouletteBadges } from './roulette-badges'
 import { wordleBadges } from './wordle-badges'
@@ -886,6 +887,7 @@ const TIER_POINTS: Record<string, number[]> = {
 const OTHER_CONTINENT_POINTS = [5, 8, 12, 16, 24]
 
 const SINGLE_POINTS: Record<string, number> = {
+  ...Object.fromEntries(NEW_PARCEL_BADGES.map((rule) => [rule.id, rule.points])),
   'wordle-first': 4,
   'wordle-last': 1,
   'wordle-efficient': 3,

@@ -4,6 +4,7 @@ import { JACK_BADGE_REWARDS } from './jackBadges'
 import { SLOT_BADGE_REWARDS } from './slotBadges'
 import { ROULETTE_BADGE_REWARDS } from './roulette-badges'
 import { WORDLE_BADGE_REWARDS } from './wordle-badges'
+import { NEW_PARCEL_BADGES } from './parcel-badge-rules'
 
 export const STARTING_BANANAS = 250
 export const CITY_REWARDS = [50, 40, 30, 20, 10]
@@ -42,6 +43,7 @@ export function dailyJackpotFor(ticket: number) {
   throw new Error('Jackpotfordelingen skal summere til 10000')
 }
 export const GAME_BADGE_REWARDS: Record<string, number[]> = {
+  ...Object.fromEntries(NEW_PARCEL_BADGES.map((rule) => [rule.id, [rule.bananas]])),
   ...WORDLE_BADGE_REWARDS,
   'parcel-five': [20],
   'roulette-colour-five': [50],

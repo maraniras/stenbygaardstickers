@@ -27,6 +27,15 @@ const ids = [
   'parcel-sixes',
   'parcel-three',
   'parcel-five',
+  'parcel-twenty-sixes',
+  'parcel-steal-ten',
+  'parcel-stolen-ten',
+  'parcel-return-to-sender',
+  'parcel-everyone-against-me',
+  'parcel-grinch',
+  'parcel-zero-to-christmas',
+  'parcel-mine-again',
+  'parcel-christmas-miracle',
   'boxes-hattrick',
   'boxes-elves',
   'boxes-miv',
@@ -144,7 +153,7 @@ test('every badge in the fixed numbered catalogue has a custom asset, including 
     .split(/\r?\n/)
     .filter((row) => /^\| x\d+\s+\|/.test(row))
     .map((row) => row.match(/`([^`]+)`/))
-  assert.equal(catalogue.length, 118)
+  assert.equal(catalogue.length, 127)
   const files = new Set()
   for (const [, id] of catalogue) {
     const icon = exports.badgeIcon(id.replace('<år>', '2026'))
@@ -152,5 +161,5 @@ test('every badge in the fixed numbered catalogue has a custom asset, including 
     assert.ok(readFileSync('public' + icon).length > 0, id)
     files.add(icon)
   }
-  assert.equal(files.size, 112)
+  assert.equal(files.size, 121)
 })

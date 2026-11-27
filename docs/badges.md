@@ -216,4 +216,25 @@ Spildøgnet skifter kl. 04 dansk tid. Tabte/oversprungne døgn bryder den aktuel
 
 Hvert betalt, unikt bogstav tæller én gang. Gratis morgenhjælp, genforsøg og admin-preview tæller ikke. Optællingen bruger de permanente købsbilag, ikke den begrænsede transaktionshistorik. Trinmotivet viser Emil på en børnecykel med støttehjul og sut; medaljekanten følger trinnet.
 
-Næste ledige nummer: **x119**
+## Flere pakkelegsbadges
+
+x119–x131 er reserveret til de allerede valgte 3.0-badges på aktiemarkedsbranchen.
+
+| Nr. | Badge (id) | Krav i ét pakkespil | Bananer | Point |
+| --- | --- | --- | --- | --- |
+| x132 | Seksermaskinen (`parcel-twenty-sixes`) | Mindst 20 seksere | 150 | 4 |
+| x133 | Gavetyven (`parcel-steal-ten`) | Stjæl mindst 10 gaver | 100 | 3 |
+| x134 | MIV, mine gaver! (`parcel-stolen-ten`) | Få stjålet mindst 10 gaver | 100 | 3 |
+| x135 | Tilbage til afsender (`parcel-return-to-sender`) | Stjæl en gave tilbage fra spilleren, der tog den | 25 | 1 |
+| x136 | Alle mod mig (`parcel-everyone-against-me`) | Få stjålet gaver af mindst 5 forskellige spillere | 75 | 2 |
+| x137 | Grinchen (`parcel-grinch`) | Stjæl fra mindst 5 forskellige spillere | 75 | 2 |
+| x138 | Fra nul til jul (`parcel-zero-to-christmas`) | Slut med mindst 5 gaver efter at have haft 0 i stjælefasen | 150 | 4 |
+| x139 | Den var min! (`parcel-mine-again`) | Få samme gave stjålet fra dig mindst 3 gange | 75 | 2 |
+| x140 | Julemiraklet (`parcel-christmas-miracle`) | Seks på alle dagens 3 slag (spildøgn kl. 04–04) | 100 | 3 |
+
+Point og bananer gives én gang pr. badge på tværs af sæsoner. Gavevalg fra bordet tæller ikke som tyverier.
+Permanent, begrænset optælling gemmes sammen med spillets ejerskab, også ved automatiske valg.
+Ved opgradering tæller bevarede hændelser med én gang; slettede hændelser gættes ikke.
+Alle tidligere gemte slag tæller til sekserbadges. Comeback-badgen kræver nul gaver efter bordet er tømt og mindst fem ved spillets afslutning.
+
+Næste ledige nummer: **x141**

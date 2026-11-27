@@ -59,6 +59,8 @@ export interface ParcelPending {
   ticket: number
 }
 export interface ParcelGame {
+  /** Bounded badge counters, independent of the last 100 public events. */
+  badgeTracking?: import('../utils/parcel-progress').ParcelBadgeTracking
   year: number
   startsAt: string
   endsAt: string

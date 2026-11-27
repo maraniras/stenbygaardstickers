@@ -1,5 +1,6 @@
 import type { ParcelGame, ParcelView } from '../types/parcel-game'
 import { gameDay } from './game-day'
+import { recordParcelTransfer } from './parcel-progress'
 
 const playerKey = (name: string) => `u:${name}`
 export const PARCEL_DAILY_ROLLS = 3
@@ -51,6 +52,7 @@ export function takeParcel(game: ParcelGame, name: string, id: string, now: Date
   const parcel = parcelTargets(game, name).find((p) => p.id === id)
   if (!pending || !parcel) fail('Vælg en af de fremhævede pakker.')
   const event = { id: pending.id, from: parcel.owner, to: name, parcel: id, at: now.toISOString() }
+  recordParcelTransfer(game, event)
   parcel.owner = name
   const order = (game.collectionSequence ?? 0) + 1
   game.collectionSequence = order
