@@ -7,7 +7,7 @@ import { ref, computed, watch, effectScope } from 'vue'
 import { setup as setupGame } from './helpers/economy-harness.mjs'
 
 const flush = () => new Promise(setImmediate)
-async function client(preview = false) {
+async function client(preview = false, previewQuery = {}) {
   let now = Date.parse('2026-12-01T12:00:00Z'),
     answer,
     tick
@@ -47,7 +47,7 @@ async function client(preview = false) {
       useUser: () => ({ name, ready: ref(true) }),
       useEconomy: () => ({ reload: async () => {} }),
       useUsers: () => ({ reload: async () => {} }),
-      useRoute: () => ({ query: preview ? { preview: '1', steal: '1' } : {} }),
+      useRoute: () => ({ query: preview ? { preview: '1', steal: '1', ...previewQuery } : {} }),
       userToken: () => name.value,
       Date: class extends Date {
         constructor(value = now) {
@@ -103,6 +103,22 @@ async function client(preview = false) {
     stop: () => scope.stop(),
   }
 }
+test('five-player local preview shows distinct daily activity without using the real game', async () => {
+  const c = await client(true, { players: '5', activity: '1', steal: undefined })
+  try {
+    assert.equal(c.state.value.players.length, 5)
+    assert.equal(c.state.value.parcels.length, 15)
+    assert.deepEqual(
+      Array.from(c.state.value.players, (p) => c.state.value.playerRolls[p].used),
+      [0, 1, 3, 2, 3],
+    )
+    assert.equal(c.state.value.phase, 'playing')
+    assert.equal(c.state.value.remaining, 3)
+  } finally {
+    c.stop()
+  }
+})
+
 test('large die rolls for 2.3 seconds, then reveals the result for two seconds without extending choice deadline', async () => {
   const c = await client()
   try {

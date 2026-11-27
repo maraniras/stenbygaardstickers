@@ -89,6 +89,7 @@ export interface ParcelView {
   day: string
   remaining: number
   players: string[]
+  playerRolls: Record<string, { used: number; total: number }>
   parcels: {
     id: string
     style: number

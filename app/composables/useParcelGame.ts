@@ -19,6 +19,13 @@ export function useParcelGame(pollMs = 5000) {
   const registrationPreview = testMode && useRoute().query.registration === '1'
   const finishedPreview = testMode && useRoute().query.finished === '1'
   const stealingPreview = testMode && useRoute().query.steal === '1'
+  const requestedPlayers =
+    testMode &&
+    typeof useRoute().query.players === 'string' &&
+    /^(?:[1-9]|1[0-2])$/.test(String(useRoute().query.players))
+      ? Number(useRoute().query.players)
+      : undefined
+  const activityPreview = testMode && useRoute().query.activity === '1'
   const { reload: reloadWallet } = useEconomy()
   const { reload: reloadUsers } = useUsers()
   const name = computed(() => (testMode ? user.name.value || 'Nicole' : user.name.value))
@@ -50,18 +57,36 @@ export function useParcelGame(pollMs = 5000) {
   function demoBoard() {
     if (!demo) {
       const players = [
-        ...new Set([
-          name.value!,
-          'Mathias',
-          'Norsk',
-          'Tobias Frost',
-          ...(finishedPreview || stealingPreview
-            ? ['Nicole', 'Emil', 'Mikkel', 'Anna', 'Jonas', 'Sofie', 'Lucas']
-            : []),
-        ]),
+        ...new Set(
+          requestedPlayers
+            ? [
+                name.value!,
+                'Mathias',
+                'Norsk',
+                'Emil',
+                'Anna',
+                'Nicole',
+                'Mikkel',
+                'Morten',
+                'Ida',
+                'Nicolas',
+                'Marc',
+                'Lucas',
+                'Sofie',
+              ]
+            : [
+                name.value!,
+                'Mathias',
+                'Norsk',
+                'Tobias Frost',
+                ...(finishedPreview || stealingPreview
+                  ? ['Nicole', 'Emil', 'Mikkel', 'Anna', 'Jonas', 'Sofie', 'Lucas']
+                  : []),
+              ],
+        ),
       ]
         .filter((p) => !registrationPreview || p !== name.value)
-        .slice(0, 10)
+        .slice(0, requestedPlayers ?? 10)
       demo = {
         year: 2026,
         startsAt: new Date(Date.now() - 86400000).toISOString(),
@@ -84,6 +109,19 @@ export function useParcelGame(pollMs = 5000) {
             amount: 50 * (i + 1),
           }),
         ),
+      }
+      if (activityPreview) {
+        const day = gameDay(new Date())
+        players.forEach((player, index) => {
+          const used = [0, 1, 3, 2, 3][index % 5]!
+          demo!.turns[`u:${player}`] = {
+            [day]: Array.from({ length: used }, (_, roll) => ({
+              id: `preview-activity-${index}-${roll}`,
+              die: [2, 4, 1][roll]!,
+              at: new Date(Date.now() - (used - roll) * 60000).toISOString(),
+            })),
+          }
+        })
       }
       if (finishedPreview) {
         demo.ended = true

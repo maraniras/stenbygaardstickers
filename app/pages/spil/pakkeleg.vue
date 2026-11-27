@@ -248,12 +248,6 @@ watch(
         class="table-scene"
         aria-label="Det fælles julebord"
       >
-        <div
-          class="table-lights"
-          aria-hidden="true"
-        >
-          ✦ · ✦ · ✦ · ✦ · ✦ · ✦
-        </div>
         <div class="parcel-table">
           <span class="table-title">{{
             middle.length ? `${middle.length} gaver på bordet` : 'Bordet er tomt'
@@ -291,12 +285,19 @@ watch(
             class="player-seat"
             :class="{ me: player === name }"
           >
-            <NuxtLink
-              :to="`/person/${encodeURIComponent(player)}`"
-              class="player-name"
-              ><UserAvatar :name="player" /><b>{{ player === name ? 'Dig' : player }}</b
-              ><span>{{ state.parcels.filter((p) => p.owner === player).length }}</span></NuxtLink
-            >
+            <div class="player-header">
+              <NuxtLink
+                :to="`/person/${encodeURIComponent(player)}`"
+                class="player-name"
+                ><UserAvatar :name="player" /><b>{{ player === name ? 'Dig' : player }}</b
+                ><span>{{ state.parcels.filter((p) => p.owner === player).length }}</span></NuxtLink
+              >
+              <ParcelPlayerRolls
+                v-if="state.phase === 'playing'"
+                :used="state.playerRolls?.[player]?.used"
+                :total="state.playerRolls?.[player]?.total ?? PARCEL_DAILY_ROLLS"
+              />
+            </div>
             <div class="player-gifts">
               <template
                 v-for="p in state.parcels.filter((p) => p.owner === player)"
@@ -638,13 +639,6 @@ watch(
   position: relative;
   padding-top: 10px;
 }
-.table-lights {
-  text-align: center;
-  color: #daa85d;
-  letter-spacing: 10px;
-  font-size: 17px;
-  margin-bottom: 5px;
-}
 .parcel-table {
   min-height: 240px;
   border-radius: 40% / 18%;
@@ -716,12 +710,18 @@ watch(
   border-color: #b8934b;
 }
 .player-name {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 7px;
   text-decoration: none;
   color: inherit;
   min-width: 0;
+}
+.player-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .player-name :deep(.user-avatar) {
   width: 29px;

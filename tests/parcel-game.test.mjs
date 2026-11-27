@@ -37,6 +37,25 @@ test('three collection rolls, replay safety and 04 reset are enforced by the eng
   assert.equal(a.parcelView(b, 'Nicole', after).remaining, 3)
   assert.throws(() => a.rollParcel(b, 'Nicole', day, 'stale', 2, 0, after), /spildøgn/)
 })
+
+test('every player has public daily roll counts, without exposing others dice or request ids', () => {
+  const { api: a } = harness(),
+    b = board()
+  a.rollParcel(b, 'Nicole', day, 'private-n1', 2, 0, now)
+  a.rollParcel(b, 'Nicole', day, 'private-n2', 5, 0, now)
+  a.rollParcel(b, 'Mathias', day, 'private-m1', 1, 0, now)
+  const view = a.parcelView(b, null, now)
+  assert.deepEqual(JSON.parse(JSON.stringify(view.playerRolls)), {
+    Nicole: { used: 2, total: 3 },
+    Mathias: { used: 1, total: 3 },
+    constructor: { used: 0, total: 3 },
+  })
+  assert.equal(view.turn, undefined)
+  assert.equal(JSON.stringify(view.playerRolls).includes('private-'), false)
+  assert.equal(a.parcelView(b, null, new Date('2026-12-02T02:59:59Z')).playerRolls.Nicole.used, 2)
+  const reset = a.parcelView(b, null, new Date('2026-12-02T03:00:00Z'))
+  assert.ok(Object.values(reset.playerRolls).every((p) => p.used === 0 && p.total === 3))
+})
 test('only six grants a choice; middle must be emptied before stealing; no own gifts', () => {
   const { api: a } = harness(),
     b = board()

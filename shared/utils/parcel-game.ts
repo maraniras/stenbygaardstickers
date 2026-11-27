@@ -148,6 +148,15 @@ export function parcelView(game: ParcelGame, name: string | null, now: Date): Pa
     day,
     remaining: Math.max(0, PARCEL_DAILY_ROLLS - turns.length),
     players: game.players,
+    playerRolls: Object.fromEntries(
+      game.players.map((player) => [
+        player,
+        {
+          used: Math.min(PARCEL_DAILY_ROLLS, game.turns[playerKey(player)]?.[day]?.length ?? 0),
+          total: PARCEL_DAILY_ROLLS,
+        },
+      ]),
+    ),
     parcels: game.parcels.map((p, index) => ({
       id: p.id,
       style: parcelWrappingStyle(index),
