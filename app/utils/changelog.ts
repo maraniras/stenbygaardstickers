@@ -11,6 +11,11 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '2.10.1.5',
+    date: '2026-11-27',
+    notes: ['På Tværs: Zoom op til 5× med zoomknapperne eller to fingre på selve krydsordet.'],
+  },
+  {
     version: '2.10.1.4',
     date: '2026-11-27',
     notes: [

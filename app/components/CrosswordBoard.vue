@@ -104,6 +104,7 @@ const cursor = ref(wordCells[0]![0]!.key)
 const board = ref<HTMLElement>()
 const boardViewport = ref<HTMLElement>()
 const zoom = ref(1)
+const MAX_ZOOM = 5
 const zoomed = computed(() => zoom.value > 1)
 const zoomLabel = computed(() => `${Number(zoom.value.toFixed(1))}×`)
 const showInfo = ref(false)
@@ -184,7 +185,7 @@ async function movePinch(event: TouchEvent) {
   if (event.cancelable) event.preventDefault()
   suppressClick = true
   const revision = ++zoomRevision
-  zoom.value = Math.max(1, Math.min(3, (gesture.zoom * pair.distance) / gesture.distance))
+  zoom.value = Math.max(1, Math.min(MAX_ZOOM, (gesture.zoom * pair.distance) / gesture.distance))
   await nextTick()
   const viewport = boardViewport.value
   const rect = board.value?.getBoundingClientRect()
@@ -200,7 +201,7 @@ function endPinch(event: TouchEvent) {
 async function setZoom(value: number) {
   pinch = undefined
   zoomRevision++
-  zoom.value = Math.max(1, Math.min(3, Math.round(value)))
+  zoom.value = Math.max(1, Math.min(MAX_ZOOM, Math.round(value)))
   await nextTick()
   const viewport = boardViewport.value
   const active = board.value?.querySelector<HTMLElement>('.letter-cell[aria-pressed="true"]')
@@ -609,7 +610,7 @@ function onKey(event: KeyboardEvent) {
         <button
           type="button"
           aria-label="Zoom ind"
-          :disabled="zoom === 3"
+          :disabled="zoom >= MAX_ZOOM"
           @click="setZoom(Math.ceil(zoom + 0.001))"
         >
           +
