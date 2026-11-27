@@ -3,8 +3,17 @@ import test from 'node:test'
 import { setup } from './helpers/economy-harness.mjs'
 
 const context = { stickers: [], ratings: {}, comments: {} }
+// Keep this enrollment scenario inside signup; the real date must not cancel its one-player fixture.
+class SignupClock extends Date {
+  constructor(...args) {
+    super(...(args.length ? args : ['2026-11-25T12:00:00Z']))
+  }
+  static now() {
+    return Date.parse('2026-11-25T12:00:00Z')
+  }
+}
 const harness = (redis = false) =>
-  setup(redis, ['shared/utils/parcel-game.ts', 'server/utils/parcel-game.ts'])
+  setup(redis, ['shared/utils/parcel-game.ts', 'server/utils/parcel-game.ts'], SignupClock)
 
 test('gift pool contains exactly three gifts per participant including the mug', () => {
   const { api: a } = harness()

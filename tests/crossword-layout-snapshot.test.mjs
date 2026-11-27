@@ -43,13 +43,13 @@ function stats(words) {
   }
 }
 
-test('the original wall-free snapshot remains complete and byte-for-byte restorable', () => {
+test('the original wall-free snapshot retains its canonical LF content on every platform', () => {
   const manifest = JSON.parse(readFileSync(`${snapshot}/manifest.json`, 'utf8'))
   assert.equal(manifest.words, 61)
   for (const file of manifest.files)
     assert.equal(
       createHash('sha256')
-        .update(readFileSync(`${snapshot}/${file.file}`))
+        .update(readFileSync(`${snapshot}/${file.file}`, 'utf8').replace(/\r\n/g, '\n'))
         .digest('hex'),
       file.sha256,
       file.file,

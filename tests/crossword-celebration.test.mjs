@@ -6,7 +6,7 @@ import ts from 'typescript'
 import { ref } from 'vue'
 
 function board(overrides = {}) {
-  const source = readFileSync('app/components/CrosswordBoard.vue', 'utf8')
+  const source = readFileSync('app/components/CrosswordBoard.vue', 'utf8').replace(/\r\n/g, '\n')
   const code = source.slice(
     source.indexOf('let celebratedCompletion ='),
     source.indexOf('\nwatch(\n  [letters, loaded]'),

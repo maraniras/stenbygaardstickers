@@ -4,7 +4,7 @@ import { createRequire } from 'node:module'
 import vm from 'node:vm'
 import ts from 'typescript'
 
-export function setup(redisEnabled = false, extra = []) {
+export function setup(redisEnabled = false, extra = [], Clock = Date) {
   const storage = new Map(),
     hashes = new Map(),
     strings = new Map(),
@@ -15,7 +15,7 @@ export function setup(redisEnabled = false, extra = []) {
     console,
     setTimeout,
     clearTimeout,
-    Date,
+    Date: Clock,
     Intl,
     redisEnabled,
     createError: (v) => Object.assign(new Error(v.statusMessage), v),
